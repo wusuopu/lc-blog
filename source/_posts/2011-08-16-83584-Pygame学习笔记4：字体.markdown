@@ -1,0 +1,58 @@
+---
+layout: post
+title: Pygame学习笔记4：字体
+data: 2011-08-16 13:32:12 +0000
+comments: true
+post_id: 83584
+permalink: /archives/83584.html
+categories: ["Python栏目"]
+tags: ["pygame", "python"]
+---
+
+<strong>写字</strong>
+
+相对于在Surface上画图，在Surface上写文字要复杂得多。
+
+首先需要导入pygame.font模块并初始化。
+
+<em>import pygame.font</em>
+
+<em>pygame.font.init()</em>
+
+<strong>选择字体</strong>
+
+然后用pygame.font.get_fonts获取可用的字体的列表。
+
+<em>pygame.font.get_fonts()</em>
+
+它返回一个字体名字的列表。
+
+然后再用字体名字列表中的一个名字可以创建一个字体对象。
+
+<em>font = pygame.font.SysFont("monospace", 12)</em>
+
+第一个参数指定字体的名字，第二个参数指定字体的大小。可选的第三个参数bold指定是否粗体，默认不是粗题。可选的地四个参数italic指定是否斜体，默认不是斜体。
+
+如果是要使用自己给的字体文件，可以这样创建字体对象
+
+<em>font = pygame.font.Font("uming.ttf", 12)</em>
+
+第一个参数指定要载入的字体文件的路径，第二个参数指定字体的大小。
+
+<strong>创建文字Surface</strong>
+
+使用字体对象的Font.render函数可以创建一个Surface，里面包含写出来的文字。比如
+
+<em>font_surface = font.render("www.xefan.com", False, (255,0,0))</em>
+
+第一个参数是要写的文字，文字只能包含一行，换行符不会被画出来。第二个参数指定是否使用抗锯齿效果，如果是True字符会有光滑的边缘。第三个参数是字体的颜色。可选的第四个参数background用来指定文字背景的颜色。如果没有指定background，背景是透明的。返回创建的Surface，它上面包含了画出来的文字，它的大小是能容纳这些字的最小的大小。
+
+要在已有的Surface上写字，只能先创建一个只包含文字的Surface，然后把它blit到已有的Surface上。比如：
+
+<em>surface.blit(font_surface, (100, 100))</em>
+
+最后用pygame.display.update()来显示。
+
+显示中文说明：
+
+要显示中文相对来说又要麻烦一些，首先你得有个可以使用中文的字体，如宋体、黑体等，或者你直接用中文TTF文件，然后文字使用unicode，即u”中文的文字”这种，最后不要忘了源文件里加上一句关于文件编码的注释。

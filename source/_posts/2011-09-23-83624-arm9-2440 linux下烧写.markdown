@@ -1,0 +1,59 @@
+---
+layout: post
+title: arm9-2440 linux下烧写
+data: 2011-09-23 14:24:54 +0000
+comments: true
+post_id: 83624
+permalink: /archives/83624.html
+categories: ["嵌入式栏目"]
+tags: ["ARM", "Linux"]
+---
+
+超级终端：使用minicom加ckermit组合，也可以单独使用Gtkterm来代替SecureCRT。  
+将Port设为设备名，如ttyUSB0。speed改为115200。如图：  
+<p style="text-align: center;"><img class="aligncenter" src="http://img165.poco.cn/mypoco/myphoto/20110923/22/5545129120110923221537067.jpg" alt="" width="890" height="620" /></p>
+
+ckermit安装好后，进行配置  
+vi /etc/kermit/kermrc  
+set line /dev/ttyUSB0  
+set speed 115200  
+set carrier-watch off  
+set handshake none  
+set flow-control none  
+robust  
+set file type bin  
+set file name lit  
+set rec pack 1000  
+set send pack 1000  
+set window 5  
+
+USB下载驱动  
+dnw_for_linux.tar.gz下载地址： http://115.com/file/aqy4rodm  
+
+其中secbulk.c是PC端USB驱动。dnw.c是写入工具，这个是经过我修改的，可以将程序下载到指定的地址。  
+编译并加载secbulk.c内核模块  
+
+    $cd secbulk  
+    $make -C /lib/modules/`uname -r`/build M=`pwd` modules  
+
+编译成功后在当前目录下可以看到secbulk.ko
+
+用insmod命令加载模块，这需要root权限  
+$sudo insmod ./secbulk.ko  
+
+编译dnw写入工具  
+$cd dnw  
+$gcc -o dnw dnw.c  
+编译成功后生成可执行档dnw   
+
+使用DNW下载  
+先使用kermit选择下载模式后再用dnw下载程序。  
+出现“USB host is connected. Waiting a download.”  
+Usage: dwn &lt;addr&gt; &lt;filename&gt;  
+$sudo ./dnw 30000000 led.bin  
+
+至此 在linux 下刷机完成  
+另有usb2ram，使用方法类似。  
+编译usb2ram需要先安装libusb-dev  
+Usage: usb2ram addr filename  
+$sudo usb2ram 30000000 led.bin  

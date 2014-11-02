@@ -1,0 +1,53 @@
+---
+layout: post
+title: fedora 13 totem安装解码器
+data: 2010-09-15 14:25:48 +0000
+comments: true
+post_id: 83400
+permalink: /archives/83400.html
+categories: ["Linux栏目"]
+tags: ["Fedora", "Linux"]
+---
+
+最近两天刚装上Fedora 13，它自带有totem播放器，不过好像由于版权的原因有的解码器没有安装，最终导致有的多媒体文件打不开。上网查了下找到了解决方法。
+
+以下转自网络：
+
+<hr />
+一、先下载两个解码器包。
+
+all-20071007.tar.bz2  
+windows-all-20071007.zip
+
+我现在使用的最新的解码器，如果以后有更新大家可以去 http://www.mplayerhq.hu/MPlayer/releases/codecs/自行下载使用。
+
+二、建立两个目录来保存这两个包中的文件。
+
+<em>mkdir /usr/lib/{codecs,wincodecs}  
+tar jxvf all-20071007.tar.bz2  
+mv all-20071007/* /usr/lib/codecs  
+unzip windows-all-20071007.zip  
+mv windows-all-20071007/* /usr/lib/wincodecs</em>
+
+三、为系统添加RPM Fusion 源，方法如下：
+
+<em>
+rpm -Uvh http://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-stable.noarch.rpm
+
+rpm -Uvh http://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-stable.noarch.rpm
+
+yum makecache </em>
+
+有更新的话，大家可以参考http://www.rpmfusion.org/Configuration自行添加
+
+四、安装多媒体软件与插件.
+
+<em>yum install totem  
+yum install gstreamer-plugins-good  gstreamer-plugins-bad gstreamer-plugins-ugly  
+yum install ffmpeg ffmpeg-libs gstreamer-ffmpeg  libmatrosca xvidcore libdvdread libdvdnav lsdvd  
+yum install totem-xine totem-gstreamer  xine-lib-extras-freeworld</em>
+
+然后就可以使用totem播放影音文件了！
+
+<hr />
+如果已经安装了totem就无需执行<em>yum install totem</em>，还有好像Fedora 13的源里没有<em>totem-xine。</em>

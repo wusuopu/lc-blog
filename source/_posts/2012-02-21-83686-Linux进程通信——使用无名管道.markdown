@@ -1,0 +1,75 @@
+---
+layout: post
+title: Linux进程通信——使用无名管道
+data: 2012-02-21 02:03:01 +0000
+comments: true
+post_id: 83686
+permalink: /archives/83686.html
+categories: ["编程开发"]
+tags: ["C", "Linux"]
+---
+
+头文件：
+
+  #include &lt;unistd.h&gt;
+
+函数：  
+int pipe(int fd[2]);  创建无名管道。  
+fd[2]：管道两个文件描述符，fd[0]代表读端（管道头），fd[1]代表写端（管道尾）。
+创建成功返回0，失败返回-1。
+
+创建成功之后可以像操作普通文件一样使用read、write进行读写操作。  
+例子：
+
+``` c
+/**********************************
+ *
+ * 使用无名管道进行进程通信
+ * 龙昌博客：http://www.xefan.com
+ *
+***********************************/
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+int main(int argc, char *argv[])
+{
+    int pfd[2];
+    pid_t pid;
+    char buf[100];
+    int num;
+
+    memset(buf, 0, sizeof(buf));
+
+    if (pipe(pfd) < 0)  //创建无名管道
+    {
+        perror("pipe");
+        exit(-1);
+    }
+    //父进程向管道写数据，子进程从管道读数据
+    if ((pid=fork()) == 0)
+    {
+        sleep(1);
+        if ((num=read(pfd[0], buf, 100)) > 0)
+        {
+            printf("%d numbers read, %s\n", num, buf);
+        }
+    }
+    else if (pid > 0)
+    {
+        if (write(pfd[1], "Hello", 5) < 0)
+        {
+            perror("write");
+        }
+        if (write(pfd[1], " Pipe", 5) < 0)
+        {
+            perror("write");
+        }
+        waitpid(pid, NULL, 0);
+    }
+    close(pfd[0]);
+    close(pfd[1]);
+    return 0;
+}
+```

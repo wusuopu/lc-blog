@@ -1,0 +1,95 @@
+---
+layout: post
+title: I2C串口总线驱动程序(汇编语言)
+data: 2011-09-17 11:57:19 +0000
+comments: true
+post_id: 83610
+permalink: /archives/83610.html
+categories: ["嵌入式栏目"]
+tags: ["单片机"]
+---
+
+```
+;I2C串口总线驱动程序
+;作者：龙昌
+;博客：http://www.xefan.com
+;请根据自己的实际情况定义SCL和SDA
+
+;延时4.7us以上，我的是12MHz的晶振，请根据自己的晶振频率相应增删NOP条数
+_NOP:   NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        RET
+
+;发送开始信号
+I2CB:   SETB SDA
+        NOP
+        SETB SCL
+        ACALL _NOP
+        CLR SDA
+        ACALL _NOP
+        CLR SCL
+        RET
+
+;发送结束信号
+I2CE:   CLR SDA
+        NOP
+        SETB SCL
+        ACALL _NOP
+        SETB SDA
+        ACALL _NOP
+        CLR SCL
+        RET
+
+;发送应答(ACK)
+MACK:   CLR SDA
+        NOP
+        SETB SCL
+        ACALL _NOP
+        CLR SCL
+        RET
+
+;发送非应答(/ACK)
+MNACK:  SETB SDA
+        NOP
+        SETB SCL
+        ACALL _NOP
+        CLR SCL
+        RET
+
+;发送一个字节数据，要发送的数据存放在A寄存器中
+SendB:  MOV R5,#8
+SendB1: RLC A
+        MOV SDA,C
+        NOP
+        SETB SCL
+        ACALL _NOP
+        CLR SCL
+        DJNZ R5,SendB1
+        ;接收ACK
+        SETB SDA
+        NOP
+        SETB SCL
+        NOP
+        NOP
+        MOV C,SDA
+        MOV ACK,C
+        CLR SCL
+        RET
+
+;接收一个字节的数据，接收完后存放在A寄存器中
+RecvB:  MOV R5,#8
+RecvB1: SETB SDA
+        NOP
+        SETB SCL
+        NOP
+        NOP
+        MOV C,SDA
+        RLC A
+        CLR SCL
+        DJNZ R5,RecvB1
+        RET
+
+```

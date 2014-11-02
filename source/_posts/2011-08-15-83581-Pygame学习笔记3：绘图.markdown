@@ -1,0 +1,116 @@
+---
+layout: post
+title: Pygame学习笔记3：绘图
+data: 2011-08-15 14:58:59 +0000
+comments: true
+post_id: 83581
+permalink: /archives/83581.html
+categories: ["Python栏目"]
+tags: ["pygame", "python"]
+---
+
+<strong>绘图</strong>
+
+除了可以把事先画好的图片blit到Surface上以外，还可以在Surface上自行在Surface上绘制一些简单的图形，比如点、线、方、圆等。这个功能主要由pygame.draw模块完成。
+
+首先导入pygame.draw模块。
+
+<em>import pygame.draw</em>
+
+如果已经用了import pygame，则pygame.draw模块也被自动导入了。
+
+然后准备好要在上面绘制图形的Surface，比如
+
+<em>surface = pygame.display.set_mode((640, 480))</em>
+
+pygame.draw中函数的第一个参数总是一个surface，然后是颜色，再后会是一系列的坐标等。稍有些计算机绘图经验的人就会知道，计算机里的坐标，(0，0)代表左上角。而返回值是一个Rect对象，包含了绘制的领域，这样你就可以很方便的更新那个部分了。
+
+函数<span> </span> 作用
+
+rect<span> </span> 绘制矩形
+
+polygon<span> </span>绘制多边形（三个及三个以上的边）
+
+circle<span> </span> 绘制圆
+
+ellipse<span> </span> 绘制椭圆
+
+arc<span> </span> 绘制圆弧
+
+line<span> </span> 绘制线
+
+lines<span> </span> 绘制一系列的线
+
+aaline<span> </span> 绘制一根平滑的线
+
+aalines<span> </span> 绘制一系列平滑的线
+
+<strong>pygame.draw.rect</strong>
+
+用法：pygame.draw.rect(Surface, color, Rect, width=0)
+
+pygame.draw.rect在surface上画一个矩形，除了surface和color，rect接受一个矩形的坐标和线宽参数，如果线宽是0或省略，则填充。我们有一个另外的方法来画矩形——fill方法
+
+<strong>pygame.draw.polygon</strong>
+
+用法：pygame.draw.polygon(Surface, color, pointlist, width=0)
+
+polygon就是多边形，用法类似rect，第一、第二、第四的参数都是相同的，只不过polygon会接受一系列坐标的列表，代表了各个顶点。
+
+<strong>pygame.draw.circle</strong>
+
+用法：pygame.draw.circle(Surface, color, pos, radius, width=0)
+
+很简单，画一个圆。与其他不同的是，它接收一个圆心坐标和半径参数。
+
+<strong>pygame.draw.ellipse</strong>
+
+用法：pygame.draw.ellipse(Surface, color, Rect, width=0)
+
+你可以把一个ellipse想象成一个被压扁的圆，事实上，它是可以被一个矩形装起来的。pygame.draw.ellipse的第三个参数就是这个椭圆的外接矩形。
+
+<strong>pygame.draw.arc</strong>
+
+用法：pygame.draw.arc(Surface, color, Rect, start_angle, stop_angle, width=1)
+
+arc是椭圆的一部分，所以它的参数也就比椭圆多一点。但它是不封闭的，因此没有fill方法。start_angle和stop_angle为开始和结束的角度。
+
+<strong>pygame.draw.line</strong>
+
+用法：pygame.draw.line(Surface, color, start_pos, end_pos, width=1)
+
+相信所有的人都能看明白。
+
+<strong>pygame.draw.lines</strong>
+
+用法：pygame.draw.lines(Surface, color, closed, pointlist, width=1)
+
+closed是一个布尔变量，指明是否需要多画一条线来使这些线条闭合（感觉就和polygone一样了），pointlist是一个点的数组。
+
+pygame.draw.aaline画抗锯齿的线段。
+
+pygame.draw.aalines可以画多条连续的抗锯齿线段。
+
+用法跟python.draw.line和pygame.draw.lines相似。
+
+<strong>点操作</strong>
+
+画点的方法和其它方法不太一样，用Surface.set_at方法完成画点的操作，比如：
+
+<em>surface.set_at((100, 100), (255,255,255))</em>
+
+第一个参数是点的坐标，第二个参数是颜色。
+
+除了可以在Surface上画点，还可以用Surface.get_at读取Surface上像素的值。比如
+
+<em>color = surface.get_at((100, 100))</em>
+
+这个函数返回给定点的颜色值。
+
+<strong>填充区域</strong>
+
+Surface.fill方法可以用一种颜色填充一个矩形区域。比如
+
+<em>surface.fill((255,0,0), (100, 200, 100, 100))</em>
+
+第一个参数指定要填充的颜色，第二个参数指定填充的矩形区域。如果没有给定第二个参数，整个Surface会被填充。第二个参数会限制备填充的区域。这个函数会返回受影响的Surface区域。

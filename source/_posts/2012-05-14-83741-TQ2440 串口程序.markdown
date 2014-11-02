@@ -1,0 +1,32 @@
+---
+layout: post
+title: TQ2440 串口程序
+data: 2012-05-14 08:10:01 +0000
+comments: true
+post_id: 83741
+permalink: /archives/83741.html
+categories: ["嵌入式栏目"]
+tags: ["ARM", "TQ2440"]
+---
+
+S3C2440的UART只需要3根线就可以实现通信功能，除去GND外只有两根线：一根发送TXD，一根接收RXD。
+
+对于UART0,TXD0与GPH2是复用的，RXD0与GPH3是复用的。
+
+因此使用UART0先要设置GPH2、GPH3：  
+
+    GPHCON &= ~((3<<4)|(3<<6));
+    GPHCON |= (2<<4)|(2<<6);
+
+其次进行初始化。
+
+与UART相关的寄存器：  
+ULCONn：主要用于设置数据长度、停止位和检验位。  
+UCONn：主要用于设置数据发送和接收的模式，中断方式还是查询方式。  
+UBRDIVn：主要用于设置波特率。  
+UTRSTATn：包含发送和接收是否完成的状态位。  
+URXHn：接收数据缓冲寄存器，8位数据长度。  
+UTXHn：发送数据缓冲寄存器，8位数据长度。  
+
+例子程序下载：
+http://download.csdn.net/detail/wosuopu/4300998

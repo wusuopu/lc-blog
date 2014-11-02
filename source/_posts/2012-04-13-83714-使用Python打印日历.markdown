@@ -1,0 +1,71 @@
+---
+layout: post
+title: 使用Python打印日历
+data: 2012-04-13 07:22:08 +0000
+comments: true
+post_id: 83714
+permalink: /archives/83714.html
+categories: ["Python栏目"]
+tags: ["python"]
+---
+
+基姆拉尔森计算公式  
+`W= (d+2*m+3*(m+1)/5+y+y/4-y/100+y/400) mod 7`
+
+在公式中d表示日期中的日数+1，m表示月份数，y表示年数。  
+注意：在公式中有个与其他公式不同的地方：  
+把一月和二月看成是上一年的十三月和十四月，例：如果是2004-1-10则换算成：2003-13-10来代入公式计算。
+
+``` python
+#!/usr/bin/env python
+#-*- coding:utf-8 -*-
+##
+# @文件名(file): date.py
+# @作者(author): 龙昌锦(LongChangjin)
+# @博客(blog): http://www.xefan.com
+# @时间(date): 2012-04-13
+# 
+
+monthday = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+weekname = ["星期日","星期一","星期二","星期三","星期四","星期五","星期六"]
+# 计算某年某月某日是星期几
+# 基姆拉尔森计算公式
+def week(y, m, d):
+    if m == 1 or m == 2:
+        m = m + 12
+        y = y - 1
+    w = ((d + 2 * m + 3 * (m+1) / 5 + y + y/4 - y/100 + y/400) + 1) % 7
+    return int(w)
+
+year, month = input("输入日期，如：2012,4:")
+if year%4 == 0:
+    monthday[1] = 29
+w = week(year, month, 1)
+
+print("%d年%d月" % (year, month))
+print weekname[0], weekname[1], weekname[2], weekname[3], weekname[4], weekname[5], weekname[6]
+i = 0
+while i < w:
+    print("      "),
+    i = i + 1
+i = 1
+while i <= monthday[month-1]:
+    print("%3d   " % i),
+    i = i + 1
+    w = w + 1
+    if w == 7:
+        print("")
+        w = 0
+
+#运行结果如下：
+#[lcj@lcj time]$ python date.py 
+#输入日期，如：2012,4:2012,2
+#2012年2月
+#星期日 星期一 星期二 星期三 星期四 星期五 星期六
+#                       1      2      3      4    
+#  5      6      7      8      9     10     11    
+# 12     13     14     15     16     17     18    
+# 19     20     21     22     23     24     25    
+# 26     27     28     29   
+#[lcj@lcj time]$ 
+```

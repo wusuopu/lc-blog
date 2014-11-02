@@ -1,0 +1,67 @@
+---
+layout: post
+title: Linux进程通信——使用信号
+data: 2012-02-22 01:54:43 +0000
+comments: true
+post_id: 83692
+permalink: /archives/83692.html
+categories: ["编程开发"]
+tags: ["C", "Linux"]
+---
+
+函数：signal 设置某一信号对应的动作  
+头文件： #include &lt;signal.h&gt;  
+函数原型： void (*signal(int signum, void (*handler) (int))) (int)；  
+signal：信号编号  
+handler：信号处理函数，若该参数不是函数指针则必须为以下两个常数之一：  
+SIG_IGN：忽略信号  
+SIG_DFL：重设为预设的处理方式  
+返回：成功则返回先前的信号处理函数指针，错误则返回SIG_ERR(-1)  
+
+函数：pause 让进程暂停直到信号出现  
+头文件：#include &lt;unistd.h&gt;  
+函数原型： int pause(void)；  
+只返回-1  
+
+函数： kill 传送信号  
+头文件：  
+  #include &lt;signal.h&gt;  
+  #include &lt;sys/types.h&gt;  
+函数原型： int kill(pid_t pid, int sig)；  
+pid：接收信号的进程号；当pid=0时为相同进程组的所有进程；当pid=-1时为系统内所有进程；当pid&gt;0时为指定进程；当pid&lt;-1时为进程组识别码为pid绝对值的所有进程。  
+sig：要传送的信号  
+返回：成功返回0，错误返回-1  
+
+例子：
+
+``` c
+/****************************************
+ *
+ *设置信号处理
+ *等待2秒后向进程本身传送一个SIGALRM信号
+ *龙昌博客：http://www.xefan.com
+ *
+ ****************************************/
+#include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+void func(int sig_no)
+{
+    if (sig_no == SIGALRM)
+    {
+        printf("get SIGALRM\n");
+    }
+}
+
+int main()
+{
+    printf("%d waiting for signal..\n", getpid());
+    alarm(2);
+    signal(SIGALRM, func);
+    raise(SIGALRM);
+    pause();
+    return 0;
+}
+```

@@ -1,0 +1,40 @@
+---
+layout: post
+title: Linux samba服务器设置
+data: 2011-11-22 15:26:39 +0000
+comments: true
+post_id: 83658
+permalink: /archives/83658.html
+categories: ["Linux栏目"]
+tags: ["Linux"]
+---
+
+我用的是Arch Linux，不过各个版本的Linux的设置应该都差不多吧。
+
+1、首先安装samba。
+
+2、/etc/samba/smb.conf为samba的配置文件，所有的修改操作都在此文件中进行。/etc/samba/smb.conf.default为配置模板，可以参照其进行配置。
+
+例如要添加一项分享，可以修改/ect/samba/smb.conf文件，添加如下内容：
+
+    [printers]                                 #显示分享名
+    comment = All Printers
+    path = /var/spool/samba     #分享的路径
+    browseable = yes                    #允许浏览
+    # Set public = yes to allow user 'guest account' to print
+    guest ok = yes                         #允许匿名访问
+    writable = yes                          #可写
+    printable = yes
+
+3、启动samba服务。  
+执行命令：/etc/rc.d/samba start
+
+现在在Windows下可以直接在地址栏输入“\\主机ip ”进行访问；在Linux下可以使用smbclient命令进行连接。
+
+smbclient命令使用方法：  
+列出服务器上共享 `#smbclient -L 机器IP -U 用户名%密码`  
+例：#smbclient -L //192.168.1.100/ -U benson%1
+
+登入samba `#smbclient //机器IP/共享目录 -U 用户名称%密码`  
+例：#smbclient //192.168.1.100/printers -U benson%1  
+登入成功后出现提示符 smb:/&gt; ，接下来的操作和ftp时命令一样，用get下载文件而用put上传文件，命令可以用help查看。

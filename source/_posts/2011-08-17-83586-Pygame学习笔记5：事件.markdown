@@ -1,0 +1,103 @@
+---
+layout: post
+title: Pygame学习笔记5：事件
+data: 2011-08-17 13:17:20 +0000
+comments: true
+post_id: 83586
+permalink: /archives/83586.html
+categories: ["Python栏目"]
+tags: ["pygame", "python"]
+---
+
+<strong>事件系统</strong>
+
+Pygame通过一个事件系统与用户进行交互，以及处理一些系统发生的事件。事件系统包括一个事件队列，其中每一项都是一个Event对象。所有的用户输入和一些系统事件，都会形成一个Event对象被添加到事件队列中。pygame.event模块提供了很多函数去访问和控制这个队列。
+Event对象有各种不同的类型，比如KEYDOWN(键盘键按下)、MOUSEBUTTONDOWN(鼠标键按下)等，通过Event.type属性来区分。不同的类型的Event对象还有不同的其它属性。通过Event.dict属性来查看。常用的类型和对应的属性有：
+
+事件              产生途径              参数
+
+QUIT             用户按下关闭按钮      none
+
+ATIVEEVENT     Pygame被激活或者隐藏  gain, state
+
+KEYDOWN       键盘被按下             unicode, key, mod
+
+KEYUP           键盘被放开             key, mod
+
+MOUSEMOTION   鼠标移动               pos, rel, buttons
+
+MOUSEBUTTONDOWN    鼠标按下        pos, button
+
+MOUSEBUTTONUP  鼠标放开              pos, button
+
+JOYAXISMOTION   游戏手柄(Joystick or pad)移动   joy, axis, value
+
+JOYBALLMOTION   游戏球(Joy ball)?移动    joy, axis, value
+
+JOYHATMOTION    游戏手柄(Joystick)?移动   joy, axis, value
+
+JOYBUTTONDOWN   游戏手柄按下         joy, button
+
+JOYBUTTONUP   游戏手柄放开            joy, button
+
+VIDEORESIZE    Pygame窗口缩放         size, w, h
+
+VIDEOEXPOSE   Pygame窗口部分公开(expose)?  none
+
+USEREVENT     触发了一个用户事件        code
+
+pygame.event.get函数可以从队列获取所有的消息，并把它们从队列中删除。
+
+pygame.event.poll()提取并删除一个事件，如果队列是空的，这个函数会马上返回一个pygame.NOEVENT。
+
+pygame.event.wait()提取一个事件，如果没有事件则会等待直到有事件发生。
+
+pygame.event.clear()可以清空整个队列。
+
+如果只关心某些类型的事件，可以用pygame.event.get(type)，只取得队列中某种类型的事件。也可以用一个类型的列表，只取得某些类型的事件。pygame.event.peek(type)函数可以检查列表中是否有某种或者某些类型的事件，如果有就返回True。除此以外还可以用pygame.event.set_blocked阻止某些类型的事件进入事件队列，使用pygame.event.set_allowed来只允许某些类型的事件进入队列。
+
+pygame.event.post函数可以往队列中添加一个事件。
+
+用pygame.event.Event可以创建一个事件，比如：
+
+e = pygame.event.Event(pygame.USEREVENT)
+
+然后可以通过
+
+pygame.event.post(e)
+
+把这个事件添加到队列中，等待处理。在创建事件时可以添加自定义的属性。
+
+在窗口方式下运行，通常只有活动的窗口才能获得用户键盘、鼠标的事件。如果希望在窗口方式下，不是活动状态也能获得事件，可以通过
+
+<em>pygame.event.set_grab(True)</em>
+
+来捕获所有输入。不过这样会阻止其它程序获得用户输入，使得除了这个游戏以外其它程序都不能正常运行。要解除这样的状态，可以执行
+
+<em>pygame.event.set_grab(False)</em>
+
+<strong><span style="text-decoration: underline">注意：这个慎用！！！</span></strong><br><br>
+
+可以使用如下代码来测试事件：
+
+``` python
+#!/usr/bin/env python
+
+import pygame
+
+pygame.init()
+
+screen = pygame.display.set_mode((640, 480), 0, 32)
+
+pygame.display.update()
+
+while True:
+
+    for event in pygame.event.get():
+
+        print str(event)
+
+        if event.type == pygame.QUIT:
+
+            exit()
+```

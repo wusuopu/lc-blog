@@ -1,0 +1,74 @@
+---
+layout: post
+title: Pygame学习笔记11：手柄
+data: 2011-09-17 11:49:56 +0000
+comments: true
+post_id: 83605
+permalink: /archives/83605.html
+categories: ["Python栏目"]
+tags: ["pygame", "python"]
+---
+
+<strong>手柄</strong>
+
+joystick模块管理计算机上的手柄设备（可能多于一个）。手柄设备包括轨迹球、类似电视游戏机的游戏手柄，允许使用多个按钮和’hats’。
+
+pygame.joystick.get_count函数可以获得系统中手柄的个数。比如：
+
+<em>count = pygame.joystick.get_count()</em>
+
+如果系统没有手柄，数量是0。
+
+如果系统有手柄，可以通过pygame.joystick.Joystick来创建手柄对象：
+
+<em>j = pygame.joystick.Joystick(0)</em>
+
+其中的整数是手柄的id，取值范围从0到count-1。
+
+创建对象后，需要先初始化
+
+<em>j.init()</em>
+
+初始化后，事件队列中就可以收到来自手柄的事件了。事件类型分为：
+
+    JOYAXISMOTION joy, axis, value
+    JOYBALLMOTION joy, ball, rel
+    JOYHATMOTION joy, hat, value
+    JOYBUTTONUP joy, button
+    JOYBUTTONDOWN joy, button
+
+要注意pygame.JOYAXISMOTION事件的value值在-1.0和1.0之间。值0.0表示轴在正中间。游戏手柄设备一般只有-1、0、1三个值，而没有中间的值。而老的模拟手柄并不一定能完全达到-1到1的区间，中间的值也可能是0附近的一个值。模拟手柄通常会有一点噪声，从而会产生很多很小很快的运动事件。当轨迹球滚动时，pygame.JOYBALLMOTION事件会发生。它会报告轨迹球总共滚动了多少距离。当按钮被按下和释放时，会产生pygame.JOYBUTTONDOWN和pygame.JOYBUTTONUP事件。当hat的位置改变时，pygame.JOYHATMOTION事件会产生。事件的位置属性包括一对值，它们是-1或者0或者1。位置(0,0)表示hat在正中间。
+
+要获得手柄的轴数可以使用
+
+<em>j.get_numaxes()</em>
+
+要获得手柄上轨迹球的个数，可以使用
+
+<em>j.get_numballs()</em>
+
+要获得手柄上的按键数，可以使用
+
+<em>j.get_numbuttons()</em>
+
+要获得手柄上hat控制器的个数，可以使用
+
+<em>j.get_numhats()</em>
+
+除了通过事件获得手柄的输入外，也可以直接查询手柄的状态。通过
+
+<em>j.get_axis(axis_number)</em>
+
+可以获得某个轴的位置。通过
+
+<em>j.get_ball(ball_number)</em>
+
+可以获得某个轨迹球的相对位置。通过
+
+<em>j.get_button(button)</em>
+
+可以获得某个按键的状态。通过
+
+<em>j.get_hat(hat_number)</em>
+
+可以获得hat控制器的当前位置。

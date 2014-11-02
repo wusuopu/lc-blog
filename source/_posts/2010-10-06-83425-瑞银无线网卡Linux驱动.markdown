@@ -1,0 +1,50 @@
+---
+layout: post
+title: 瑞银无线网卡Linux驱动
+data: 2010-10-06 05:04:15 +0000
+comments: true
+post_id: 83425
+permalink: /archives/83425.html
+categories: ["Linux栏目"]
+tags: ["Linux", "无线网"]
+---
+
+我的是瑞银UR54g(R01) V1.1的usb无线网卡，以前在Ubuntu 9.04及其更高版本中都是即插即用的，然而现在换成了Fedora 13之后就不能识别了，很是郁闷。
+
+还好有款软件可以让Linux直接使用Windows的无线网卡驱动，这个就是ndiswrapper（下载地址： https://sourceforge.net/projects/ndiswrapper/files/ ）。
+
+将源代码下载后解压，然后进入解压目录打开<em>INSTALL</em>文件查看安装帮助。
+
+1、<strong>安装ndiswrapper</strong>
+
+进入解压目录后执行命令：  
+
+    $ make uninstall
+    $ make
+    # make install
+
+2、<strong>安装Windows驱动</strong>
+
+（瑞银3321驱动下载： http://u.115.com/file/f56c19bf72 ）  
+进入驱动文件所在目录执行命令：
+
+    # ndiswrapper -i WlanUIG.inf //安装驱动
+    # ndiswrapper -m  //写入配置信息
+    # ndiswrapper -l //查看已安装的驱动
+
+3、<strong>加载网卡驱动</strong>
+
+    # modprobe ndiswrapper
+
+这里如果出错，<em>FATAL: Module ndiswrapper not found.</em>请检查文件 ndiswrapper.ko 是不是在你相对应的内核版本的文件夹中。执行命令查看：
+
+<em></em>#<em>ls /lib/modules/`uname -r`/kernel/drivers/net/ndiswrapper</em>
+
+如果没有请把它从ndiswrapper解压后的文件夹中拷贝过去，然后执行以下命令：
+
+    # depmod -a
+    # modprobe ndiswrapper
+
+好了，搞定，无线网卡上的灯已经亮了。
+
+顺便说下本本自带的无线网卡系统看作wlan0，外置的无线网卡系统看作wlan1。如果你的无线网卡灯已经亮了，但是用Wicd搜索不到无线信号的话，请把Wicd设置中的Wireless interface改为wlan1试试看。

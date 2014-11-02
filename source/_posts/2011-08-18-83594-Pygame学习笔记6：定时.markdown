@@ -1,0 +1,44 @@
+---
+layout: post
+title: Pygame学习笔记6：定时
+data: 2011-08-18 13:42:40 +0000
+comments: true
+post_id: 83594
+permalink: /archives/83594.html
+categories: ["Python栏目"]
+tags: ["pygame", "python"]
+---
+
+<strong>定时</strong>
+
+pygame中的时间是以毫秒（千分之一秒）表示的。
+
+通过pygame.time.get_ticks函数可以获得pygame.init后经过的时间的毫秒数。
+
+pygame.time.wait函数会暂停给定的时间。比如
+
+<em>pygame.time.wait(1000)</em>
+
+会暂停一秒钟。这个函数会休眠这个进程，使得其他程序可以共享处理器。一个程序即使只有休眠很少的毫秒数，就能够消耗非常少的处理器时间。pygame.time.delay函数也会使程序暂停给定的时间。这个函数会使用处理器（而不是休眠）以使这个等待比pygame.time.wait更加精确。这两个函数返回实际暂停的时间。
+
+pygame.time.set_timer可以反复创建一个事件放在事件队列中。比如
+
+<em>pygame.time.set_timer(pygame.USEREVENT, 1000)</em>
+
+每隔1秒钟在事件队列中放一个pygame.USEREVENT事件。每一个事件类型可以有一个不同的定时器。要禁止一个事件的定时器，可以把对应的毫秒数设成0。
+
+使用pygame.time.Clock可以更方便的控制游戏执行的速度。先使用
+
+<em>c = pygame.time.Clock()</em>
+
+创建一个Clock对象。然后可以调用
+
+<em>c.tick(30)</em>
+
+参数为游戏的帧速。这个函数会暂停一定的时间，保证两次tick调用之间间隔1/30秒。这可以帮助限制游戏运行的速度。通过每帧调用一次Clock.tick(30)，这个程序就永远不会以超过每秒30帧的速度运行。通过调用tick_busy_loop方法也可以达到和tick相似的效果，区别是这个函数使用pygame.time.delay，会使用很多cpu来进行忙等，而定时也更精确一些。
+
+通过
+
+<em>c.get_fps()</em>
+
+可以获得游戏运行的帧速。

@@ -1,0 +1,46 @@
+---
+layout: post
+title: pentadactyl使用笔记
+data: 2012-09-21 13:03:20 +0000
+comments: true
+post_id: 83791
+permalink: /archives/83791.html
+categories: ["开源软件"]
+tags: ["firefox", "vim"]
+---
+
+pentadactyl是firefox下的一款vim按键的插件。对于习惯了vim的人来说这个是非常方便的。
+
+pentadactyl的默认按键跟vim差不多，而且也可以自行修改。 pentadactyl的配置文件在windows下是_pentadactylrc，在linux下是.pentadactylrc。如果不存在可以在firefox直接执行命令:mkp，就会生成~/.pentadactyl目录和一个空的~/.pentadactylrc文件。
+
+然后就可以直接编辑这个文件了，编辑完成后再重启一下firefox即可。以下是我在网上找到的一些配置内容，仅供参考。
+
+```
+"1.0
+loadplugins '\.(js|penta)$'
+group user
+
+" vim: set ft=pentadactyl:
+
+map J <C-d>
+map K <C-u>
+" 修改Ctrl快捷键
+noremap <C-c> <C-v><C-c>
+noremap <C-a> <C-v><C-a>
+cnoremap <C-c> <C-v><C-c>
+cnoremap <C-v> <C-v><C-v>
+cnoremap <C-x> <C-v><C-x>
+inoremap <C-a> <C-v><C-a>
+inoremap <C-c> <C-v><C-c>
+inoremap <C-v> <C-v><C-v>
+inoremap <C-x> <C-v><C-x>
+inoremap <C-z> <C-v><C-z>
+inoremap <C-y> <C-v><C-y>
+
+" 在Gmail和Greader中屏蔽Vimperator
+autocmd LocationChange .* :js modes.passAllKeys = /mail\.google\.com/.test(buffer.URL) || /google\.com\/reader\//.test(buffer.URL)
+
+" 在有无菜单、地址栏之间切换：
+map <C-Up> :se go=mnT<CR>
+map <C-Down> :se go=s<CR>：
+```

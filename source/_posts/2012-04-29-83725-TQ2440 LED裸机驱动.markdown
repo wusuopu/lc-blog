@@ -1,0 +1,62 @@
+---
+layout: post
+title: TQ2440 LED裸机驱动
+data: 2012-04-29 12:26:34 +0000
+comments: true
+post_id: 83725
+permalink: /archives/83725.html
+categories: ["嵌入式栏目"]
+tags: ["ARM", "TQ2440"]
+---
+
+根据TQ2440的手册可知LED1、2、3、4分别由GPB5、6、7、8控制。  
+程序的步骤为：  
+1、先将GPB5、6、7、8设为输出；  
+2、将对应位置0表示LED灯亮，对应位置1表示灯灭。  
+
+程序如下：
+
+```
+@  文件名：led_on.s
+.equ GPBCON, 0x56000010
+.equ GPBDAT, 0x56000014
+.equ GPBUP,  0x56000018
+
+.text
+.global _start
+_start:
+    LDR R0,=GPBCON
+    MOV R1,#0b010101010000000000    @将GPB5、6、7、8设为输出
+    STR R1,[R0]
+    LDR R0,=GPBDAT
+    MOV R1,#0x00000000
+n:  MVN R1,R1
+    STR R1,[R0]
+    LDR R2,=100000
+w:  SUB R2,R2,#1
+    CMP R2,#0
+    BGT w
+    B n
+
+MAIN_LOOP:
+    B MAIN_LOOP
+.end
+```
+
+Makefile内容如下：
+
+```
+ARCH=arm-linux-
+CC=$(ARCH)gcc
+LD=$(ARCH)ld
+Objcopy=$(ARCH)objcopy
+
+led_on:led_on.s
+	$(CC) -g -c -o led_on.o led_on.s
+	$(LD) -Ttext 0x00000000 -g led_on.o -o led_on_elf
+	$(Objcopy) -O binary -S led_on_elf led_on.bin
+clean:
+	rm -f led_on.bin
+	rm -f led_on.o
+	rm -f led_on_elf
+```

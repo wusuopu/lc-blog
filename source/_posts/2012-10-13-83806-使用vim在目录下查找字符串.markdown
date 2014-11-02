@@ -1,0 +1,30 @@
+---
+layout: post
+title: 使用vim在目录下查找字符串
+data: 2012-10-13 08:07:04 +0000
+comments: true
+post_id: 83806
+permalink: /archives/83806.html
+categories: ["教程"]
+tags: ["vim"]
+---
+
+vim有个vimgrep命令，跟linux下的grep类似。用法如下：  
+:vimgrep /{pattern}/[g][j] {file} ...  
+{pattern}为要查找的字符串;  
+没有参数g的话,则行只查找一次关键字.反之会查找所有的关键字.  
+没有参数j的话,查找后,VIM会跳转至第一个关键字所在的文件.反之,只更新结果列表(quickfix).  
+{file}为要查找的文件，可以有多个。  
+
+例如，要在当前目录及其子目录中的python文件查找"import"字符串。  
+`:vimgrep /import/ **/*.py`  
+命令中的**表示递归查找。  
+
+{pattern}也可以用正则表达式。搜索结果保存在quickfix中，可以使用以下方法查看。
+
+:cnext (:cn) 当前页下一个结果  
+:cprevious (:cp) 当前页上一个结果  
+:clist (:cl) 打开quickfix窗口，列出所有结果，不能直接用鼠标点击打开，只能看  
+:copen (:cope) 打开quickfix窗口，列出所有结果，可以直接用鼠标点击打开  
+:ccl[ose] 关闭 quickfix 窗口。  
+ctrl + ww 切换编辑窗口和quickfix窗口，在quickfix里面和编辑窗口一样jk表示上下移动，回车选中进入编辑窗口  

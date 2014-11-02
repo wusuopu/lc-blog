@@ -1,0 +1,124 @@
+---
+layout: post
+title: 使用Glade进行PyGTK开发
+data: 2011-10-25 15:29:50 +0000
+comments: true
+post_id: 83642
+permalink: /archives/83642.html
+categories: ["Python栏目"]
+tags: ["gtk", "python"]
+---
+
+使用Glade来进行GTK开发效率比较高，下面是一个例子。
+
+将以下代码保存为test.glade文件。
+
+``` xml
+  <!--   文件名：test.glade  -->
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk+" version="2.24"/>
+  <!-- interface-naming-policy project-wide -->
+  <object class="GtkWindow" id="window1">
+    <property name="can_focus">False</property>
+    <property name="resizable">False</property>
+    <property name="default_width">440</property>
+    <property name="default_height">450</property>
+    <signal name="destroy" handler="on_MainWindow_destroy" swapped="no"/>
+    <child>
+      <object class="GtkAlignment" id="alignment1">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="top_padding">10</property>
+        <property name="bottom_padding">10</property>
+        <property name="left_padding">10</property>
+        <property name="right_padding">10</property>
+        <child>
+          <object class="GtkVBox" id="vbox1">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <child>
+              <object class="GtkLabel" id="label1">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">龙昌博客： http://www.xefan.com</property>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="button1">
+                <property name="label" translatable="yes">关闭</property>
+                <property name="use_action_appearance">False</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <signal name="clicked" handler="on_MainWindow_destroy" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>
+```
+
+将以下代码保存为test.py文件。
+
+``` python
+#!/usr/bin/env python
+# -*- encoding: UTF-8 -*-
+##
+# @文件名(file): test.py
+# @作者(author): 龙昌锦(LongChangjin)
+# @博客(blog): http://www.xefan.com
+# @邮箱(mail): admin@xefan.com
+# @QQ: 346202141
+# @ICQ: wosuopu@gmail.com
+# @时间(date): 2011-10-25
+#
+try:
+    import pygtk
+    pygtk.require(&quot;2.0&quot;)
+except:
+    pass
+try:
+    import gtk
+    import gtk.glade
+except:
+    exit(1)
+
+class GBuilder:
+    def delete_event(self,widget,event,data=None):
+        return gtk.FALSE
+    def on_MainWindow_destroy(self,widget,data=None):
+        gtk.main_quit()
+    def __init__(self):
+        #初始化 gtkbuilder
+        builder = gtk.Builder()
+        #设置 glade文件
+        builder.add_from_file(&quot;test.glade&quot;)
+        #连接 glade文件中的signals
+        builder.connect_signals(self)
+
+        #小部件
+        self.button1 = builder.get_object(&quot;button1&quot;)
+        #获取主窗口
+        self.window = builder.get_object(&quot;window1&quot;)
+        self.window.show()
+
+if __name__ == &quot;__main__&quot;:
+    window=GBuilder()
+    gtk.main()
+```
+
+然后运行查看效果。

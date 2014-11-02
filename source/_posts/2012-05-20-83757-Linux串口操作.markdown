@@ -1,0 +1,272 @@
+---
+layout: post
+title: Linux串口操作
+data: 2012-05-20 04:48:17 +0000
+comments: true
+post_id: 83757
+permalink: /archives/83757.html
+categories: ["编程开发"]
+tags: ["C", "Linux"]
+---
+
+1、所需的头文件
+
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <unistd.h>     //unix标准函数
+    #include <sys/types.h>
+    #include <sys/stat.h>
+    #include <fcntl.h>      //文件控制
+    #include <termios.h>    //POSIX中断控制
+    #include <errno.h>
+
+2、打开串口
+
+    fd = open("/dev/ttyUSB0", O_RDWR);
+
+3、设置波特率   
+最基本的串口设置包括波特率、校验位和停止位设置，主要使用termios.h头文件中定义的termios结构，如下：  
+
+    struct termios
+    {
+        tcflag_t c_iflag;   //输入模式标志
+        tcflag_t c_oflag;   //输出模式标志
+        tcflag_t c_cflag;   //控制模式标志
+        tcflag_t c_lflag;   //本地模式标志
+        cc_t c_line;
+        cc_t c_cc[NCC];
+    }
+
+4、设置数据位、停止位和校验位  
+
+    8位数据位、无校验位：
+    Opt.c_cflag &= ~PARENB;
+    Opt.c_cflag &= ~CSTOPB;
+    Opt.c_cflag &= ~CSIZE;
+    Opt.c_iflag |= CS8
+    7位数据位、奇校验
+    Opt.c_cflag |= PARENB;
+    Opt.c_cflag |= PARODD;
+    Opt.c_cflag &= ~CSTOPB;
+    Opt.c_cflag &= ~CSIZE;
+    Opt.c_cflag |= CS7;
+    7位数据位、偶校验
+    Opt.c_cflag |= PARENB;
+    Opt.c_cflag &= ~PARODD;
+    Opt.c_cflag &= ~CSTOPB;
+    Opt.c_cflag &= CSIZE;
+    Opt.c_cflag |= CS7;
+    7位数据位、Space校验
+    Opt.c_cflag &= ~PARENB;
+    Opt.c_cflag &= ~CSTOPB;
+    Opt.c_cflag &= ~CSIZE;
+    Opt.c_cflag |= CS7;
+
+
+5、读写串口  
+读使用read函数；写使用write函数。
+
+6、关闭串口  
+
+    close(fd);
+
+
+例子：
+
+``` c
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>     //unix标准函数
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>      //文件控制
+#include <termios.h>    //POSIX中断控制
+#include <errno.h>
+
+#define TRUE    1
+#define FALSE   0
+#define SERIAL  "/dev/ttyUSB0"
+
+int speed_arr[] = {B115200, B57600, B38400, B19200, B9600, B4800, B2400, B1200, B600, B300, };
+int name_arr[] = {115200, 57600, 38400, 19200, 9600, 4800, 2400, 1200, 600, 300, };
+
+//设置波特率
+void SetSpeed(int fd, int speed)
+{
+    int i;
+    struct termios Opt; //定义termios结构
+
+    if (tcgetattr(fd, &Opt) != 0)
+    {
+        perror("tcgetattr fd");
+        return;
+    }
+    for (i=0; i<sizeof(speed_arr)/sizeof(int); i++)
+    {
+        if (speed == name_arr[i])
+        {
+            tcflush(fd, TCIOFLUSH);
+            cfsetispeed(&Opt, speed_arr[i]);
+            cfsetospeed(&Opt, speed_arr[i]);
+            //tcsetattr函数标志：
+            //TCSANOW:立即执行而不等待数据发送或者接受完成
+            //TCSADRAIN:等待所有数据传递完成后执行
+            //TCSAFLUSH:Flush input and output buffers and make the change
+            if (tcsetattr(fd, TCSANOW, &Opt) != 0)
+            {
+                perror("tcsetattr fd");
+                return;
+            }
+            tcflush(fd, TCIOFLUSH);
+        }
+    }
+}
+
+//设置数据位、停止位和校验位
+int SetParity(int fd, int databits, int stopbits, int parity)
+{
+    struct termios Opt;
+    if (tcgetattr(fd, &Opt) != 0)
+    {
+        perror("tcgetattr fd");
+        return FALSE;
+    }
+    Opt.c_cflag |= (CLOCAL | CREAD);    //一般必设置的标志
+    switch (databits)                   //设置数据位
+    {
+        case 7:
+        {
+            Opt.c_cflag &= ~CSIZE;
+            Opt.c_cflag |= CS7;
+            break;
+        }
+        case 8:
+        {
+            Opt.c_cflag &= ~CSIZE;
+            Opt.c_cflag |= CS8;
+            break;
+        }
+        default:
+        {
+            fprintf(stderr, "Unsupport data size.\n");
+            return FALSE;
+        }
+    }
+    switch (parity)                     //设置校验位
+    {
+        case 'n':
+        case 'N':
+        {
+            Opt.c_cflag &= ~PARENB;     //清除校验位
+            Opt.c_iflag &= ~INPCK;      //enable parity checking
+            break;
+        }
+        case 'o':
+        case 'O':
+        {
+            Opt.c_cflag |= PARENB;      //enable parity
+            Opt.c_cflag |= PARODD;      //奇校验
+            Opt.c_iflag |= INPCK;       //disable parity checking
+            break;
+        }
+        case 'e':
+        case 'E':
+        {
+            Opt.c_cflag |= PARENB;      //enable parity
+            Opt.c_cflag &= ~PARODD;     //偶校验
+            Opt.c_iflag |= INPCK;       //disable parity checking 
+            break;
+        }
+        case 's':
+        case 'S':
+        {
+            Opt.c_cflag &= ~PARENB;     //清除校验位
+            Opt.c_cflag &= ~CSTOPB;     //?????
+            Opt.c_iflag |= INPCK;       //disable parity checking
+            break;
+        }
+        default:
+        {
+            fprintf(stderr,"Unsupoort parity.\n");
+            return FALSE;
+        }
+    }
+    switch (stopbits)                   //设置停止位
+    {
+        case 1:
+        {
+            Opt.c_cflag &= ~CSTOPB;
+            break;
+        }
+        case 2:
+        {
+            Opt.c_cflag |= CSTOPB;
+            break;
+        }
+        default:
+        {
+            fprintf(stderr, "Unsupport stopbits.\n");
+            return FALSE;
+        }
+    }
+
+    Opt.c_cflag |= (CLOCAL | CREAD);
+    Opt.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+
+    Opt.c_oflag &= ~OPOST;
+    Opt.c_oflag &= ~(ONLCR | OCRNL);        //添加的
+
+    Opt.c_iflag &= ~(ICRNL | INLCR);
+    Opt.c_iflag &= ~(IXON | IXOFF | IXANY); //添加的
+
+    tcflush(fd, TCIFLUSH);
+    Opt.c_cc[VTIME] = 0;                    //设置超时为15sec
+    Opt.c_cc[VMIN] = 0;                     //Update the Opt and do it now
+    if (tcsetattr(fd, TCSANOW, &Opt) != 0)
+    {
+        perror("tcsetattr fd");
+        return FALSE;
+    }
+    return TRUE;
+}
+
+int main()
+{
+    int fd;
+    int i, len, n=0;
+    char read_buf[256];
+    char write_buf[256];
+    char c;
+    struct termios opt;
+
+    fd = open(SERIAL, O_RDWR|O_NOCTTY);
+    if (fd == -1)
+    {
+        perror("open serial\n");
+        exit(-1);
+    }
+    SetSpeed(fd, 115200);
+    SetParity(fd, 8, 1, 'n');
+    while (1)
+    {
+        n = 0;
+        len = 0;
+        memset(read_buf, 0, sizeof(read_buf));
+        memset(write_buf, 0, sizeof(write_buf));
+
+        while ((n=read(fd, read_buf, sizeof(read_buf))) > 0)
+        {
+            read_buf[n] = '\0';
+            printf("%s", read_buf);
+        }
+        scanf("%c", &c);
+        write(fd, &c, 1);
+        while ((n=read(fd, read_buf, sizeof(read_buf))) > 0)
+        {
+            read_buf[n] = '\0';
+            printf("%s\n", read_buf);
+        }
+    }
+}
+```
+

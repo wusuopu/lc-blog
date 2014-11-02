@@ -1,0 +1,59 @@
+---
+layout: post
+title: SCons工具用法介绍
+data: 2013-06-29 13:03:36 +0000
+comments: true
+post_id: 83823
+permalink: /archives/83823.html
+categories: ["编程开发"]
+tags: ["python"]
+---
+
+SCons是使用Python语言开发的一个软件自动构建工具，功能类似于UNIX上的make、autoconf与automake工具。它跨平台，能够帮助我们更方便，可靠，快速的构建软件。
+
+与make命令和Makefile文件类似，scons也需要编写一个SConstruct文件（实际上也是一个python脚本），scons可以根据此文件自动完成依赖关系的推导及编译链接等过程。
+
+下面通过一个简单的例子来介绍一下scons的用法，首先得先安装scons工具的gcc编译器。
+
+新建一个hello.c文件，内容如下：
+
+``` c
+//hello.c
+#include<stdio.h>
+
+int main(){
+printf(&quot;hello world!\n&quot;);
+return 0;
+}
+```
+
+
+然后再创建一个SConstruct文件，内容为：
+
+```
+Program('hello.c')
+```
+
+
+这两个文件放在同一目录下，再执行命令scons即可完成编译，并生成名为hello.o的中间文件和名为hello的可执行文件。
+
+如果想要清除生成的文件，跟make clean类似可以执行scons --clean命令。
+
+
+上面只是一个简单的例子，如果你的程序中使用的第三方库，编译时就需要手动指定链接库。
+
+以gtk程序为例，编译一个名为gtk_test.c的源文件，SConstruct脚本可以用如下的方法。
+
+```
+env = Environment(CCFLAGS='-g')
+env.ParseConfig('pkg-config --cflags --libs gtk+-2.0')
+
+env.Program('gtk_test.c')
+```
+
+
+
+我个人感觉SConstruct比Makefile要更加简洁灵活，更多关于scons有用法以及SConstruct脚本的写法可以参考它的官方文档。
+
+scons主页： http://www.scons.org  
+scons文档： http://www.scons.org/documentation.php

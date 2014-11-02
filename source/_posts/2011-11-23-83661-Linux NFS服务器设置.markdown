@@ -1,0 +1,31 @@
+---
+layout: post
+title: Linux NFS服务器设置
+data: 2011-11-23 11:56:27 +0000
+comments: true
+post_id: 83661
+permalink: /archives/83661.html
+categories: ["Linux栏目"]
+tags: ["Arch", "Linux"]
+---
+
+我用的是Arch Linux，不过不同的版本应该都差不多吧。
+
+1、首先安装nfs-utils软件包。
+
+2、修改/ect/exports文件，添加分享，格式为：  
+<em>路径 允许的主机(属性)</em>  
+如：<em>/opt/arm 192.168.1.*(ro,sync,no_root_squash)</em>
+
+3、启动nfs服务。  
+执行命令：/etc/rc.d/nfs-server start
+
+现在可以在其他主机上使用mount命令来挂载该主机的分享目录，命令格式：<em>mount -t nfs -o nolock 主机:/路径 挂载点 </em>  
+如：<em>mount -t nfs -o nolock 192.168.1.100:/opt/arm /mnt/nfs </em>
+
+如果挂载时出现提示：mount.nfs: access denied by server while mounting，说明请求被拒绝了。  
+修改/ect/hosts.allow文件（没有请自行创建），添加允许，格式  
+portmap: 主机/网段 :allow  
+如：  
+portmap: 192.168.1.100 :allow  
+portmap: 192.168.1.0/255.255.255.0 :allow  

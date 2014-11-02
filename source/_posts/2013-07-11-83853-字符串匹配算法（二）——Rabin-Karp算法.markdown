@@ -1,0 +1,67 @@
+---
+layout: post
+title: 字符串匹配算法（二）——Rabin-Karp算法
+data: 2013-07-11 14:52:04 +0000
+comments: true
+post_id: 83853
+permalink: /archives/83853.html
+categories: ["数据结构和算法"]
+tags: ["匹配算法", "算法"]
+---
+
+Rabin-Karp设计了一个巧妙的hash算法。用到的数学公式为：t(s+1) = (d(t(s)-T[s+1]h)+T[s+m+1]) mod q
+t(s+1)为目标字符串的子字符串T[s+1,s+m+1]的哈希值，因为用到了上一次的结果t(s)，所以可以节省计算时间。
+
+首先计算pattern字符串的hash值，然后在从目标字符串的开头，计算相同长度字符串的hash值。若hash值相同，则表示匹配，若不同，则向右移动一位，计算新的hash值。整个过程，与暴力的字符串匹配算法很相似，但由于计算hash值时，可以利用上一次的hash值，从而使新的hash值只需要加上新字母的计算，并减去上一次的第一个字母的计算，即可。
+
+Rabin-Karp算法的预处理时间为O(m)，最坏情况下该算法的匹配时间为O((n-m+1)m)。但是平均运行时间还是比较好的。
+
+
+用C语言实现如下：
+
+``` c
+#include <stdio.h>
+#include <math.h>
+
+int mod = 0x7fffffff;
+const int d = 128;
+
+int rabin_karp(char *T, char *P, int n, int m)
+{
+    if (n < m) return -2;
+    int h = pow(d, m-1);
+    int p = 0;
+    int t = 0;
+    int i, j;
+    for (i=0; i<m; i++) {
+        p = (d*p + P[i]) % mod;
+        t = (d*t + T[i]) % mod;
+    }
+    for (j=0; j<=n-m; j++) {
+        if (p == t) {
+            return j;
+        }
+        if (j < n-m) {
+            t = (d*(t - h*T[j]) + T[j+m]) % mod;
+        }
+    }
+    return -1;
+}
+
+int main(int argc, char *argv[])
+{
+    char t[] = "BBC ABCDAB ABCDABCDABDE";
+    char p[] = "ABCDABD";
+    int len1 = sizeof(t) - 1;
+    int len2 = sizeof(p) - 1;
+    int index = rabin_karp(t, p, len1, len2);
+    printf("index: %d\n", index);
+    return 0;
+    return 0;
+}
+```
+
+现在结合上面的公式和代码再进行讲解一下。  
+d表示字母表的字母个数，上面的代码只接受ascii值为0~127的字符。如果采用小写英文字母来做字母表的话，那么d就是26。  
+h等于d^(m-1) % q。其实模q运算应该是可有可无的，加入q应该是为了避免数据溢出。但是加入模q后，由ts == p mod q不能说明ts == p，不过ts != p mod q则可以肯定ts != p。所以q最好选择比较大的质数，并且选取的q要满足使dq的值在一个计算机字长内。如果使用的是动态的编程语言的话就不用担心数据溢出，因此就不用进行模q运算。
+

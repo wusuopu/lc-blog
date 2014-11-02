@@ -1,0 +1,55 @@
+---
+layout: post
+title: Pygame学习笔记1：起步
+data: 2011-08-13 13:33:56 +0000
+comments: true
+post_id: 83577
+permalink: /archives/83577.html
+categories: ["Python栏目"]
+tags: ["pygame", "python"]
+---
+
+<div><strong>初始化</strong></div>
+
+<div>要使用pygame先要对其初始化。pygame的初始化是非常简单的，首先我们必须先导入（import）pygame这个包。</div>
+
+<em>import pygame</em>  
+<em>from pygame.locals import *</em>
+
+<div>第一行是必须的，它导入了pygame包中所有可用的模块。第二行是可选的，它把一些常量和函数放在global名字空间中。</div>
+<div></div>
+<div>必需注意的是，有些pygame模块是可选的，比如font模块。当你import pygame时，pygame会检查font模块是否存在。如果font模块存在，那么它会自动被导入为pygame.font。如果它不存在，pygame.font会被设置成None。</div>
+<div></div>
+<div>在用pygame前，必须先初始化。一般只要一句话就可以完成：</div>
+<div><em>pygame.init()</em></div>
+<div>执行这个语句，它会试着去初始化所有的pygame模块。并不是所有的模块都是需要初始化的，这个语句会自动去初始化那些需要初始化的模块。你也可以手动的去初始化各个模块，比如说要单独初始化display模块可以这样做：</div>
+<div><em>pygame.display.init()</em></div>
+<div>注意，如果执行pygame.init()初始化有错误，它不会给出异常。如果手动初始化单个模块，错误会导致抛出异常。任何必须初始化的模块都包含一个get_init()函数，来判断这个模块是否已经被初始化。</div>
+<div>可以对任何模块多次调用init()函数而不会出错。</div>
+<div></div>
+<div>已经初始化的模块通常会有一个quit()函数来完成清理工作。没有必要显式的调用这个函数，因为pygame会在python退出的时候自动清理所有已经初始化的模块。</div>
+<div></div>
+
+<div><strong>surface和屏幕</strong></div>
+<div>pygame最重要的部分就是surface。我们可以把surface看作是一张白纸。你可以对surface作很多操作。一个surface可以是任何大小，一个游戏可以有任意多surface。其中有一个surface是特别的，就是用pygame.display.set_mode()创建的display surface。它代表了屏幕，对它的任何操作会出现在用户的屏幕上。一个游戏只能有一个这样的surface，这是SDL的限制。</div>
+<div></div>
+<div>surface的大部分方法都不重要，只要学习其中的blit(), fill(), set_at()和get_at()就够用了。</div>
+<div>display surface的初始化操作是这样的：</div>
+<div><em>screen = pygame.display.set_mode((1024, 768))</em></div>
+<div>或者</div>
+<div><em>screen = pygame.display.set_mode((1024, 768), pygame.FULLSCREEN)</em></div>
+<div>set_mode会返回一个Surface对象，代表了在桌面上出现的那个窗口，三个参数第一个为元祖，代表分 辨率（必须）；第二个是一个标志位，具体意思见下表，如果不用什么特性，就指定0；第三个为色深。</div>
+<div>标志位 功能</div>
+<div>FULLSCREEN 创建一个全屏窗口</div>
+<div>DOUBLEBUF 创建一个“双缓冲”窗口，建议在HWSURFACE或者OPENGL时使用</div>
+<div>HWSURFACE 创建一个硬件加速的窗口，必须和FULLSCREEN同时使用</div>
+<div>OPENGL 创建一个OPENGL渲染的窗口</div>
+<div>RESIZABLE 创建一个可以改变大小的窗口</div>
+<div>NOFRAME 创建一个没有边框的窗口</div>
+<div></div>
+<div>使用pygame.display.list_modes()可以查看当前设备支持的分辨率。</div>
+<div>使用update函数把内容显示到屏幕上。</div>
+<div><em>pygame.display.update()</em></div>
+<div>如果使用DOUBLEBUF，你需要用flip函数。</div>
+<div><em>pygame.display.flip()</em></div>
+<div></div>

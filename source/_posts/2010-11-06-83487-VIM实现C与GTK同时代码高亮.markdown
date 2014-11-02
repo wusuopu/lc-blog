@@ -1,0 +1,25 @@
+---
+layout: post
+title: VIM实现C与GTK同时代码高亮
+data: 2010-11-06 13:06:16 +0000
+comments: true
+post_id: 83487
+permalink: /archives/83487.html
+categories: ["开源软件"]
+tags: ["gtk", "vim", "开源软件"]
+---
+
+vim是一款优秀的编辑器，支持多种语言的高亮。不过在编程时支持C高亮就不能支持GTK高亮，支持GTK高亮就不能支持C高亮，这个很是郁闷，难道就不能同时支持两种语言吗。通过试验发现可以修改VIM的配置实现多种语言同时高亮。
+
+首先你要有关键字高亮的配置文件，C的VIM应该自带有，GTK的如果没有可以到这里下载。<em>gtk-vim-syntax.7z：http://v4.u.115.com/file/f5123a8395</em>
+
+下载解压后，进入解压目录，其中<em>gtk.vim</em>就是GTK的关键字高亮文件，不过如果直接使用这个的话GTK高亮了，但是C又不高亮。偶用的方法是将<em>c.vim</em>的内容复制到<em>gtk.vim</em>中去，然后保存为一个文件，就是压缩包中的<em>gtk+.vim</em>这个文件，然后将其复制到<em>/usr/share/vim/vim72/syntax</em>目录下。
+
+然后再在<em>gvim</em>菜单中添加一个GTK高亮选项，方法是修改<em>/usr/share/vim/vim72</em>目录下的<em>synmenu.vim</em>文件，添加一行“<em>an 50.40.440 &amp;Syntax.FG.GTK+ :cal SetSyn("gtk+")&lt;CR&gt;</em>”，偶是添加在“<em>an 50.40.430 &amp;Syntax.FG.GTKrc :cal SetSyn("gtkrc")&lt;CR&gt;</em>”（210行处，不同人可能不同）这一行的下方。
+
+现在就可以同时实现C与GTK关键字高亮了，如图：
+<p style="text-align: center"><img style="width: 660px;height: 510px" src="http://img208.poco.cn/mypoco/myphoto/20101106/20/5545129120101106201934050.jpg" alt="gtk-vim-syntax" />
+
+<img style="width: 191px;height: 510px" src="http://img208.poco.cn/mypoco/myphoto/20101106/20/5545129120101106201910026.jpg" alt="Vim-syntax-menu" />
+
+这样虽然实现了C与GTK同时高亮，但是还是有些关键字不行，如gdk、glib等。虽然压缩包内包含有这些的文件，但是如果全都合成一个文件的话，那样会显得比较臃肿，所以就先将就了。

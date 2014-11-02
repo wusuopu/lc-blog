@@ -1,0 +1,63 @@
+---
+layout: post
+title: Linux常见的引导参数组合
+data: 2009-12-02 12:18:20 +0000
+comments: true
+post_id: 81831
+permalink: /archives/81831.html
+categories: ["Linux栏目"]
+tags: ["Linux", "内核"]
+---
+
+说不定哪天某个内核或 desktop cd 启动不了, 这个列表就有用.
+
+    noapic nolapic acpi=off pci=noacpi
+    nolapic noapic acpi=off
+    acpi=off noapic
+    nohz=off
+    hpet=disable
+    acpi=off irqpoll
+    noapictimer irqpoll
+    noapic nolapic irqpoll
+    noapic irqpoll
+    nolapic irqpoll
+    apic=off irqpoll
+    acpi=noirq irqpoll
+    noapic
+    pci=routeirq
+    pci=noacpi
+    apic=off
+    nolapic
+    noacpi
+    irqpoll
+    acpi=noirq
+    noapic acpi=noirq
+    noapictimer
+    noapic acpi=noirq nolapic
+    noapic nolapic
+    pci=biosirq
+    pci=biosirq irqpoll
+    noapic irqpoll
+    noacpi
+    acpi=off
+    nolacpi
+    noapictimer ( x86_64 专用)
+    nolapic_timer (x86_32 专用)
+    nosmb nolapic
+    acpi=debug
+    apic lapic acpi=debug
+    noapic nolapic acpi=debug
+    noapic lapic acpi=debug
+    noapic nolapic acpi=ht
+    noapic lapic acpi=ht
+    noapic lapic
+
+详情请访问：http://www.kernel.org/doc/Documentation/kernel-parameters.txt
+
+我的本本是神舟的天运F3000，纯粹sis芯片。之前尝试过安装红旗Linux、Everest Linux、Ubuntu，可是都没成功。后来在安装时添加了一个引导参数才顺利地完成安装。经过测试在我的电脑上以下参数可用。
+    
+    noapic nolapic acpi=off pci=noacpi     可引导，鼠标不能用
+    nohz=off                               可引导
+    noapictimer irqpoll        可引导
+    noapic nolapic irqpoll        可引导
+    nolapic irqpoll        可引导

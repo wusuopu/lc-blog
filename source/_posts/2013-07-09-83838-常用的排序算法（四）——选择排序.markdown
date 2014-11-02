@@ -1,0 +1,82 @@
+---
+layout: post
+title: 常用的排序算法（四）——选择排序
+data: 2013-07-09 14:09:53 +0000
+comments: true
+post_id: 83838
+permalink: /archives/83838.html
+categories: ["数据结构和算法"]
+tags: ["排序算法", "算法"]
+---
+
+选择排序的时间复杂度为O(n*n)。
+
+其基本操作是每一次从待排序的数列中先出最大（或最小）的一个元素，然后把它顺序的放在已排好序的数列的最后。
+
+例如：  
+一个数列初始状态为：[ 5 3 16 2 10 14 ]  
+第一次排序后为：    [ 5 3 14 2 10 ] 16  
+第二次排序后为：    [ 5 3 10 2 ] 14 16  
+第三次排序后为：    [ 5 3 2 ] 10 14 16  
+第四次排序后为：    [ 2 3 ] 5 10 14 16  
+第五次排序后为：    [ 2 ] 3 5 10 14 16  
+排序完成之后为：    [ 2 3 5 10 14 16 ]  
+
+代码如下：
+
+``` c
+#include <stdio.h>
+
+void print_list(int *ar, int n)
+{
+    int i;
+    printf("[ ");
+    for (i=0; i<n; i++) {
+        printf("%d ", ar[i]);
+    }
+    printf("]\n");
+
+}
+
+int select_max(int *ar, int left, int right)
+{
+    int max = left;
+    int i = left;
+    while (++i <= right) {
+        if (ar[i]  > ar[max]) {
+            max = i;
+        }
+    }
+    return max;
+}
+
+void selection_sort(int *ar, int n)
+{
+    int i, max, tmp;
+    for (i=n-1; i>=1; i--) {
+        max = select_max(ar, 0, i);
+        if (max != i) {
+            tmp = ar[i];
+            ar[i] = ar[max];
+            ar[max] = tmp;
+        }
+    }
+
+}
+
+int main(int argc, char *argv[])
+{
+    int a[] = {5, 3, 16, 2, 10, 14};
+    int len=sizeof(a)/sizeof(int);
+    printf("begin: ");
+    print_list(a, len);
+    selection_sort(a, len);
+    printf("end ");
+    print_list(a, len);
+    return 0;
+}
+```
+
+选择排序演示图片：
+<img src="http://www.linuxeden.com/upimg/allimg/130504/1021141c0-3.gif">
+

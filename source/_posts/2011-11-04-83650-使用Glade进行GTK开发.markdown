@@ -1,0 +1,109 @@
+---
+layout: post
+title: 使用Glade进行GTK开发
+data: 2011-11-04 15:07:00 +0000
+comments: true
+post_id: 83650
+permalink: /archives/83650.html
+categories: ["编程开发"]
+tags: ["gtk"]
+---
+
+在前面的文章介绍了<a title="使用Glade进行PyGTK开发" href="http://www.xefan.com/archives/83642.html" target="_blank">使用Glade进行PyGTK开发</a>，现在再来说一说使用Glade来进行GTK的开发。
+
+首先需要的开发环境：
+Glade3、GTK+2.0、GCC
+
+先用Glade设计一个用户界面，保存为test.glade，内容如下：
+
+``` xml
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk+" version="2.24"/>
+  <!-- interface-naming-policy project-wide -->
+  <object class="GtkWindow" id="window1">
+    <property name="can_focus">False</property>
+    <property name="resizable">False</property>
+    <property name="default_width">440</property>
+    <property name="default_height">450</property>
+    <signal name="destroy" handler="on_MainWindow_destroy" swapped="no"/>
+    <child>
+      <object class="GtkAlignment" id="alignment1">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="top_padding">10</property>
+        <property name="bottom_padding">10</property>
+        <property name="left_padding">10</property>
+        <property name="right_padding">10</property>
+        <child>
+          <object class="GtkVBox" id="vbox1">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <child>
+              <object class="GtkLabel" id="label1">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">龙昌博客： http://www.xefan.com</property>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="button1">
+                <property name="label" translatable="yes">关闭</property>
+                <property name="use_action_appearance">False</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <signal name="clicked" handler="on_MainWindow_destroy" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>
+```
+
+再创建一个C源文件，保存为test.c，内容如下：
+
+``` c
+#include <gtk/gtk.h>
+
+void on_MainWindow_destroy(GtkObject *widget, gpointer data)
+{
+    gtk_main_quit();
+}
+
+int main(int argc, char *argv[])
+{
+    GtkBuilder *builder;
+    gtk_init(&argc, &argv);
+    GtkWidget *window;
+    builder = gtk_builder_new();
+    gtk_builder_add_from_file(builder, "test.glade", NULL);
+
+    window = GTK_WIDGET(gtk_builder_get_object(builder, "window1"));
+    gtk_builder_connect_signals(builder, NULL);
+    // 释放builder的空间
+    g_object_unref(G_OBJECT(builder));
+
+    gtk_widget_show_all(window);
+    gtk_main();
+    return 0;
+}
+```
+
+然后再编译运行查看效果。
+如果出现类似“Gtk-WARNING **: Could not find signal handler 'on_MainWindow_destroy'”的错误请尝试以下方法：  
+方法一：将编译命令改为：gcc -o test test.c \`pkg-config --libs --cflags gtk+-2.0\` <span style="color: #ff0000;">-export-dynamic</span>  
+方法二：将编译命令改为：gcc -o test test.c \`pkg-config --libs --cflags <span style="color: #ff0000;">libglade-2.0 gmodule-export-2.0</span>\`

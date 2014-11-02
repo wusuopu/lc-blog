@@ -1,0 +1,40 @@
+---
+layout: post
+title: linux下交叉编译windows程序
+data: 2011-11-25 13:35:27 +0000
+comments: true
+post_id: 83663
+permalink: /archives/83663.html
+categories: ["编程开发"]
+tags: ["gcc", "Linux", "windows"]
+---
+
+有时候需要编写在Windows下运行的程序，但是又不想切换到Windows下来编译，于是就想在Linux下来编译Windows下运行的exe文件。
+
+这个需要先安装mingw32交叉编译工具。  
+ubuntu下使用命令：sudo apt-get install mingw32进行安装，  
+Arch Linux下使用命令：sudo pacman -S mingw32-binutils mingw32-gcc mingw32-pthreads mingw32-runtime mingw32-w32api
+
+安装完后测试一下效果。  
+将以下代码保存为mingw32_test.c文件。
+
+``` c
+int main(int argc, char *argv)
+{
+    printf("Windows Compiler Test\nhttp://www.xefan.com\n");
+    return 0;
+}
+```
+
+
+然后执行命令：
+
+    [lcj@lcj C]$ i486-mingw32-gcc -o mingw32_test.exe mingw32_test.c
+    mingw32_test.c: In function 'main':
+    mingw32_test.c:3:5: warning: incompatible implicit declaration of built-in function 'printf' [enabled by default]
+    [lcj@lcj C]$ wine mingw32_test.exe
+    Windows Compiler Test
+    http://www.xefan.com
+    [lcj@lcj C]$
+
+经测试在wine下能正常运行，在虚拟机里的WinXP下测试也可正常运行。

@@ -1,0 +1,170 @@
+---
+layout: post
+title: 常用的排序算法（八）——桶排序
+data: 2013-07-10 14:43:44 +0000
+comments: true
+post_id: 83849
+permalink: /archives/83849.html
+categories: ["数据结构和算法"]
+tags: ["排序算法", "算法"]
+---
+
+桶排序算法对待排数列有一定的要求。数据长度必须一样，并且符合均匀分布。
+
+桶排序的基本思想就是先创建一个含n个元素的数组，即就是创建n个桶。然后将待排的数进行哈希算法并链接到这个数组的各个元素中去，即就是将这些数分布到各个桶中去。为得到结果先对各个桶中的数据进行排序，然后按次序把各个桶的元素取出来即可。
+
+代码如下：
+
+``` c
+#include <stdio.h>
+#include <time.h>
+#include <stdlib.h>
+const int N = 20;
+const int M = 10;
+
+struct chain
+{
+    int key;
+    struct chain *next;
+};
+
+void init_bucket(struct chain a[], int n)
+{
+    int i = 0;
+    for(; i < n; i++)
+    {
+        a[i].key = i * 10;
+        a[i].next = NULL;
+    }
+}
+
+int * generate(int a[], int n)
+{
+    int i;
+    for(i = 0; i < n; i++)
+    {
+        a[i] = 0;
+    }
+    time_t t;
+    srand((unsigned)time(&t));
+
+    for(i = 0; i < n; i++)
+    {
+        a[i] = rand() % 100;
+    }
+    return a;
+}
+
+
+void print_array(int *a, int n)
+{
+    int i = 0;
+    while(i < n)
+    {
+        printf("%4d", a[i]);
+        i++;
+    }
+    printf("\n");
+}
+
+void print_bucket(struct chain a[], int n)
+{
+    int i = 0;
+    for(; i < n; i++)
+    {
+        printf("%4d", a[i].key);
+    }
+    printf("\n");
+}
+
+
+void insertChain(struct chain node, struct chain *newNode)
+{
+    if(node.next == NULL)
+    {
+        node.next = newNode;
+    }
+    else
+    {
+        struct chain *p = node.next;
+        struct chain *q = p;
+        while(p->key < newNode->key)
+        {
+
+            q = p;
+            p = p->next;
+        }
+        newNode->next = q->next;
+        q->next = newNode;
+
+    }
+}
+
+void print_keys(struct chain a[], int n)
+{
+    int i = 0;
+    for(; i < n; i++)
+    {
+        if(a[i].next != NULL)
+        {
+            struct chain *p = a[i].next;
+            while(p->next != NULL)
+            {
+                printf("%4d", p->key);
+                p = p->next;
+            }
+            printf("%4d", p->key);
+        }
+    }
+}
+
+void insert_bucket(struct chain a[], int *keys, int n)
+{
+    int i = 0;
+    for(; i < n; i++)
+    {
+        struct chain *newNode = (struct chain *)malloc(sizeof(struct chain));
+        newNode->key = keys[i];
+        newNode->next = NULL;
+
+        struct chain *node = &a[keys[i] / 10];
+
+        if(node->next == NULL)
+        {
+            node->next = newNode;
+        }
+        else
+        {
+            struct chain *p = node->next;
+            struct chain *q = p;
+            while((p->key <= newNode->key) && (p->next != NULL))
+            {
+
+                q = p;
+                p = p->next;
+            }
+            newNode->next = q->next;
+            q->next = newNode;
+        }
+    }
+}
+
+int main()
+{
+    struct chain heads[M];
+    init_bucket(heads, M);
+    printf("bucket: ");
+    print_bucket(heads, M);
+
+    int keys[N];
+    generate(keys,N);
+    printf("numbers:");
+    print_array(keys, N);
+
+    insert_bucket(heads, keys, N);
+    printf("ordered:");
+    print_keys(heads, M);
+    printf("\n");
+    return 0;
+}
+```

@@ -1,0 +1,42 @@
+---
+layout: post
+title: TQ2440 定时器程序
+data: 2012-05-13 08:07:00 +0000
+comments: true
+post_id: 83739
+permalink: /archives/83739.html
+categories: ["嵌入式栏目"]
+tags: ["ARM", "TQ2440"]
+---
+
+S3C2440有两个PLL：MPLL（用于CPU及其他外设）、UPLL（专用于USB设备）  
+MPLL会产生三个部分的时钟频率：FCLK、HCLK、PCLK
+
+S3C2440有5个16位定时器。定时器0和1共享一个8位预分频器，定时器2、3、4共享另一个8位预分频器。
+
+定时器的时钟源为PCLK，首先经过预分频器降低频率后，进入第二分频。可生成5种不同的分频信号（1/2,1/4,1/8,1/16和TCLK）。
+
+定时器启动后，TCNTn开始减一计数，当TCNTn等于TCMPn时TOUTn反转，TCNTn继续减数。当TCNTn=0时，TOUTn再反转，并触发中断（中断已使能）。若TCON设为自动加载，TCNTn/TCMPn值被重载。
+
+与定时器相关的寄存器：  
+TCFG0：配置两个8位预分频器［15:8］决定定时器2,3,4的预标定器值，[7:0]决定定时器0,1。  
+输出频率=PCLK/(prescaler value+1)
+
+TCFG1：设置第二个分频，可设置5种不同分频信号（1/2,1/4,1/8,1/16,TCLK）  
+定时器工作频率=PCLK/(Prescaler value+1)/(divider value)  
+divider value=2,4,8,16  
+Prescaler=0~255
+
+TCON：定时器控制寄存器  
+TCNTBn：设置一个被装载到递减计数器中的初始值  
+TCMPBn：设置一个被装载到比较寄存器中用来和递减计数器的值比较的初始值  
+TCNTOn：通过读取其可以得到TCNTn的值  
+TCNTB=(PCLK/(Prescaler+1)/divider)*中断间隔  
+
+定时器初始化例子：  
+TCFG0 = 99; //预分频器0=99  
+TCFG1 = 0x03; //选择16分频  
+TCNTB0 = 31250; //0.5秒触发一次中断  
+TCON |= (1&lt; TCON = 0x09; //自动加载，清“手动更新”，启动定时器0  
+
+一个简单的定时器程序下载：http://download.csdn.net/detail/wosuopu/4298320

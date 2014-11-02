@@ -1,0 +1,82 @@
+---
+layout: post
+title: Pygame学习笔记2：显示
+data: 2011-08-14 13:26:22 +0000
+comments: true
+post_id: 83579
+permalink: /archives/83579.html
+categories: ["Python栏目"]
+tags: ["pygame", "python"]
+---
+
+首先使用了如下的语句创建一个窗口：
+
+<em>screen =pygame.display.set_mode((640, 480), 0, 32)</em>
+
+这里创建了一个640*480的黑窗口，现在可以往内面画内容。
+
+<strong>读取和保存图片</strong>
+
+使用pygame.image模块，可以对图像进行读取和保存。
+
+使用pygame.image.load读取图像文件。
+
+<em>img = pygame.image.load(filename)</em>
+
+可以读取文件名为filename的图像文件，pygame会自动确定文件的类型（比如GIF或者BMP），一般来说支持JPG、PNG、GIF (non animated)、BMP、PCX、TGA (uncompressed)、TIF、LBM (及PBM)、PBM (及PGM, PPM)、XPM等。它返回一个包含图像的Surface，Surface的格式和原来的文件相同（包括颜色格式、透明色和alpha透明）。
+
+使用pygame.image.save可以把图像保存到文件中。
+
+<em>pygame.image.save(img, filename)</em>
+
+这个函数可以把img这个Surface的内容保存为filename指定的图像文件，文件格式可以是BMP、TGA、PNG或者JPEG。如果文件扩展名不认识，默认保存为TGA格式。TGA和BMP格式都是非压缩的文件。
+
+还有pygame.image.tostring、pygame.image.fromstring、pygame.image.frombuffer函数可以把图像序列化，即把图像保存在字符串中或者从字符串中读取图像。
+
+<strong>变换</strong>
+
+使用pygame.transform模块中的函数，可以对图像进行简单的变换。所有的这些函数都需要一个Surface参数指明要处理的图像，并生成一个新的图像表示处理后的结果，原来的图像不会被改变。
+
+使用pygame.transform.flip可以上下左右翻转图像
+
+使用pygame.transform.scale可以对图像进行缩放
+
+使用pygame.transform.rotate可以对图像进行旋转
+
+使用pygame.transform.rotozoom可以对图像进行缩放并旋转
+
+使用pygame.transform.scale2x可以对图像进行快速的两倍大小的放大
+
+使用pygame.transform.chop可以对图像进行裁减
+
+<strong>转换Surfaces</strong>
+
+通常你不用在意surface里的具体内容，不过也许你需要吧这些surface转换一下以获得更高的性能，
+
+img2 =pygame.image.load(image_filename).convert()
+
+mouse_cursor =pygame.image.load(image_filename).convert_alpha()
+
+第一句是普通的转换，相同于display；第二句是带alpha通道的转换。如果你给convert或者conver_alpha一个surface对象作为参数，那么这个会被作为目标来转换。
+
+<strong>块复制</strong>
+
+一个图像复制到另一个上面
+
+现在要将读取的图片画在屏幕上，可由blit函数来实现
+
+Surface.blit(source, dest, area=None, special_flags = 0): return Rect
+
+画的位置可以由dest参数指定。dest可以是一对坐标值，表示源Surface的左上角在这个Surface上的坐标。dest也可以是一个矩形，矩形的左上角作为blit的位置，而矩形的大小不影响blit。
+
+有一个可选的area矩形参数，可以用来指定只画源Surface的一部分。
+
+一个可选的special_flags参数，可以是BLEND_ADD、BLEND_SUB、BLEND_MULT、BLEND_MIN、BLEND_MAX。将来也可能有其它特殊标记添加进来。
+
+函数返回的矩形表示受影响的像素的区域，不包括目标Surface以外的像素，也不包括剪切区域以外的像素。
+
+例如：
+
+<em>screen.blit(img,(0,0))</em>
+
+然后使用pygame.display.update()来更新显示。

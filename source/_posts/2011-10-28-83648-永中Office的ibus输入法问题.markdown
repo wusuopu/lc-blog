@@ -1,0 +1,22 @@
+---
+layout: post
+title: 永中Office的ibus输入法问题
+data: 2011-10-28 11:35:49 +0000
+comments: true
+post_id: 83648
+permalink: /archives/83648.html
+categories: ["Linux栏目"]
+tags: ["ibus", "Linux"]
+---
+
+我在永中Office下无法调用ibus输入法，但是在其他窗口中都没有问题，如：gVIM，LeafPad，OpenOffice等等。我按照网上的方法在.bashrc文件中也添加了以下内容，可是还是不行。
+
+<em>export GTK_IM_MODULE=ibus</em>  
+<em> export XMODIFIERS=@im=ibus</em>  
+<em> export QT_IM_MODULE=ibus</em>  
+
+正打算更换输入法时无意中发现了问题的所在。
+首先用ps -e|grep ibus命令发现只有 ibus-daemon、ibus-gconf两个进程。
+然后执行命令/usr/lib/ibus/ibus-x11 &amp;，运行ibux-x11。 这时就有了 ibus-daemon、ibus-gconf、ibus-x11三个进程。此时在永中Office中可以正常使用ibus输入法了。
+
+原来是ibus-x11没有运行的原因，如果不想每次都手动运行的话，可以将它设置为开机自动启动。

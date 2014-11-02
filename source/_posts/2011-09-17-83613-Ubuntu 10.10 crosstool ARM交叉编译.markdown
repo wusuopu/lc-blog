@@ -1,0 +1,102 @@
+---
+layout: post
+title: Ubuntu 10.10 crosstool ARM交叉编译
+data: 2011-09-17 12:00:23 +0000
+comments: true
+post_id: 83613
+permalink: /archives/83613.html
+categories: ["嵌入式栏目"]
+tags: ["ARM", "gcc"]
+---
+
+弄了两天，经过了N次失败后现在终于编译成功了，赶紧做个笔记。
+
+1、下载crosstool(http://www.kegel.com/crosstool/crosstool-0.43.tar.gz)
+
+2、下载编译过程中需要用到的源代码，虽然crosstool也会自动下载不过速度很慢，建议还是自己先下载好，源代码的版本根据自己的情况选择：  
+binutils-2.15 http://ftp.gnu.org/gnu/binutils/  
+gcc-3.4.5 http://ftp.gnu.org/gnu/gcc/  
+glibc-2.3.6 ftp://ftp.gnu.org/gnu/glibc/ 
+glibc-linuxthreads-2.3.6 ftp://ftp.gnu.org/gnu/glibc/  
+
+linux-2.6.10 http://ftp.cc.uoc.gr/mirrors/ftp.kernel.org/pub/linux/kernel/v2.6/linux-2.6.10.tar.gz  
+linux-libc-headers-2.6.12.0 http://ep09.pld-linux.org/~mmazur/linux-libc-headers/linux-libc-headers-2.6.12.0.tar.bz2  
+
+将以上七个压缩包放在同一个目录下。
+
+3、编译过程依赖这几个软件，没有的请自行安装。Bison、flex 、build-essential、patch 、libncurses5-de  
+还有gcc的编译依赖于gmp、mpfr、mpc这几个软件，没有的请先安装。  
+mpc-0.9.tar.gz http://www.multiprecision.org/mpc/download/mpc-0.9.tar.gz  
+mpfr-3.0.1.tar.bz2 http://www.mpfr.org/mpfr-current/mpfr-3.0.1.tar.bz2  
+gmp-5.0.2.tar.bz2 ftp://ftp.gmplib.org/pub/gmp-5.0.2/gmp-5.0.2.tar.bz2  
+这几个软件之间也存在依赖关系，请按顺序依次安装gmp、mpfr、mpc  
+
+4、修改配置  
+1)、ubuntu10.10自己的GCC是4.4版本，使用这个版本的进行编译会出错，建议使用gcc-4.1。  
+sudo apt-get install gcc-4.1  
+sudo rm /usr/bin/gcc  
+sudo ln -s /usr/bin/gcc-4.1 /usr/bin/gcc  
+
+2)、修改sh，ubuntu10.10默认的sh是用的dash  
+如果运行 ls -la /bin/sh 看到链接是dash，则需要修改一下。不改的话编译会出错。  
+我是直接运行命令 sudo ln -sf /bin/bash /bin/sh 修改。改完后重启下，或者切换工作台以使其生效。  
+
+3)、修改编译脚本  
+解压crosstool然后进入解压目录，这里我选择demo-arm.sh这个脚本。  
+cp demo-arm.sh arm.sh
+
+修改arm.sh  
+vi arm.sh  
+
+    TARBALLS_DIR=(刚刚下载的源码存放目录)  
+    RESULT_TOP=(生成工具链要安装到的目录)  
+    eval `cat arm.dat gcc-3.4.5-glibc-2.3.6.dat` sh all.sh –notest #这个根据自己的情况选择
+
+然后修改gcc-3.4.5-glibc-2.3.6.dat这个文件  
+BINUTILS_DIR=binutils-2.15  
+GCC_DIR=gcc-3.4.5  
+GLIBC_DIR=glibc-2.3.6  
+LINUX_DIR=linux-2.6.10  
+LINUX_SANITIZED_HEADER_DIR=linux-libc-headers-2.6.12.0  
+GLIBCTHREADS_FILENAME=glibc-linuxthreads-2.3.6  
+
+再修改arm.dat这个文件  
+
+    KERNELCONFIG=`pwd`/arm.config  
+    TARGET=arm-linux #生成的工具链名称  
+    TARGET_CFLAGS=”-O”  
+
+还有ubuntu10.10自带的ar、ld是2.20版本的，而这个编译时需要的是2.13~2.19版本的，所以会出错。  
+解决方法：  
+(1)、像上面的gcc一样，再安装个低版本的ls、ar。  
+(2)、如果不想再另外安装就可以用这个方法。修改glibc-2.3.6.tar.bz2这个压缩包内的configure文件。将3920行和3981行处的”2.1[3-9])*”改为”2.[1-2][0-9]*)”。  
+
+5、开始编译  
+都配置好了之后就可以开始了  
+./arm.sh  
+漫长的等待开始了……，我的是奔腾双核处理器，整个过程花了半个多小时  
+
+6、测试  
+现在用刚刚编译安装好的arm-linux-gcc来编译一个C程序试试。  
+先将arm-linux-gcc的安装目录添加到环境变量中。  
+
+``` c
+//文件名:hello.c
+ int main()
+ {
+ printf(&quot;www.xefam.com&quot;);
+ }
+```
+
+
+$ arm-linux-gcc -o hello hello.c  
+$ file hello  
+hello: ELF 32-bit LSB executable, ARM, version 1, dynamically linked (uses shared libs), for GNU/Linux 2.4.3, not stripped  
+这就说明这个已经成功了！
+
+7、现在可以恢复之前的系统配置了  
+将gcc修为gcc-4.4  
+将sh修改dash  
+
+如果嫌麻烦不想自己编译的可以直接下载已经编译好的来用，下面这个就是我编译好：
+gcc-3.4.5-glibc-2.3.6.tar.gz http://115.com/file/e65akpi1

@@ -1,0 +1,52 @@
+---
+layout: post
+title: 在Windows下安装GTK
+data: 2010-10-30 06:07:37 +0000
+comments: true
+post_id: 83448
+permalink: /archives/83448.html
+categories: ["编程开发"]
+tags: ["gcc", "gtk", "windows"]
+---
+
+<strong>GTK 简介 </strong>
+
+GTK (GIMP Toolkit) 是一套用于创建图形用户界面的工具包。它遵循 LGPL许可证，所以可以用它来开发开源软件、自由软件，甚至是封闭源代码的商业软件，而不用花费任何费用来购买许可证和使用权。当前，GTK 已经被成功地应用到 了大量的自由软件及商业软件中，已经取得了很大的成功。  
+GTK是跨平台的，它能够运行于Linux/Unix/Windows/MacOS及嵌入式系统
+
+下面就来介绍一下在Windows一搭建GTK开发环境。  
+首先需要先安装C/C++开发环境，GTK支持Cygwin、MSYS、Dec-Cpp、MSVC这几种。这里偶用的是Dev-Cpp。在前一篇文章《在Windows下安装gcc》（ http://www.xefan.cn/archives/83446.html ）介绍了Dev-Cpp的安装。
+
+<strong>下载、安装GTK</strong>
+
+下载地址：http://gladewin32.sourceforge.net/
+
+由于我们是用于开发，所以就选择下载<strong><em>Gtk+ 2.12.9 Development Environment Revision 2</em></strong>这个。下载完后安装gtk-dev-2.12.9-win32-2.exe，安装过程全部按照默然的就可以了，留意一下的是选择IDE的时候确定一下是Dev-Cpp就可以了。安装完毕后系统环境变量和Dev-Cpp的目录设置应该都已经设置好了。  
+1、查看系统环境变量：右键单击“我的电脑”–&gt;“属性”–&gt;“高级”–&gt;“环境变量”–&gt;“系统变量”，可以看到Path增加了“%GTK_BASEPATH%bin”。
+
+2、查看Dev-Cpp的目录设置：“工具”–&gt;“编译器选项”–&gt;“目录”，选择“库”可以看到“C:GTKbin”;选择“C包含文件”可以看到“C:GTKINCLUDE”……
+
+接下来我们进行测试一下，打开 Dev-C++，建立一个新的工程，添加一个新文件：
+
+<pre>#include &lt;gtk/gtk.h&gt;
+int main(int argc, char *argv[])
+{
+GtkWidget *window;
+gtk_init(&amp;argc, &amp;argv);
+window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+gtk_window_set_title(GTK_WINDOW(window), "Hello World");
+gtk_widget_show(window);
+gtk_main();
+return 0 ;
+}</pre>
+
+这个时候还不能编译，需要修改工程属性，在"工程-&gt;工程属性-&gt;参数" 或 "工具-&gt;编译选项"中的链接器框里面填入：  
+<ul> -lgtk-win32-2.0 -lgdk-win32-2.0 -latk-1.0 -lgdk_pixbuf-2.0 -lpangowin32-1.0 -lgdi32 -lpango-1.0 -lgobject-2.0 -lgmodule-2.0 -lglib-2.0 -lintl -liconv</ul>
+
+在编译选项里面填入：  
+<ul> -mms-bitfields</ul>
+就可以编译通过了。
+
+在运行以后，你会发现出现一个空白窗口，标题为 Hello World。
+
+<img class="aligncenter" title="Dev Cpp-GTK" src="http://img208.poco.cn/mypoco/myphoto/20101030/13/5545129120101030135311028.jpg" alt="" width="533" height="446" />

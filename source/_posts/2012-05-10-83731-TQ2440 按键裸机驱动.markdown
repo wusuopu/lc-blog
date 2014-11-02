@@ -1,0 +1,140 @@
+---
+layout: post
+title: TQ2440 按键裸机驱动
+data: 2012-05-10 12:55:41 +0000
+comments: true
+post_id: 83731
+permalink: /archives/83731.html
+categories: ["嵌入式栏目"]
+tags: ["ARM", "TQ2440"]
+---
+
+根据TQ2440的手册可知KEY1、2、3、4分别由GPF1、4、2、0控制。  
+程序的步骤为：  
+1、先将GPB1、4、2、0设为输入；  
+2、若有按键按下则对应引脚为0，否则为1.  
+
+程序如下：  
+文件名 crt0.S
+
+```
+.text
+.global _start
+_start:
+        ldr r0, =0x56000010 @WATCHDOG
+        mov r1, #0
+        str r1, [r0]
+        ldr sp, =1024*4
+        bl main
+
+halt_loop:
+        b halt_loop
+```
+
+文件名 gpio.h
+
+``` c
+#ifndef _GPIO_H
+#define _GPIO_H
+
+#define GPACON (*(volatile unsigned int*)0x56000000)
+#define GPADAT (*(volatile unsigned int*)0x56000004)
+
+#define GPBCON (*(volatile unsigned int*)0x56000010)
+#define GPBDAT (*(volatile unsigned int*)0x56000014)
+#define GPBUP  (*(volatile unsigned int*)0x56000018)
+
+#define GPCCON (*(volatile unsigned int*)0x56000020)
+#define GPCDAT (*(volatile unsigned int*)0x56000024)
+#define GPCUP  (*(volatile unsigned int*)0x56000028)
+
+
+#define GPDCON (*(volatile unsigned int*)0x56000030)
+#define GPDDAT (*(volatile unsigned int*)0x56000034)
+#define GPDUP  (*(volatile unsigned int*)0x56000038)
+
+#define GPECON (*(volatile unsigned int*)0x56000040)
+#define GPEDAT (*(volatile unsigned int*)0x56000044)
+#define GPEUP  (*(volatile unsigned int*)0x56000048)
+
+#define GPFCON (*(volatile unsigned int*)0x56000050)
+#define GPFDAT (*(volatile unsigned int*)0x56000054)
+#define GPFUP  (*(volatile unsigned int*)0x56000058)
+
+#define GPGCON (*(volatile unsigned int*)0x56000060)
+#define GPGDAT (*(volatile unsigned int*)0x56000064)
+#define GPGUP  (*(volatile unsigned int*)0x56000068)
+
+#define GPHCON (*(volatile unsigned int*)0x56000070)
+#define GPHDAT (*(volatile unsigned int*)0x56000074)
+#define GPHUP  (*(volatile unsigned int*)0x56000078)
+
+#define GPJCON (*(volatile unsigned int*)0x560000d0)
+#define GPJDAT (*(volatile unsigned int*)0x560000d4)
+#define GPJUP  (*(volatile unsigned int*)0x560000d8)
+
+#endif
+```
+
+文件名 key.c
+
+``` c
+#include "gpio.h"
+
+void delay()
+{
+    int i;
+    for (i=0; i<100000; i++);
+}
+
+void main()
+{
+    GPFCON = 0b0011000000;
+    GPFDAT = 0b10111;
+
+    GPBCON = (0b01010101<<10);
+    GPBDAT = 0b111100000;
+    while(1)
+    {
+        if((GPFDAT & 0b10) == 0)                   //key1
+        {
+            GPBDAT = 0b111000000;
+        }
+        else if((GPFDAT & 0b10000) == 0)        //key2
+        {
+            GPBDAT = 0b110100000;
+        }
+        else if((GPFDAT & 0b100) == 0)          //key3
+        {
+            GPBDAT = 0b101100000;
+        }
+        else if((GPFDAT & 0b1) == 0)            //key4
+        {
+            GPBDAT = 0b011100000;
+        }
+        else continue;
+        delay();
+        GPBDAT = 0b111100000;
+    }
+}
+```
+
+文件名 Makefile
+
+```
+ARCH = arm-linux-
+CC = $(ARCH)gcc
+LD = $(ARCH)ld
+OBJDUMP = $(ARCH)objdump
+OBJCOPY = $(ARCH)objcopy
+
+all: crt0.S key.c
+	$(CC) -nostdlib -g -c -o crt0.o crt0.S
+	$(CC) -nostdlib -g -c -o key.o key.c
+	$(LD) -Ttext 0x00000000 -g crt0.o key.o -o key-elf
+	$(OBJCOPY) -O binary -S key-elf key_c.bin
+	$(OBJDUMP) -D -m arm key-elf &gt; key.dis
+
+clean:
+	rm -f *.o key-elf key_c.bin key.dis
+```

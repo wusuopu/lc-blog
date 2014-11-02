@@ -1,0 +1,89 @@
+---
+layout: post
+title: vim编译源文件
+data: 2010-10-17 14:57:22 +0000
+comments: true
+post_id: 83435
+permalink: /archives/83435.html
+categories: ["Linux栏目"]
+tags: ["Linux", "vim"]
+---
+
+最近开始学习使用vim，它是Linux下的一个功用非常强大的编辑器。另外emacs也是一款很不错的编辑器，不过偶用了几天不太顺手于是就改用vim。在vim的官网还提供了丰富的插件可以对其进行扩展。网上也有文章介绍使用插件将vim打造成ide，不过偶觉得这个没有必要，因为Linux下也有一些很好的ide，如netbeans、eclipse等，再说了高手们往往都是使用记事本的。
+
+好了，开始切入正题。先打开vimrc文件（在/usr/share/vim目录下），然后添加以下内容：
+
+
+"单个文件编译---------------------------------------------------  
+map &lt;F5&gt; :call Do_OneFileMake()&lt;CR&gt;  
+function Do_OneFileMake()  
+"判断文件名是否为空  
+let sourcefileename=expand("%:t")  
+if (sourcefileename=="")  
+echohl WarningMsg | echo "Fail to make! Please select the right file!" |   echohl None  
+return  
+endif  
+
+if &amp;filetype=="c"  
+setlocal makeprg=gcc -o '%&lt;' '%'  
+endif  
+if &amp;filetype=="cpp"  
+setlocal makeprg=g++ -o '%&lt;' '%'  
+endif  
+if &amp;filetype=="python"  
+setlocal makeprg=python -u  
+silent make %  
+copen  
+return  
+endif  
+"编译  
+make  
+"运行  
+let outfilename=expand("%&lt;")  
+execute "!./".outfilename  
+endfunction  
+
+
+好了，现在用vim打开源文件然后按F5键即可实现编译、运行了，这个只支持C/C++和python，如果你想要支持更多的话可以参照这个自己进行修改。
+
+最后顺便附上一些对编程比较有帮助的vim插件：
+
+<strong><a href="http://www.vim.org/scripts/script.php?script_id=273" target="_blank">taglist</a></strong>：
+
+相信无人不知其大名，用来提供单个源代码文件的函数列表之类的功能。
+
+<strong><a href="http://www.vim.org/scripts/script.php?script_id=1520" target="_blank">omnicppcomplete</a></strong>：
+
+提供C++代码的自动补全功能
+
+<strong><a href="http://www.vim.org/scripts/script.php?script_id=31" target="_blank">a.vim</a></strong>：
+
+提供快速切换.h和.cpp文件的功能
+
+<strong><a href="http://www.vim.org/scripts/script.php?script_id=1218" target="_blank">NERD_commenter</a></strong>：
+
+提供快速注释/反注释代码块的功能
+
+<strong><a href="http://www.vim.org/scripts/script.php?script_id=2540" target="_blank">snipMate</a></strong>：
+
+提供快速生成代码段的功能
+
+<strong><a href="http://www.vim.org/scripts/script.php?script_id=39" target="_blank">matchit</a></strong>：
+
+使%不仅能够匹配简单的&lt;&gt;()，还能匹配&lt;html&gt;&lt;/html&gt;之类标签的功能
+
+<strong><a href="http://www.vim.org/scripts/script.php?script_id=2666" target="_blank">mark.vim</a></strong>：
+
+给不同的单词高亮，表明不同的变量时很有用。（特别说明一下，vim.org上有两个Mark.vim，请使用链接中指向的那个，另外一个是有bug的）
+
+<strong><a href="http://www.vim.org/scripts/script.php?script_id=2727" target="_blank">jsbeautify.vim</a></strong>：
+
+优化js代码，并不是简单的缩进，而是整个优化
+
+<strong><a href="http://www.vim.org/scripts/script.php?script_id=2441" target="_blank">pyflakes</a></strong>：
+
+提供实时检查python代码语法的功能（强烈推荐！）
+
+<strong><a href="http://www.vim.org/scripts/script.php?script_id=1397" target="_blank">xml.vim</a></strong>：
+
+提供快速编写xml/html的能力，如标签自动闭合等

@@ -1,0 +1,38 @@
+---
+layout: post
+title: Pygame学习笔记10：鼠标
+data: 2011-09-17 11:46:05 +0000
+comments: true
+post_id: 83603
+permalink: /archives/83603.html
+categories: ["Python栏目"]
+tags: ["pygame", "python"]
+---
+
+<strong>鼠标</strong>
+
+当显示模式设置后，事件队列就会开始收到鼠标事件。当按下和释放鼠标的按键时，会产生 pygame.MOUSEBUTTONDOWN和pygame.MOUSEBUTTONUP事件。这些事件包含一个button属性表示哪些键被按下。滚动鼠标滚轮会产生pygame.MOUSEBUTTONDOWN事件。当向上滚动滚轮时button的值是4，向下滚动时button的值是5。除此外还有一个pos属性，表示按键按下或释放时鼠标指针的位置。当移动鼠标时，会产生pygame.MOUSEMOTION事件。鼠标移动事件会被分解成一组较小的精确的移动事件。当鼠标移动时，会有很多事件被放在队列中。鼠标移动事件没有被正确的清除，常常是事件队列被填满的主要原因。鼠标移动事件包括一个buttons属性，表示鼠标移动时，鼠标键的状态。还有一个pos属性，表示鼠标指针的位置。还有一个rel属性表示当前位置相对于上一次事件发生时指针位置的偏移量。
+
+除了可以通过事件来接受鼠标输入外，还可以直接调用函数检查鼠标的状态。pygame.mouse.get_pressed可以获得当前所有鼠标按键的状态。pygame.mouse.get_pos获得当前鼠标的位置。pygame.mouse.get_rel获得当前鼠标位置相对于前一个位置的位移。
+
+用pygame.mouse.set_visible可以隐藏鼠标的指针。如果鼠标指针被隐藏，输入被当前的display捕获，鼠标会进入虚拟输入模式，这种模式下鼠标的相对位移不会收到屏幕边界的影响。
+
+通过pygame.mouse.set_cursor可以设置鼠标指针的形状。
+
+<em>pygame.mouse.set_cursor(size, hotspot, xormasks, andmasks): return None</em>
+
+当鼠标指针可见时，它会显示为给定的位域数组指定的黑白色的位图。size是包含指针高度和宽度的列表。hotspot是表示指针的热点位置的列表。xormasks是序列包含指针异或数据位域的序列，andmask是一组包含指针位域数据的序列。宽度必须是8的倍数，位域数组必须是size给定的正确的大小。
+
+pygame.cursors模块包括了几个内置的指针形状。可以这样使用
+
+<em>pygame.mouse.set_cursor(*pygame.cursors.arrow)</em>
+
+可以使用的指针形状有：
+
+pygame.cursors.arrow  
+pygame.cursors.diamond  
+pygame.cursors.broken_x  
+pygame.cursors.tri_left  
+pygame.cursors.tri_right  
+
+偶自己写的一个扫雷小游戏，全鼠标操作的。下载地址：<a href="http://app.xefan.com/小游戏/扫雷/" target="_blank">http://app.xefan.com/小游戏/扫雷/</a>

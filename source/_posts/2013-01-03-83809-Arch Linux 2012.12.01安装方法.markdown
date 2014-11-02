@@ -1,0 +1,84 @@
+---
+layout: post
+title: Arch Linux 2012.12.01安装方法
+data: 2013-01-03 13:37:24 +0000
+comments: true
+post_id: 83809
+permalink: /archives/83809.html
+categories: ["Linux栏目"]
+tags: ["Arch", "Linux"]
+---
+
+自从上次我的Arch系统崩溃之后我就改用其它系统了，距离现在已有小半年了。突然发现Arch又更新了，于是下下来体验一下。  
+在新版的ArchLinux中已经不在使用AIF(Arch Installation Framwork)了，而是使用新的脚本工具(Arch Install Scripts)，https://github.com/falconindy/arch-install-scripts
+
+新版的安装过程是通过网络安装，因此整个过程需要联网才行。
+
+1、首先为Arch分配一个分区，然后挂载到/mnt目录。如果使用多个分区，还需要创建它们并正确挂载（/mnt/boot, /mnt/home, ...），这样genfstab才能自动检测到它们。
+
+2、安装基本系统  
+先编辑/etc/pacman.d/mirrorlist选择首先镜像。  
+然后使用pacstrap脚本安装基本系统。  
+`# pacstrap /mnt base base-devel`
+
+3、安装引导器  
+安装一个Bootloader，Grub或者Syslinux。  
+(1)安装GRUB:  
+如果是BIOS用户执行命令：  
+`# pacstrap /mnt grub-bios`  
+如果是EFI用户执行命令：  
+`# pacstrap /mnt grub-efi-x86_64`
+
+(2)安装Syslinux：  
+`#pacstrap /mnt syslinux`
+
+4、配置系统  
+(1)生成fstab文件  
+`# genfstab -p /mnt &gt;&gt; /mnt/etc/fstab`
+
+(2)chroot到新安装的系统中去  
+`# arch-chroot /mnt`
+
+(3)进行一些系统配置  
+设置主机名：修改/etc/hostname文件，将主机名写入里面。  
+设置时区： cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime  
+设置locale： 修改/etc/locale.gen文件，然后再执行命令locale-gen  
+创建一个初始的RAM disk： mkinitcpio -p linux  
+设置root用户的密码： passwd root  
+配置引导器，在我的电脑上是依次执行如下命令，这个请结合自己的情况进行设置：  
+`# grub-install --no-floppy /dev/sda`  
+`# grub-mkconfig -o /boot/grub/grub.cfg`  
+
+其余的根据自己的需要再进行设置。
+
+5、重启进入新系统  
+先退出chroot，然后卸载之前挂载在/mnt的分区。  
+`# umount /mnt`  
+然后重启进入新系统并以root用户登陆。  
+现在一个基本的Arch系统就已经安装好了，接下来可以根据自己的需要来安装相应的软件。
+
+6、安装应用软件  
+Arch系统刚安装好后发现居然连ifconfig命令都没有，可以使用如下命令安装：  
+`# pacman -S net-tools dnsutils inetutils iproute2`
+
+
+安装Yaourt  
+在/etc/pacman.conf中添加以下内容：  
+```
+[archlinuxfr]
+Server = http://repo.archlinux.fr/$arch
+```
+
+然后再执行命令: pacman -Syu yaourt
+
+
+安装Xorg：  
+`# pacman -S xorg-server xorg-xinit xorg-utils xorg-server-utils`  
+安装显示驱动(根据自己的情况选择安装相应的驱动)：  
+`# pacman -S xf86-video-fbdev`  
+安装evdev，支持大部分即插即用设备  
+`# pacman -S xf86-input-evdev`  
+安装默认的测试环境：  
+`# pacman -S xorg-twm xorg-xclock xterm`  
+然后启动X会话，如果能够看到一个终端和一个时钟就表示已经安装成功了：  
+`$ startx`

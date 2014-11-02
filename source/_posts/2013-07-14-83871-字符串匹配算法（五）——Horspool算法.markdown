@@ -1,0 +1,130 @@
+---
+layout: post
+title: 字符串匹配算法（五）——Horspool算法
+data: 2013-07-14 08:46:55 +0000
+comments: true
+post_id: 83871
+permalink: /archives/83871.html
+categories: ["数据结构和算法"]
+tags: ["匹配算法", "算法"]
+---
+
+Horspool算法是Boyer-Moore算法的一个简化版，全名叫做Boyer-Moore-Horspool算法。
+
+Horspool算法的基本思想是将文本串text中匹配窗口的最后一个字符跟模式串pattern中的最后一个字符比较。如果相等，继续从后向前对主串和模式串进行比较，直到完全相等或者在某个字符处不匹配为止 。如果不匹配，则根据文本串匹配窗口中的最后一个字符β在模式串中的下一个出现位置将窗口向右移动；若字符β没有在模式串中出现，则直接将整个模式串滑过这一位。
+
+同样的举个例子来说明一下。假定文本串text为：”HERE IS A SIMPLE EXAMPLE”，长度为n；模式串pattern为：”EXAMPLE”，长度为m；现在要在text中搜索看看是否包含pattern。
+
+1).
+<pre>
+HERE I<span style="color: #ff0000;">S</span> A SIMPLE EXAMPLE
+EXAMPL<span style="color: #ff0000;">E</span>
+</pre>
+'S'与'E'匹配失败，并且'S'没有在pattern中出现，所以直接将pattern滑过'S'这一位。
+
+2).
+<pre>
+HERE IS A SIM<span style="color: #ff0000;">P</span>LE EXAMPLE
+       EXAMPL<span style="color: #ff0000;">E</span>
+</pre>
+这时'P'与'E'匹配失败，但是'P'在模式串pattern中出现了，所以把pattern向右移，使得text中的'P'与pattern中的'P'对齐。
+
+3).
+<pre>
+HERE IS A SIM<span style="color: #00ff00;">P</span>L<span style="color: #ff0000;">E</span> EXAMPLE
+         EXAM<span style="color: #00ff00;">P</span>L<span style="color: #ff0000;">E</span>
+</pre>
+然后重复执行之前的操作。
+
+
+用C语言实现如下。
+
+``` c
+#include <stdio.h>
+#include <string.h>
+#include <limits.h>
+ 
+/* Returns a pointer to the first occurrence of "needle"
+ * within "haystack", or NULL if not found. Works like
+ * memmem().
+ */
+ 
+/* Note: In this example needle is a C string. The ending
+ * 0x00 will be cut off, so you could call this example with
+ * boyermoore_horspool_memmem(haystack, hlen, "abc", sizeof("abc"))
+ */
+const unsigned char *
+boyermoore_horspool_memmem(const unsigned char* haystack, size_t hlen,
+                           const unsigned char* needle,   size_t nlen)
+{
+    int index = 0;
+    size_t scan = 0;
+    size_t bad_char_skip[UCHAR_MAX + 1]; /* Officially called:
+                                          * bad character shift */
+ 
+    /* Sanity checks on the parameters */
+    if (nlen <= 0 || !haystack || !needle)
+        return NULL;
+ 
+    /* ---- Preprocess ---- */
+    /* Initialize the table to default value */
+    /* When a character is encountered that does not occur
+     * in the needle, we can safely skip ahead for the whole
+     * length of the needle.
+     */
+    for (scan = 0; scan <= UCHAR_MAX; scan = scan + 1)
+        bad_char_skip[scan] = nlen;
+ 
+    /* C arrays have the first byte at [0], therefore:
+     * [nlen - 1] is the last byte of the array. */
+    size_t last = nlen - 1;
+ 
+    /* Then populate it with the analysis of the needle */
+    for (scan = 0; scan < last; scan = scan + 1)
+        bad_char_skip[needle[scan]] = last - scan;
+ 
+    /* ---- Do the matching ---- */
+ 
+    /* Search the haystack, while the needle can still be within it. */
+    while (hlen >= nlen)
+    {
+        /* scan from the end of the needle */
+        for (scan = last; haystack[scan] == needle[scan]; scan = scan - 1)
+            if (scan == 0) /* If the first byte matches, we've found it. */
+            {
+                printf("index: %d\n", index-1);
+                return haystack;
+            }
+ 
+        /* otherwise, we need to skip some bytes and start again.
+           Note that here we are getting the skip value based on the last byte
+           of needle, no matter where we didn't match. So if needle is: "abcd"
+           then we are skipping based on 'd' and that value will be 4, and
+           for "abcdd" we again skip on 'd' but the value will be only 1.
+           The alternative of pretending that the mismatched character was
+           the last character is slower in the normal case (E.g. finding
+           "abcd" in "...azcd..." gives 4 by using 'd' but only
+           4-2==2 using 'z'. */
+        hlen     -= bad_char_skip[haystack[last]];
+        index += bad_char_skip[haystack[last]];
+        haystack += bad_char_skip[haystack[last]];
+    }
+ 
+    return NULL;
+}
+
+
+int main(int argc, char *argv[])
+{
+    char text[] = "HERE IS A SILMPLE EXAMPLE";
+    char pattern[] = "EXAMPLE";
+    char *result = boyermoore_horspool_memmem(text, strlen(text), pattern, strlen(pattern));
+    if (result)
+    {
+        printf("result: %s\n", result);
+    } else {
+        printf("failed!\n");
+    }
+    return 0;
+}
+```

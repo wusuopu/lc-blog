@@ -1,0 +1,100 @@
+---
+layout: post
+title: TQ2440 蜂鸣器程序
+data: 2012-05-12 15:07:45 +0000
+comments: true
+post_id: 83736
+permalink: /archives/83736.html
+categories: ["嵌入式栏目"]
+tags: ["ARM", "TQ2440"]
+---
+
+根据原理图知道TOUT0与GPB0连接，因此当GPB0输出高电平时蜂鸣器鸣；当GPB0输出低电平时蜂鸣器停止鸣。  
+程序如下：  
+文件名 beep.S
+
+```
+.include "gpio.inc"
+.text
+.global _start
+_start:
+        ldr r0, =GPBCON
+        mov r1, #0b01
+        str r1, [r0]
+        ldr r0, =GPBUP
+        mov r1, #0
+        str r1, [r0]
+        ldr r0, =GPBDAT
+        mov r1, #1
+next:   
+        mvn r1, r1
+        str r1, [r0]
+        bl delay
+        b next
+
+delay:
+        ldr r4, =100000
+delay1: sub r4, r4, #1
+        cmp r4, #0
+        bgt delay1
+        mov pc, lr
+
+main_loop:
+        b main_loop
+```
+
+文件名 gpio.inc
+
+```
+.equ GPACON, 0x56000000
+.equ GPADAT, 0x56000004
+
+.equ GPBCON, 0x56000010
+.equ GPBDAT, 0x56000014
+.equ GPBUP,  0x56000018
+
+.equ GPCCON, 0x56000020
+.equ GPCDAT, 0x56000024
+.equ GPCUP,  0x56000028
+
+.equ GPDCON, 0x56000030
+.equ GPDDAT, 0x56000034
+.equ GPDUP,  0x56000038
+
+.equ GPECON, 0x56000040
+.equ GPEDAT, 0x56000044
+.equ GPEUP,  0x56000048
+
+.equ GPFCON, 0x56000050
+.equ GPFDAT, 0x56000054
+.equ GPFUP,  0x56000058
+
+.equ GPGCON, 0x56000060
+.equ GPGDAT, 0x56000064
+.equ GPGUP,  0x56000068
+
+.equ GPHCON, 0x56000070
+.equ GPHDAT, 0x56000074
+.equ GPHUP,  0x56000078
+
+.equ GPJCON, 0x560000d0
+.equ GPJDAT, 0x560000d4
+.equ GPJUP,  0x560000d8
+```
+
+文件名 Makefile
+
+```
+ARCH = arm-linux-
+CC = $(ARCH)gcc
+LD = $(ARCH)ld
+OBJCOPY = $(ARCH)objcopy
+
+all:beep.S
+	$(CC) -g -c -o beep.o beep.S
+	$(LD) -Ttext 0x00000000 -g -o beep-elf beep.o
+	$(OBJCOPY) -O binary -S beep-elf beep.bin
+
+clean:
+	rm -f beep.o beep-elf beep.bin
+```

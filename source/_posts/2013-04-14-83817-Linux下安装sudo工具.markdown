@@ -1,0 +1,38 @@
+---
+layout: post
+title: Linux下安装sudo工具
+data: 2013-04-14 12:48:42 +0000
+comments: true
+post_id: 83817
+permalink: /archives/83817.html
+categories: ["Linux栏目"]
+tags: ["Gentoo", "Linux"]
+---
+
+以gentoo为例，先执行命令安装sudo工具  
+`# emerge sudo`
+
+然后再进行配置。sudo的配置文件是/etc/sudoers。应当永远使用visudo命令编辑/etc/sudoers文件。visudo会锁住sudoers文件，保存修改到临时文件，然后检查文件格式，确保正确后才会覆盖sudoers文件。必须保证sudoers格式正确，否则sudo将无法运行。
+
+编辑/etc/sudoers文件，加入以下内容：
+```
+Defaults    env_reset
+Defaults    secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+```
+
+要为某个用户提供特权，使其可以使用sudo执行所有命令，在配置文件中加入：  
+`用户名   ALL=(ALL) ALL`
+
+如果只想允许本地登陆的用户使用sudo：  
+`用户名   主机名=(ALL) ALL`
+
+允许admin用户组成员无密码使用sudo：  
+`%admin      ALL=(ALL) NOPASSWD: ALL`
+
+请把用户名替换为实际用户名称。
+
+只为用户启用部分特权：  
+`用户名 主机名=/sbin/halt,/sbin/reboot -Syu`  
+`该用户只能使用sudo执行halt、reboot。`
+
+在~/.bashrc中加入 complete -cf sudo 开启sudo的自动补全。

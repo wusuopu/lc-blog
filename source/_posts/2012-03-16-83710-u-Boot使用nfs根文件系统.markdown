@@ -1,0 +1,43 @@
+---
+layout: post
+title: u-Boot使用nfs根文件系统
+data: 2012-03-16 07:02:34 +0000
+comments: true
+post_id: 83710
+permalink: /archives/83710.html
+categories: ["嵌入式栏目"]
+tags: ["Arch", "ARM"]
+---
+
+使用nfs根文件系统对于开发非常方便，不用每次编译好后又要烧写到开发板上。
+
+设置方法：  
+打开开发板电源后进入u-boot，然后选择“[0] Set the boot parameters”。  
+再选择“[1] Set NFS boot parameter ”。  
+然后依次输入PC的IP、开发板的IP、子网掩码、NFS目录。  
+例子如下：  
+Enter the PC IP address:(xxx.xxx.xxx.xxx)  
+10.10.10.2  
+Enter the SKY2440/TQ2440 IP address:(xxx.xxx.xxx.xxx)  
+10.10.10.3  
+Enter the Mask IP address:(xxx.xxx.xxx.xxx)  
+255.255.255.0  
+Enter NFS directory:(eg: /opt/EmbedSky/root_nfs)  
+/opt/EmbedSky/root  
+bootargs: console=ttySAC0 root=/dev/nfs nfsroot=10.10.10.2:/opt/EmbedSky/root ip=10.10.10.3:10.10.10.2:10.10.10.3:255.255.255.0:SKY2440.embedsky.net:eth0:off
+
+输入好后再选择“[s] Save the parameters to Nand Flash”保存设置即可。
+
+以上是一般情况，下面再说说我的特殊情况。
+
+=====================分割线===============================  
+
+我在PC上安装的是ArchLinux，按照以上方法运行时挂载失败，提示Root-NFS: Server returned error -93 while mounting /opt/EmbedSky/root
+－93的意思好像是没有这个协议。
+
+于是我又在虚拟机里安装了ubuntu，再尝试以上方法结果却成功了。  
+最后我查了资料，原因好像是u-boot使用的nfs3，而ArchLinux的官网上说nfs3太老了所以Arch用的是nfs4。因此就出现了这个问题。  
+解决方法：添加一个",v3"参数。如：  
+Enter NFS directory:(eg: /opt/EmbedSky/root_nfs)  
+/opt/EmbedSky/root<span style="color: #ff0000;">,v3</span>  
+bootargs: console=ttySAC0 root=/dev/nfs nfsroot=10.10.10.2:/opt/EmbedSky/root<span style="color: #ff0000;">,v3</span> ip=10.10.10.3:10.10.10.2:10.10.10.3:255.255.255.0:SKY2440.embedsky.net:eth0:off

@@ -1,0 +1,134 @@
+---
+layout: post
+title: Gentoo安装笔记
+data: 2013-01-27 08:52:18 +0000
+comments: true
+post_id: 83811
+permalink: /archives/83811.html
+categories: ["Linux栏目"]
+tags: ["Gentoo", "Linux"]
+---
+
+参考官方手册，并整理一下。http://www.gentoo.org/doc/zh_cn/handbook/
+下载iso文件，并使用其进行引导系统。安装光盘上提供了几个内核。默认的是gentoo。  
+即使用boot:gentoo来启动安装光盘即可。
+
+整个安装过程需要联网进行，请确保网络已经配置好了。
+
+1、先创建一个分区，然后挂载到/mnt/gentoo目录下。
+
+2、安装需要的安装文件  
+(1)、下载stage3 tarball文件，并解压到安装目录下，也就是/mnt/gentoo。  
+(2)、下载安装Portage文件。  
+`# cd /mnt/gentoo`  
+`# tar xvf portage-lastest.bar.bz2 -C /mnt/gentoo/usr`  
+
+3、配置编译选项  
+定义CFLAGS和CXXFLAGS变量  
+
+```
+# nano -w /mnt/gentoo/etc/portage/make.conf
+
+CFLAGS="-O2 -march=i686 -pipe"
+# 两个变量使用相同的设置
+CXXFLAGS="${CFLAGS}"
+```
+
+4、安装Gentoo基本系统  
+为了快速下载源代码，建议选择一个速度快的境像。我用的网易的源，在make.conf文件中添加以下内容。  
+`GENTOO_MIRRORS="http://mirrors.163.com/gentoo/"`
+
+(1)、拷贝DNS信息  
+`# cp -L /etc/resolv.conf /mnt/gentoo/etc`
+
+(2)、挂载proc和dev文件系统  
+`# mount -t proc none /mnt/gentoo/proc`  
+`# mount -o bind /dev /mnt/gentoo/dev`  
+
+(3)、进入新系统环境  
+`# chroot /mnt/gentoo /bin/bash`  
+`# env-update`  
+`# source /etc/profile`  
+`# export PS1="(chroot)$PS1"`  
+
+(4)、配置Portage  
+更新Portage树  
+`# emerge --sync`
+
+修改/etc/locale.gen文件设置locale然后再执行命令locale-gen
+
+5、配置内核  
+(1)、设置时区，我这用的是上海的时区。  
+`# cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime`
+
+(2)、安装源码  
+`# emerge gentoo-sources`  
+然后内核源码就会下载到/usr/src/linux目录下。转到该目录进行内核编译配置。  
+`# cd /usr/src/linux`  
+执行以下命令进行手动配置，手动配置就要注意驱动都要选对，并且要编译进内核，不要编译成模块。反正我是编译了好几次系统都不能正常启动。最后我就使用自动配置。  
+`# make menuconfig`
+
+自动编译内核首先先安装genkernel  
+`# emerge genkernel`  
+然后复制光盘上的内核配置文件到genkernel搜索配置文件的默认位置。  
+  # zcat /proc/config.gz &gt; /usr/share/genkernel/arch/x86/kernel-config  
+现在执行如下命令编译内核。这样编译出来的内核支持几乎所有配件，但是耗时较多。  
+`# genkernel all`  
+编译完成后将会在/boot目录下生成内核文件和initrd文件。
+
+6、配置系统  
+(1)、文件系统信息  
+编辑/etc/fstab文件，设置分区的挂载。  
+
+(2)、网络信息  
+编辑/etc/conf.d/hostname文件，设置主机名。  
+编辑/etc/conf.d/net 文件，设置ip。  
+手动设置ip，设置 config_eth0和routes_eth0：  
+config_eth0=( "192.168.0.2 netmask 255.255.255.0 brd 192.168.0.255" )  
+routes_eth0=( "default via 192.168.0.1" )  
+使用DHCP，请定义一下config_eth0：  
+config_eth0=( "dhcp" )  
+
+创建启动脚本，并设置自动启动。
+
+```
+# cd /etc/init.d
+# ls -s net.lo net.eth0
+# rc-update add net.eth0 default
+```
+
+(3)、系统信息  
+设置root密码，并创建一个普通用户。  
+`# passwd`  
+`# useradd users`  
+
+7、安装一些系统工具  
+根据自己需求再安装一些系统工具。  
+(1)、系统日志工具  
+`# emerge syslog-ng`  
+`# rc-update add syslog-ng default`  
+
+(2)、守护进程  
+`# emerge vixie-cron`  
+`# rc-update add vixie-cron default`  
+
+(3)、网络工具  
+`# emerge dhcpd`  
+`# emerge ppp`  
+
+8、配置引导程序  
+Gentoo提供的引导程序有GRUB和LILO，我用的是GRUB。  
+安装Grub，请根据自己的情况进行调整。  
+```
+# emerge grub
+# grep -v rootfs /proc/mounts &gt; /etc/mtab
+# grub-install --no-floppy /dev/sda
+# update-grub -o /boot/grub/grub.conf
+```
+
+9、重启系统  
+```
+# eixt
+# umount /mnt/gentoo/{dev,proc,}
+# reboot
+```

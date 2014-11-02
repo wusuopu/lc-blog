@@ -1,0 +1,249 @@
+---
+layout: post
+title: 字符串匹配算法（四）——Boyer-Moore算法
+data: 2013-07-14 07:41:51 +0000
+comments: true
+post_id: 83866
+permalink: /archives/83866.html
+categories: ["数据结构和算法"]
+tags: ["匹配算法", "算法"]
+---
+
+1977年，德克萨斯大学的Robert S. Boyer教授和J Strother Moore教授提出了另一种在O(n)时间复杂度内，完成字符串匹配的算法，其在绝大多数场合的性能表现，比KMP算法还要出色。
+
+Boyer-Moore算法不仅高效，而且构思巧妙，文本编辑器的”查找”功能（Ctrl+F），大多采用的是该算法。
+
+Boyer-Moore算法基本原理是从右向左扫描pattern；与KMP算法类似当遇到不匹配的字符时它也不需要对文本串text进行回溯，而是通过预先计算的Bad-character(坏字符)跳转表以及Good-suffix(好后缀)跳转表进行寻找最大的跳转长度。
+
+下面以Moore教授的例子来讲解一下。这个例子的原始地址： http://www.cs.utexas.edu/~moore/best-ideas/string-searching/fstrpos-example.html
+
+假定文本串text为：”HERE IS A SIMPLE EXAMPLE”，长度为n；模式串pattern为：”EXAMPLE”，长度为m；现在要在text中搜索看看是否包含pattern。
+
+1).
+<pre>
+HERE I<span style="color: #ff0000;">S</span> A SIMPLE EXAMPLE
+EXAMPL<span style="color: #ff0000;">E</span>
+</pre>
+首先text与pattern左边对齐，从右边开始进行比较。这个方法比较巧妙，因为如果最右边的字符不匹配，那么就只要比较一次就可以知道前7个字符肯定是不相同的。
+
+S与E不匹配，这时'S'被称为Bad-character。并且'S'不包含在pattern之中，这样就可以把pattern直接移动到text的'S'的后一位。
+
+2).
+<pre>
+HERE IS A SIM<span style="color: #ff0000;">P</span>LE EXAMPLE
+       EXAMPL<span style="color: #ff0000;">E</span>
+</pre>
+仍然是从右边开始比较，发现'P'与'E'不匹配，因此'P'是Bad-character。但是'P'包含中pattern中，因此将pattern后移2位，把两个'P'对齐。注意这里后移时需要用到Bad-character跳转表，这个在后面再介绍。
+
+3).
+<pre>
+HERE IS A SIM<span style="color: #00ff00;">P</span>L<span style="color: #ff0000;">E</span> EXAMPLE
+         EXAM<span style="color: #00ff00;">P</span>L<span style="color: #ff0000;">E</span>
+</pre>
+
+再从右边开始比较，'E'与'E'相匹配，然后再比较下一个字符。
+
+4).
+<pre>
+HERE IS A S<span style="color: #00ff00;">I</span><span style="color: #ff0000;">MPLE</span> EXAMPLE
+         EX<span style="color: #00ff00;">A</span><span style="color: #ff0000;">MPLE</span>
+</pre>
+几次比较之后得到这样的结果，'A'与'I'不匹配，因此'I'是Bad-character。但是'MPLE'与'MPLE'是匹配的。我们尾部匹配的字符串称为Good-suffix(好后缀)。
+
+5).
+根据Bad-character的跳转方法，可以将pattern后移3位，变成如下形式。
+<pre>
+HERE IS A SI<span style="color: #ff0000;">M</span>PLE EXAMPLE
+            <span style="color: #ff0000;">E</span>XAMPLE
+</pre>
+
+但是我们可以有更好的方法。这里'MPLE'为Good-suffix，根据Good-suffix跳转方法，将pattern后移6位，变成如下形式。同样的Good-suffix跳转表也将在后面介绍。
+<pre>
+HERE IS A SIMPL<span style="color: #ff0000;">E</span> EXAM<span style="color: #ff0000;">P</span>LE
+               <span style="color: #ff0000;">E</span>XAMPL<span style="color: #ff0000;">E</span>
+</pre>
+
+6).
+'P'与'E'不匹配，因此'P'为Bad-character。再将pattern后移2位，最后变成：
+<pre>
+HERE IS A SIMPLE EXAM<span style="color: #00ff00;">P</span>L<span style="color: #ff0000;">E</span>
+                 EXAM<span style="color: #00ff00;">P</span>L<span style="color: #ff0000;">E</span>
+</pre>
+至此整个字符串的匹配就完成了。
+<pre>
+HERE IS A SIMPLE <span style="color: #ff0000;">EXAMPLE</span>
+                 <span style="color: #ff0000;">EXAMPLE</span>
+</pre>
+
+
+
+接下来介绍一下Bad-character和Good-suffix的跳转方法。  
+(1).对于Bad-character后移位数计算公式为：  
+delta1(x) = m ;x != pattern[j] (1 &lt;= j &lt;= m),即坏字符x中pattern中未出现  
+delta1(x) = m - max{k|pattern[k]=x, 1 &lt;=k&lt;=m} ;其他情况
+
+例如上面的第2步时，'P'与'E'不匹配，因此'P'为Bad-character，在pattern中上次出现的位置为5,因此后移位数就是 7 - 5 = 2。
+
+(2).对于Good-suffix后移位数计算方法为：  
+1.pattern中间的某一子字符串pattern[j-s+1:m-s] == pattern[j+1:m]，可将pattern右移s位；  
+2.pattern已比较部分pattern[j+1:m]的后缀pattern[s+1:m]与pattern的前缀pattern[1:m-s]相同，可将pattern右移s位。  
+满足上面情况的s的最小值为最佳右移距离。  
+delta2(j) = min{s|(pattern[j+1:m]=pattern[j-s+1:m-s])&&(pattern[j]!=pattern[j-s])(j&gt;s),pattern[s+1:m]=pattern[1:m-s](j&lt;=s)}  
+
+例如上面的第5步，满足的是情况2.pattern[6+1:7] == pattern[1:7-6] => pattern[7] == pattern[1]，即是'E' == 'E'，所以s为6。故右移6位。
+
+
+在匹配过程中，取delta1和delta2中较大的那一个。
+
+
+用C语言实现如下：
+
+``` c
+#include <stdint.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+ 
+#define ALPHABET_LEN 256
+#define NOT_FOUND patlen
+#define max(a, b) ((a < b) ? b : a)
+ 
+// delta1 table: delta1[c] contains the distance between the last
+// character of pat and the rightmost occurence of c in pat.
+// If c does not occur in pat, then delta1[c] = patlen.
+// If c is at string[i] and c != pat[patlen-1], we can
+// safely shift i over by delta1[c], which is the minimum distance
+// needed to shift pat forward to get string[i] lined up 
+// with some character in pat.
+// this algorithm runs in alphabet_len+patlen time.
+void make_delta1(int *delta1, uint8_t *pat, int32_t patlen) {
+    int i;
+    for (i=0; i < ALPHABET_LEN; i++) {
+        delta1[i] = NOT_FOUND;
+    }
+    for (i=0; i < patlen-1; i++) {
+        delta1[pat[i]] = patlen-1 - i;
+    }
+}
+ 
+// true if the suffix of word starting from word[pos] is a prefix 
+// of word
+int is_prefix(uint8_t *word, int wordlen, int pos) {
+    int i;
+    int suffixlen = wordlen - pos;
+    // could also use the strncmp() library function here
+    for (i = 0; i < suffixlen; i++) {
+        if (word[i] != word[pos+i]) {
+            return 0;
+        }
+    }
+    return 1;
+}
+ 
+// length of the longest suffix of word ending on word[pos].
+// suffix_length("dddbcabc", 8, 4) = 2
+int suffix_length(uint8_t *word, int wordlen, int pos) {
+    int i;
+    // increment suffix length i to the first mismatch or beginning
+    // of the word
+    for (i = 0; (word[pos-i] == word[wordlen-1-i]) && (i < pos); i++);
+    return i;
+}
+ 
+// delta2 table: given a mismatch at pat[pos], we want to align 
+// with the next possible full match could be based on what we
+// know about pat[pos+1] to pat[patlen-1].
+//
+// In case 1:
+// pat[pos+1] to pat[patlen-1] does not occur elsewhere in pat,
+// the next plausible match starts at or after the mismatch.
+// If, within the substring pat[pos+1 .. patlen-1], lies a prefix
+// of pat, the next plausible match is here (if there are multiple
+// prefixes in the substring, pick the longest). Otherwise, the
+// next plausible match starts past the character aligned with 
+// pat[patlen-1].
+// 
+// In case 2:
+// pat[pos+1] to pat[patlen-1] does occur elsewhere in pat. The
+// mismatch tells us that we are not looking at the end of a match.
+// We may, however, be looking at the middle of a match.
+// 
+// The first loop, which takes care of case 1, is analogous to
+// the KMP table, adapted for a 'backwards' scan order with the
+// additional restriction that the substrings it considers as 
+// potential prefixes are all suffixes. In the worst case scenario
+// pat consists of the same letter repeated, so every suffix is
+// a prefix. This loop alone is not sufficient, however:
+// Suppose that pat is "ABYXCDEYX", and text is ".....ABYXCDEYX".
+// We will match X, Y, and find B != E. There is no prefix of pat
+// in the suffix "YX", so the first loop tells us to skip forward
+// by 9 characters.
+// Although superficially similar to the KMP table, the KMP table
+// relies on information about the beginning of the partial match
+// that the BM algorithm does not have.
+//
+// The second loop addresses case 2. Since suffix_length may not be
+// unique, we want to take the minimum value, which will tell us
+// how far away the closest potential match is.
+void make_delta2(int *delta2, uint8_t *pat, int32_t patlen) {
+    int p;
+    int last_prefix_index = patlen-1;
+ 
+    // first loop
+    for (p=patlen-1; p>=0; p--) {
+        if (is_prefix(pat, patlen, p+1)) {
+            last_prefix_index = p+1;
+        }
+        delta2[p] = last_prefix_index + (patlen-1 - p);
+    }
+ 
+    // second loop
+    for (p=0; p < patlen-1; p++) {
+        int slen = suffix_length(pat, patlen, p);
+        if (pat[p - slen] != pat[patlen-1 - slen]) {
+            delta2[patlen-1 - slen] = patlen-1 - p + slen;
+        }
+    }
+}
+ 
+uint8_t* boyer_moore (uint8_t *string, uint32_t stringlen, uint8_t *pat, uint32_t patlen) {
+    int i;
+    int delta1[ALPHABET_LEN];
+    int *delta2 = malloc(patlen * sizeof(int));
+    make_delta1(delta1, pat, patlen);
+    make_delta2(delta2, pat, patlen);
+ 
+    i = patlen-1;
+    while (i < stringlen) {
+        int j = patlen-1;
+        while (j >= 0 && (string[i] == pat[j])) {
+            --i;
+            --j;
+        }
+        if (j < 0) {
+            free(delta2);
+            printf("index: %d\n", i);
+            return (string + i+1);
+        }
+ 
+        i += max(delta1[string[i]], delta2[j]);
+    }
+    free(delta2);
+    return NULL;
+}
+
+int main(int argc, char *argv[])
+{
+    
+    char text[] = "HERE IS A SILMPLE EXAMPLE";
+    char pattern[] = "EXAMPLE";
+    char *result = boyer_moore(text, strlen(text), pattern, strlen(pattern));
+    if (result)
+    {
+        printf("result: %s\n", result);
+    } else {
+        printf("failed!\n");
+    }
+    return 0;
+}
+```

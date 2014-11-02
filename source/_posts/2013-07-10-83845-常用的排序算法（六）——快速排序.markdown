@@ -1,0 +1,82 @@
+---
+layout: post
+title: 常用的排序算法（六）——快速排序
+data: 2013-07-10 13:59:48 +0000
+comments: true
+post_id: 83845
+permalink: /archives/83845.html
+categories: ["数据结构和算法"]
+tags: ["排序算法", "算法"]
+---
+
+快速排序也是分治算法的一种应用。它的基本操作是根据某种方法（可以是随机的，也可以是最左边，或者是中间的）选择一个元素作为中枢值。这个元素将数组分为两个子数组，小于或等于中枢值的元素都移到左边，大于或等于中枢值的元素都移到右边。然后每个子数组再递归地排序。
+
+
+快速排序的平均时间复杂度为O(nlogn)，最好时为O(nlogn)，最坏时为O(n*n)。
+
+
+用C语言实现如下：
+
+``` c
+#include <stdio.h>
+
+void print_list(int *ar, int n)
+{
+    int i;
+    printf("[ ");
+    for (i=0; i<n; i++) {
+        printf("%d ", ar[i]);
+    }
+    printf("]\n");
+
+}
+
+int partition(int *ar, int left, int right)
+{
+    int x, i, j;
+    int tmp;
+
+    x = ar[right];
+    i = left;
+    for (j=left; j<right; j++) {
+        if (ar[j] <= x) {
+            tmp = ar[j];
+            ar[j] = ar[i];
+            ar[i] = tmp;
+            i++;
+        }
+    }
+    tmp = ar[i];
+    ar[i] = ar[right];
+    ar[right] = tmp;
+    return i;
+}
+
+void quick_sort(int *ar, int left, int right)
+{
+    int index;
+    if (left < right) {
+        index = partition(ar, left, right);
+        quick_sort(ar, left, index-1);
+        quick_sort(ar, index, right);
+    }
+}
+
+int main(int argc, char *argv[])
+{
+    int a[] = {15, 9, 8, 1, 4, 11, 7, 12, 13, 16, 5, 3, 16, 2, 10, 14};
+    int len=sizeof(a)/sizeof(int);
+    printf("begin: ");
+    print_list(a, len);
+    quick_sort(a, 0, len-1);
+    printf("end ");
+    print_list(a, len);
+    return 0;
+}
+```
+
+这个例子是选择最右边的元素作为中枢值。
+
+快速排序演示图片：
+<img src="http://www.linuxeden.com/upimg/allimg/130504/102114LX-0.gif">
+

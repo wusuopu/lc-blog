@@ -1,0 +1,37 @@
+---
+layout: post
+title: Pygame学习笔记8：视频
+data: 2011-09-17 11:29:32 +0000
+comments: true
+post_id: 83597
+permalink: /archives/83597.html
+categories: ["Python栏目"]
+tags: ["pygame", "python"]
+---
+
+<strong>视频</strong>
+
+要在游戏中播放片头动画、过场动画等视频画面，可以使用pygame.movie模块。
+
+要播放视频中的音乐，pygame.movie模块需要对音频接口的完全控制，不能初始化mixer模块。因此要这样完成初始化
+
+<em>pygame.init()</em>
+<em> pygame.mixer.quit()</em>
+
+或者只初始化
+
+<em>pygame.display.init()</em>
+
+用movie = pygame.movie.Movie(’filename’)指定文件名载入视频。视频的格式可以为mpeg1。视频文件不会马上全部载入内存，而是在播放的时候一点一点的载入内存。
+
+用movie.set_display(pygame.display.set_mode((640,480)))指定播放的surface。
+
+用movie.set_volume(value)指定播放的音量。音量的值value的取值范围为0.0到1.0。
+
+用movie.play()播放视频。这个函数会立即返回，视频在后台播放。这个函数可以带一个参数loops，指定重复次数。
+
+正在播放的视频可以用movie.stop()停止播放。还可以用movie.pause()暂停播放。可以使用movie.skip(seconds)使视频前进seconds秒钟。
+
+如有不懂的可以参考Pygame的官方例子，在Python安装目录下的\lib\site-packages\pygame\examples\movieplayer.py文件。
+
+不过偶用官方的这个例子在Linux下播放mpeg1文件一切正常，但是在Windows下却只有声音没有画面，偶也不知道是何故。

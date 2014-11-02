@@ -1,0 +1,66 @@
+---
+layout: post
+title: Linux下静态编译win32的GTK程序
+data: 2011-11-27 03:36:20 +0000
+comments: true
+post_id: 83665
+permalink: /archives/83665.html
+categories: ["编程开发"]
+tags: ["gtk", "Linux", "windows"]
+---
+
+首先感谢hangyu网友分享的GTK静态库。  
+原帖地址：http://forum.ubuntu.org.cn/viewtopic.php?f=162&amp;t=354286 <br>
+下载地址：http://code.google.com/p/static-gtk2-mingw32/
+
+先说一下在Windows下编译的方法。
+
+解压文件，然后进入解压后的bin目录执行命令：  
+<em>pkg-config.exe --libs --cflags "gtk+-2.0"</em>  
+如果出现以下错误  
+Package gtk+-2.0 was not found in the pkg-config search path.  
+Perhaps you should add the directory containing `gtk+-2.0.pc'  
+to the PKG_CONFIG_PATH environment variable  
+No package 'gtk+-2.0' found  
+则先执行命令：<em>set PKG_CONFIG_PATH=你的解压路径\lib\pkgconfig</em> 设置PKG_CONFIG_PATH环境变量
+
+我得到的结果是：  
+-mms-bitfields -IE:/Dev-Cpp/gtk+-2.0/include/gtk-2.0 -IE:/Dev-Cpp/gtk+-2.0/lib/gtk-2.0/include -IE:/Dev-Cpp/gtk+-2.0/include/atk-1.0 -IE:/Dev-Cpp/gtk+-2.0/include/cairo -IE:/Dev-Cpp/gtk+-2.0/include/gdk-pixbuf-2.0 -IE:/Dev-Cpp/gtk+-2.0/include/pango-1.0 -IE:/Dev-Cpp/gtk+-2.0/include/glib-2.0 -IE:/Dev-Cpp/gtk+-2.0/lib/glib-2.0/include -IE:/Dev-Cpp/gtk+-2.0/include/pixman-1 -IE:/Dev-Cpp/gtk+-2.0/include -IE:/Dev-Cpp/gtk+-2.0/include/freetype2 -I/gtk-dev/include/libpng14 -LE:/Dev-Cpp/gtk+-2.0/lib -L/gtk-dev/lib -lgtk-win32-2.0 -lgdk-win32-2.0 -limm32 -lshell32 -luuid -latk-1.0 -lpangocairo-1.0 -lgio-2.0 -lshlwapi -ldnsapi -lgdk_pixbuf-2.0 -ltiff -ljpeg -ljasper -lpangoft2-1.0 -lpangowin32-1.0 -lusp10 -lfontconfig -lexpat -lpango-1.0 -lcairo -lpixman-1 -lfreetype -lmsimg32 -lgdi32 -lpng -lz -lm -lgobject-2.0 -lgmodule-2.0 -lgthread-2.0 -lglib-2.0 -lintl -liconv -lws2_32 -lole32
+
+记得保存这个结果，作为编译时的参数在后面要用到。  
+然后编译一个程序试试，将以下代码保存为test.c文件。
+
+``` c
+#include <gtk/gtk.h>
+int main(int argc,char *argv[]){
+    GtkWidget *window, *label;
+    gtk_init(&argc,&argv);
+    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_title(GTK_WINDOW(window),"Hellow World");
+    g_signal_connect(G_OBJECT(window), "destroy", G_CALLBACK(gtk_main_quit), NULL);
+    label = gtk_label_new("龙昌博客:http://www.xefan.com");
+    gtk_container_add (GTK_CONTAINER (window), label);
+    gtk_widget_show_all(window);
+    gtk_main();
+    return 0;
+}
+```
+
+执行命令进行编译：  
+gcc -o test.exe test.c -mms-bitfields -IE:/Dev-Cpp/gtk+-2.0/include/gtk-2.0 -IE:/Dev-Cpp/gtk+-2.0/lib/gtk-2.0/include -IE:/Dev-Cpp/gtk+-2.0/include/atk-1.0 -IE:/Dev-Cpp/gtk+-2.0/include/cairo -IE:/Dev-Cpp/gtk+-2.0/include/gdk-pixbuf-2.0 -IE:/Dev-Cpp/gtk+-2.0/include/pango-1.0 -IE:/Dev-Cpp/gtk+-2.0/include/glib-2.0 -IE:/Dev-Cpp/gtk+-2.0/lib/glib-2.0/include -IE:/Dev-Cpp/gtk+-2.0/include/pixman-1 -IE:/Dev-Cpp/gtk+-2.0/include -IE:/Dev-Cpp/gtk+-2.0/include/freetype2 -I/gtk-dev/include/libpng14 -LE:/Dev-Cpp/gtk+-2.0/lib -L/gtk-dev/lib -lgtk-win32-2.0 -lgdk-win32-2.0 -limm32 -lshell32 -luuid -latk-1.0 -lpangocairo-1.0 -lgio-2.0 -lshlwapi -ldnsapi -lgdk_pixbuf-2.0 -ltiff -ljpeg -ljasper -lpangoft2-1.0 -lpangowin32-1.0 -lusp10 -lfontconfig -lexpat -lpango-1.0 -lcairo -lpixman-1 -lfreetype -lmsimg32 -lgdi32 -lpng -lz -lm -lgobject-2.0 -lgmodule-2.0 -lgthread-2.0 -lglib-2.0 -lintl -liconv -lws2_32 -lole32
+
+如果不出错的话则生成一个test.exe的可执行文件。  
+如果没有gcc的话，可以下载安装一个MinGW程序，我之前用MinGW的gcc 4.4.0版本来编译结果出错了，然后换了个4.6版本的才能顺利编译，下载地址：http://nuwen.net/mingw.html
+
+然后再介绍下在Linux下交叉编译的方法。
+
+前一篇文章介绍了在Linux下交叉编译Windows程序的方法。现在只需把上面的参数的路径改下即可。
+
+我的Windows的E盘在Linux下挂载到/mnt/Win_E ，再用上面的程序测试，执行命令：  
+i486-mingw32-gcc -o test.exe test.c -mms-bitfields -I/mnt/Win_E/Dev-Cpp/gtk+-2.0/include/gtk-2.0 -I/mnt/Win_E/Dev-Cpp/gtk+-2.0/lib/gtk-2.0/include -I/mnt/Win_E/Dev-Cpp/gtk+-2.0/include/atk-1.0 -I/mnt/Win_E/Dev-Cpp/gtk+-2.0/include/cairo -I/mnt/Win_E/Dev-Cpp/gtk+-2.0/include/gdk-pixbuf-2.0 -I/mnt/Win_E/Dev-Cpp/gtk+-2.0/include/pango-1.0 -I/mnt/Win_E/Dev-Cpp/gtk+-2.0/include/glib-2.0 -I/mnt/Win_E/Dev-Cpp/gtk+-2.0/lib/glib-2.0/include -I/mnt/Win_E/Dev-Cpp/gtk+-2.0/include/pixman-1 -I/mnt/Win_E/Dev-Cpp/gtk+-2.0/include -I/mnt/Win_E/Dev-Cpp/gtk+-2.0/include/freetype2 -I/gtk-dev/include/libpng14  -L/mnt/Win_E/Dev-Cpp/gtk+-2.0/lib -L/gtk-dev/lib -lgtk-win32-2.0 -lgdk-win32-2.0 -limm32 -lshell32 -luuid -latk-1.0 -lpangocairo-1.0 -lgio-2.0 -lshlwapi -ldnsapi -lgdk_pixbuf-2.0 -ltiff -ljpeg -ljasper -lpangoft2-1.0 -lpangowin32-1.0 -lusp10 -lfontconfig -lexpat -lpango-1.0 -lcairo -lpixman-1 -lfreetype -lmsimg32 -lgdi32 -lpng -lz -lm -lgobject-2.0 -lgmodule-2.0 -lgthread-2.0 -lglib-2.0 -lintl -liconv -lws2_32 -lole32
+
+然后生成 test.exe文件，可以用wine来测试下是否可用。
+
+这个生成的文件好像有点大了，随便一个都是25M以上。使用命令：  
+i486-mingw32-strip hellow.exe  
+一下子可以减到7M左右。

@@ -1,0 +1,242 @@
+---
+layout: post
+title: PHP对XML的读写实例
+data: 2011-07-24 08:25:24 +0000
+comments: true
+post_id: 83559
+permalink: /archives/83559.html
+categories: ["编程开发"]
+tags: ["php", "xml"]
+---
+
+新建两个文件，文件名分别为：photo_list.php、photo_list.xml，放在同一目录下。
+
+<strong>photo_list.xml</strong>文件内容：
+
+``` xml
+<?xml version="1.0" encoding="utf-8"?>
+<photos>
+<photo>
+<filename>flashmo_175_01.jpg</filename>
+<title>精美相框</title>
+<description>
+</description>
+</photo>
+<photo>
+<filename>flashmo_175_02.jpg</filename>
+<title>精美相框</title>
+<description>
+精美相框
+</description>
+</photo>
+<photo>
+<filename>flashmo_175_03.jpg</filename>
+<title>精美相框</title>
+<description>
+精美相框
+</description>
+</photo>
+<photo>
+<filename>flashmo_175_04.jpg</filename>
+<title>精美相框</title>
+<description>
+精美相框
+</description>
+</photo>
+<photo>
+<filename>flashmo_175_05.jpg</filename>
+<title>精美相框</title>
+<description>
+精美相框
+</description>
+</photo>
+<photo>
+<filename>flashmo_175_06.jpg</filename>
+<title>精美相框</title>
+<description>
+精美相框
+</description>
+</photo>
+<photo>
+<filename>flashmo_175_07.jpg</filename>
+<title>精美相框</title>
+<description>
+精美相框
+</description>
+</photo>
+<photo>
+<filename>flashmo_175_08.jpg</filename>
+<title>精美相框</title>
+<description>
+精美相框
+</description>
+</photo>
+<photo>
+<filename>flashmo_175_09.jpg</filename>
+<title>精美相框</title>
+<description>
+精美相框
+</description>
+</photo>
+<photo>
+<filename>flashmo_175_10.jpg</filename>
+<title>精美相框</title>
+<description>
+精美相框
+</description>
+</photo>
+<photo>
+<filename>flashmo_175_11.jpg</filename>
+<title>精美相框</title>
+<description>
+精美相框
+</description>
+</photo>
+<photo>
+<filename>flashmo_175_12.jpg</filename>
+<title>精美相框</title>
+<description>
+精美相框
+</description>
+</photo>
+<photo>
+<filename>flashmo_175_13.jpg</filename>
+<title>精美相框</title>
+<description>
+精美相框
+</description>
+</photo>
+<photo>
+<filename>flashmo_175_14.jpg</filename>
+<title>精美相框</title>
+<description>
+精美相框
+</description>
+</photo>
+<photo>
+<filename>flashmo_175_15.jpg</filename>
+<title>精美相框</title>
+<description>
+精美相框
+</description>
+</photo>
+<photo>
+<filename>flashmo_175_16.jpg</filename>
+<title>精美相框</title>
+<description>
+精美相框
+</description>
+</photo>
+<photo>
+<filename>flashmo_175_17.jpg</filename>
+<title>精美相框</title>
+<description>
+精美相框
+</description>
+</photo>
+<photo>
+<filename>1300513578.jpg</filename>
+<title>精美相框</title>
+<description>精美相框</description>
+</photo>
+<photo>
+<filename>1300513595.jpg</filename>
+<title>精美相框</title>
+<description>精美相框</description>
+</photo>
+<photo>
+<filename>1300514082.jpg</filename>
+<title>精美相框</title>
+<description>精美相框</description>
+</photo>
+</photos>
+```
+
+
+<strong>photo_list.php</strong>文件内容：
+
+``` php
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<html>
+<head>
+<title>XML Library</title>
+</head>
+<?php
+$xml = new DOMDocument('1.0');
+$xml->load( 'photo_list.xml' );
+switch($_GET['action']){
+//添加内容
+case 'add':
+$filename2 = time().'.jpg';
+$root=$xml->getElementsByTagName('photos')->item(0);
+//创建结点
+$Nphoto=$xml->createElement('photo');
+$Nfilename=$xml->createElement('filename');
+$Ntitle=$xml->createElement('title');
+$Ndescription=$xml->createElement('description');
+//各结点的值
+$Tfilename=$xml->createTextNode($filename2);
+$Ttitle=$xml->createTextNode('精美相框');
+$Tdescription=$xml->createTextNode('精美相框');
+//值插入结点
+$Nfilename->appendChild($Tfilename);
+$Ntitle->appendChild($Ttitle);
+$Ndescription->appendChild($Tdescription);
+//保存结点
+$Nphoto->appendChild($Nfilename);
+$Nphoto->appendChild($Ntitle);
+$Nphoto->appendChild($Ndescription);
+$root->appendChild($Nphoto);
+$xml->save('photo_list.xml');
+echo "添加成功！";
+exit();
+//删除内容
+case 'del':
+$filename = $_GET['file'];
+$root=$xml->getElementsByTagName('photos')->item(0);
+$N_photo=$root->getElementsByTagName('photo');
+foreach($N_photo as $Nphoto){
+$N_filename=$Nphoto->getElementsByTagName('filename');
+if($N_filename->item(0)->firstChild->nodeValue==$filename){
+$root->removeChild($Nphoto);
+$xml->save('photo_list.xml');
+echo "删除成功！";
+}
+}
+exit();
+//列出内容
+default:
+}
+
+$description = array();
+$filename  = array();
+$title  = array();
+$count = 0;
+$XMLGroups = $xml->getElementsByTagName('photos')->item(0);
+foreach($XMLGroups->getElementsByTagName('photo') as $groupNode) {
+$description[$count] = $groupNode->getElementsByTagName('description')->item(0)->firstChild->nodeValue;
+$filename[$count]  = $groupNode->getElementsByTagName('filename')->item(0)->firstChild->nodeValue;
+$title[$count]  = $groupNode->getElementsByTagName('title')->item(0)->firstChild->nodeValue;
+$count++;
+}
+
+?>
+
+<body>
+<br />
+
+<?
+$Length=count($filename);
+$i=0;
+while($i<$Length){
+echo '<div style="border:1px; border-style:dashed; border-color:#000000; width:820px;">';
+echo "文件名：$filename[$i]<br>标题：$title[$i]<br>描述：$description[$i]<br>";
+echo '</div><br>';
+$i++;
+}
+?>
+
+<br />
+</body>
+</html>
+```

@@ -1,0 +1,41 @@
+---
+layout: post
+title: 用PyGTK创建Dialog对话框
+data: 2011-10-20 12:37:00 +0000
+comments: true
+post_id: 83639
+permalink: /archives/83639.html
+categories: ["Python栏目"]
+tags: ["gtk", "python"]
+---
+
+PyGTK创建Dialog的函数如下：  
+`gtk.Dialog(title=None, parent=None, flags=0, buttons=None)`
+
+原文地址：http://www.pygtk.org/docs/pygtk/class-gtkdialog.html#constructor-gtkdialog
+
+下面是一个例子：
+
+``` python
+#!/usr/bin/env python
+# -*- coding:UTF-8 -*-
+import gtk
+
+label = gtk.Label(u&quot;龙昌博客  http://www.xefan.com&quot;)
+dialog = gtk.Dialog(u&quot;测试对话框&quot;,
+                   None,
+                   gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+                   (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
+                    gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+dialog.vbox.pack_start(label)
+label.show()
+checkbox = gtk.CheckButton(&quot;Useless checkbox&quot;)
+dialog.action_area.pack_end(checkbox)
+checkbox.show()
+response = dialog.run()
+dialog.destroy()
+if response == gtk.RESPONSE_ACCEPT.real:
+    print u&quot;确定&quot;
+if response == gtk.RESPONSE_REJECT.real:
+    print u&quot;取消&quot;
+```

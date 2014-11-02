@@ -1,0 +1,22 @@
+---
+layout: post
+title: Linux下文件、文件名编码转换
+data: 2010-10-23 13:31:02 +0000
+comments: true
+post_id: 83443
+permalink: /archives/83443.html
+categories: ["Linux栏目"]
+tags: ["Linux", "电脑技巧"]
+---
+
+在Windows下文本文件默认保存为ansi的编码，而在Linux下是utf8的编码，所以Linux与Windows共享文件时常常出现乱码。这时就需要转换编码了。
+
+转换文件编码  
+直接用文本编辑器（如gedit）打开文本文件，再另存为时选择编码类型然后保存。
+
+转换文件名编码  
+偶用vsftpd搭建了一个ftp服务器，结果在Windows下访问时文件名有中文的会出现乱码。只要把文件名的编码转换一下就可以了，可以使用convmv软件来完成。
+
+把文件名由utf8改为gbk：convmv -f utf8 -t gbk * --notest
+
+把文件名由gbk改为utf8：convmv -f gbk -t utf8 * --notest

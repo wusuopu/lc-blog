@@ -1,0 +1,137 @@
+---
+layout: post
+title: Linux进程通信——使用消息队列
+data: 2012-02-24 11:06:58 +0000
+comments: true
+post_id: 83703
+permalink: /archives/83703.html
+categories: ["编程开发"]
+tags: ["C", "Linux"]
+---
+
+头文件：  
+  #include &lt;sys/ipc.h&gt;  
+  #include &lt;sys/msg.h&gt;  
+  #include &lt;sys/types.h&gt;  
+
+函数： key_t ftok(const char *filename, int proj_id);  
+通过文件名和项目号获得System V IPC键值（用于创建消息队列、共享内存所用）  
+proj_id：项目号，不为0即可  
+返回：成功则返回键值，失败则返回-1  
+
+函数： int msgget(key_t key, int msgflg)；  
+key：键值，当为IPC_PRIVATE时新建一块共享内存；  
+shmflg：标志。  
+IPC_CREAT：内存不存在则新建，否则打开；  
+IPC_EXCL：只有在内存不存在时才创建，否则出错。  
+返回：成功则返回标识符，出错返回-1  
+
+函数： int msgsnd(int msgid, const void *msgp, size_t sz, int flg)；  
+向消息队列发送消息  
+msgid：通过msgget获取  
+msgp：指向消息内容的指针  
+sz：消息内容的大小  
+flg：处理方式；如为IPC_NOWAIT时表示空间不足时不会阻塞  
+返回：成功则返回0，失败返回-1  
+
+函数： int msgrcv(int msgid, void *msgp, size_t sz, long type, int flg)；  
+从消息队列读取消息  
+msgid：通过msgget获取  
+msgp：指向消息内容的指针  
+sz：消息内容的大小  
+type：指定接收的消息类型；若为0则队列第一条消息将被读取，而不管类型；若大于0则队列中同类型的消息将被读取，如在flg中设了MSG_RXCEPT位将读取指定类型的其他消息；若小于0读取绝对值小于type的消息。  
+flg：处理方式；  
+返回：成功返回收到消息长度，错误返回-1  
+
+函数： int msgctl(int msgid, int cmd, struct msgid_ds *buf)；  
+msgid：通过msgget获取  
+cmd：控制命令，如下：  
+IPC_STAT：获取消息队列状态  
+IPC_SET：改变消息队列状态  
+IPC_RMID：删除消息队列  
+buf：结构体指针，用于存放消息队列状态  
+返回：成功返回与cmd相关的正数，错误返回-1  
+
+<span style="color: #ff0000;">注意：消息队列一旦创建就会一直存在系统中，直到手动删除或者重启系统。可以使用ipcs -q命令来查看系统存在的消息队列。</span>
+
+例子：
+
+``` c
+/****************************************
+ *
+ * 使用消息队列进行进程通信——写进程
+ * 该进程用于创建信号量
+ * 龙昌博客：http://www.xefan.com
+ *
+ ****************************************/
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+#include <stdio.h>
+
+typedef struct _msg_buf{
+    long type;          //消息类型
+    char buf[100];      //消息内容
+} msg_buf;
+
+int main()
+{
+    int key, qid;
+    msg_buf buf;
+    key = ftok("tmp", 10);
+    qid = msgget(key, IPC_CREAT);
+    printf("key: %d\nqid: %d\n", key, qid);
+    buf.type = 10;
+    while (1)
+    {
+        fgets(buf.buf, 100, stdin);
+        if (msgsnd(qid, (void *)&buf, 100, 0) < 0)
+        {
+            perror("msgsnd");
+            exit(-1);
+        }
+    }
+    return 0;
+}
+```
+
+
+``` c
+/****************************************
+ *
+ * 使用消息队列进行进程通信——读进程
+ * 该进程用于创建信号量
+ * 龙昌博客：http://www.xefan.com
+ *
+ ****************************************/
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+#include <stdio.h>
+
+typedef struct _msg_buf{
+    long type;          //消息类型
+    char buf[100];      //消息内容
+} msg_buf;
+
+int main()
+{
+    int key, qid;
+    msg_buf buf;
+    key = ftok("tmp", 10);
+    qid = msgget(key, IPC_CREAT);
+    printf("key: %d\nqid: %d\n", key, qid);
+    while (1)
+    {
+        if (msgrcv(qid, (void *)&buf, 100, 0, 0) < 0)
+        {
+            perror("msgrcv");
+            exit(-1);
+        }
+        printf("type:%d\nget:%s\n", buf.type, buf.buf);
+    }
+    return 0;
+}
+```
+
+先运行写进程再运行读进程。

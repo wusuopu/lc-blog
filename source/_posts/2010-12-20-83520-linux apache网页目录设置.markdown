@@ -1,0 +1,25 @@
+---
+layout: post
+title: linux apache网页目录设置
+data: 2010-12-20 01:20:32 +0000
+comments: true
+post_id: 83520
+permalink: /archives/83520.html
+categories: ["Linux栏目"]
+tags: ["apache", "Linux", "ubuntu"]
+---
+
+在Windows下，Apache的配置文件通常只有一个，就是httpd.conf。但是在Linux下就比较复杂。
+
+Linux下apache的默认目录是/var/www。网上说的修改方法是：打开/etc/httpd/conf/httpd.conf文件，找到下面这行 DocumentRoot "/var/www" 可以改成你想要的目录，同时要确保你对该目录拥有相应的权限。
+
+偶用的是ubuntu，没有/etc/httpd/conf/httpd.conf这个文件，它的配置文件好像是/etc/apache2/apache2.conf，不过这个文件里也没有目录设置的选项。最后偶用的是一个比较笨的方法，就是打开所有与apache相关的配置文件，然后查找"/var/www"。最后找到了 /etc/apache2/sites-available/default 这个文件，里面有这样的内容：
+
+<pre>
+NameVirtualHost *
+&lt;VirtualHost *&gt;
+ServerAdmin webmaster@localhost
+DocumentRoot /var/www/
+</pre>
+
+现在只要把DocumentRoot改为你想要的目录即可。

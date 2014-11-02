@@ -1,0 +1,114 @@
+---
+layout: post
+title: 常用的排序算法（五）——堆排序
+data: 2013-07-10 13:34:07 +0000
+comments: true
+post_id: 83841
+permalink: /archives/83841.html
+categories: ["数据结构和算法"]
+tags: ["排序算法", "算法"]
+---
+
+堆排序的时间复杂度为O(nlogn)。
+
+首先简单介绍一下堆，一个堆其实就是一个近似的完全二叉树，它具有以下两个性质：  
+外形性质：如果深度k-1存在2**(k-1)个节点，那么深度k(k>0)上存在叶子节点。另外，在一个部分填充的深度级上，节点是“ 从左到右”添加的。
+
+堆的性质：树中每一个节点的值都大于或者等于任意一个子节点的值。
+
+堆只是一个抽象的数据结构，在内存可以使用数组来表示的。第0个值为根节点。对于第i个节点，其左子节点为2*i+1，右子节点为2*i+2。
+
+例如，对于数列[ 5 3 16 2 10 14 ]，将其构造一个堆则为：
+
+```
+        16
+       /   \
+      10    14
+     / \    /
+    2   3  5
+```
+
+然后这个堆对应的数组为[ 16 10 14 2 3 5 ]，最后就是对这个堆进行排序。
+
+代码如下：
+
+``` c
+#include <stdio.h>
+
+void print_list(int *ar, int n)
+{
+    int i;
+    printf("[ ");
+    for (i=0; i<n; i++) {
+        printf("%d ", ar[i]);
+    }
+    printf("]\n");
+
+}
+static void heapify(int *ar, int idx, int max)
+{
+    int left = 2*idx + 1;
+    int right = 2*idx +2;
+    int largest;
+
+    // 计算A[idx], A[left], A[right]中最大的一个
+    if (left < max && ar[left] > ar[idx]) {
+        largest = left;
+    } else {
+        largest = idx;
+    }
+
+    if (right < max && ar[right] > ar[largest]) {
+        largest = right;
+    }
+
+    // 如果最大的不是父节点，那么交换并递归执行
+    if (largest != idx) {
+        int tmp;
+        tmp = ar[idx];
+        ar[idx] = ar[largest];
+        ar[largest] = tmp;
+
+        heapify(ar, largest, max);
+    }
+}
+
+static void buildHeap(int *ar, int n)
+{
+    int i;
+    for (i=n/2-1; i>=0; i--) {
+        heapify(ar, i, n);
+    }
+}
+
+void heap_sort(int *ar, int n)
+{
+    int i;
+    int tmp;
+    buildHeap(ar, n);
+    printf("build:");
+    for (i=n-1; i>=1; i--) {
+        tmp = ar[0];
+        ar[0] = ar[i];
+        ar[i] = tmp;
+
+        heapify(ar, 0, i);
+    }
+}
+
+int main(int argc, char *argv[])
+{
+    int a[] = {5, 3, 16, 2, 10, 14};
+    int len=sizeof(a)/sizeof(int);
+    printf("begin: ");
+    print_list(a, len);
+    heap_sort(a, len);
+    printf("end ");
+    print_list(a, len);
+    return 0;
+}
+```
+
+堆排序演示图片：
+<img src="http://www.linuxeden.com/upimg/allimg/130504/1021144023-2.gif">
+

@@ -1,0 +1,53 @@
+---
+layout: post
+title: Windows下静态编译Qt4
+data: 2011-12-29 14:55:04 +0000
+comments: true
+post_id: 83668
+permalink: /archives/83668.html
+categories: ["编程开发"]
+tags: ["Qt", "windows"]
+---
+
+既然是静态编译，那就要编译出来的程序不信赖于任何dll文件。  
+首先下载qt-win-opensource-4.7.4-mingw.exe： http://get.qt.nokia.com/qt/source/qt-win-opensource-4.7.4-mingw.exe 和MinGW-gcc440_1.zip： http://get.qt.nokia.com/misc/MinGW-gcc440_1.zip
+
+然后依次解压MinGW-gcc440_1.zip、安装qt-win-opensource-4.7.4-mingw.exe。记得要将gcc的目录和qt的目录添加到环境变量中。
+
+然后打开DOS窗口并切换到Qt的目录（比如我的是D:\Qt\4.7.4），再设置两个变量  
+<em>set QTDIR=D:\Qt\4.7.4</em>  
+<em> set QMAKESPEC=win32-g++</em>  
+
+再编辑D:\Qt\4.7.4\mkspecs\win32-g++\qmake.conf文件（最好先备份），改两处：  
+<em>QMAKE_LFLAGS = -enable-stdcall-fixup -Wl,-enable-auto-import -Wl,-enable-runtime-pseudo-reloc</em>  
+修改为  
+<em>QMAKE_LFLAGS = <span style="color: #ff0000;">-static</span> -enable-stdcall-fixup -Wl,-enable-auto-import -Wl,-enable-runtime-pseudo-reloc</em>  
+再将  
+<em>QMAKE_LFLAGS_DLL = -shared</em>  
+修改为  
+<em>QMAKE_LFLAGS_DLL = -static</em>  
+
+再执行命令：  
+configure -platform win32-g++ <span style="color: #ff0000;">-release</span> -opensource <span style="color: #ff0000;">-static</span> -fast -qt-sql-sqlite -plugin-sql-sqlite -qt-zlib -qt-gif -qt-libpng -qt-libmng -qt-libtiff -qt-libjpeg -no-webkit -nomake examples -nomake docs -nomake demos  
+
+如果有提问是否遵守LGPL协议，选y。配置完成后，最后两句是这样的：  
+Qt is now configured for building. Just run mingw32-make.  
+To reconfigure, run mingw32-make confclean and configure.  
+
+cd src  
+mingw32-make -i -k  
+
+注意：我们只在在Qt子目录src里运行make。不要在整个qt库的大目录下运行make。只在src目录make，这样只编译核心的Qt库和一些插件，节省时间，而且有核心Qt库就够用了。  
+如果在D:\Qt\4.7.4\ 整个大目录下运行make，那么make还会去重新编译生成tools目录下的代码，重新做工具程序，像assistant.exe、designer.exe、linguist.exe、qmlviewer.exe等等（生成后全在bin目录）。这些工具使用静态库生成后巨大无比。这些工具程序不管是静态链接还是动态链接生成的，对我们编程压根没影响，都一样用。  
+
+好了，接下来就是漫长的等待。2个多小时左右就应该可以编译完成了。  
+此时再用Qt编译生成的可执行文件不用再信赖Qt的动态库了,但是文件比较大随便一个都是10M以上，而且如果使用的是从qt官网下载的MinGW-gcc编译生成的可执行文件还是会信赖mingwm10.dll动态库。这个只需换一个版本的编译器即可，我用的是这个： http://115.com/file/dn3fkn1g  
+
+如果嫌这个过程太麻烦可以直接下载我编译好的静态库来使用：  
+Qt4.7.4_Win32静态库.part1.rar： http://115.com/file/dn3zwayy  
+Qt4.7.4_Win32静态库.part2.rar： http://115.com/file/dn3zwa9g  
+这个是完整版的，解压下来有2G多。如果觉得太大了可以下载精简版：  
+Qt4.7.4_Win32静态库精简版.rar： http://115.com/file/bhy7bat6  
+精简版只保留了编译时需要的库文件和qmake等必要的工具，解压下来有500M左右。  
+注意：只有解压到D盘根目录下才能使用  
+编译器用的是mingw-7.2.exe： http://115.com/file/dn3fkn1g  
