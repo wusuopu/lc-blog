@@ -1,0 +1,81 @@
+---
+layout: post
+title: Scrapy框架学习笔记1——概括
+data: 2013-10-07 08:47:27 +0000
+comments: true
+post_id: 83883
+permalink: /archives/83883.html
+categories: ["Python栏目"]
+tags: ["python", "Scrapy"]
+---
+
+Scrapy是一个python的web爬虫框架，其设计思想与Django非常相似。如果事先用过Django的话那么理解Scrapy应该不难。
+
+<h3>0.安装Scrapy</h3>
+当前Scrapy的稳定版本是0.18  
+使用pip进行安装：  `pip install Scrapy`  
+使用easy_install进行安装：  `easy_install Scrapy`
+
+
+初次使用可以按照它的官方教程操作，先熟悉一下：  
+http://doc.scrapy.org/en/0.18/intro/tutorial.html
+
+
+<h3>1.一个项目的基本流程</h3>
+  创建新项目  scrapy startproject &lt;name&gt;
+
+  然后在&lt;name&gt;/spiders目录下新建一个python文件。  
+  编写一个新的class继承自 scrapy.spider.BaseSpider，并且需要设置如下属性：  
+    * name: 该爬虫的名字，不能与其它的相同  
+    * start_urls: 开始的url入口  
+    * parse(): 对从start_urls的获取的内容进行处理的函数，需要一个Response参数  
+    * allowed_domains: 一个列表，表示该爬虫允许爬取的网站域名。可选  
+
+  爬虫运行流程：  
+    * 首先调用 start_requests()方法访问start_urls的链接（默认的），然后由parse回调方法对请求的响应进行处理。  
+    * 在回调中处理Response，并返回Item或者Request，再或者是由这两种对象组成的一个可迭代的对象。  
+      Request对象对应的callback可以与parse相同，也可以不同。  
+
+
+  最后运行这个爬虫脚本：  scrapy crawl name  
+
+  也可以直接在终端运行一个选择器： scrapy shell &lt;url&gt;  
+
+
+<h3>2.使用Item</h3>
+
+    scrapy.item.Item的调用接口类似于python的dict，Item包含多个scrapy.item.Field。  
+    这跟django的Model与Field有点相似。  
+    Item通常是在Spider的parse方法里使用，它用来保存解析到的数据。
+
+
+<h3>3.使用Item Pipeline</h3>
+
+  在settings.py中设置ITEM_PIPELINES，其默认为[]，与django的MIDDLEWARE_CLASSES等相似。  
+  从Spider的parse返回的Item数据将依次被ITEM_PIPELINES列表中的Pipeline类处理。
+
+  一个Item Pipeline类必须实现以下方法：  
+  >  process_item(item, spider)  
+  >  > 为每个item pipeline组件调用，并且需要返回一个scrapy.item.Item实例对象或者抛出一个scrapy.exceptions.DropItem异常。  
+  >  > 当抛出异常后该item将不会被之后的pipeline处理。  
+  >  > 参数:  
+        item (Item object) – 由parse方法返回的Item对象  
+        spider (BaseSpider object) – 抓取到这个Item对象对应的爬虫对象  
+
+  >  也可额外的实现以下两个方法：  
+  >  open_spider(spider)  
+  >  > 当爬虫打开之后被调用。  
+  >  > 参数: spider (BaseSpider object) – 已经运行的爬虫    
+ 
+  >  close_spider(spider)  
+  >  > 当爬虫关闭之后被调用。  
+  >  > 参数: spider (BaseSpider object) – 已经关闭的爬虫  
+
+
+<h3>4.保存数据</h3>
+
+  想要保存抓取到的数据，最简单的方法是使用Feed exports。 参考官方文档：http://doc.scrapy.org/en/0.18/topics/feed-exports.html#topics-feed-exports  
+
+  例如将抓取的数据导出为json:  scrapy crawl dmoz -o items.json -t json  
+
+  对于小项目用这种方法也足够了。如果是比较复杂的数据的话可能就需要编写一个Item Pipeline进行处理了。

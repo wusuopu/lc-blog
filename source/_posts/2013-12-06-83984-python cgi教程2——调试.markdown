@@ -1,0 +1,46 @@
+---
+layout: post
+title: python cgi教程2——调试
+data: 2013-12-06 14:41:50 +0000
+comments: true
+post_id: 83984
+permalink: /archives/83984.html
+categories: ["Web开发"]
+tags: ["python", "Web开发"]
+---
+
+<p>有时数据头出错是很难定位的，除非有权限访问服务器日志。</p>
+<p>好在Python有cgitb模块，可以将异常的堆栈信息放在正文中，作为HTML输出。</p>
+<p>以下是一个简单的例子：</p>
+
+```python
+#!/usr/bin/env python
+print "Content-Type: text/html\n"
+import cgitb; cgitb.enable()
+print 1/0
+```
+
+<p>也可以使用handler()方法进行捕获异常处理。</p>
+
+```python
+#!/usr/bin/env python
+print "Content-Type: text/html"
+print
+import cgitb
+try:
+   f = open('non-existent-file.txt', 'r')
+except:
+   cgitb.handler()
+```
+
+<p>还有一种更直接的方法，将数据头设为"text/plain"并把标准错误输出设置到标准输出。</p>
+
+```python
+print "Content-Type: text/plain"
+print
+import sys
+sys.stderr = sys.stdout
+f = open('non-existent-file.txt', 'r')
+```
+
+<p>注意：这些只是用于在开发阶段，在生产环境中要把它禁用。以免异常信息被攻击者利用。</p>

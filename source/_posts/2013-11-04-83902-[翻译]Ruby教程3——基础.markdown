@@ -1,0 +1,209 @@
+---
+layout: post
+title: "[翻译]Ruby教程3——基础"
+data: 2013-11-04 12:48:35 +0000
+comments: true
+post_id: 83902
+permalink: /archives/83902.html
+categories: ["Ruby栏目"]
+tags: ["Ruby", "翻译"]
+---
+
+<h1>基础</h1>
+<p>在这一章我们将覆盖Ruby语言的基本程序概念。我们展示一些非常基础的程序，使用到了变量、常量和基本的数据类型。从终端读取、写入内容；我们将会介绍变量的插值（interpolation）。</p>
+<p>我们从一个非常简单的代码例子开始。  </p>
+<blockquote>
+<p>#!/usr/bin/ruby<br>
+  puts "This is Ruby"</p>
+</blockquote>
+<p>这个简单的脚本会在终端打印<em>"This is Ruby"</em>信息。  </p>
+<blockquote>
+<p>#!/usr/bin/ruby</p>
+</blockquote>
+<p>这用于执行这个脚本的Ruby解释器的路径。</p>
+<blockquote>
+<p>puts "This is Ruby"</p>
+</blockquote>
+<p><em>puts</em>是Ruby的关键字，用于将它的参数打印到终端上。在这个例子中它的参数是一个被双引号分隔的字符串。</p>
+<p>$ ./first.rb <br>
+This is Ruby</p>
+<p>以上是这个例子的输出结果。</p>
+<hr>
+<p>我们可以从终端读取值。</p>
+<blockquote>
+<p>#!/usr/bin/ruby<br>
+   print "What is your name? "<br>
+   name = gets
+   puts "Hello #{name}"</p>
+</blockquote>
+<p>第二个程序将会从终端读取一个值并输出。  </p>
+<blockquote>
+<p>print "What is your name? "</p>
+</blockquote>
+<p><em>print</em>关键字是将参数打印到终端上。<em>print</em>与<em>puts</em>的不同在于<em>print</em>不同自动换行，而<em>puts</em>会自动换行。</p>
+<blockquote>
+<p>name = gets</p>
+</blockquote>
+<p>这里我们将从用户输入中读取值并将其保存在<em>name</em>变量中。<em>gets</em>是一个方法用于从终端读取一行内容。它是一个内置的方法。</p>
+<blockquote>
+<p>puts "Hello #{name}"</p>
+</blockquote>
+<p>在这行代码我们展示变量的插值。变量插值（Variable interpolation）是将字符串字面量中的变量替换成它真实的值。变量插值（interpolation）的其他说法是：变量置换和变量扩展。  </p>
+<blockquote>
+<p>$ ./name.rb <br>
+ What is your name? Jan<br>
+ Hello Jan  </p>
+</blockquote>
+<p>以上是第二个程序的输出结果。</p>
+<hr>
+<p>Ruby代码可以从命令行运行。这个是借鉴至Perl的单行方式，小块代码执行小任务。</p>
+<blockquote>
+<p>$ ruby -e "puts RUBY_VERSION"<br>
+ 2.0.0</p>
+</blockquote>
+<p><em>-e</em>参数告诉Ruby要执行的代码从命令行中给定，而不是Ruby代码文件。我们例子将在终端输出Ruby解释器的版本号。<br>
+译注：原文的作者使用的是ruby 1.9.3，而如今ruby最新版已经是2.0.0了。</p>
+<hr>
+<p>Ruby解释器有一个<em>-c</em>选项用于检查代码的语法。如果启用了的话，代码将不会被执行。如果代码没有语法错误，那么将会打印<em>"Syntax OK"</em>。</p>
+<blockquote>
+<p>#!/usr/bin/ruby<br>
+ class Being end <br>
+ m = Test.new<br>
+ p m  </p>
+</blockquote>
+<p>以上例子中有一个语法错误。如果我们将<em>class</em>和<em>end</em>关键字放在同一行，那么我们就必须还要使用分号字符(;)。</p>
+<p>$ ruby -c syntax_check.rb <br>
+syntax_check.rb:3: syntax error, unexpected keyword_end, expecting '&lt;' or ';' or '\n'<br>
+syntax_check.rb:6: syntax error, unexpected $end, expecting keyword_end  </p>
+<p>发现了语法错误。如果我们在<em>Being</em>的后面加上分号，错误提示消息就会消失。  </p>
+<h2>命令行参数</h2>
+<p>Ruby程序可以从命令行接收参数。当我们执行程序时参数接在程序名的后面。</p>
+<blockquote>
+<p>#!/usr/bin/ruby<br>
+ puts ARGV  </p>
+</blockquote>
+<p>接在文件名后面的有效命令行参数被Ruby程序保存在全局数组ARGV中。</p>
+<p>这里我们将所有的命令行参数打印到终端上。  </p>
+<p>$ ./args.rb 1 2 3<br>
+1<br>
+2<br>
+3  </p>
+<p>我们提供了三个数字作为命令行参数，并且它们都打印到终端上了。</p>
+<hr>
+<p>在下面的例子中我们将打印所有的参数还有脚本名。</p>
+<blockquote>
+<p>#!/usr/bin/ruby<br>
+ puts $0<br>
+ puts $*  </p>
+</blockquote>
+<p><em>$0</em>是全局变量，包含被执行的脚本的名称。在Ruby中全局变量是以<em>$</em>字符开头。<em>$*</em>是另一个全局变量。它与ARGV是相等的，包含了命令行的所有参数。</p>
+<p>$ ./args2.rb Ruby Python Perl<br>
+./args2.rb<br>
+Ruby<br>
+Python<br>
+Perl  </p>
+<p><em>args2.rb</em>脚本接收了三个参数。脚本名和这三个参数都打印到终端上了。  </p>
+<h2>变量和常量</h2>
+<p>变量是保存数据的地址。变量包括名称和数据类型。数据类型表示了数据的不同类型。整数、字符串和浮点数都是数据类型。Ruby是一门动态语言，这意味着我们不需要（也不能）定义一个变量的确定类型。而是Ruby解释器在分配变量时决定它的数据类型。此外，在程序运行时一个变量还可以包含不同类型的不同值。这与Java、C或者Pascal之类的强类型语言不同。与变量不同，常量（应该）保持它的值。一旦初始化了就不能修改。然后在Ruby中是有可能修改常量的值，这种情况下会出现一个警告。</p>
+<blockquote>
+<p>#!/usr/bin/ruby<br>
+ city = "New York"<br>
+ name = "Paul"; age = 35<br>
+ nationality = "American"  </p>
+<p>puts city<br>
+ puts name<br>
+ puts age<br>
+ puts nationality  </p>
+<p>city = "London"  </p>
+<p>puts city  </p>
+</blockquote>
+<p>在上面的例子中我们使用了四个变量。</p>
+<blockquote>
+<p>city = "New York"</p>
+</blockquote>
+<p>我们给<em>city</em>变量分配了一个字符串。这个变量是动态创建的。 </p>
+<blockquote>
+<p>name = "Paul"; age = 35</p>
+</blockquote>
+<p>创建两个变量。我们可以将两条语句放在一行里。然后为了提高可读性应该每行一条语句。</p>
+<blockquote>
+<p>puts city<br>
+ puts name<br>
+ puts age<br>
+ puts nationality  </p>
+</blockquote>
+<p>将变量的值打印到终端。</p>
+<blockquote>
+<p>city = "London"  </p>
+</blockquote>
+<p>给<em>city</em>变量分配新的值。  </p>
+<p>$ ./variables.rb <br>
+New York<br>
+Paul<br>
+35<br>
+American<br>
+London  </p>
+<p>这是以上例子的输出。</p>
+<hr>
+<p>之前我们已经介绍过常量了，它一直都保存着一个值。但是不同于其他语言，Ruby没有对这个进行强制限制。</p>
+<blockquote>
+<p>#!/usr/bin/ruby  </p>
+<p>WIDTH = 100<br>
+ HEIGHT = 150   </p>
+<p>var = 40<br>
+ puts var  </p>
+<p>var = 50<br>
+ puts var  </p>
+<p>puts WIDTH<br>
+ WIDTH = 110<br>
+ puts WIDTH  </p>
+</blockquote>
+<p>在这个例子中定义了两个常量和一个变量。</p>
+<blockquote>
+<p>WIDTH = 100<br>
+ HEIGHT = 150   </p>
+</blockquote>
+<p>在Ruby中常量是以大写字母开头的。通常是将所有字母都大写。</p>
+<blockquote>
+<p>var = 40<br>
+ puts var  </p>
+<p>var = 50  </p>
+</blockquote>
+<p>定义并初始化一个变量。随后又给它分配了一个新的值，这是合法的。</p>
+<blockquote>
+<p>WIDTH = 100  </p>
+</blockquote>
+<p>我们给常量分配了一个新的值。常量一旦创建就不应该改变，否则它就不意味着是一个常量。Ruby解释器将会给出一条警告。</p>
+<p>$ ./constants.rb <br>
+40<br>
+50<br>
+100<br>
+./constants.rb:13: warning: already initialized constant WIDTH<br>
+110  </p>
+<p>以上是脚本的输出。</p>
+<h2>变量插值</h2>
+<p>变量插值（interpolation）是将字符串中的变量替换成它的值。变量插值的其他说法是：变量置换和变量扩展。</p>
+<blockquote>
+<p>#!/usr/bin/ruby  </p>
+<p>age = 34<br>
+ name = "William"  </p>
+<p>puts "#{name} is #{age} years old"   </p>
+</blockquote>
+<p>在Ruby中字符串是不可变的。我们不能修改一个已存在的字符串。变量插值是字符创建时进行的。  </p>
+<blockquote>
+<p>age = 34<br>
+ name = "William"  </p>
+</blockquote>
+<p>定义两个变量。</p>
+<blockquote>
+<p>puts "#{name} is #{age} years old" </p>
+</blockquote>
+<p>字符串是被双引号所引起来。当我们将变量名放在<em>#{</em>和<em>}</em>字符之间时,这个变量会被它的值所篡改。</p>
+<p>$ ./interpolation.rb <br>
+William is 34 years old  </p>
+<p>以上是这个例子的输出。</p>
+<p>这一章覆盖了Ruby语言的一些基础。 </p>
+<hr>
+<p>原文地址： <a href="http://zetcode.com/lang/rubytutorial/basics/">http://zetcode.com/lang/rubytutorial/basics/</a><br>
+翻译：龙昌  admin@longchangjin.cn<br>
+完整教程：<a href="https://github.com/wusuopu/Ruby-tutorial">https://github.com/wusuopu/Ruby-tutorial</a>  </p>

@@ -1,0 +1,201 @@
+---
+layout: post
+title: "[翻译]Ruby GTK教程7——自定义控件"
+data: 2013-11-24 11:30:15 +0000
+comments: true
+post_id: 83972
+permalink: /archives/83972.html
+categories: ["Ruby栏目"]
+tags: ["gtk", "Ruby", "翻译"]
+---
+
+<h1>自定义控件</h1>
+<p>大多数套件通常只提供了最常用的控件，如按钮、文本控件、滑动条等。没有套件可以提供所有可能的控件。程序员必须自己创建这些。这是通过套件提供的绘制工具完成。这有两种可能。程序员可以修改或增强已存在的控件，或者从头开始创建一个自定义控件。</p>
+<h2>Burning控件</h2>
+<p>这个例子我们从头开始创建一个控件。这个控件可以在各种媒体烧定应用中看到，如Nero Burning ROM。</p>
+<p><em>custom.rb</em></p>
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial 
+#
+# This example creates a burning
+# custom widget
+#
+# author: jan bodnar
+# website: zetcode.com 
+# last edited: June 2009
+
+
+require 'gtk2'
+
+class Burning &lt; Gtk::DrawingArea
+
+    def initialize(parent)
+        @parent = parent
+
+        super()
+
+        @num = [ "75", "150", "225", "300", 
+            "375", "450", "525", "600", "675" ]
+
+        set_size_request 1, 30
+        signal_connect "expose-event" do
+            expose
+        end
+    end
+
+
+    def expose
+
+        cr = window.create_cairo_context
+        draw_widget cr
+
+    end
+
+    def draw_widget cr
+
+         cr.set_line_width 0.8
+
+        cr.select_font_face("Courier", 
+            Cairo::FONT_SLANT_NORMAL, Cairo::FONT_WEIGHT_NORMAL)
+        cr.set_font_size 11
+
+        width = allocation.width
+
+        @cur_width = @parent.get_cur_value
+
+        step = (width / 10.0).round
+
+        till = (width / 750.0) * @cur_width
+        full = (width / 750.0) * 700
+
+        if @cur_width &gt;= 700
+
+            cr.set_source_rgb(1.0, 1.0, 0.72)
+            cr.rectangle(0, 0, full, 30)
+            cr.clip
+            cr.paint
+            cr.reset_clip
+
+            cr.set_source_rgb(1.0, 0.68, 0.68)
+            cr.rectangle(full, 0, till-full, 30)
+            cr.clip
+            cr.paint
+            cr.reset_clip
+
+        else
+            cr.set_source_rgb 1.0, 1.0, 0.72
+            cr.rectangle 0, 0, till, 30
+            cr.clip
+            cr.paint
+            cr.reset_clip
+        end
+
+
+        cr.set_source_rgb(0.35, 0.31, 0.24)
+
+        for i in (1..@num.length)
+            cr.move_to i*step, 0
+            cr.line_to i*step, 5
+            cr.stroke
+
+            te = cr.text_extents @num[i-1]
+            cr.move_to i*step-te.width/2, 15
+            cr.text_path @num[i-1]
+            cr.stroke
+        end         
+    end
+end
+
+
+class RubyApp &lt; Gtk::Window
+    def initialize
+        super
+
+        set_title "Burning"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        set_size_request 350, 200        
+        set_window_position Gtk::Window::POS_CENTER
+
+        @cur_value = 0
+
+        vbox = Gtk::VBox.new false, 2
+
+        scale = Gtk::HScale.new
+        scale.set_range 0, 750
+        scale.set_digits 0
+        scale.set_size_request 160, 35
+        scale.set_value @cur_value
+
+        scale.signal_connect "value-changed" do |w|
+            on_changed(w)
+        end
+
+        fix = Gtk::Fixed.new
+        fix.put scale, 50, 50
+
+        vbox.pack_start fix
+
+        @burning = Burning.new(self)
+        vbox.pack_start @burning, false, false, 0
+
+        add vbox
+        show_all
+    end
+
+    def on_changed widget
+
+        @cur_value = widget.value
+        @burning.queue_draw
+    end
+
+    def get_cur_value
+        return @cur_value
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+<p>我们将DrawingArea放在窗口的底部，并且手动绘制控件的条目。所有的重要代码放在draw_widget里，通过Burning类的expose方法调用。这个控件生动的显示了媒介的容量和剩余空间。这个控件通过刻度控件来控制。我们自定义控件的最小值为0,最大值为750。如果达到700，我们开始绘制红色。这通常表明超标了。</p>
+<pre><code>@num = [ "75", "150", "225", "300", 
+    "375", "450", "525", "600", "675" ]
+</code></pre>
+<p>这些数字显示在控件上。他们显示了媒介的容量。</p>
+<pre><code>@cur_width = @parent.get_cur_value
+</code></pre>
+<p>通过父控件我们获得刻度控件的值。</p>
+<pre><code>till = (width / 750.0) * @cur_width
+full = (width / 750.0) * 700
+</code></pre>
+<p>我们使用width变量进行刻度值和自定义控件尺寸的转换。注意我们使用了浮点数，得到较大精度的绘制。<em>till</em>参数决定了绘制的总大小，它的值来自刻度控件。它是整个区域的比例。<em>full</em>参数决定了从什么位置开始绘制红色。</p>
+<pre><code>cr.set_source_rgb(1.0, 1.0, 0.72)
+cr.rectangle(0, 0, full, 30)
+cr.clip
+cr.paint
+cr.reset_clip
+</code></pre>
+<p>绘制黄色矩形直到<em>full</em>点。</p>
+<pre><code>te = cr.text_extents @num[i-1]
+cr.move_to i*step-te.width/2, 15
+cr.text_path @num[i-1]
+cr.stroke
+</code></pre>
+<p>这些代码绘制了burning控件的数字。我们计算了文本恰当的位置。</p>
+<pre><code>def on_changed widget
+
+    @cur_value = widget.value
+    @burning.queue_draw
+end
+</code></pre>
+<p>我们获取刻度控件的值保存在<em>cur_value</em>变量中，稍后使用。重绘burning控件。</p>
+<p><img alt="image" src="http://zetcode.com/img/gui/rubygtk/burning.png"><br>
+<em>图片：Burning widget</em></p>
+<p>在这一章中，我们创建了一个自定义控件。</p>
+<hr>
+<p>原文地址： <a href="http://zetcode.com/gui/rubygtk/customwidget/">http://zetcode.com/gui/rubygtk/customwidget/</a><br>
+翻译：龙昌  admin@longchangjin.cn </p>

@@ -1,0 +1,462 @@
+---
+layout: post
+title: "[翻译]Ruby GTK教程6——Cairo"
+data: 2013-11-24 02:23:08 +0000
+comments: true
+post_id: 83969
+permalink: /archives/83969.html
+categories: ["Ruby栏目"]
+tags: ["gtk", "Ruby", "翻译"]
+---
+
+<h1>使用Cairo绘制</h1>
+<p>这部分的Ruby GTK教程，我们将使用Cairo库进行一些绘制。</p>
+<p>Cairo是一个用于创建2D矢量图像的库。我们可以用它来绘制自己的控件、图表或者各种效果或动画。</p>
+<h2>颜色</h2>
+<p>在第一个会例子，我们将介绍颜色。颜色是一个代表了红、绿和蓝（RGB）强度值的对象。Cairo的RGB有效值范围为0到1。</p>
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# This program shows how to work
+# with colors in Cairo
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "Colors"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 360, 100
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        @darea = Gtk::DrawingArea.new
+
+        @darea.signal_connect "expose-event" do  
+            on_expose
+        end
+
+        add(@darea)
+
+    end
+
+    def on_expose
+
+        cr = @darea.window.create_cairo_context  
+        draw_colors cr
+
+    end
+
+    def draw_colors cr
+
+        cr.set_source_rgb 0.2, 0.23, 0.9
+        cr.rectangle 10, 15, 90, 60
+        cr.fill
+
+        cr.set_source_rgb 0.9, 0.1, 0.1
+        cr.rectangle 130, 15, 90, 60
+        cr.fill
+
+        cr.set_source_rgb 0.4, 0.9, 0.4
+        cr.rectangle 250, 15, 90, 60
+        cr.fill
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+<p>这个例子中我们绘制了三个矩形并且用三种不同的颜色填充。</p>
+<pre><code>@darea = Gtk::DrawingArea.new
+</code></pre>
+<p>我们将在DrawingArea控件是进行绘制操作。</p>
+<pre><code>@darea.signal_connect "expose-event" do  
+    on_expose
+end
+</code></pre>
+<p>当窗口需要重绘时<em>expose-event</em>事件将触发。对这个事件的响应中我们调用了<em>on_expose</em>方法。</p>
+<pre><code>cr = @darea.window.create_cairo_context
+</code></pre>
+<p>从GdkWindow创建cairo上下文对象。这个上下文是我们将要进行所有绘制的对象。</p>
+<pre><code>draw_colors cr
+</code></pre>
+<p>实际的绘制委托给<em>draw_colors</em>方法。</p>
+<pre><code>cr.set_source_rgb 0.2, 0.23, 0.9
+</code></pre>
+<p><em>set_source_rgb</em>方法是设置cairo上下文的颜色。这个方法的三个参数是颜色的强度值。</p>
+<pre><code>cr.rectangle 10, 15, 90, 60
+</code></pre>
+<p>绘制一个矩形。前两个参数是矩形左上角的x、y坐标。后两个参数是矩形的宽和高。</p>
+<pre><code>cr.fill
+</code></pre>
+<p>使用当前的颜色填充矩形。</p>
+<p><img alt="image1" src="http://zetcode.com/img/gui/rubygtk/colors.png"><br>
+<em>图片：颜色</em></p>
+<h2>基本形状</h2>
+<p>下一个例子在窗口上绘制一些基本形状。</p>
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# This code example draws basic shapes
+# with the Cairo library
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "Basic shapes"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 390, 240
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        @darea = Gtk::DrawingArea.new
+
+        @darea.signal_connect "expose-event" do  
+            on_expose
+        end
+
+        add(@darea)
+    end
+
+    def on_expose
+
+        cr = @darea.window.create_cairo_context  
+        draw_shapes cr
+    end
+
+    def draw_shapes cr
+
+        cr.set_source_rgb 0.6, 0.6, 0.6
+
+        cr.rectangle 20, 20, 120, 80
+        cr.rectangle 180, 20, 80, 80
+        cr.fill
+
+        cr.arc 330, 60, 40, 0, 2*Math::PI
+        cr.fill
+
+        cr.arc 90, 160, 40, Math::PI/4, Math::PI
+        cr.fill
+
+        cr.translate 220, 180
+        cr.scale 1, 0.7
+        cr.arc 0, 0, 50, 0, 2*Math::PI
+        cr.fill
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+<p>这个例子我们将创建一个矩形、方形、圆形、弧形和椭圆形。我们将轮廓绘为蓝色，内部为白色。</p>
+<pre><code>cr.rectangle 20, 20, 120, 80
+cr.rectangle 180, 20, 80, 80
+cr.fill
+</code></pre>
+<p>这几行绘制了一个矩形和一个方形。</p>
+<pre><code>cr.arc 330, 60, 40, 0, 2*Math::PI
+cr.fill
+</code></pre>
+<p><em>arc</em>方法绘制一个全圆。</p>
+<pre><code>cr.translate 220, 180
+cr.scale 1, 0.7
+cr.arc 0, 0, 50, 0, 2*Math::PI
+cr.fill
+</code></pre>
+<p><em>translate</em>方法将对象移动到指定的点。如果我们想要绘制椭圆，我们需要进行一些缩放。这里<em>scale</em>方法将y轴收缩。</p>
+<p><img alt="image2" src="http://zetcode.com/img/gui/rubygtk/shapes.png"><br>
+<em>图片：基本形状</em></p>
+<h2>透明矩形</h2>
+<p>透明度是透过实体的可见度。最简单的理解可以把它想象成玻璃或者水。光线可以透过玻璃，这样我们就可以看到玻璃后的物体。</p>
+<p>在计算机图像中，我们可以使用透明混合实现透明度。透明混合处理图片和背景的组合，显示部透明。作品处理使用了阿尔法通道。</p>
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# This program shows transparent
+# rectangles using Cairo
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "Transparent rectangles"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 590, 90
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        @darea = Gtk::DrawingArea.new
+
+        @darea.signal_connect "expose-event" do  
+            on_expose
+        end
+
+        add(@darea)
+
+    end
+
+    def on_expose
+
+        cr = @darea.window.create_cairo_context
+
+        for i in (1..10)
+            cr.set_source_rgba 0, 0, 1, i*0.1
+            cr.rectangle 50*i, 20, 40, 40
+            cr.fill
+        end
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+<p>这个例子我们使用不同等级透明度绘制了10个矩形。</p>
+<pre><code>cr.set_source_rgba 0, 0, 1, i*0.1
+</code></pre>
+<p><em>set_source_rgba</em>方法是最后一个参数是alpha透明度。</p>
+<p><img alt="image3" src="http://zetcode.com/img/gui/rubygtk/transparency.png"> <br>
+<em>图片：透明矩形</em></p>
+<h2>甜甜圈</h2>
+<p>接下来的例子我们通过旋转一堆椭圆来创建一个复杂的形状。</p>
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# This program creates a donut
+# with Cairo library
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "Donut"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 350, 250
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        @darea = Gtk::DrawingArea.new
+
+        @darea.signal_connect "expose-event" do  
+            on_expose
+        end
+
+        add(@darea)
+
+    end
+
+    def on_expose
+
+        cr = @darea.window.create_cairo_context  
+        cr.set_line_width 0.5
+
+        w = allocation.width
+        h = allocation.height
+
+        cr.translate w/2, h/2
+        cr.arc 0, 0, 120, 0, 2*Math::PI
+        cr.stroke
+
+        for i in (1..36)
+            cr.save
+            cr.rotate i*Math::PI/36
+            cr.scale 0.3, 1
+            cr.arc 0, 0, 120, 0, 2*Math::PI
+            cr.restore
+            cr.stroke
+        end
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+<p>这个例子我们创建了一个甜甜圈。它的形状与饼干相似，因此取名为甜甜圈（donut）。</p>
+<pre><code>cr.translate w/2, h/2
+cr.arc 0, 0, 120, 0, 2*Math::PI
+cr.stroke
+</code></pre>
+<p>在开始只是一个椭圆。</p>
+<pre><code>for i in (1..36)
+    cr.save
+    cr.rotate i*Math::PI/36
+    cr.scale 0.3, 1
+    cr.arc 0, 0, 120, 0, 2*Math::PI
+    cr.restore
+    cr.stroke
+end
+</code></pre>
+<p>经过一些旋转后变成了甜甜圈。</p>
+<p><img alt="image4" src="http://zetcode.com/img/gui/rubygtk/donut.jpg"><br>
+<em>图片：Donut</em></p>
+<h2>绘制文本</h2>
+<p>下一个例子我们在窗口上绘制一些文本。</p>
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# This program draws text
+# using Cairo
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "Soulmate"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 370, 240
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        @darea = Gtk::DrawingArea.new
+
+        @darea.signal_connect "expose-event" do  
+            on_expose
+        end
+
+        add(@darea)
+
+    end
+
+    def on_expose
+
+        cr = @darea.window.create_cairo_context
+
+        cr.set_source_rgb 0.1, 0.1, 0.1
+
+        cr.select_font_face "Purisa", Cairo::FONT_SLANT_NORMAL, 
+            Cairo::FONT_WEIGHT_NORMAL
+        cr.set_font_size 13
+
+        cr.move_to 20, 30
+        cr.show_text "Most relationships seem so transitory"
+        cr.move_to 20, 60
+        cr.show_text "They're all good but not the permanent one"
+        cr.move_to 20, 120
+        cr.show_text "Who doesn't long for someone to hold"
+        cr.move_to 20, 150
+        cr.show_text "Who knows how to love without being told"
+        cr.move_to 20, 180
+        cr.show_text "Somebody tell me why I'm on my own"
+        cr.move_to 20, 210
+        cr.show_text "If there's a soulmate for everyone"
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+<p>我们显示了Natasha Bedingfields Soulmate歌的部分歌词。</p>
+<pre><code>cr.select_font_face "Purisa", Cairo::FONT_SLANT_NORMAL, 
+    Cairo::FONT_WEIGHT_NORMAL
+</code></pre>
+<p>这里我们指定我们使用的字体。</p>
+<pre><code>cr.set_font_size 13
+</code></pre>
+<p>我们指定字体的大小。</p>
+<pre><code>cr.move_to 20, 30
+</code></pre>
+<p>移动到开始绘制文本的坐标。</p>
+<pre><code>cr.show_text "Most relationships seem so transitory"
+</code></pre>
+<p><em>show_text</em>方法在窗口上绘制文本。</p>
+<p><img alt="image5" src="http://zetcode.com/img/gui/rubygtk/soulmate.png"><br>
+<em>图片: Soulmate</em></p>
+<p>这章的Ruby GTK教程我们使用Cairo库进行绘制。</p>
+<hr>
+<p>原文地址： <a href="http://zetcode.com/gui/rubygtk/cairo/">http://zetcode.com/gui/rubygtk/cairo/</a><br>
+翻译：龙昌  admin@longchangjin.cn </p>

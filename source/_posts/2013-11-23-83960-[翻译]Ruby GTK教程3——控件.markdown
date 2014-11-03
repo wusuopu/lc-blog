@@ -1,0 +1,400 @@
+---
+layout: post
+title: "[翻译]Ruby GTK教程3——控件"
+data: 2013-11-23 03:15:27 +0000
+comments: true
+post_id: 83960
+permalink: /archives/83960.html
+categories: ["Ruby栏目"]
+tags: ["gtk", "Ruby", "翻译"]
+---
+
+<h1>控件</h1>
+<p>在这部分的Ruby GTK编程教程中我们将提到一些控件。</p>
+<p>控件是GUI应用程序的基本构成。这些年来一些控件成为了所有平台所有套件的标准。如按钮、复选框或者滚动条。GTK套件的理念是保持控件的数量为最小的数量级，一些特殊的控件需要创建为自定义GTK控件。</p>
+<h2>复选按钮（CheckButton）</h2>
+<p><em>CheckButton</em>是一个有两种状态的控件，开和关。开状态表示选中。它用于表示一些布尔属性。</p>
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# This program toggles the title of the
+# window with the CheckButton widget
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: April 2009
+
+require 'gtk2'
+
+class RubyApp &lt; Gtk::Window
+    def initialize
+        super
+
+        set_title "CheckButton"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 250, 200
+        set_window_position Gtk::Window::POS_CENTER
+        show_all
+    end
+
+
+    def init_ui
+
+        fixed = Gtk::Fixed.new
+        add fixed
+
+        cb = Gtk::CheckButton.new "Show title"
+        cb.set_active true
+        cb.set_can_focus false
+        cb.signal_connect("clicked") do |w|
+            on_clicked(w)
+        end
+
+        fixed.put cb, 50, 50
+
+    end
+
+    def on_clicked sender
+
+        if sender.active?
+            self.set_title "Check Button"
+        else
+           self.set_title ""
+        end
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+<p>我们将根据复选按钮的状态在窗口的标题栏显示一个标题。</p>
+<pre><code>cb = Gtk::CheckButton.new "Show title"
+</code></pre>
+<p>创建<em>CheckButton</em>控件。</p>
+<pre><code>cb.set_active true
+</code></pre>
+<p>标题默认是可见的，因此我们将按钮默认选中。</p>
+<pre><code>if sender.active?
+    self.set_title "Check Button"
+else
+    self.set_title ""
+end
+</code></pre>
+<p>如果按钮选中则显示标题。</p>
+<p><img alt="image1" src="http://zetcode.com/img/gui/rubygtk/checkbutton.png"><br>
+<em>图片：复选按钮</em></p>
+<h2>标签（Label）</h2>
+<p>Label控件用于显示文本。</p>
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# This example demonstrates the Label widget
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+$lyrics = %{Meet you downstairs in the bar and heard
+your rolled up sleeves and your skull t-shirt
+You say why did you do it with him today?
+and sniff me out like I was Tanqueray
+
+cause you're my fella, my guy
+hand me your stella and fly
+by the time I'm out the door
+you tear men down like Roger Moore
+
+I cheated myself
+like I knew I would
+I told ya, I was trouble
+you know that I'm no good}
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title  "You know I'm no Good"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 250, 200
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        set_border_width 10
+        label = Gtk::Label.new $lyrics
+        add label
+
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+<p>例子在窗口上显示了一些歌词。</p>
+<pre><code> $lyrics = %{Meet you downstairs in the bar and heard
+ your rolled up sleeves and your skull t-shirt
+ ...
+</code></pre>
+<p>创建一个多行文本。</p>
+<pre><code>set_border_width 10
+</code></pre>
+<p>标签被一些空白空间包围着。</p>
+<pre><code>label = Gtk::Label.new $lyrics
+add label
+</code></pre>
+<p>创建标签并添加到窗口内。</p>
+<p><img alt="image2" src="http://zetcode.com/img/gui/rubygtk/label.png"><br>
+<em>图片：标签控件</em></p>
+<h2>输入框（Entry）</h2>
+<p>Entry是单行文本输入字段，用于文本数据的输入。</p>
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# This example demonstrates the Entry widget
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "Entry"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 250, 200
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        fixed = Gtk::Fixed.new
+
+        label = Gtk::Label.new "..."
+        fixed.put label, 60, 40
+
+        entry = Gtk::Entry.new
+        fixed.put entry, 60, 100
+
+        entry.signal_connect "key-release-event" do |w, e|
+            on_key_release(w, e, label)
+        end
+
+        add(fixed)
+    end
+
+    def on_key_release sender, event, label
+        label.set_text sender.text
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+<p>这个例子显示了一个输入控件和一个标签。我们在输入框输入的文本会立即在标签上显示。</p>
+<pre><code>entry = Gtk::Entry.new
+</code></pre>
+<p>创建Entry控件。</p>
+<pre><code>entry.signal_connect "key-release-event" do |w, e|
+    on_key_release(w, e, label)
+end
+</code></pre>
+<p>我们将<em>on_key_release</em>方法插到Entry控件的<em>key-release-event</em>事件中。</p>
+<pre><code>def on_key_release sender, event, label
+    label.set_text sender.text
+end
+</code></pre>
+<p>从Entry控件获取文本并设置到标签中。</p>
+<p><img alt="image3" src="http://zetcode.com/img/gui/rubygtk/entry.png"><br>
+<em>图片：Entry控件</em></p>
+<h2>图片（Image）</h2>
+<p>Image控件用于显示图片。</p>
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# This example demonstrates the Image widget
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "Red Rock"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 250, 200
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        set_border_width 2
+
+        begin
+            image = Gtk::Image.new "redrock.png"
+        rescue
+            puts "cannot load image"
+            exit
+        end
+
+        add image
+    end
+
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+<p>我们例子在窗口上显示了一个图片。</p>
+<pre><code>set_border_width 2
+</code></pre>
+<p>我们在图片周围添加一些空白边框。</p>
+<pre><code>begin
+    image = Gtk::Image.new "redrock.png"
+rescue
+    puts "cannot load image"
+    exit
+end
+</code></pre>
+<p>创建Image控件。IO操作容易出现错误，因此我们处理可能的异常。</p>
+<pre><code>add image
+</code></pre>
+<p>将控件添加到容器中。</p>
+<p><img alt="image4" src="http://zetcode.com/img/gui/rubygtk/image.jpg"><br>
+<em>图片：Image控件</em></p>
+<h2>下拉框（ComboBox）</h2>
+<p>ComboBox控件允许用户从一个列表选项中进行选择。</p>
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# This example demonstrates the ComboBox widget
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "ComboBox"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 250, 200
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        fixed = Gtk::Fixed.new
+        label = Gtk::Label.new '-'
+        fixed.put label, 50, 140
+
+        cb = Gtk::ComboBox.new
+        cb.signal_connect "changed" do |w, e|
+            on_changed(w, e, label)
+        end
+
+        cb.append_text 'Ubuntu'
+        cb.append_text 'Mandriva'
+        cb.append_text 'Redhat'
+        cb.append_text 'Gento'
+        cb.append_text 'Mint'
+
+        fixed.put cb, 50, 30
+
+        add fixed
+
+    end
+
+    def on_changed sender, event, label
+        label.set_label sender.active_text
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+<p>这个例子显示了一个下拉框和一个标签。下拉框列表有5个选项。它们是Linux发行版的名称。标签控件显示下拉列表选中的选项。</p>
+<pre><code>cb = Gtk::ComboBox.new
+</code></pre>
+<p>创建下拉框。</p>
+<pre><code>cb.append_text 'Ubuntu'
+cb.append_text 'Mandriva'
+cb.append_text 'Redhat'
+cb.append_text 'Gento'
+cb.append_text 'Mint'
+</code></pre>
+<p>填充数据。</p>
+<pre><code>def on_changed sender, event, label
+    label.set_label sender.active_text
+end
+</code></pre>
+<p>在<em>on_changed</em>方法里，我们获取选中的文本并设置到标签中。</p>
+<p><img alt="image5" src="http://zetcode.com/img/gui/rubygtk/combobox.png"><br>
+<em>图片：下拉框</em></p>
+<p>在这章的Ruby GTK教程中我们显示了一些基本的控件。</p>
+<hr>
+<p>原文地址： <a href="http://zetcode.com/gui/rubygtk/widgets/">http://zetcode.com/gui/rubygtk/widgets/</a><br>
+翻译：龙昌  admin@longchangjin.cn  </p>

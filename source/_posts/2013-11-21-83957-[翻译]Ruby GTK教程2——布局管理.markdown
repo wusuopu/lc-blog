@@ -1,0 +1,411 @@
+---
+layout: post
+title: "[翻译]Ruby GTK教程2——布局管理"
+data: 2013-11-21 14:58:00 +0000
+comments: true
+post_id: 83957
+permalink: /archives/83957.html
+categories: ["Ruby栏目"]
+tags: ["gtk", "Ruby", "翻译"]
+---
+
+<h1>布局管理</h1>
+<p>这一章我们将展示如何布置窗口或者对话框中的控件。</p>
+<p>当我设计应用程序的用户界面时，我们决定了将要使用哪些控件以及如何在应用程序中组织这些控件。为了组织我们的控件，我们使用了一些称为布局容器的特殊不可见控件。这一章我们将提到<em>Alignment</em>、<em>Fixed</em>、<em>VBox</em>和<em>Table</em>。</p>
+<h2>Fixed</h2>
+<p>Fixed窗口是将子控件放置在固定位置固定大小。这个容器不会执行自动布局管理。在大部分的应用程序中我们不使用这个容器。它用于一些特殊的地方，例如游戏、使用图表的特殊应用、可移动可变大小的组件（如电子表格中的图表）。以下是一些小例子。</p>
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# In this program, we lay out widgets
+# using absolute positioning
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "Fixed"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 300, 280
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        modify_bg Gtk::STATE_NORMAL, Gdk::Color.new(6400, 6400, 6440)
+
+        begin       
+            bardejov = Gdk::Pixbuf.new "bardejov.jpg"
+            rotunda = Gdk::Pixbuf.new "rotunda.jpg"
+            mincol = Gdk::Pixbuf.new "mincol.jpg"
+        rescue IOError =&gt; e
+            puts e
+            puts "cannot load images"
+            exit
+        end
+
+        image1 = Gtk::Image.new bardejov
+        image2 = Gtk::Image.new rotunda
+        image3 = Gtk::Image.new mincol
+
+        fixed = Gtk::Fixed.new
+
+        fixed.put image1, 20, 20
+        fixed.put image2, 40, 160
+        fixed.put image3, 170, 50
+
+        add fixed
+
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+<p>在我们在例子中我们在窗口上显示了三张图片。我们明确的指定了这些图片的x、y坐标的位置。</p>
+<pre><code>modify_bg Gtk::STATE_NORMAL, Gdk::Color.new(6400, 6400, 6440)
+</code></pre>
+<p>为了更好的显示体验，我们修改背景颜色为灰色。</p>
+<pre><code>bardejov = Gdk::Pixbuf.new "bardejov.jpg"
+</code></pre>
+<p>从磁盘上加载图片为Pixbug对象。</p>
+<pre><code>image1 = Gtk::Image.new bardejov
+image2 = Gtk::Image.new rotunda
+image3 = Gtk::Image.new mincol
+</code></pre>
+<p><em>Image</em>是用于显示图片的控件。在它的构造函数接收一个<em>Pixbuf</em>对象。</p>
+<pre><code>fixed = Gtk::Fixed.new
+</code></pre>
+<p>创建一个Fixed容器。</p>
+<pre><code>fixed.put image1, 20, 20
+</code></pre>
+<p>将第一张图片放在x=20，y=20的坐标位置上。</p>
+<pre><code> add fixed
+</code></pre>
+<p>最后我们将Fixed窗口放入窗口中。</p>
+<p><img alt="image1" src="http://zetcode.com/img/gui/rubygtk/fixed.png"><br>
+<em>图片：Fixed</em></p>
+<h2>按钮</h2>
+<p>Alignment容器用于控件它的子控件的对齐和大小。</p>
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# In this program, we position two buttons
+# in the bottom right corner of the window.
+# We use horizontal and vertical boxes.
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "Buttons"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 260, 150
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        vbox = Gtk::VBox.new false, 5
+        hbox = Gtk::HBox.new true, 3
+
+        valign = Gtk::Alignment.new 0, 1, 0, 0
+        vbox.pack_start valign
+
+        ok = Gtk::Button.new "OK"
+        ok.set_size_request 70, 30
+        close = Gtk::Button.new "Close"
+
+        hbox.add ok
+        hbox.add close
+
+        halign = Gtk::Alignment.new 1, 0, 0, 0
+        halign.add hbox
+
+        vbox.pack_start halign, false, false, 3
+
+        add vbox
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+<p>这个例子的代码中，我们将两个按钮放置在窗口的右下角。为了实现这个功能我们使用了两个垂直盒子和一个水平盒子和两个对齐容器。</p>
+<pre><code>valign = Gtk::Alignment.new 0, 1, 0, 0
+</code></pre>
+<p>这会将子控件放置在底部。</p>
+<pre><code>vbox.pack_start valign
+</code></pre>
+<p>这里我们将Alignment控件放置在竖直例子中。</p>
+<pre><code>hbox = Gtk::HBox.new true, 3 
+...
+ok = Gtk::Button.new "OK"
+ok.set_size_request 70, 30
+close = Gtk::Button.new "Close"
+
+hbox.add ok
+hbox.add close
+</code></pre>
+<p>创建一个水平盒子并放入两个按钮。</p>
+<pre><code>halign = Gtk::Alignment.new 1, 0, 0, 0
+halign.add hbox
+
+vbox.pack_start halign, false, false, 3
+</code></pre>
+<p>这将会创建一个对齐容器用于将其子控件放置在右边。我们将水平盒子放入对齐容器里并将对齐容器放入竖直盒子中。我们必须记住对齐容器只有一个子控件，这就是为什么我们要使用盒子容器。 <br>
+<img alt="image2" src="http://zetcode.com/img/gui/rubygtk/buttons.png"><br>
+<em>图片：按钮</em></p>
+<h2>计算器框架</h2>
+<p>Table控件将控件按行和列进行排序。</p>
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# In this program we create a skeleton of
+# a calculator. We use the Table widget. 
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "Calculator"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 300, 250
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        vbox = Gtk::VBox.new false, 2
+
+        mb = Gtk::MenuBar.new
+        filemenu = Gtk::Menu.new
+        file = Gtk::MenuItem.new "File"
+        file.set_submenu filemenu
+        mb.append file
+
+        vbox.pack_start mb, false, false, 0
+
+        table = Gtk::Table.new 5, 4, true
+
+        table.attach Gtk::Button.new("Cls"), 0, 1, 0, 1
+        table.attach Gtk::Button.new("Bck"), 1, 2, 0, 1
+        table.attach Gtk::Label.new, 2, 3, 0, 1
+        table.attach Gtk::Button.new("Close"), 3, 4, 0, 1
+
+        table.attach Gtk::Button.new("7"), 0, 1, 1, 2
+        table.attach Gtk::Button.new("8"), 1, 2, 1, 2
+        table.attach Gtk::Button.new("9"), 2, 3, 1, 2
+        table.attach Gtk::Button.new("/"), 3, 4, 1, 2
+
+        table.attach Gtk::Button.new("4"), 0, 1, 2, 3
+        table.attach Gtk::Button.new("5"), 1, 2, 2, 3
+        table.attach Gtk::Button.new("6"), 2, 3, 2, 3
+        table.attach Gtk::Button.new("*"), 3, 4, 2, 3
+
+        table.attach Gtk::Button.new("1"), 0, 1, 3, 4
+        table.attach Gtk::Button.new("2"), 1, 2, 3, 4
+        table.attach Gtk::Button.new("3"), 2, 3, 3, 4
+        table.attach Gtk::Button.new("-"), 3, 4, 3, 4
+
+        table.attach Gtk::Button.new("0"), 0, 1, 4, 5
+        table.attach Gtk::Button.new("."), 1, 2, 4, 5
+        table.attach Gtk::Button.new("="), 2, 3, 4, 5
+        table.attach Gtk::Button.new("+"), 3, 4, 4, 5
+
+        vbox.pack_start Gtk::Entry.new, false, false, 0
+
+        vbox.pack_end table, true, true, 0
+
+        add vbox
+
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+<p>我们使用Table控件来创建计算器的框架。</p>
+<pre><code>table = Gtk::Table.new 5, 4, true
+</code></pre>
+<p>我们创建了一个有5行4列的表格控件。第三个参数是homogenous参数。如果设置为true那么表格中的所有控件都是一样大小的。控件的大小等于表格容器中最大的那个控件。</p>
+<pre><code>table.attach Gtk::Button.new("Cls"), 0, 1, 0, 1
+</code></pre>
+<p>我们将一个按钮附加到表格容器的左上角。前两个参数是单元格的左右边界，后两个参数是单元格的上下边界。</p>
+<pre><code>vbox.pack_end table, true, true, 0
+</code></pre>
+<p>将表格控件打包放入竖直盒子里。<br>
+<img alt="image3" src="http://zetcode.com/img/gui/rubygtk/calculator.png">  <br>
+<em>图片：计算器框架</em></p>
+<h2>窗口</h2>
+<p>接下来我们创建一个更高级的例子。我们展示一个JDeveloper IDE中的窗口。</p>
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# This is a more complicated layout example.
+# We use Alignment and Table widgets. 
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "Windows"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 300, 250
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        set_border_width 15
+
+        table = Gtk::Table.new 8, 4, false
+        table.set_column_spacings 3
+
+        title = Gtk::Label.new "Windows"
+
+        halign = Gtk::Alignment.new 0, 0, 0, 0
+        halign.add title
+
+        table.attach(halign, 0, 1, 0, 1, Gtk::FILL,
+            Gtk::FILL, 0, 0)
+
+        frame = Gtk::Frame.new
+        table.attach(frame, 0, 2, 1, 3, Gtk::FILL | Gtk::EXPAND,
+            Gtk::FILL | Gtk::EXPAND, 1, 1)
+
+        activate = Gtk::Button.new "Activate"
+        activate.set_size_request 50, 30
+        table.attach(activate, 3, 4, 1, 2, Gtk::FILL,
+            Gtk::SHRINK, 1, 1)
+
+        valign = Gtk::Alignment.new 0, 0, 0, 0
+        close = Gtk::Button.new "Close"
+        close.set_size_request 70, 30
+        valign.add close
+        table.set_row_spacing 1, 3
+        table.attach(valign, 3, 4, 2, 3, Gtk::FILL,
+            Gtk::FILL | Gtk::EXPAND, 1, 1)
+
+        halign2 = Gtk::Alignment.new 0, 1, 0, 0
+        help = Gtk::Button.new "Help"
+        help.set_size_request 70, 30
+        halign2.add help
+        table.set_row_spacing 3, 6
+        table.attach(halign2, 0, 1, 4, 5, Gtk::FILL,
+            Gtk::FILL, 0, 0)
+
+        ok = Gtk::Button.new "OK"
+        ok.set_size_request 70, 30
+        table.attach(ok, 3, 4, 4, 5, Gtk::FILL,
+            Gtk::FILL, 0, 0)
+
+        add table
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+<p>这个例子展示了我们如何可以使用Ruby GTK创建一个类似的窗口。</p>
+<pre><code>table = Gtk::Table.new 8, 4, false
+table.set_column_spacings 3
+</code></pre>
+<p>这个例子是基于Table容器的。每个列之间有3像素的空隙。</p>
+<pre><code>title = Gtk::Label.new "Windows"
+
+halign = Gtk::Alignment.new 0, 0, 0, 0
+halign.add title
+
+table.attach(halign, 0, 1, 0, 1, Gtk::FILL,
+    Gtk::FILL, 0, 0)
+</code></pre>
+<p>这个代码创建了一个左对齐的标签。这个标签放置在表格的第一行中。</p>
+<pre><code>frame = Gtk::Frame.new
+table.attach(frame, 0, 2, 1, 3, Gtk::FILL | Gtk::EXPAND,
+    Gtk::FILL | Gtk::EXPAND, 1, 1)
+</code></pre>
+<p><em>frame</em>控件跨度为2行2列。</p>
+<pre><code>valign = Gtk::Alignment.new 0, 0, 0, 0
+close = Gtk::Button.new "Close"
+close.set_size_request 70, 30
+valign.add close
+table.set_row_spacing 1, 3
+table.attach(valign, 3, 4, 2, 3, Gtk::FILL,
+    Gtk::FILL | Gtk::EXPAND, 1, 1)
+</code></pre>
+<p>我们将关闭按钮放置在<em>frame</em>控件的下一个位置，在表格的第4列（我们是从0算起）。我们将按钮放在对齐控件内，这样我们就可以顶对齐了。</p>
+<p><img alt="image4" src="http://zetcode.com/img/gui/rubygtk/windows.png"><br>
+<em>图片：窗口</em></p>
+<p>这部分的Ruby GTK教程，我们提到了布局控件。</p>
+<hr>
+<p>原文地址： <a href="http://zetcode.com/gui/rubygtk/layoutmanagement/">http://zetcode.com/gui/rubygtk/layoutmanagement/</a><br>
+翻译：龙昌  admin@longchangjin.cn  </p>
