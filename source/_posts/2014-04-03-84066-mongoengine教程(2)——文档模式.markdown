@@ -1,0 +1,116 @@
+---
+layout: post
+title: mongoengine教程(2)——文档模式
+data: 2014-04-03 12:46:12 +0000
+comments: true
+post_id: 84066
+permalink: /archives/84066.html
+categories: ["数据库"]
+tags: ["mongodb", "python"]
+---
+
+<p>在MongoDB中一个文档(document)与关系型数据库中的一行(row)相似；文档保存在集合(collection)中，行保存在表(table)中。</p>
+<h2>定义文档的模式</h2>
+<p>与django类似，要定义一个文档模式只需要创建一个类继承自 Document，并添加一些 Field 对象。</p>
+<pre><code>from mongoengine import *
+import datetime
+
+class Page(Document):
+    title = StringField(max_length=200, required=True)
+    date_modified = DateTimeField(default=datetime.datetime.now)
+</code></pre>
+<p>如上定义了一个文档模式具有 title和date_modified 两个字段。</p>
+<p>同时MongoDB本身就是无模式的，因此我们还可以创建动态的文档模式。它可以在添加数据时为不同的数据设置不同的字段。</p>
+<pre><code>class Page(DynamicDocument):
+    title = StringField(max_length=200, required=True)
+</code></pre>
+<p>添加数据：</p>
+<pre><code>page = Page(title='Using MongoEngine')
+page.tags = ['mongodb', 'mongoengine']
+page.save()
+</code></pre>
+<h2>文档字段</h2>
+<p>文档字段(Field)不是必需的，但是使用它来进行数据验证、设置默认值等操作会比较方便。</p>
+<p>MongoEngine提供了如下这些类型的Field:</p>
+<ul>
+<li>BinaryField  </li>
+<li>BooleanField  </li>
+<li>ComplexDateTimeField  </li>
+<li>DateTimeField  </li>
+<li>DecimalField  </li>
+<li>DictField  </li>
+<li>DynamicField  </li>
+<li>EmailField  </li>
+<li>EmbeddedDocumentField  </li>
+<li>FileField  </li>
+<li>FloatField  </li>
+<li>GenericEmbeddedDocumentField  </li>
+<li>GenericReferenceField  </li>
+<li>GeoPointField  </li>
+<li>ImageField  </li>
+<li>IntField  </li>
+<li>ListField  </li>
+<li>MapField  </li>
+<li>ObjectIdField  </li>
+<li>ReferenceField  </li>
+<li>SequenceField  </li>
+<li>SortedListField  </li>
+<li>StringField  </li>
+<li>URLField  </li>
+<li>UUIDField  </li>
+</ul>
+<h2>文档之间引用关系</h2>
+<p>在关系型数据库中多个表可以使用外键进行关联。然而MongoDB是无模式的，因此想要达到这样的效果就这能在应用程序中自己手动的进行关联了。</p>
+<p>不过还好，使用MongoEngine的ReferenceField可以很方便的实现。</p>
+<pre><code>class User(Document):
+    name = StringField()
+
+class Page(Document):
+    content = StringField()
+    author = ReferenceField(User)
+
+john = User(name="John Smith")
+john.save()
+
+post = Page(content="Test Page")
+post.author = john
+post.save()
+</code></pre>
+<h3>一对多的关系</h3>
+<p>对于一对多的关系可以使用ListField来保存一个ReferenceField列表。在进行查询操作是需要传入一个实例对象。</p>
+<pre><code>class User(Document):
+    name = StringField()
+
+class Page(Document):
+    content = StringField()
+    authors = ListField(ReferenceField(User))
+
+bob = User(name="Bob Jones").save()
+john = User(name="John Smith").save()
+
+Page(content="Test Page", authors=[bob, john]).save()
+Page(content="Another Page", authors=[john]).save()
+
+# Find all pages Bob authored
+Page.objects(authors__in=[bob])
+</code></pre>
+<h3>引用对象的删除操作</h3>
+<p>MongoDB默认不会检查数据的完整性，因此在删除一个对象是就需要自己手动的处理引用了该对象的其他对象。</p>
+<p>同样的MongoEngine也提供了一样的功能。ReferenceField有一个 reverse_delete_rule 参数可以进行设置。它的取值如下：  </p>
+<ul>
+<li>mongoengine.DO_NOTHING:默认就是这个值，它不会进行任何操作。  </li>
+<li>mongoengine.DENY:如果该对象还被其他对象引用，则拒绝删除。  </li>
+<li>mongoengine.NULLIFY:将其他对象对该对象的引用字段设为null。  </li>
+<li>mongoengine.CASCADE:将引用了该对象的其他对象也删除掉。  </li>
+<li>mongoengine.PULL:移除对该对象的引用。  </li>
+</ul>
+<h2>索引</h2>
+<p>与django的Model相似，MongoEngine的Document也可以在meta属性中设置索引。</p>
+<pre><code>class Page(Document):
+    title = StringField()
+    rating = StringField()
+    meta = {
+        'indexes': ['title', ('title', '-rating')]
+    }
+</code></pre>
+<p>meta中的indexes可以是一个列表，也可以是一个字典。</p>

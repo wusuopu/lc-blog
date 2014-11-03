@@ -1,0 +1,51 @@
+---
+layout: post
+title: mongoengine教程(5)——信号
+data: 2014-04-06 11:24:39 +0000
+comments: true
+post_id: 84076
+permalink: /archives/84076.html
+categories: ["数据库"]
+tags: ["mongodb", "python"]
+---
+
+<p>MongoEngine在进行数据操作时会发出一些信号，我们可以连接这些信号进行一些额外的操作。注意：要在MongoEngine中使用信号，需要安装 <em>blinker</em> 这个库。  </p>
+<pre><code>$ pip install blinker
+</code></pre>
+<p>MongoEngine提供的信号如下：  </p>
+<ul>
+<li>pre_init: 在创建一个新的 Document 或者 EmbeddedDocument 实例对象之后，并且对象初始化之前调用。  </li>
+<li>post_init:在 Document 或者 EmbeddedDocument 实例对象初始化完成之后调用。  </li>
+<li>pre_save:在 save 方法执行之前调用。  </li>
+<li>pre_save_post_validation:在数据检验完成之后，数据保存之前调用。  </li>
+<li>post_save:在数据保存完成之后调用。  </li>
+<li>pre_delete:在 delete 方法执行之前调用。  </li>
+<li>post_delete:在记录成功删除之后调用。  </li>
+<li>pre_bulk_insert:在数据检验之后，数据插入之前调用。  </li>
+<li>post_bulk_insert:在数据成功插入之后调用。</li>
+</ul>
+<h2>事件连接</h2>
+<p>使用 signals 将信号与回调函数进行连接。</p>
+<pre><code>from mongoengine import *
+from mongoengine import signals
+
+class Author(Document):
+    name = StringField()
+
+    @classmethod
+    def pre_save(cls, sender, document, **kwargs):
+        print("Pre Save: %s" % document.name)
+
+    @classmethod
+    def post_save(cls, sender, document, **kwargs):
+        print("Post Save: %s" % document.name)
+        if 'created' in kwargs:
+            if kwargs['created']:
+                print("Created")
+            else:
+                print("Updated")
+
+signals.pre_save.connect(Author.pre_save, sender=Author)
+signals.post_save.connect(Author.post_save, sender=Author)
+</code></pre>
+<p>注意：对于 RefereneField 的<em>reverse_delete_rules</em>参数不会触发信号。</p>

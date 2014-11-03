@@ -1,0 +1,28 @@
+---
+layout: post
+title: 修改Mongo命令提示符
+data: 2014-01-24 13:23:22 +0000
+comments: true
+post_id: 84042
+permalink: /archives/84042.html
+categories: ["数据库"]
+tags: ["mongodb"]
+---
+
+<p>默认的启动mongo终端后，命令行的提示符就只有一个大于符号（&gt;）。虽然这不会有什么问题，但是如果同时开启了多个终端连接时，如一个本地连接一个远程连接。终端来回切换，有时就会忘了哪个是哪个，一旦误操作后果是很严重的。因此如果能够显示当前是哪个连接的话会很方便的。</p>
+<p>修改mongo的配置文件，将提示符改为“当前连接的主机:当前操作的数据库 (当前执行的命令数)&gt;” 这样的形式。</p>
+<p>编辑 ~/.mongorc.js 文件，没有则创建：</p>
+<pre><code>var cmdCountNum = 0;
+var prompt = function () {
+  var host = db.getMongo().host;
+  var database = db.getName();
+  cmdCountNum++;
+  return host + ':' + database + ' (' + cmdCountNum + ')&gt; ';
+}
+</code></pre>
+<p>现在再执行mongo命令试试。</p>
+<pre><code>$ mongo
+127.0.0.1:test (1)&gt; db
+test
+127.0.0.1:test (2)&gt;
+</code></pre>

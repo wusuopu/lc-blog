@@ -1,0 +1,78 @@
+---
+layout: post
+title: pymongo教程(2)——聚合操作
+data: 2014-03-29 12:57:25 +0000
+comments: true
+post_id: 84057
+permalink: /archives/84057.html
+categories: ["Python栏目"]
+tags: ["mongodb", "python"]
+---
+
+<p>在MongoDB中常用的聚合操作有 aggregation、map/reduce和group 。</p>
+<p>首先先添加一些测试数据：</p>
+<pre><code>db.things.insert({"x": 1, "tags": ["dog", "cat"]})
+db.things.insert({"x": 2, "tags": ["cat"]})
+db.things.insert({"x": 2, "tags": ["mouse", "cat", "dog"]})
+db.things.insert({"x": 3, "tags": []})
+</code></pre>
+<h2>aggregation</h2>
+<p>以下例子是统计 tags 字段内的各个值的出现的次数。</p>
+<pre><code>from bson.son import SON
+db.things.aggregate([
+    {"$unwind": "$tags"},
+    {"$group": {"_id": "$tags", "count": {"$sum": 1}}},
+    {"$sort": SON([("count", -1), ("_id", -1)])}
+])
+
+{'ok': 1.0, 'result': [{'count': 3, '_id': 'cat'}, {'count': 2, '_id': 'dog'}, {'count': 1, '_id': 'mouse'}]}
+</code></pre>
+<p>注意：aggregate操作要求服务器程序为 2.1.0 以上的版本。PyMongo 驱动程序为 2.3 以上的版本。</p>
+<h2>Map/Reduce</h2>
+<p>上面的操作同样也可以使用 Map/Reduce 完成。</p>
+<pre><code>from bson.code import Code
+mapper = Code("""
+    function () {
+      this.tags.forEach(function(z) {
+        emit(z, 1);
+      });
+    }
+""")
+
+reducer = Code("""
+    function (key, values) {
+      var total = 0;
+      for (var i = 0; i &lt; values.length; i++) {
+        total += values[i];
+      }
+      return total;
+    }
+""")
+
+result = db.things.map_reduce(mapper, reducer, "myresults")
+for doc in result.find():
+    print(doc)
+
+{u'_id': u'cat', u'value': 3.0}
+{u'_id': u'dog', u'value': 2.0}
+{u'_id': u'mouse', u'value': 1.0}
+</code></pre>
+<p>map和reduce都是一个javascript的函数； map_reduce 方法会将统计结果保存到一个临时的数据集合中。</p>
+<h2>Group</h2>
+<p>group 操作与SQL的 GROUP BY 相似，同时比 Map/Reduce 要简单。</p>
+<pre><code>reducer = Code("""
+    function(obj, prev){
+      prev.count++;
+    }
+""")
+
+results = db.things.group(key={"x":1}, condition={}, initial={"count": 0}, reduce=reducer)
+for doc in results:
+    print(doc)
+
+{'x': 1.0, 'count': 1.0}
+{'x': 2.0, 'count': 2.0}
+{'x': 3.0, 'count': 1.0}
+</code></pre>
+<p>注意：在MongoDB的集群环境中不支持 group 操作，可以使用 aggregation 或者 map/reduce 代替。</p>
+<p>完整的MongoDB聚合文档： http://docs.mongodb.org/manual/aggregation/</p>

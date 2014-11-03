@@ -1,0 +1,75 @@
+---
+layout: post
+title: mongoengine教程(3)——数据查询
+data: 2014-04-05 06:01:03 +0000
+comments: true
+post_id: 84069
+permalink: /archives/84069.html
+categories: ["数据库"]
+tags: ["mongodb", "python"]
+---
+
+<p>与Django一样，Document类都有一个 objects 属性。它用于将类与数据库关联起来。objects属性是一个QuerySetManager类型的对象，它的操作会返回一个QuerySet类型的对象。可以通过对QuerySet对象的迭代获取数据库中的数据。</p>
+<pre><code>class User(Document):
+    name = StringField()
+    country = StringField()
+
+class Paper(Document):
+    content = StringField()
+    author = ReferenceField(User)
+</code></pre>
+<h2>查询过滤</h2>
+<p>可以在查询是指定过滤条件以获取想要的结果。例如想要查询英国的用户：</p>
+<pre><code>uk_users = User.objects(country='uk')
+</code></pre>
+<p>与Django类似，要查询引用的对象只需要使用双下划线即可。例如想要查询英国用户的论文：</p>
+<pre><code>uk_papers = Paper.objects(author__country='uk')
+</code></pre>
+<h2>查询操作</h2>
+<p>与Django类似，MongoEngine同样也提供了一些条件语句。</p>
+<ul>
+<li>ne - 不相等</li>
+<li>lt - 小于</li>
+<li>lte - 小于等于</li>
+<li>gt - 大于</li>
+<li>gte - 大于等于</li>
+<li>not - 取反</li>
+<li>in - 值在列表中</li>
+<li>nin - 值不在列表中</li>
+<li>mod - 取模</li>
+<li>all - 与列表的值相同</li>
+<li>size - 数组的大小</li>
+<li>exists - 字段的值存在</li>
+</ul>
+<p>例如查询年龄小于等于18岁的用户：</p>
+<pre><code>young_users = Users.objects(age__lte=18)
+</code></pre>
+<p>对于不同类型的数据提供了不同的条件语句。</p>
+<h3>查询结果个数限制</h3>
+<p>跟传统的ORM一样，MongoEngine也可以限制查询结果的个数。一种方法是在QuerySet对象上调用limit和skip方法；另一种方法是使用数组的分片的语法。例如：</p>
+<pre><code>users = User.objects[10:15]
+users = User.objects.skip(10).limit(5)
+</code></pre>
+<h2>聚合操作</h2>
+<p>MongoEngine提供了一些数据库的聚合操作。</p>
+<p>统计结果个数即可以使用QuerySet的count方法，也可以使用Python风格的方法：</p>
+<pre><code>num_users = len(User.objects)
+num_users = User.objects.count()
+</code></pre>
+<p>其他的一些聚合操作。<br>
+求和：</p>
+<pre><code>yearly_expense = Employee.objects.sum('salary')
+</code></pre>
+<p>求平均数：</p>
+<pre><code>mean_age = User.objects.average('age')
+</code></pre>
+<h2>高级查询</h2>
+<p>有时需要将多个条件进行组合，前面提到的方法就不能满足需求了。这时可以使用MongoEngine的Q类。它可以将多个查询条件进行 &amp;(与) 和 |(或) 操作。</p>
+<p>例如下面的语句是查询所有年龄大于等于18岁的英国用户，或者所有年龄大于等于20岁的用户。</p>
+<pre><code>User.objects((Q(country='uk') &amp; Q(age__gte=18)) | Q(age__gte=20))
+</code></pre>
+<h2>在服务器端执行javascript代码</h2>
+<p>通过MongoEngine QuerySet对象的 exec_js 方法可以将javascript代码作为字符串发送给服务器端执行，然后返回执行的结果。</p>
+<p>例如查询该数据库都有那些集合：</p>
+<pre><code>User.objects.exec_js("db.getCollectionNames()")
+</code></pre>

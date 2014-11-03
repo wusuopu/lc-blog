@@ -1,0 +1,112 @@
+---
+layout: post
+title: Redis使用笔记
+data: 2014-06-21 07:46:38 +0000
+comments: true
+post_id: 84110
+permalink: /archives/84110.html
+categories: ["数据库"]
+tags: ["Redis"]
+---
+
+<p>Redis是一个键值型数据库，之前花了些时间体验了一下Redis，感觉还是很不错的。而且Redis学习起来也很容易，差不多花几个小时应该就能入门了。当时我是看的<a href="https://github.com/karlseguin/the-little-redis-book">《the little redis book》</a>，初学者可以看看。</p>
+<h2>安装</h2>
+<p>下载软件包： http://redis.io/download</p>
+<p>首先运行服务器程序：</p>
+<pre><code>$ redis-server
+</code></pre>
+<p>程序默认是监听6379端口。</p>
+<p>然后再运行客户端程序：</p>
+<pre><code>$ redis-cli
+</code></pre>
+<h2>基本数据类型</h2>
+<p>运行客户端程序连接上Redis服务之后，所有的操作都可以通过该命令行交互完成。</p>
+<p>Redis有5种不同的数据类型：字符串、散列表、列表、集合、有序集合。所有的数据在Redis中都是以键值对的形式保存的。</p>
+<p>以下介绍这几种类型数据的基本操作。</p>
+<h3>String</h3>
+<p>设置一个键的值为字符串：  </p>
+<pre><code>set &lt;key&gt; &lt;value&gt;
+</code></pre>
+<p>获取该键的值：  </p>
+<pre><code>get &lt;key&gt;
+</code></pre>
+<p>字符串相关的命令：  </p>
+<pre><code>help @string
+</code></pre>
+<h3>Hashes</h3>
+<p>设置一个散列值：  </p>
+<pre><code>hset &lt;key&gt; &lt;k&gt; &lt;v&gt;
+</code></pre>
+<p>获取该键的值：  </p>
+<pre><code>hget &lt;key&gt; &lt;k&gt;  
+hgetall &lt;key&gt;
+</code></pre>
+<p>散列相关的命令：  </p>
+<pre><code>help @hash
+</code></pre>
+<h3>Lists</h3>
+<p>添加值：  </p>
+<pre><code>lpush &lt;key&gt; &lt;v&gt;
+</code></pre>
+<p>移除值：  </p>
+<pre><code>lpop &lt;key&gt;  
+help @list
+</code></pre>
+<h3>Set</h3>
+<p>添加值：  </p>
+<pre><code>sadd &lt;key&gt; &lt;v&gt;[ &lt;v&gt; ..]  
+help set
+</code></pre>
+<h3>Sorted Sets</h3>
+<p>类似于集合(Set)，但是提供了排序（sorting）和秩划分（ranking）的功能。</p>
+<p>添加值：  </p>
+<pre><code>zadd key score member [score] [member]   
+help @sorted_set
+</code></pre>
+<h2>其他</h2>
+<h3>有效期</h3>
+<p>设置某个值在seconds秒后到期：  </p>
+<pre><code>expire &lt;key&gt; seconds
+</code></pre>
+<p>设置某个值在time时刻到期：  </p>
+<pre><code>expireat &lt;key&gt; time
+</code></pre>
+<p>查看到期时间：  </p>
+<pre><code>ttl &lt;key&gt;
+</code></pre>
+<p>清除到期时间：  </p>
+<pre><code>persist &lt;key&gt;
+</code></pre>
+<h3>事务（Transactions）</h3>
+<pre><code>multi  
+do something  
+exec
+</code></pre>
+<p>multi和exec之间的命令作为原子操作。</p>
+<p>在multi之前调用watch可监听值的变化，若该值被其他客户端修改，事务将会运行失败。</p>
+<h3>杂项</h3>
+<p>选择数据库：</p>
+<pre><code>select index
+</code></pre>
+<p>清除当前数据库所属key:</p>
+<pre><code>flushdb
+</code></pre>
+<p>清除所有数据库所属key:</p>
+<pre><code>flushall
+</code></pre>
+<p>查看key所储存的值的类型：</p>
+<pre><code>type key
+</code></pre>
+<p>Redis相关的命令手册： http://redis.io/commands</p>
+<h2>在应用程序中使用Redis</h2>
+<p>Redis提供了多种语言的绑定，以Ruby为例：</p>
+<pre><code>require 'redis'
+r = Redis.new
+r.set 'key', 1234
+puts r.get 'key'
+puts r.keys
+</code></pre>
+<p>输出结果应该为：</p>
+<pre><code>"1234"
+["key"]
+</code></pre>

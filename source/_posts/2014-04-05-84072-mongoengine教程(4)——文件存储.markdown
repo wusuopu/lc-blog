@@ -1,0 +1,45 @@
+---
+layout: post
+title: mongoengine教程(4)——文件存储
+data: 2014-04-05 12:45:50 +0000
+comments: true
+post_id: 84072
+permalink: /archives/84072.html
+categories: ["数据库"]
+tags: ["mongodb", "python"]
+---
+
+<p>MongoDB的GridFS支持直接在数据库中存储文件。要在MongoEngine中使用GridFS，只要使用 FileField 对象即可。以下是一个例子：</p>
+<pre><code>class Animal(Document):
+    genus = StringField()
+    family = StringField()
+    photo = FileField()
+
+marmot = Animal(genus='Marmota', family='Sciuridae')
+
+marmot_photo = open('gtk.png', 'rb')
+marmot.photo.put(marmot_photo, content_type = 'image/png')
+marmot.save()
+</code></pre>
+<p>这个例子将 gtk.png 这个图片存入了数据库中。<br>
+文件的读取也很简单：</p>
+<pre><code>marmot = Animal.objects(genus='Marmota').first()
+photo = marmot.photo.read()
+content_type = marmot.photo.content_type
+</code></pre>
+<p>FileField不仅可以存储文件，还可以用来存储数据流。只是操作上略微不同。</p>
+<p>要存储数据流，首先先创建一个新的文件，然后再往里面写入数据。</p>
+<pre><code>marmot.photo.new_file()
+marmot.photo.write('some_image_data')
+marmot.photo.write('some_more_image_data')
+marmot.photo.close()
+marmot.save()
+</code></pre>
+<p>如果要删除存储在数据库中的文件，只需要调用该文件对象的 delete 方法：</p>
+<pre><code>marmot.photo.delete()
+</code></pre>
+<p>注意：一条文档记录中的FileField字段只保存了对GridFS集合中该文件的ID引用。这意味着如果该文档被删除了，对用的文件不会被删除。因此在删除这类文档时需要小心，以免出现孤立文件。</p>
+<p>对于已存储的文件可以进行替换修改：</p>
+<pre><code>another_marmot = open('python.png', 'rb')
+marmot.photo.replace(another_marmot, content_type='image/png')
+</code></pre>

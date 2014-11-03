@@ -1,0 +1,47 @@
+---
+layout: post
+title: 使用rvm进行ruby多版本管理
+data: 2014-06-16 02:17:34 +0000
+comments: true
+post_id: 84105
+permalink: /archives/84105.html
+categories: ["Ruby栏目"]
+tags: ["Ruby"]
+---
+
+<p>rvm与Python的virtualenv和Node的nvm类似。使用它可以很方便的在你的系统中安装多个Ruby环境。类似的工具还有rbenv、ry、rbfu等。  </p>
+<h3>安装rvm</h3>
+<p>以下的命令都是在当前用户权限下执行的，最好不要使用sudo。<br>
+下载安装rvm:</p>
+<pre><code>$ curl -sSL https://get.rvm.io | bash -s stable
+</code></pre>
+<p>安装完成之后再加载配置：</p>
+<pre><code>$ source ~/.profile
+</code></pre>
+<p>为了下次能直接使用，建议将该命令添加到 ~/.bash_profile 或者 ~/.zshrc 中。  </p>
+<p>使用rvm安装Ruby时会默认从官方网站上进行下载，为了提高下载速度这里建议将安装源修改为淘宝的镜像。</p>
+<pre><code>$ sed -i -e 's/ftp\.ruby-lang\.org\/pub\/ruby/ruby\.taobao\.org\/mirrors\/ruby/g' ~/.rvm/config/db
+</code></pre>
+<h3>使用</h3>
+<p>安装完成之后就可以使用了，以下介绍几条常用的命令。<br>
+列出已知的ruby版本:  </p>
+<pre><code>$ rvm list known
+</code></pre>
+<p>列出已经安装的ruby：  </p>
+<pre><code>$ rvm list
+</code></pre>
+<p>安装一个ruby版本：  </p>
+<pre><code>$ rvm install 2.1.0
+</code></pre>
+<p>这里安装最新的2.1.0版本的Ruby。</p>
+<p>如果安装了多个版本，想使用其中一个版本：  </p>
+<pre><code>$ rvm use 2.1.0
+</code></pre>
+<p>设置为默认版本：  </p>
+<pre><code>$ rvm use 2.1.0 --default
+</code></pre>
+<p>use了某个版本之后，可以使用 which ruby 命令查看当前的ruby命令信息。  </p>
+<p>删除一个已安装的版本：  </p>
+<pre><code>$ rvm remove 2.1.0
+</code></pre>
+<p>更多内容请参考官方文档： https://rvm.io/#docindex</p>

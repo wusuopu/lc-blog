@@ -1,0 +1,168 @@
+---
+layout: post
+title: python cgi教程3——表单
+data: 2013-12-07 06:22:08 +0000
+comments: true
+post_id: 83990
+permalink: /archives/83990.html
+categories: ["Web开发"]
+tags: ["python", "Web开发"]
+---
+
+<p>cgi模块中有一个FieldStorage类可用于表单处理。</p>
+<h2>单一字段名</h2>
+<p>有一个HTML表单如下：</p>
+
+```html
+<html><body>
+<form method="get" action="/cgi-bin/form1.py">
+Name: <input type="text" name="name">
+<input type="submit" value="Submit">
+</form>
+</body></html>
+```
+
+<p>form1.py内容为：</p>
+
+    #!/usr/bin/env python
+    import cgi
+    form = cgi.FieldStorage() # instantiate only once!
+    name = form.getfirst('name', 'empty')
+    
+    # Avoid script injection escaping the user input
+    name = cgi.escape(name)
+    
+    print """\
+    Content-Type: text/html\n
+    <html><body>
+    <p>The submitted name was "%s"</p>
+    </body></html>
+    """ % name
+
+<p><em>getfirst</em>方法获取指定字段的第一个值，如果该字段不存在则为空。将表单的方法改为post它同样适用。</p>
+<p>为了避免用户提交危险的内容，可以使用<em>cgi.escape()</em>方法对内容进行转换。</p>
+<h2>多字段名</h2>
+<p>对于多个字段具有相同名字的可以使用<em>getlist()</em>方法，它返回一个列表包含了这些值。</p>
+
+    <html><body>
+    <form method="post" action="/cgi-bin/form2.py">
+    Red<input type="checkbox" name="color" value="red">
+    Green<input type="checkbox" name="color" value="green">
+    <input type="submit" value="Submit">
+    </form>
+    </body></html>
+
+<p>form2.py内容如下：</p>
+
+    #!/usr/bin/env python
+    import cgi
+    form = cgi.FieldStorage()
+    
+    # getlist() returns a list containing the
+    # values of the fields with the given name
+    colors = form.getlist('color')
+    
+    print "Content-Type: text/html\n"
+    print '<html><body>'
+    print 'The colors list:', colors
+    for color in colors:
+       print '<p>', cgi.escape(color), '</p>'
+    print '</body></html>'
+
+
+<h2>文件上传</h2>
+
+    <html><body>
+    <form enctype="multipart/form-data" action="/cgi-bin/form3.py" method="post">
+    <p>File: <input type="file" name="file"></p>
+    <p><input type="submit" value="Upload"></p>
+    </form>
+    </body></html>
+
+<p><em>getfirst()</em>和<em>getlist()</em>都只能获取文件的内容。想获取文件名需要使用<em>FieldStorage</em>。</p>
+<p>form3.py内容如下：</p>
+
+    #!/usr/bin/env python
+    import cgi, os
+    import cgitb; cgitb.enable()
+    
+    try: # Windows needs stdio set for binary mode.
+        import msvcrt
+        msvcrt.setmode (0, os.O_BINARY) # stdin  = 0
+        msvcrt.setmode (1, os.O_BINARY) # stdout = 1
+    except ImportError:
+        pass
+    
+    form = cgi.FieldStorage()
+    
+    # A nested FieldStorage instance holds the file
+    fileitem = form['file']
+    
+    # Test if the file was uploaded
+    if fileitem.filename:
+       
+       # strip leading path from file name to avoid directory traversal attacks
+       fn = os.path.basename(fileitem.filename)
+       open('files/' + fn, 'wb').write(fileitem.file.read())
+       message = 'The file "' + fn + '" was uploaded successfully'
+       
+    else:
+       message = 'No file was uploaded'
+       
+    print """\
+    Content-Type: text/html\n
+    <html><body>
+    <p>%s</p>
+    </body></html>
+    """ % (message,)
+
+<h2>大文件上传</h2>
+<p>在处理大文件时如果内存不足，可以使用生成器将文件分成小片。<br>
+可将之前的脚本改写如下：</p>
+
+    #!/usr/bin/env python
+    import cgi, os
+    import cgitb; cgitb.enable()
+    
+    try: # Windows needs stdio set for binary mode.
+        import msvcrt
+        msvcrt.setmode (0, os.O_BINARY) # stdin  = 0
+        msvcrt.setmode (1, os.O_BINARY) # stdout = 1
+    except ImportError:
+        pass
+    
+    form = cgi.FieldStorage()
+    
+    # Generator to buffer file chunks
+    def fbuffer(f, chunk_size=10000):
+       while True:
+          chunk = f.read(chunk_size)
+          if not chunk: break
+          yield chunk
+          
+    # A nested FieldStorage instance holds the file
+    fileitem = form['file']
+    
+    # Test if the file was uploaded
+    if fileitem.filename:
+    
+       # strip leading path from file name to avoid directory traversal attacks
+       fn = os.path.basename(fileitem.filename)
+       f = open('files/' + fn, 'wb', 10000)
+
+       # Read the file in chunks
+       for chunk in fbuffer(fileitem.file):
+          f.write(chunk)
+       f.close()
+       message = 'The file "' + fn + '" was uploaded successfully'
+    
+    else:
+       message = 'No file was uploaded'
+       
+    print """\
+    Content-Type: text/html\n
+    <html><body>
+    <p>%s</p>
+    </body></html>
+    """ % (message,)
+

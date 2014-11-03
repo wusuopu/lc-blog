@@ -1,0 +1,68 @@
+---
+layout: post
+title: pymongo教程(1)——概述
+data: 2014-03-29 06:39:11 +0000
+comments: true
+post_id: 84053
+permalink: /archives/84053.html
+categories: ["Python栏目"]
+tags: ["mongodb", "python"]
+---
+
+<p>MongoDB是使用C++开发的一款文档型数据库，PyMongo是MongoDB的Python驱动。</p>
+<h2>安装</h2>
+<h3>使用pip安装</h3>
+<pre><code>$ [sudo] pip install pymongo
+</code></pre>
+<p>如果要安装特定的版本则：</p>
+<pre><code>$ [sudo] pip install pymongo==2.6.3
+</code></pre>
+<h3>通过源代码安装</h3>
+<pre><code>$ git clone git://github.com/mongodb/mongo-python-driver.git pymongo
+$ cd pymongo/
+$ [sudo] python setup.py install
+</code></pre>
+<p>注意：使用C的扩展会对性能提升会有帮助。但是在uwsgi中会出现警告，则可以选择只安装python驱动，而不安装C扩展。</p>
+<pre><code>$ [sudo] python setup.py --no_ext install
+</code></pre>
+<p>注意： 如果你使用的是Python3的话，PyMongo只支持 Python 3.1以上的版本。</p>
+<h2>使用</h2>
+<p>首先启动 mongodb 服务器：</p>
+<pre><code>$ mongod
+</code></pre>
+<h3>连接服务器</h3>
+<p>然后执行python程序连接服务器：</p>
+<pre><code>from pymongo import MongoClient
+client = MongoClient()
+</code></pre>
+<p>以上会连接到默认的主机和端口（localhost:27017），也可以指定主机名和端口：</p>
+<pre><code>client = MongoClient('localhost', 27017)
+</code></pre>
+<p>或者：</p>
+<pre><code>client = MongoClient('mongodb://localhost:27017/')
+</code></pre>
+<h3>访问数据库</h3>
+<pre><code>db = client.test_database
+</code></pre>
+<p>如果数据库的名称不能直接使用属性名的风格访问，那么就需要使用字典的风格：</p>
+<pre><code>db = client['test-database']
+</code></pre>
+<h3>访问数据集合</h3>
+<p>与访问数据库相似：</p>
+<pre><code>collection = db.test_collection
+collection = db['test-collection']
+</code></pre>
+<h3>插入数据</h3>
+<p>在MongoDB中数据是以类似JSON格式进行保存的，在PyMongo中则是使用字典风格。然后可以数据集合对象的 insert() 方法进行插入数据。</p>
+<pre><code>import datetime
+post = {"author": "Mike",
+        "text": "My first blog post!",
+        "tags": ["mongodb", "python", "pymongo"],
+        "date": datetime.datetime.utcnow()}
+post_id = db.posts.insert(post)
+</code></pre>
+<h3>查询数据</h3>
+<p>可以数据集合对象的 find() 方法进行查询数据。</p>
+<pre><code>db.posts.find({"author": "Mike"})
+db.posts.find_one({"author": "Mike"})
+</code></pre>

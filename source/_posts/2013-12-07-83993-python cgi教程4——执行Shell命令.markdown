@@ -1,0 +1,43 @@
+---
+layout: post
+title: python cgi教程4——执行Shell命令
+data: 2013-12-07 07:36:31 +0000
+comments: true
+post_id: 83993
+permalink: /archives/83993.html
+categories: ["Web开发"]
+tags: ["python", "Web开发"]
+---
+
+可以使用subprocess.Popen或者os.popen4让cgi执行shell命令。
+
+```python
+#!/usr/bin/python
+import cgitb; cgitb.enable()
+
+# The subprocess module is new in 2.4
+import os, urllib, subprocess as sub
+
+# Retrieve the command from the query string
+# and unencode the escaped %xx chars
+str_command = urllib.unquote(os.environ['QUERY_STRING'])
+
+p = sub.Popen(['/bin/bash', '-c', str_command], 
+    stdout=sub.PIPE, stderr=sub.STDOUT)
+output = urllib.unquote(p.stdout.read())
+
+print """\
+Content-Type: text/html\n
+<html><body>
+<pre>
+$ %s
+%s
+</pre>
+</body></html>
+""" % (str_command, output)
+```
+
+注意：这只是一个例子，在生产环境中这么使用是非常的不安全。
+
+可以使用Cookies和Session对用户进行认证以提高安全性。
+

@@ -1,0 +1,72 @@
+---
+layout: post
+title: 使用distcc加快编译速度
+data: 2014-01-07 12:35:54 +0000
+comments: true
+post_id: 84027
+permalink: /archives/84027.html
+categories: ["编程开发"]
+tags: ["gcc", "资源分享"]
+---
+
+<p>distcc是一个分布式的C/C++编译工具，它可以组织一个网络内的多台计算机同时进行某个编译任务。</p>
+<p>对于Debian系列的系统可以执行如下命令进行安装：</p>
+<p>$ sudo apt-get install distcc</p>
+<h3>使用</h3>
+<p>1、首先得先运行服务器软件</p>
+<p>运行如下命令启动distccd服务，并接收192.168.1网段内的所有TCP连接：</p>
+<pre><code>$ distccd --allow 192.168.1.0/24 --log-level error --log-file /tmp/distccd.log --daemon
+</code></pre>
+<p>2、运行客户端软件</p>
+<p>设置服务器列表：<br>
+设置DISTCC_HOSTS环境变量；或者修改 ~/.distcc/hosts 或者 /etc/distcc/hosts 文件。<br>
+每行一个服务器主机地址，主机地址可以是如下格式：  </p>
+<pre><code>localhost       表示本地
+HOST            TCP连接到该主机的3632端口
+HOST:PORT       TCP连接到该主机的指定端口
+@HOST           使用ssh连接
+USER@HOST       使用指定用户进行ssh连接
+</code></pre>
+<p>所有的服务器的架构最好是相同的。都是32位或者都是64位。  </p>
+<p>3、在编译的时候使用distcc</p>
+<p>如果工程使用automake机制：<br>
+在configure阶段执行"CC=distcc ./configure" ，然后再执行"make -j XX; make install"。</p>
+<p>如果工程由GNU make管理：<br>
+修改Makefile使得在原来C/C++编译器名称前加上"distcc "，例如设置CC="distcc arm-linux-gcc"。然后执行"make -j XX"。</p>
+<p>如果工程由SCons管理：<br>
+修改SConstruct使得在原来C/C++编译器名称前加上"distcc "。导出环境变量HOME和DISTCC_HOSTS到构建环境（注意SCons不会自动把系统环境变量导出到builder子进程）：</p>
+<pre><code>Environment(ENV={'HOME': os.environ['HOME'],'DISTCC_HOSTS': ‘localhost 10.0.0.2’},...)
+</code></pre>
+<p>然后执行"scons -j XX"。</p>
+<h3>实例</h3>
+<p>接下来编译Python源代码，测试一下distcc。</p>
+<pre><code>$ tar xfv Python-2.7.5.tar
+$ cd Python-2.7.5
+$ ./configure
+$ time make
+make  124.32s user 7.11s system 94% cpu 2:19.24 total
+$ time make
+make  0.17s user 0.04s system 89% cpu 0.241 total
+$ make clean
+$ time make
+make  123.52s user 7.32s system 96% cpu 2:16.12 total
+</code></pre>
+<p>正常编译花了2分10多秒的时间。</p>
+<pre><code>$ cat /etc/distcc/hosts
+10.0.0.129
+localhost
+$ tar xfv Python-2.7.5.tar
+$ cd Python-2.7.5
+$ CC=distcc ./configure
+$ time make -j 3
+make -j 3  49.58s user 5.53s system 30% cpu 3:01.40 total
+$ time make -j 3
+make -j 3  0.60s user 0.24s system 7% cpu 11.482 total
+$ make clean
+$ time make -j 3
+make -j 3  46.17s user 5.20s system 40% cpu 2:05.66 total
+</code></pre>
+<p>使用129这台主机和本机一起进行编译，结果花了3分钟的时间。好像使用distcc编译还比正常的编译方式更耗时，有可能是时间花费在了网络传输上。</p>
+<p>如果有多台主机的话效果应该会好些。还有可以配合使用ccache和distcc进一步加快编译速度。</p>
+<p>下图是distcc提供的监控工具，用于查看编译执行的情况：</p>
+<a href="http://www.xefan.com/wp-content/uploads/2014/01/distcc-Monitor.png"><img src="http://www.xefan.com/wp-content/uploads/2014/01/distcc-Monitor-300x194.png" alt="" title="distcc Monitor" width="300" height="194" class="aligncenter size-medium wp-image-84028" /></a>

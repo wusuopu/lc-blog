@@ -1,0 +1,48 @@
+---
+layout: post
+title: python wsgi教程1——介绍
+data: 2013-12-08 08:38:16 +0000
+comments: true
+post_id: 84004
+permalink: /archives/84004.html
+categories: ["Web开发"]
+tags: ["python", "Web开发"]
+---
+
+WSGI(Web Server Gateway Interface)并不是一个服务器，而是一个协议。最开始是用Python写的，现在很多语言都有了对应的实现。详细内容可以看这里： http://www.python.org/dev/peps/pep-3333/
+
+WSGI应用程序接口是一个可调用的对象。它必须接收两个固定的参数：一个包含了类似CGI变量的字典；一个可调用的函数用于返回HTTP状态代码和数据头。
+
+```python
+# This is our application object. It could have any name,
+# except when using mod_wsgi where it must be "application"
+def application( # It accepts two arguments:
+      # environ points to a dictionary containing CGI like environment variables
+      # which is filled by the server for each received request from the client
+      environ,
+      # start_response is a callback function supplied by the server
+      # which will be used to send the HTTP status and headers to the server
+      start_response):
+
+   # build the response body possibly using the environ dictionary
+   response_body = 'The request method was %s' % environ['REQUEST_METHOD']
+
+   # HTTP response code and message
+   status = '200 OK'
+
+   # These are HTTP headers expected by the client.
+   # They must be wrapped as a list of tupled pairs:
+   # [(Header name, Header value)].
+   response_headers = [('Content-Type', 'text/plain'),
+                       ('Content-Length', str(len(response_body)))]
+
+   # Send them to the server using the supplied function
+   start_response(status, response_headers)
+
+   # Return the response body.
+   # Notice it is wrapped in a list although it could be any iterable.
+   return [response_body]
+```
+
+以上是一个应用程序的基本框架。由于没有服务器，因此这段代码目前还不能运行。
+

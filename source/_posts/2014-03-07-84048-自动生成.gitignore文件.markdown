@@ -1,0 +1,22 @@
+---
+layout: post
+title: 自动生成.gitignore文件
+data: 2014-03-07 13:09:22 +0000
+comments: true
+post_id: 84048
+permalink: /archives/84048.html
+categories: ["教程"]
+tags: ["git"]
+---
+
+<p>.gitignore文件是用于对git进行设置，让其忽略对某些文件的跟踪。</p>
+<p>最近发现每创建一个新的仓库都要把.gitignore文件重新写一遍，甚是麻烦。于是就想能否自动生成.gitignore文件，这样的话就比较方便。最后找到了 gitignore.io 这个网站，它可以根据需求生成相应的.gitignore文件。比较你是用vim编辑器编写python代码，则输入vim  python就会生成对应vim和python的gitignore文件了。</p>
+<p>为了方便使用我编写了一个shell脚本。从 https://gist.github.com/wusuopu/9408486 下载代码，保存为mkgitignore，并加上执行权限。然后执行如下命令生成.gitignore文件。</p>
+<pre><code>$ mkgitignore vim,python
+$ mkgitignore vim,python .gitignore
+</code></pre>
+<p>第一条命令是直接将结果输出到终端，第二条命令是将结果输出到.gitignore文件中。</p>
+<p>最后补充一个git的小知识：<br>
+如果想要在所有的项目中都忽略掉某些文件的话，那么可以设置一个全局的gitignore。执行如下命令：</p>
+<pre><code>$ git config --global core.excludesfile ~/.gitignore
+</code></pre>

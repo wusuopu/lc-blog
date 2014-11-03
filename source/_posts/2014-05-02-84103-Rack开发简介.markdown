@@ -1,0 +1,40 @@
+---
+layout: post
+title: Rack开发简介
+data: 2014-05-02 13:05:23 +0000
+comments: true
+post_id: 84103
+permalink: /archives/84103.html
+categories: ["Ruby栏目", "Web开发"]
+tags: ["Ruby", "Web开发"]
+---
+
+<p>Rack是Ruby应用与web服务器之间的一个接口，它在服务器与应用程序之间作为中间件，可以对用户的请求和程序的返回数据进行处理。现在几乎所有主流的Ruby web框架都是支持Rack接口的。</p>
+<p>Rack与Python的wsgi很相似，在它的规格书（http://rack.rubyforge.org/doc/SPEC.html）中也说道它采用了WSGI的一些内容。</p>
+<h2>开始</h2>
+<p>首先安装Rack:</p>
+<pre><code>[sudo] gem install rack
+</code></pre>
+<p>然后通过一个简单的例子来讲解。</p>
+<pre><code>require "rack"
+rack_app = lambda{|env| [200, {}, ["Hello World!"]]}
+Rack::Handler::WEBrick.run rack_app, :Port =&gt; 3000
+</code></pre>
+<p>执行上述代码，然后访问 http://127.0.0.1:3000 会看到 "Hello World!"。</p>
+<p>上面代码中的rack_app即是一个Rack应用。Rack应用除了lambda之外也还可以使用其他对象，只要满足以下条件即可：<br>
+  * 可响应call方法的对象；<br>
+  * 接收一个参数rack环境 environment 。它是一个散列表，包含了CGI的信息和rack的一些变量；<br>
+  * 返回一个有三个值的数组，第一个值为返回状态 status；第二个值为返回头 headers，也是一个散列表；第三个值为返回正文 body，它必须是一个可响应each方法并生成字符串的对象，例如字符串数组。</p>
+<p>WEBrick是Handler的一种。Handler用于将web服务器与Rack连接。使用 Rack::Handler.constants 可以查看Rack包含的所有Handler。</p>
+<h2>请求/Request</h2>
+<p>在Rack应用中可以直接操作env参数来访问请求信息，但是这种方法不太方便。对于这种操作Rack::Request对象提供了方便的接口。</p>
+<pre><code>request = Rack::Request.new env
+</code></pre>
+<p>创建request对象时传入env参数。</p>
+<h2>响应/Response</h2>
+<p>Rack应用的返回值是一个有三个值的数组，包含了返回状态、返回头和返回正文。对于简单的程序手动构建数组还行，如果是复杂的程序则要考虑自动构建了。<br>
+同样的可以使用Rack::Request对象来创建返回数据。</p>
+<pre><code>response = Rack::Response.new
+response.finish
+</code></pre>
+<p>内容填充完之后调用response对象的finish方法生成符合Rack规范的数组对象。</p>

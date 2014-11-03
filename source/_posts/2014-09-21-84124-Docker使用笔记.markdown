@@ -1,0 +1,64 @@
+---
+layout: post
+title: Docker使用笔记
+data: 2014-09-21 12:06:35 +0000
+comments: true
+post_id: 84124
+permalink: /archives/84124.html
+categories: ["Linux栏目"]
+tags: ["Linux"]
+---
+
+<p>docker是一个Linux下的应用容器引擎。使用它可以很方便地将程序以及依赖都打包到一个可移植的容器中。最后体验了一下，使用docker配置了一个Web开发环境。这样就不用担心每次重装系统之后都要重新配置开发环境。</p>
+<h3>安装</h3>
+<p>首先是安装docker应用程序，目前只有64位系统才能使用。</p>
+<pre><code>$ [sudo] apt-get install apparmor apparmor-profiles apparmor-utils
+$ [sudo] apt-get install aufs-tools
+$ [sudo] apt-get install cgroup-lite
+
+$ wget https://get.docker.io/builds/Linux/x86_64/docker-latest.tgz
+$ [sudo] tar xf docker-latest.tgz -C /
+</code></pre>
+<h3>基本用法</h3>
+<p>安装完成之后使用 <code>[sudo] docker -d</code> 命令启动docker的daemon进程。</p>
+<p>以下是一些常用命令的用法介绍：</p>
+<pre><code>docker version            # 查看版本
+docker search TERM        # 搜索镜像
+docker pull NAME[:TAG]    # 下载镜像
+</code></pre>
+
+<p>启动镜像：</p>
+<pre><code>docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
+docker run IMAGE -t -i /bin/bash                        # 进入镜像的shell环境
+docker run IMAGE -p 12345:8000 -t -i /bin/bash          # 进入镜像的shell环境，将主机的12345端口映射到容器的8000端口
+
+</code></pre>
+
+<p>容器与镜像管理：</p>
+<pre><code>docker ps [OPTIONS]                              # 列出容器
+docker images [OPTIONS] [NAME]                   # 列出镜像
+docker rm [OPTIONS] CONTAINER [CONTAINER...]     # 删除容器
+docker rmi IMAGE [IMAGE...]                      # 删除镜像
+
+docker commit [OPTIONS] CONTAINER [REPOSITORY[:TAG]]    # 根据修改的容器创建一个新的镜像
+docker commit -m &quot;centos&quot; f9ccb5cef3c0 wusuopu/centos6
+docker push NAME[:TAG]                                  # 上传镜像
+</code></pre>
+
+<pre><code>docker inspect CONTAINER|IMAGE [CONTAINER|IMAGE...]     # 查看一个容器或者镜像的详细信息
+docker logs CONTAINER     # 查看日志
+docker start CONTAINER [CONTAINER...]                   # 启动镜像
+docker stop CONTAINER [CONTAINER...]                    # 停止镜像
+docker tag [OPTIONS] IMAGE [REGISTRYHOST/][USERNAME/]NAME[:TAG]   # 给镜像打tag
+docker diff CONTAINER     # 查看容器文件系统的变化
+docker cp CONTAINER:PATH HOSTPATH                       # 将文件从容器复制到主机
+</code></pre>
+
+<p>导入、导出：</p>
+<pre><code>docker export CONTAINER                                 # 导出容器到标准输出
+docker export red_panda &gt; latest.tar
+
+docker import URL|- [REPOSITORY[:TAG]]                  # 导入文件为镜像
+docker import http://example.com/exampleimage.tgz
+cat exampleimage.tgz | sudo docker import - exampleimagelocal:new
+</code></pre>

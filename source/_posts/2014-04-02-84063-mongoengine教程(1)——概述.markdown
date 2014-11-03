@@ -1,0 +1,56 @@
+---
+layout: post
+title: mongoengine教程(1)——概述
+data: 2014-04-02 12:23:09 +0000
+comments: true
+post_id: 84063
+permalink: /archives/84063.html
+categories: ["数据库"]
+tags: ["mongodb", "python"]
+---
+
+<p>MongoEngine是MongoDB的一个ODM(Object-Document Mapper)框架，它提供了类似Django的语法来操作MongoDB数据库。</p>
+<h2>安装</h2>
+<p>安装 MongoEngine 需要先安装 PyMongo。  </p>
+<h3>使用pip安装</h3>
+<pre><code>$ [sudo] pip install mongoengine
+</code></pre>
+<h3>通过源代码安装</h3>
+<p>先从 <a href="http://pypi.python.org/pypi/mongoengine/">PyPi</a> 或者 <a href="http://github.com/MongoEngine/mongoengine">Github</a> 下载源代码。然后再进行安装。</p>
+<pre><code>$ [sudo] python setup.py install
+</code></pre>
+<h2>使用</h2>
+<p>首先启动 mongodb 服务器：</p>
+<pre><code>$ mongod
+</code></pre>
+<h3>连接服务器</h3>
+<p>使用 connect 方法进行数据库链接，与pymongo的用法相似，其参数可以是多种型式的。</p>
+<pre><code>from mongoengine import connect
+connect('project1')
+connect('project1', host='mongodb://localhost:27017/test_database')
+</code></pre>
+<p>从 MongoEngine 0.6 开始增加了多数据库的支持， connect 的第二个参数可以为每个链接设置一个别名。</p>
+<h3>定义数据模型</h3>
+<p>mongoengine的 Document 与django的 Model 相似。</p>
+<pre><code>class User(mongoengine.Document):
+    name = mongoengine.StringField()
+
+    meta = {"db_alias": "default"}
+</code></pre>
+<h3>数据操作</h3>
+<p>数据的添加过程也与django相似：</p>
+<pre><code>User.objects.create(name="test1")
+User.objects.create(name="test2")
+User(name="test3").save()
+</code></pre>
+<p>查询数据：</p>
+<pre><code>User.objects.filter(name="test2")
+</code></pre>
+<p>删除数据：</p>
+<pre><code>User.objects.filter(name="test2").delete()
+</code></pre>
+<p>MongoEngine虽然提供了ODM，但是我们同样还是可以直接对数据库进行操作。<br>
+获取 pymongo 的 collection 对象：</p>
+<pre><code>User.objects._collection
+</code></pre>
+<p>然后就可以使用原生的pymongo操作了。</p>

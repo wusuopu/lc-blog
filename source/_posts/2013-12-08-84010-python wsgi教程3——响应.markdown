@@ -1,0 +1,54 @@
+---
+layout: post
+title: python wsgi教程3——响应
+data: 2013-12-08 11:05:07 +0000
+comments: true
+post_id: 84010
+permalink: /archives/84010.html
+categories: ["Web开发"]
+tags: ["python", "Web开发"]
+---
+
+<p>将上一个例子的返回：</p>
+<pre><code>return [response_body]
+</code></pre>
+<p>改为：</p>
+<pre><code>return response_body
+</code></pre>
+<p>再次运行会发现速度变慢了。这是因此服务器对发送过来的字符串是按单个字节进行迭代的，所以最好对返回的字符串用一个可迭代对象包装一下。</p>
+<p>如果返回的这个可迭代对象生成多个字符串，那么正文的长度即为这些字符串长度的总和。</p>
+<p>接下来看一个例子：</p>
+
+```python
+#! /usr/bin/env python
+
+from wsgiref.simple_server import make_server
+
+def application(environ, start_response):
+
+   response_body = ['%s: %s' % (key, value)
+                    for key, value in sorted(environ.items())]
+   response_body = '\n'.join(response_body)
+
+   # Response_body has now more than one string
+   response_body = ['The Beggining\n',
+                    '*' * 30 + '\n',
+                    response_body,
+                    '\n' + '*' * 30 ,
+                    '\nThe End']
+
+   # So the content-lenght is the sum of all string's lengths
+   content_length = 0
+   for s in response_body:
+      content_length += len(s)
+
+   status = '200 OK'
+   response_headers = [('Content-Type', 'text/plain'),
+                  ('Content-Length', str(content_length))]
+   start_response(status, response_headers)
+
+   return response_body
+
+httpd = make_server('localhost', 8051, application)
+httpd.handle_request()
+```

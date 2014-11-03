@@ -1,0 +1,47 @@
+---
+layout: post
+title: Linux下VNC使用
+data: 2014-03-01 12:21:53 +0000
+comments: true
+post_id: 84045
+permalink: /archives/84045.html
+categories: ["资源分享"]
+tags: []
+---
+
+<h3>安装</h3>
+<p>VNC (Virtual Network Computer)是虚拟网络计算机的缩写。VNC 是一款优秀的远程控制工具软件。<br>
+VNC程序有多个软件包可选择，例如执行以下命令进行安装：</p>
+<pre><code>$ sudo apt-get install vnc4server
+$ sudo pacman -S tigervnc
+</code></pre>
+<h3>启动服务器程序</h3>
+<p>修改$HOME/.vnc/xstartup配置文件，我是用的xfce，配置如下：</p>
+<pre><code>#!/bin/sh
+
+# Uncomment the following two lines for normal desktop:
+# unset SESSION_MANAGER
+# exec /etc/X11/xinit/xinitrc
+
+[ -x /etc/vnc/xstartup ] &amp;&amp; exec /etc/vnc/xstartup
+[ -r $HOME/.Xresources ] &amp;&amp; xrdb $HOME/.Xresources
+xsetroot -solid grey
+vncconfig -iconic &amp;
+startxfce4 &amp;
+</code></pre>
+<p>然后运行服务程序，首次运行需要先设置密码：</p>
+<pre><code>$ vncserver
+</code></pre>
+<h3>启动客户端程序</h3>
+<p>执行如下命令链接vnc服务：</p>
+<pre><code>$ vncviewer &lt;host&gt;:&lt;DISPLAY&gt;
+</code></pre>
+<p>例如要链接到10.0.0.101的1号DISPLAY，则是：</p>
+<pre><code>$ vncviewer 10.0.0.101:1
+</code></pre>
+<p>然后根据提示输入密码即可。</p>
+<h3>退出程序</h3>
+<p>如果要退出客户端程序，直接将程序窗口关闭即可。<br>
+如果要退出服务端程序，则在服务端执行命令：  </p>
+<pre><code>$ vncserver -kill :1
+</code></pre>
