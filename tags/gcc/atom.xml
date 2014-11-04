@@ -1,0 +1,474 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Tag: Gcc | 龍昌博客]]></title>
+  <link href="http://www.xefan.com/tags/gcc/atom.xml" rel="self"/>
+  <link href="http://www.xefan.com/"/>
+  <updated>2014-11-04T14:10:28+08:00</updated>
+  <id>http://www.xefan.com/</id>
+  <author>
+    <name><![CDATA[龍昌]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[使用distcc加快编译速度]]></title>
+    <link href="http://www.xefan.com/archives/84027.html"/>
+    <updated>2014-01-07T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84027-使用distcc加快编译速度</id>
+    <content type="html"><![CDATA[<p>distcc是一个分布式的C/C++编译工具，它可以组织一个网络内的多台计算机同时进行某个编译任务。</p>
+
+
+<p>对于Debian系列的系统可以执行如下命令进行安装：</p>
+
+
+<p>$ sudo apt-get install distcc</p>
+
+
+<h3>使用</h3>
+
+
+<p>1、首先得先运行服务器软件</p>
+
+
+<p>运行如下命令启动distccd服务，并接收192.168.1网段内的所有TCP连接：</p>
+
+
+<pre><code>$ distccd --allow 192.168.1.0/24 --log-level error --log-file /tmp/distccd.log --daemon
+</code></pre>
+
+
+<p>2、运行客户端软件</p>
+
+
+<p>设置服务器列表：<br>
+设置DISTCC_HOSTS环境变量；或者修改 ~/.distcc/hosts 或者 /etc/distcc/hosts 文件。<br>
+每行一个服务器主机地址，主机地址可以是如下格式：  </p>
+
+
+<pre><code>localhost       表示本地
+HOST            TCP连接到该主机的3632端口
+HOST:PORT       TCP连接到该主机的指定端口
+@HOST           使用ssh连接
+USER@HOST       使用指定用户进行ssh连接
+</code></pre>
+
+
+<p>所有的服务器的架构最好是相同的。都是32位或者都是64位。  </p>
+
+
+<p>3、在编译的时候使用distcc</p>
+
+
+<p>如果工程使用automake机制：<br>
+在configure阶段执行&#8221;CC=distcc ./configure&#8221; ，然后再执行&#8221;make -j XX; make install&#8221;。</p>
+
+
+<p>如果工程由GNU make管理：<br>
+修改Makefile使得在原来C/C++编译器名称前加上&#8221;distcc &#8220;，例如设置CC=&#8221;distcc arm-linux-gcc&#8221;。然后执行&#8221;make -j XX&#8221;。</p>
+
+
+<p>如果工程由SCons管理：<br>
+修改SConstruct使得在原来C/C++编译器名称前加上&#8221;distcc &#8220;。导出环境变量HOME和DISTCC_HOSTS到构建环境（注意SCons不会自动把系统环境变量导出到builder子进程）：</p>
+
+
+<pre><code>Environment(ENV={'HOME': os.environ['HOME'],'DISTCC_HOSTS': ‘localhost 10.0.0.2’},...)
+</code></pre>
+
+
+<p>然后执行&#8221;scons -j XX&#8221;。</p>
+
+
+<h3>实例</h3>
+
+
+<p>接下来编译Python源代码，测试一下distcc。</p>
+
+
+<pre><code>$ tar xfv Python-2.7.5.tar
+$ cd Python-2.7.5
+$ ./configure
+$ time make
+make  124.32s user 7.11s system 94% cpu 2:19.24 total
+$ time make
+make  0.17s user 0.04s system 89% cpu 0.241 total
+$ make clean
+$ time make
+make  123.52s user 7.32s system 96% cpu 2:16.12 total
+</code></pre>
+
+
+<p>正常编译花了2分10多秒的时间。</p>
+
+
+<pre><code>$ cat /etc/distcc/hosts
+10.0.0.129
+localhost
+$ tar xfv Python-2.7.5.tar
+$ cd Python-2.7.5
+$ CC=distcc ./configure
+$ time make -j 3
+make -j 3  49.58s user 5.53s system 30% cpu 3:01.40 total
+$ time make -j 3
+make -j 3  0.60s user 0.24s system 7% cpu 11.482 total
+$ make clean
+$ time make -j 3
+make -j 3  46.17s user 5.20s system 40% cpu 2:05.66 total
+</code></pre>
+
+
+<p>使用129这台主机和本机一起进行编译，结果花了3分钟的时间。好像使用distcc编译还比正常的编译方式更耗时，有可能是时间花费在了网络传输上。</p>
+
+
+<p>如果有多台主机的话效果应该会好些。还有可以配合使用ccache和distcc进一步加快编译速度。</p>
+
+
+<p>下图是distcc提供的监控工具，用于查看编译执行的情况：</p>
+
+
+<p><a href="http://www.xefan.com/wp-content/uploads/2014/01/distcc-Monitor.png"><img src="http://www.xefan.com/wp-content/uploads/2014/01/distcc-Monitor-300x194.png" alt="" title="distcc Monitor" width="300" height="194" class="aligncenter size-medium wp-image-84028" /></a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[使用ccache加快编译速度]]></title>
+    <link href="http://www.xefan.com/archives/84024.html"/>
+    <updated>2014-01-04T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84024-使用ccache加快编译速度</id>
+    <content type="html"><![CDATA[<p>ccache是一个编译器缓存，可以将编译的结果缓存起来。这样尽管第一次编译会花费长一点的时间，不过之后再次编译将变得非常非常快。 </p>
+
+
+<h3>1、安装</h3>
+
+
+<p>主流的linux发行版应该都有这个包，对于Debian系列的可以执行以下命令安装：</p>
+
+
+<pre><code>sudo apt-get install ccache
+</code></pre>
+
+
+<h3>2、使用</h3>
+
+
+<p>安装之后基本不用进行什么配置就可以直接使用了。<br>
+例如之前要编译一个hello.c文件要执行命令：  </p>
+
+
+<pre><code>gcc hello.c -o hello
+</code></pre>
+
+
+<p>现在是：</p>
+
+
+<pre><code>ccache gcc hello.c -o hello
+</code></pre>
+
+
+<p>ccache默认是将结果缓存保存到 $HOME/.ccache 目录下。如果想要修改这个目录，可以修改 CCACHE_DIR 环境变量。例如：</p>
+
+
+<pre><code>export CCACHE_DIR=/ramdisk/ccache
+</code></pre>
+
+
+<p>如果觉得每次都在命令前加上ccache比较麻烦的话，有一个一劳永逸的办法。执行如下命令：</p>
+
+
+<pre><code>cp ccache /usr/local/bin/
+ln -s ccache /usr/local/bin/gcc
+ln -s ccache /usr/local/bin/g++
+ln -s ccache /usr/local/bin/cc
+ln -s ccache /usr/local/bin/c++
+</code></pre>
+
+
+<p>不过这样的话每次都是使用的ccache，不太灵活。这个就要自己取舍了。</p>
+
+
+<h3>3、实例</h3>
+
+
+<p>接下来通过一个例子来看看使用ccache和不使用的差别。<br>
+作为一个Python程序员，我们就来编译一个Python试试。</p>
+
+
+<pre><code>$ tar xf Python-2.7.3.tar.gz
+$ cd Python-2.7.3
+$ ./configure
+$ time make
+make  96.49s user 5.10s system 93% cpu 1:48.77 total
+</code></pre>
+
+
+<p>首次编译花了1分48秒。</p>
+
+
+<pre><code>$ time make
+make  0.12s user 0.03s system 88% cpu 0.172 total
+$ make clean
+$ time make
+make  96.46s user 4.98s system 95% cpu 1:46.43 total
+</code></pre>
+
+
+<p>清除结果之后再次编译，还是花了1分46秒。</p>
+
+
+<p>再来看看使用ccache后的结果：</p>
+
+
+<pre><code>$ tar xf Python-2.7.3.tar.gz
+$ cd Python-2.7.3
+$ ./configure
+$ time make
+make  99.42s user 5.84s system 93% cpu 1:52.95 total
+
+$ time make
+make  0.16s user 0.00s system 89% cpu 0.178 total
+$ make clean
+$ time make
+make  3.36s user 1.41s system 52% cpu 9.093 total
+</code></pre>
+
+
+<p>首次编译花了1分52秒，之后都是只花了几秒。</p>
+
+
+<p>查看ccache的统计信息：</p>
+
+
+<pre><code>$ ccache -s
+cache directory                     /home/longchang/.ccache
+cache hit (direct)                   250
+cache hit (preprocessed)               4
+cache miss                           349
+called for link                      132
+alled for preprocessing              84
+compile failed                        29
+preprocessor error                    28
+bad compiler arguments                 5
+unsupported source language            6
+autoconf compile/link                224
+no input file                         24
+files in cache                       710
+cache size                          30.3 Mbytes
+max cache size                       1.0 Gbytes
+</code></pre>
+
+
+<p>清除掉缓存后再次编译：</p>
+
+
+<pre><code>$ ccache -c
+Cleaned cache
+
+$ make clean
+$ time make
+make  99.36s user 5.94s system 92% cpu 1:53.47 total
+
+$ make clean
+$ time make
+make  3.48s user 1.42s system 54% cpu 9.049 total
+</code></pre>
+
+
+<p>ccache手册： <a href="http://ccache.samba.org/manual.html">http://ccache.samba.org/manual.html</a></p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Linux下交叉编译windows程序]]></title>
+    <link href="http://www.xefan.com/archives/83663.html"/>
+    <updated>2011-11-25T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/83663-linux下交叉编译windows程序</id>
+    <content type="html"><![CDATA[<p>有时候需要编写在Windows下运行的程序，但是又不想切换到Windows下来编译，于是就想在Linux下来编译Windows下运行的exe文件。</p>
+
+<p>这个需要先安装mingw32交叉编译工具。<br/>
+ubuntu下使用命令：sudo apt-get install mingw32进行安装，<br/>
+Arch Linux下使用命令：sudo pacman -S mingw32-binutils mingw32-gcc mingw32-pthreads mingw32-runtime mingw32-w32api</p>
+
+<p>安装完后测试一下效果。<br/>
+将以下代码保存为mingw32_test.c文件。</p>
+
+<pre><code class="c">int main(int argc, char *argv)
+{
+    printf("Windows Compiler Test\nhttp://www.xefan.com\n");
+    return 0;
+}
+</code></pre>
+
+<p>然后执行命令：</p>
+
+<pre><code>[lcj@lcj C]$ i486-mingw32-gcc -o mingw32_test.exe mingw32_test.c
+mingw32_test.c: In function 'main':
+mingw32_test.c:3:5: warning: incompatible implicit declaration of built-in function 'printf' [enabled by default]
+[lcj@lcj C]$ wine mingw32_test.exe
+Windows Compiler Test
+http://www.xefan.com
+[lcj@lcj C]$
+</code></pre>
+
+<p>经测试在wine下能正常运行，在虚拟机里的WinXP下测试也可正常运行。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Ubuntu 10.10 Crosstool ARM交叉编译]]></title>
+    <link href="http://www.xefan.com/archives/83613.html"/>
+    <updated>2011-09-17T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/83613-Ubuntu 10.10 crosstool ARM交叉编译</id>
+    <content type="html"><![CDATA[<p>弄了两天，经过了N次失败后现在终于编译成功了，赶紧做个笔记。</p>
+
+<p>1、下载crosstool(<a href="http://www.kegel.com/crosstool/crosstool-0.43.tar.gz">http://www.kegel.com/crosstool/crosstool-0.43.tar.gz</a>)</p>
+
+<p>2、下载编译过程中需要用到的源代码，虽然crosstool也会自动下载不过速度很慢，建议还是自己先下载好，源代码的版本根据自己的情况选择：<br/>
+binutils-2.15 <a href="http://ftp.gnu.org/gnu/binutils/  ">http://ftp.gnu.org/gnu/binutils/  </a>
+gcc-3.4.5 <a href="http://ftp.gnu.org/gnu/gcc/  ">http://ftp.gnu.org/gnu/gcc/  </a>
+glibc-2.3.6 <a href="ftp://ftp.gnu.org/gnu/glibc/">ftp://ftp.gnu.org/gnu/glibc/</a>
+glibc-linuxthreads-2.3.6 <a href="ftp://ftp.gnu.org/gnu/glibc/">ftp://ftp.gnu.org/gnu/glibc/</a></p>
+
+<p>linux-2.6.10 <a href="http://ftp.cc.uoc.gr/mirrors/ftp.kernel.org/pub/linux/kernel/v2.6/linux-2.6.10.tar.gz  ">http://ftp.cc.uoc.gr/mirrors/ftp.kernel.org/pub/linux/kernel/v2.6/linux-2.6.10.tar.gz  </a>
+linux-libc-headers-2.6.12.0 <a href="http://ep09.pld-linux.org/~mmazur/linux-libc-headers/linux-libc-headers-2.6.12.0.tar.bz2">http://ep09.pld-linux.org/~mmazur/linux-libc-headers/linux-libc-headers-2.6.12.0.tar.bz2</a></p>
+
+<p>将以上七个压缩包放在同一个目录下。</p>
+
+<p>3、编译过程依赖这几个软件，没有的请自行安装。Bison、flex 、build-essential、patch 、libncurses5-de<br/>
+还有gcc的编译依赖于gmp、mpfr、mpc这几个软件，没有的请先安装。<br/>
+mpc-0.9.tar.gz <a href="http://www.multiprecision.org/mpc/download/mpc-0.9.tar.gz  ">http://www.multiprecision.org/mpc/download/mpc-0.9.tar.gz  </a>
+mpfr-3.0.1.tar.bz2 <a href="http://www.mpfr.org/mpfr-current/mpfr-3.0.1.tar.bz2  ">http://www.mpfr.org/mpfr-current/mpfr-3.0.1.tar.bz2  </a>
+gmp-5.0.2.tar.bz2 <a href="ftp://ftp.gmplib.org/pub/gmp-5.0.2/gmp-5.0.2.tar.bz2  ">ftp://ftp.gmplib.org/pub/gmp-5.0.2/gmp-5.0.2.tar.bz2  </a>
+这几个软件之间也存在依赖关系，请按顺序依次安装gmp、mpfr、mpc</p>
+
+<p>4、修改配置<br/>
+1)、ubuntu10.10自己的GCC是4.4版本，使用这个版本的进行编译会出错，建议使用gcc-4.1。<br/>
+sudo apt-get install gcc-4.1<br/>
+sudo rm /usr/bin/gcc<br/>
+sudo ln -s /usr/bin/gcc-4.1 /usr/bin/gcc</p>
+
+<p>2)、修改sh，ubuntu10.10默认的sh是用的dash<br/>
+如果运行 ls -la /bin/sh 看到链接是dash，则需要修改一下。不改的话编译会出错。<br/>
+我是直接运行命令 sudo ln -sf /bin/bash /bin/sh 修改。改完后重启下，或者切换工作台以使其生效。</p>
+
+<p>3)、修改编译脚本<br/>
+解压crosstool然后进入解压目录，这里我选择demo-arm.sh这个脚本。<br/>
+cp demo-arm.sh arm.sh</p>
+
+<p>修改arm.sh<br/>
+vi arm.sh</p>
+
+<pre><code>TARBALLS_DIR=(刚刚下载的源码存放目录)  
+RESULT_TOP=(生成工具链要安装到的目录)  
+eval `cat arm.dat gcc-3.4.5-glibc-2.3.6.dat` sh all.sh –notest #这个根据自己的情况选择
+</code></pre>
+
+<p>然后修改gcc-3.4.5-glibc-2.3.6.dat这个文件<br/>
+BINUTILS_DIR=binutils-2.15<br/>
+GCC_DIR=gcc-3.4.5<br/>
+GLIBC_DIR=glibc-2.3.6<br/>
+LINUX_DIR=linux-2.6.10<br/>
+LINUX_SANITIZED_HEADER_DIR=linux-libc-headers-2.6.12.0<br/>
+GLIBCTHREADS_FILENAME=glibc-linuxthreads-2.3.6</p>
+
+<p>再修改arm.dat这个文件</p>
+
+<pre><code>KERNELCONFIG=`pwd`/arm.config  
+TARGET=arm-linux #生成的工具链名称  
+TARGET_CFLAGS=”-O”  
+</code></pre>
+
+<p>还有ubuntu10.10自带的ar、ld是2.20版本的，而这个编译时需要的是2.13~2.19版本的，所以会出错。<br/>
+解决方法：<br/>
+(1)、像上面的gcc一样，再安装个低版本的ls、ar。<br/>
+(2)、如果不想再另外安装就可以用这个方法。修改glibc-2.3.6.tar.bz2这个压缩包内的configure文件。将3920行和3981行处的”2.1[3-9])<em>”改为”2.[1-2][0-9]</em>)”。</p>
+
+<p>5、开始编译<br/>
+都配置好了之后就可以开始了<br/>
+./arm.sh<br/>
+漫长的等待开始了……，我的是奔腾双核处理器，整个过程花了半个多小时</p>
+
+<p>6、测试<br/>
+现在用刚刚编译安装好的arm-linux-gcc来编译一个C程序试试。<br/>
+先将arm-linux-gcc的安装目录添加到环境变量中。</p>
+
+<pre><code class="c">//文件名:hello.c
+ int main()
+ {
+ printf(&amp;quot;www.xefam.com&amp;quot;);
+ }
+</code></pre>
+
+<p>$ arm-linux-gcc -o hello hello.c<br/>
+$ file hello<br/>
+hello: ELF 32-bit LSB executable, ARM, version 1, dynamically linked (uses shared libs), for GNU/Linux 2.4.3, not stripped<br/>
+这就说明这个已经成功了！</p>
+
+<p>7、现在可以恢复之前的系统配置了<br/>
+将gcc修为gcc-4.4<br/>
+将sh修改dash</p>
+
+<p>如果嫌麻烦不想自己编译的可以直接下载已经编译好的来用，下面这个就是我编译好：
+gcc-3.4.5-glibc-2.3.6.tar.gz <a href="http://115.com/file/e65akpi1">http://115.com/file/e65akpi1</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[在Windows下安装GTK]]></title>
+    <link href="http://www.xefan.com/archives/83448.html"/>
+    <updated>2010-10-30T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/83448-在Windows下安装GTK</id>
+    <content type="html"><![CDATA[<p><strong>GTK 简介 </strong></p>
+
+<p>GTK (GIMP Toolkit) 是一套用于创建图形用户界面的工具包。它遵循 LGPL许可证，所以可以用它来开发开源软件、自由软件，甚至是封闭源代码的商业软件，而不用花费任何费用来购买许可证和使用权。当前，GTK 已经被成功地应用到 了大量的自由软件及商业软件中，已经取得了很大的成功。<br/>
+GTK是跨平台的，它能够运行于Linux/Unix/Windows/MacOS及嵌入式系统</p>
+
+<p>下面就来介绍一下在Windows一搭建GTK开发环境。<br/>
+首先需要先安装C/C++开发环境，GTK支持Cygwin、MSYS、Dec-Cpp、MSVC这几种。这里偶用的是Dev-Cpp。在前一篇文章《在Windows下安装gcc》（ <a href="http://www.xefan.cn/archives/83446.html">http://www.xefan.cn/archives/83446.html</a> ）介绍了Dev-Cpp的安装。</p>
+
+<p><strong>下载、安装GTK</strong></p>
+
+<p>下载地址：<a href="http://gladewin32.sourceforge.net/">http://gladewin32.sourceforge.net/</a></p>
+
+<p>由于我们是用于开发，所以就选择下载<strong><em>Gtk+ 2.12.9 Development Environment Revision 2</em></strong>这个。下载完后安装gtk-dev-2.12.9-win32-2.exe，安装过程全部按照默然的就可以了，留意一下的是选择IDE的时候确定一下是Dev-Cpp就可以了。安装完毕后系统环境变量和Dev-Cpp的目录设置应该都已经设置好了。<br/>
+1、查看系统环境变量：右键单击“我的电脑”–&gt;“属性”–&gt;“高级”–&gt;“环境变量”–&gt;“系统变量”，可以看到Path增加了“%GTK_BASEPATH%bin”。</p>
+
+<p>2、查看Dev-Cpp的目录设置：“工具”–&gt;“编译器选项”–&gt;“目录”，选择“库”可以看到“C:GTKbin”;选择“C包含文件”可以看到“C:GTKINCLUDE”……</p>
+
+<p>接下来我们进行测试一下，打开 Dev-C++，建立一个新的工程，添加一个新文件：</p>
+
+<pre>#include &lt;gtk/gtk.h&gt;
+int main(int argc, char *argv[])
+{
+GtkWidget *window;
+gtk_init(&amp;argc, &amp;argv);
+window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+gtk_window_set_title(GTK_WINDOW(window), "Hello World");
+gtk_widget_show(window);
+gtk_main();
+return 0 ;
+}</pre>
+
+
+<p>这个时候还不能编译，需要修改工程属性，在&#8221;工程-&gt;工程属性-&gt;参数&#8221; 或 &ldquo;工具-&gt;编译选项&#8221;中的链接器框里面填入：</p>
+
+<ul> -lgtk-win32-2.0 -lgdk-win32-2.0 -latk-1.0 -lgdk_pixbuf-2.0 -lpangowin32-1.0 -lgdi32 -lpango-1.0 -lgobject-2.0 -lgmodule-2.0 -lglib-2.0 -lintl -liconv</ul>
+
+
+<p>在编译选项里面填入：</p>
+
+<ul> -mms-bitfields</ul>
+
+
+<p>就可以编译通过了。</p>
+
+<p>在运行以后，你会发现出现一个空白窗口，标题为 Hello World。</p>
+
+<p><img class="aligncenter" title="Dev Cpp-GTK" src="http://img208.poco.cn/mypoco/myphoto/20101030/13/5545129120101030135311028.jpg" alt="" width="533" height="446" /></p>
+]]></content>
+  </entry>
+  
+</feed>

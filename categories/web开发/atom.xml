@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Web开发 | 龍昌博客]]></title>
+  <link href="http://www.xefan.com/categories/web开发/atom.xml" rel="self"/>
+  <link href="http://www.xefan.com/"/>
+  <updated>2014-11-04T14:10:28+08:00</updated>
+  <id>http://www.xefan.com/</id>
+  <author>
+    <name><![CDATA[龍昌]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Nginx + Php + FastCGI配置]]></title>
+    <link href="http://www.xefan.com/archives/84121.html"/>
+    <updated>2014-08-01T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84121-nginx + php + FastCGI配置</id>
+    <content type="html"><![CDATA[<p>最近在弄PHP，于是乎把配置过程作一个笔记以免忘了。</p>
+
+
+<h2>PHP安装、配置</h2>
+
+
+<p>我是通过源代码编译的形式进行安装的，基本步骤如下：</p>
+
+
+<pre><code>$ tar xf php-5.5.12.tar.bz2
+$ cd php-5.5.12
+$ './configure'  '--prefix=/opt/myphp' '--with-mysql' '--enable-safe-mode' '--enable-ftp' '--enable-zip' '--with-jpeg-dir' '--with-bz2' '--with-png-dir' '--with-freetype-dir' '--with-iconv' '--with-libxml-dir' '--with-xmlrpc' '--with-zlib-dir' '--with-gd' '--enable-gd-native-ttf' '--with-curl' '--with-gettext' '--with-pear' '--enable-fpm' '--enable-fastcgi' '--with-ncurses' '--with-mcrypt' '--with-mhash' '--with-openssl' '--with-pcre-dir' '--enable-pdo' '--enable-phar' '--enable-json' '--enable-mbstring' '--with-pdo-mysql' '--with-pdo-sqlite' '--with-readline' '--enable-bcmath'
+$ make
+$ sudo make install
+</code></pre>
+
+
+
+
+<p>安装完成之后进入安装目录修改配置文件 lib/php.ini (没有则创建)，添加时区设置：</p>
+
+
+<pre><code>date.timezone=Asia/Shanghai
+</code></pre>
+
+
+
+
+<p>然后运行PHP的FastCGI服务：</p>
+
+
+<pre><code>./bin/php-cgi -b 9000
+</code></pre>
+
+
+
+
+<h2>nginx配置</h2>
+
+
+<p>nginx可以直接从仓库进行安装：</p>
+
+
+<pre><code>sudo pacman -S nginx
+</code></pre>
+
+
+
+
+<p>或者：</p>
+
+
+<pre><code>sudo apt-get install nginx
+</code></pre>
+
+
+
+
+<p>安装完成之后修改配置，添加一条新的虚拟主机：</p>
+
+
+<pre><code>server {
+    listen 8000;
+    server_name localhost;
+
+    root /var/www;
+
+    location / {
+        index index.php;
+    }
+
+    location ~ \.php$ {
+        fastcgi_pass   127.0.0.1:9000;
+        fastcgi_index  index.php;  
+        fastcgi_split_path_info ^(.+\.php)(/.*)$;
+        include        fastcgi_params;
+        fastcgi_param  SCRIPT_FILENAME  /var/www/$fastcgi_script_name;
+    }
+
+}
+</code></pre>
+
+
+
+
+<p>然后再创建文件 /var/www/index.php</p>
+
+
+<pre><code>&lt;?php
+  phpinfo();
+?&gt;
+</code></pre>
+
+
+
+
+<p>现在通过浏览器访问 http://127.0.0.1:8000/ 应该就可以看到效果了。</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Rack开发简介]]></title>
+    <link href="http://www.xefan.com/archives/84103.html"/>
+    <updated>2014-05-02T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84103-Rack开发简介</id>
+    <content type="html"><![CDATA[<p>Rack是Ruby应用与web服务器之间的一个接口，它在服务器与应用程序之间作为中间件，可以对用户的请求和程序的返回数据进行处理。现在几乎所有主流的Ruby web框架都是支持Rack接口的。</p>
+
+
+<p>Rack与Python的wsgi很相似，在它的规格书（http://rack.rubyforge.org/doc/SPEC.html）中也说道它采用了WSGI的一些内容。</p>
+
+
+<h2>开始</h2>
+
+
+<p>首先安装Rack:</p>
+
+
+<pre><code>[sudo] gem install rack
+</code></pre>
+
+
+<p>然后通过一个简单的例子来讲解。</p>
+
+
+<pre><code>require "rack"
+rack_app = lambda{|env| [200, {}, ["Hello World!"]]}
+Rack::Handler::WEBrick.run rack_app, :Port =&gt; 3000
+</code></pre>
+
+
+<p>执行上述代码，然后访问 http://127.0.0.1:3000 会看到 &#8220;Hello World!&#8221;。</p>
+
+
+<p>上面代码中的rack_app即是一个Rack应用。Rack应用除了lambda之外也还可以使用其他对象，只要满足以下条件即可：<br>
+  * 可响应call方法的对象；<br>
+  * 接收一个参数rack环境 environment 。它是一个散列表，包含了CGI的信息和rack的一些变量；<br>
+  * 返回一个有三个值的数组，第一个值为返回状态 status；第二个值为返回头 headers，也是一个散列表；第三个值为返回正文 body，它必须是一个可响应each方法并生成字符串的对象，例如字符串数组。</p>
+
+
+<p>WEBrick是Handler的一种。Handler用于将web服务器与Rack连接。使用 Rack::Handler.constants 可以查看Rack包含的所有Handler。</p>
+
+
+<h2>请求/Request</h2>
+
+
+<p>在Rack应用中可以直接操作env参数来访问请求信息，但是这种方法不太方便。对于这种操作Rack::Request对象提供了方便的接口。</p>
+
+
+<pre><code>request = Rack::Request.new env
+</code></pre>
+
+
+<p>创建request对象时传入env参数。</p>
+
+
+<h2>响应/Response</h2>
+
+
+<p>Rack应用的返回值是一个有三个值的数组，包含了返回状态、返回头和返回正文。对于简单的程序手动构建数组还行，如果是复杂的程序则要考虑自动构建了。<br>
+同样的可以使用Rack::Request对象来创建返回数据。</p>
+
+
+<pre><code>response = Rack::Response.new
+response.finish
+</code></pre>
+
+
+<p>内容填充完之后调用response对象的finish方法生成符合Rack规范的数组对象。</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[使用nvm进行node多版本管理]]></title>
+    <link href="http://www.xefan.com/archives/84039.html"/>
+    <updated>2014-01-23T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84039-使用nvm进行node多版本管理</id>
+    <content type="html"><![CDATA[<p>nvm与Python的virtualenv和Ruby的rvm类似。<br>
+NVM (Node Version Manager，Node多版本管理器)是一个通用的叫法,它目前有许多不同的实现。通常我们说的 nvm 是指 https://github.com/creationix/nvm 或者 https://github.com/visionmedia/n 。这两个工具都是使用shell编写的。</p>
+
+
+<h2>n</h2>
+
+
+<p>个人感觉 n 比较简洁些，它就只有一个脚本文件。  </p>
+
+
+<h3>安装</h3>
+
+
+<p>如果已经安装了npm的话，可以直接执行命令进行安装n :</p>
+
+
+<pre><code>$ npm install -g n
+</code></pre>
+
+
+<p>或者是直接获取源代码安装：</p>
+
+
+<pre><code>$ git clone https://github.com/visionmedia/n.git
+$ cd n
+$ [sudo] make install
+</code></pre>
+
+
+<h3>使用</h3>
+
+
+<p>直接运行 n 命令查看所有已安装的版本。</p>
+
+
+<pre><code>$ n
+</code></pre>
+
+
+<p>运行命令 n <version> 进行安装指定版本的node。 version 可以是 stable(最新稳定版)、latest(最新版)或者具体的版本数字。</p>
+
+
+<pre><code>$ n stable
+install : v0.10.24
+mkdir : /usr/local/n/versions/0.10.24
+fetch : http://nodejs.org/dist/v0.10.24/node-v0.10.24-linux-x64.tar.gz
+</code></pre>
+
+
+<p>指定的版本将会安装在 /usr/local/n/versions 目录下。</p>
+
+
+<p>运行命令 n rm <version> 删除已安装指定版本的node。</p>
+
+
+<p>运行命令 n use <version> 选择使用指定版本的node。</p>
+
+
+<h2>nvm</h2>
+
+
+<h3>安装</h3>
+
+
+<pre><code>$ git clone https://github.com/creationix/nvm.git ~/.nvm
+$ source ~/.nvm/nvm.sh
+</code></pre>
+
+
+<h3>使用</h3>
+
+
+<p>查看已安装的版本：</p>
+
+
+<pre><code>$ nvm ls
+</code></pre>
+
+
+<p>查看可以安装的版本：</p>
+
+
+<pre><code>$ nvm ls-remote
+</code></pre>
+
+
+<p>安装指定的版本：</p>
+
+
+<pre><code>$ nvm install &lt;version&gt;
+</code></pre>
+
+
+<p>指定的版本将会直接安装在 nvm 程序所在的目录下。</p>
+
+
+<p>删除指定的版本：</p>
+
+
+<pre><code>$ nvm uninstall &lt;version&gt;
+</code></pre>
+
+
+<p>使用选定的版本：</p>
+
+
+<pre><code>$ nvm use &lt;version&gt;
+</code></pre>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[使用css3绘制lxde桌面]]></title>
+    <link href="http://www.xefan.com/archives/84032.html"/>
+    <updated>2014-01-15T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84032-使用css3绘制lxde桌面</id>
+    <content type="html"><![CDATA[<p>最近在学习CSS，本来是打算写点小东西练习练习。正好自己用的是linux系统的lxde桌面，于是就用CSS来绘制一个lxde。</p>
+
+
+<p>在做的过程中发现了less，感觉很不错，于是就把less也加进来了。</p>
+
+
+<p>最后的效果图：</p>
+
+
+<p><img src="https://github.com/wusuopu/css3-lxde/blob/master/snapshoot/lxde0.png?raw=true" /></p>
+
+
+<p><img src="https://github.com/wusuopu/css3-lxde/blob/master/snapshoot/lxde1.png?raw=true" /></p>
+
+
+<p><img src="https://github.com/wusuopu/css3-lxde/blob/master/snapshoot/lxde2.png?raw=true" /></p>
+
+
+<p>源代码： https://github.com/wusuopu/css3-lxde</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[使用CSS3绘制海贼王]]></title>
+    <link href="http://www.xefan.com/archives/84018.html"/>
+    <updated>2013-12-11T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84018-使用CSS3绘制海贼王</id>
+    <content type="html"><![CDATA[<p style="-qt-block-indent: 0; text-indent: 0px; margin: 0px;">之前国外有网友用CSS3绘制了一个哆啦A梦，最近也在学习CSS，于是就自己画了一个海贼王的图标。</p>
+
+
+<p style="-qt-block-indent: 0; text-indent: 0px; margin: 0px;"></p>
+
+
+<p style="-qt-block-indent: 0; text-indent: 0px; margin: 0px;">以下是画出来的效果：</p>
+
+
+<p style="-qt-block-indent: 0; text-indent: 0px; margin: 0px;"></p>
+
+
+<p style="-qt-block-indent: 0; text-indent: 0px; margin: 0px;"><a href="http://www.xefan.com/wp-content/uploads/2013/12/lufei.png"><img class="aligncenter size-medium wp-image-84019" title="lufei" src="http://www.xefan.com/wp-content/uploads/2013/12/lufei-300x233.png" alt="" width="300" height="233" /></a></p>
+
+
+<p style="-qt-block-indent: 0; text-indent: 0px; margin: 0px;"></p>
+
+
+<p style="-qt-block-indent: 0; text-indent: 0px; margin: 0px;"></p>
+
+
+<p style="-qt-block-indent: 0; text-indent: 0px; margin: 0px;">以下是原图：</p>
+
+
+<p style="-qt-paragraph-type: empty; -qt-block-indent: 0; text-indent: 0px; margin: 0px;"><a href="http://www.xefan.com/wp-content/uploads/2013/12/caimao.jpg"><img class="aligncenter size-medium wp-image-84021" title="caimao" src="http://www.xefan.com/wp-content/uploads/2013/12/caimao-300x192.jpg" alt="" width="300" height="192" /></a></p>
+
+
+<p>源代码： <a href="https://gist.github.com/wusuopu/7910942">https://gist.github.com/wusuopu/7910942</a></p>
+]]></content>
+  </entry>
+  
+</feed>

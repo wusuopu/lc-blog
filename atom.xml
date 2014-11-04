@@ -1,0 +1,2522 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[龍昌博客]]></title>
+  <link href="http://www.xefan.com/atom.xml" rel="self"/>
+  <link href="http://www.xefan.com/"/>
+  <updated>2014-11-04T14:10:28+08:00</updated>
+  <id>http://www.xefan.com/</id>
+  <author>
+    <name><![CDATA[龍昌]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[配置elixir的vim环境]]></title>
+    <link href="http://www.xefan.com/archives/84132.html"/>
+    <updated>2014-10-29T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84132-配置elixir的vim环境</id>
+    <content type="html"><![CDATA[<p>elixir是建立在Erlang虚拟机之上的一种函数式编程语言。下面介绍elixir的两个vim插件。</p>
+
+
+<p>首先是语法高亮支持： https://github.com/elixir-lang/vim-elixir</p>
+
+
+<p>其次是snippets支持： https://github.com/carlosgaldino/elixir-snippets
+这个需要先安装 snipMate 插件。</p>
+
+
+<p>如果也是用的 vundle 进行插件管理的话，可以直接在 .vimrc 配置中添加如下内容即可：</p>
+
+
+<pre><code>Bundle 'elixir-lang/vim-elixir'
+Bundle 'carlosgaldino/elixir-snippets'
+
+au BufNewFile,BufRead *.exs set ft=elixir
+</code></pre>
+
+
+
+
+<p>然后再在vim执行命令 :BundleInstall 即可。</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[配置coffeescript的vim环境]]></title>
+    <link href="http://www.xefan.com/archives/84130.html"/>
+    <updated>2014-10-24T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84130-配置coffeescript的vim环境</id>
+    <content type="html"><![CDATA[<p>coffeescript是构建在javascript基础上一门语言，它在运行时会编译在javascript。下面介绍vim用来开发coffeescript的两个插件。</p>
+
+
+<p>首先是语法高亮支持： https://github.com/kchmck/vim-coffee-script</p>
+
+
+<p>其次是snippets支持： https://github.com/carlosvillu/coffeScript-VIM-Snippets
+这个需要先安装 snipMate 插件。</p>
+
+
+<p>如果也是用的 vundle 进行插件管理的话，可以直接在 .vimrc 配置中添加如下内容即可：</p>
+
+
+<pre><code>Bundle 'kchmck/vim-coffee-script'
+Bundle 'carlosvillu/coffeScript-VIM-Snippets'
+
+au BufNewFile,BufRead *.coffee set ft=coffee
+</code></pre>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[VIM编译参数]]></title>
+    <link href="http://www.xefan.com/archives/84127.html"/>
+    <updated>2014-10-18T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84127-VIM编译参数</id>
+    <content type="html"><![CDATA[<p>每次重装系统之后都要重新编译一次VIM，为了方便就将编译参数记录如下：</p>
+
+
+<pre><code>./configure --prefix=/opt/vim --enable-acl --enable-cscope --enable-largefile --enable-multibyte --enable-sniff --enable-mzschemeinterp --enable-xim --enable-tclinterp --enable-perlinterp --enable-python3interp --enable-pythonint
+erp --enable-rubyinterp --enable-netbeans --enable-gui --enable-luainterp --enable-nls --enable-xsmp --enable-xsmp-interact --enable-fontset --with-features=huge --with-x
+</code></pre>
+
+
+
+
+<p>上面的参数中启用了对tcl、perl、python、ruby、lau的支持。同时为了使用系统的剪切板还启用了对X的支持。</p>
+
+
+<p>我的VIM配置文件： https://github.com/wusuopu/my-vimrc</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Docker使用笔记]]></title>
+    <link href="http://www.xefan.com/archives/84124.html"/>
+    <updated>2014-09-21T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84124-Docker使用笔记</id>
+    <content type="html"><![CDATA[<p>docker是一个Linux下的应用容器引擎。使用它可以很方便地将程序以及依赖都打包到一个可移植的容器中。最后体验了一下，使用docker配置了一个Web开发环境。这样就不用担心每次重装系统之后都要重新配置开发环境。</p>
+
+
+<h3>安装</h3>
+
+
+<p>首先是安装docker应用程序，目前只有64位系统才能使用。</p>
+
+
+<pre><code>$ [sudo] apt-get install apparmor apparmor-profiles apparmor-utils
+$ [sudo] apt-get install aufs-tools
+$ [sudo] apt-get install cgroup-lite
+
+$ wget https://get.docker.io/builds/Linux/x86_64/docker-latest.tgz
+$ [sudo] tar xf docker-latest.tgz -C /
+</code></pre>
+
+
+<h3>基本用法</h3>
+
+
+<p>安装完成之后使用 <code>[sudo] docker -d</code> 命令启动docker的daemon进程。</p>
+
+
+<p>以下是一些常用命令的用法介绍：</p>
+
+
+<pre><code>docker version            # 查看版本
+docker search TERM        # 搜索镜像
+docker pull NAME[:TAG]    # 下载镜像
+</code></pre>
+
+
+
+
+<p>启动镜像：</p>
+
+
+<pre><code>docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
+docker run IMAGE -t -i /bin/bash                        # 进入镜像的shell环境
+docker run IMAGE -p 12345:8000 -t -i /bin/bash          # 进入镜像的shell环境，将主机的12345端口映射到容器的8000端口
+
+</code></pre>
+
+
+
+
+<p>容器与镜像管理：</p>
+
+
+<pre><code>docker ps [OPTIONS]                              # 列出容器
+docker images [OPTIONS] [NAME]                   # 列出镜像
+docker rm [OPTIONS] CONTAINER [CONTAINER...]     # 删除容器
+docker rmi IMAGE [IMAGE...]                      # 删除镜像
+
+docker commit [OPTIONS] CONTAINER [REPOSITORY[:TAG]]    # 根据修改的容器创建一个新的镜像
+docker commit -m &quot;centos&quot; f9ccb5cef3c0 wusuopu/centos6
+docker push NAME[:TAG]                                  # 上传镜像
+</code></pre>
+
+
+
+
+<pre><code>docker inspect CONTAINER|IMAGE [CONTAINER|IMAGE...]     # 查看一个容器或者镜像的详细信息
+docker logs CONTAINER     # 查看日志
+docker start CONTAINER [CONTAINER...]                   # 启动镜像
+docker stop CONTAINER [CONTAINER...]                    # 停止镜像
+docker tag [OPTIONS] IMAGE [REGISTRYHOST/][USERNAME/]NAME[:TAG]   # 给镜像打tag
+docker diff CONTAINER     # 查看容器文件系统的变化
+docker cp CONTAINER:PATH HOSTPATH                       # 将文件从容器复制到主机
+</code></pre>
+
+
+
+
+<p>导入、导出：</p>
+
+
+<pre><code>docker export CONTAINER                                 # 导出容器到标准输出
+docker export red_panda &gt; latest.tar
+
+docker import URL|- [REPOSITORY[:TAG]]                  # 导入文件为镜像
+docker import http://example.com/exampleimage.tgz
+cat exampleimage.tgz | sudo docker import - exampleimagelocal:new
+</code></pre>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Nginx + Php + FastCGI配置]]></title>
+    <link href="http://www.xefan.com/archives/84121.html"/>
+    <updated>2014-08-01T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84121-nginx + php + FastCGI配置</id>
+    <content type="html"><![CDATA[<p>最近在弄PHP，于是乎把配置过程作一个笔记以免忘了。</p>
+
+
+<h2>PHP安装、配置</h2>
+
+
+<p>我是通过源代码编译的形式进行安装的，基本步骤如下：</p>
+
+
+<pre><code>$ tar xf php-5.5.12.tar.bz2
+$ cd php-5.5.12
+$ './configure'  '--prefix=/opt/myphp' '--with-mysql' '--enable-safe-mode' '--enable-ftp' '--enable-zip' '--with-jpeg-dir' '--with-bz2' '--with-png-dir' '--with-freetype-dir' '--with-iconv' '--with-libxml-dir' '--with-xmlrpc' '--with-zlib-dir' '--with-gd' '--enable-gd-native-ttf' '--with-curl' '--with-gettext' '--with-pear' '--enable-fpm' '--enable-fastcgi' '--with-ncurses' '--with-mcrypt' '--with-mhash' '--with-openssl' '--with-pcre-dir' '--enable-pdo' '--enable-phar' '--enable-json' '--enable-mbstring' '--with-pdo-mysql' '--with-pdo-sqlite' '--with-readline' '--enable-bcmath'
+$ make
+$ sudo make install
+</code></pre>
+
+
+
+
+<p>安装完成之后进入安装目录修改配置文件 lib/php.ini (没有则创建)，添加时区设置：</p>
+
+
+<pre><code>date.timezone=Asia/Shanghai
+</code></pre>
+
+
+
+
+<p>然后运行PHP的FastCGI服务：</p>
+
+
+<pre><code>./bin/php-cgi -b 9000
+</code></pre>
+
+
+
+
+<h2>nginx配置</h2>
+
+
+<p>nginx可以直接从仓库进行安装：</p>
+
+
+<pre><code>sudo pacman -S nginx
+</code></pre>
+
+
+
+
+<p>或者：</p>
+
+
+<pre><code>sudo apt-get install nginx
+</code></pre>
+
+
+
+
+<p>安装完成之后修改配置，添加一条新的虚拟主机：</p>
+
+
+<pre><code>server {
+    listen 8000;
+    server_name localhost;
+
+    root /var/www;
+
+    location / {
+        index index.php;
+    }
+
+    location ~ \.php$ {
+        fastcgi_pass   127.0.0.1:9000;
+        fastcgi_index  index.php;  
+        fastcgi_split_path_info ^(.+\.php)(/.*)$;
+        include        fastcgi_params;
+        fastcgi_param  SCRIPT_FILENAME  /var/www/$fastcgi_script_name;
+    }
+
+}
+</code></pre>
+
+
+
+
+<p>然后再创建文件 /var/www/index.php</p>
+
+
+<pre><code>&lt;?php
+  phpinfo();
+?&gt;
+</code></pre>
+
+
+
+
+<p>现在通过浏览器访问 http://127.0.0.1:8000/ 应该就可以看到效果了。</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[使用ruby开发vim插件]]></title>
+    <link href="http://www.xefan.com/archives/84117.html"/>
+    <updated>2014-07-03T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84117-使用ruby开发vim插件</id>
+    <content type="html"><![CDATA[<p>作为一个Vimmer和Pythoner，之前折腾过用python编写vim插件。现在作为半个Rubist，又开始继续折腾。</p>
+
+
+<p>在开始编写插件之前，你需要确认 Vim 是否支持 Ruby，通过以下命令来判别：</p>
+
+
+<pre><code>$ vim --version | grep +ruby
+</code></pre>
+
+
+<p>如果输出为空，则表示你当前的vim不支持Ruby，需要重新编译一下，并启用对Ruby的支持。</p>
+
+
+<p>顺便说下我当前的环境是：</p>
+
+
+<ul>
+<li>vim 7.4  </li>
+<li>ruby 2.1.0  </li>
+</ul>
+
+
+<p>环境检查没有问题那么就开始吧。<br>
+在~/.vim/plugin目录下创建一个 demo.vim 文件。</p>
+
+
+<p>在开头写上以下代码：</p>
+
+
+<pre><code>if !has('ruby')
+    echo "Error: Required vim compiled with +ruby"
+    finish
+endif
+</code></pre>
+
+
+<p>这段代码就是用 VimL 编写的，它将检查 Vim 是否支持 Ruby。</p>
+
+
+<p>接下来再判断该插件是否已经加载过了，以免重复加载：</p>
+
+
+<pre><code>if exists('g:loaded_ruby_demo_plugin')
+    finish
+endif
+let g:loaded_ruby_demo_plugin = 1
+</code></pre>
+
+
+<p>所有的检查都没有问题，则开始插件的正文了。先定义一个函数。</p>
+
+
+<pre><code>function! DemoFun1()
+ruby&lt;&lt;EOF
+buf = VIM::Buffer.current
+puts "current buffer name: #{buf.name} number: #{buf.number} length: #{buf.length}"
+EOF
+endfunction
+</code></pre>
+
+
+<p>function与endfunction是vim中用于定义函数的，在”ruby&lt;&lt;EOF”和”EOF”之间部分的是Ruby代码。这个例子是输出当前缓冲区的名字、编号以及总行数。<br>
+执行命令:call DemoFun1()，应该就可以看到输出结果了。</p>
+
+
+<p>然后再举个例子说下函数的参数处理。</p>
+
+
+<pre><code>function! DemoFun2(arg1)
+ruby&lt;&lt; EOF
+puts "you input: #{VIM.evaluate('a:arg1')}"
+EOF
+endfunction
+</code></pre>
+
+
+<p>这里定义了一个函数接收一个参数，然后将其输出。使用 VIM.evaluate 将vim的变量转化为Ruby的变量。</p>
+
+
+<p>为了方便我们再定义两个命令，以简化对这两个函数的调用。</p>
+
+
+<pre><code>command! -nargs=0 DemoFun1 call DemoFun1()  
+command! -nargs=1 -rang DemoFun2 call DemoFun2(&lt;f-args&gt;)
+</code></pre>
+
+
+<p>要获取完整的代码可以访问： https://gist.github.com/wusuopu/c1182efefa85d4f6839b</p>
+
+
+<p>接下来再简单说下vim中Ruby的使用。</p>
+
+
+<p>vim为Ruby提供了一个VIM模块，通过它可以在Ruby中访问vim的接口。同时还提供了两个全局变量：$curwin、$curbuf，它们分别代表了当前窗口对象以及当前缓冲区对象。</p>
+
+
+<p>VIM模块中有 Buffer 和 Window 两个对象，分别是用来对缓冲区和窗口进行操作的。同时VIM模块还提供了message、set_option、command和evaluate四个函数。</p>
+
+
+<p>想要查看更多的帮忙信息，可以在vim中执行如下命令：</p>
+
+
+<pre><code>:help ruby
+</code></pre>
+
+
+<p>好了，先写这么多吧，其余的自己去尝试吧。</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Vim的symfony2开发环境配置]]></title>
+    <link href="http://www.xefan.com/archives/84114.html"/>
+    <updated>2014-06-26T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84114-vim的symfony2开发环境配置</id>
+    <content type="html"><![CDATA[<h2>安装</h2>
+
+
+<p>最近在用Symfony2框架进行开发，正所谓工欲善其事必先利其器。为了提高开发效率，因此将vim配置为symfony的IDE。</p>
+
+
+<p>我安装的是phpcomplete-extended-symfony这款插件 https://github.com/m2mdas/phpcomplete-extended-symfony</p>
+
+
+<p>它有些依赖在文档中没写清楚，我也是折腾了好久才搞定的，于是做个笔记记录一下。</p>
+
+
+<p>我总共安装了以下插件：</p>
+
+
+<ul>
+<li>neocomplete.vim  </li>
+<li>vimproc.vim  </li>
+<li>unite.vim  </li>
+<li>phpcomplete.vim  </li>
+<li>phpcomplete-extended  </li>
+<li>phpcomplete-extended-symfony  </li>
+<li>vim-twig  </li>
+</ul>
+
+
+<p>我是使用的Vundle进行vim插件管理，因此在 .vimrc 配置中添加以下内容：</p>
+
+
+<pre><code>Bundle 'Shougo/neocomplete.vim'
+Bundle 'Shougo/vimproc.vim'
+Bundle 'Shougo/unite.vim'
+Bundle 'shawncplus/phpcomplete.vim'
+Bundle 'm2mdas/phpcomplete-extended'
+Bundle 'm2mdas/phpcomplete-extended-symfony'
+Bundle 'evidens/vim-twig'
+</code></pre>
+
+
+<p>然后再执行BundleInstall命令进行下载安装。</p>
+
+
+<p>注意：vim-twig插件不是必需的，安装它只是为了编写twig模板时能够高亮。  </p>
+
+
+<h2>使用</h2>
+
+
+<p>接下来说说使用流程。</p>
+
+
+<p>1.vimproc需要编译<br>
+进行vimproc的安装目录，执行make命令进行编译。详细内容请阅读它的README文件。</p>
+
+
+<p>2.安装ctags工具<br>
+由于当前的ctags工具不支持PHP的新特性，如命名空间、traits、interface，于是就需要给ctags打补丁。  </p>
+
+
+<p>下载打过补丁的ctags源代码：  </p>
+
+
+<pre><code>$ wget "https://github.com/shawncplus/phpcomplete.vim/blob/master/misc/ctags-better-php-parser.tar.bz2?raw=true" -O ctags-better-php-parser.tar.bz2
+</code></pre>
+
+
+<p>编译安装：  </p>
+
+
+<pre><code>$ tar xvjf ctags-better-php-parser.tar.bz2  
+$ ./configure  
+$ make  
+$ sudo make install
+</code></pre>
+
+
+<p>3.安装 composer.phar  </p>
+
+
+<pre><code>$ curl -s https://getcomposer.org/installer | php
+</code></pre>
+
+
+<p>4.修改vim配置<br>
+在vim中添加如下配置：  </p>
+
+
+<pre><code>au FileType php setlocal omnifunc=phpcomplete_extended#CompletePHP  
+let g:phpcomplete_index_composer_command = 'composer.phar'
+</code></pre>
+
+
+<p>5.开始使用<br>
+进入Symfony项目的根目录，执行命令生成tags文件：</p>
+
+
+<pre><code>$ ctags -R --fields=+aimS --languages=php
+</code></pre>
+
+
+<p>然后使用vim打开该tags文件，根据提示创建索引文件。完成之后索引文件会创建在 .phpcomplete_extended 目录中。下次在项目的根目录下打开vim，如果提示 “Index Loaded.”则表示配置成功了。接下来编写代码时就会有补全提示以及use语句的自动补全了。</p>
+
+
+<p><strong>注意：</strong>在使用该插件时需要把自动切换目录功能给禁用掉，添加设置： set autochdir! 。否则会出现无法加载索引，从而补全不了。这个问题在文档中没说，我也是折腾了好久才发现的。</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Redis使用笔记]]></title>
+    <link href="http://www.xefan.com/archives/84110.html"/>
+    <updated>2014-06-21T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84110-Redis使用笔记</id>
+    <content type="html"><![CDATA[<p>Redis是一个键值型数据库，之前花了些时间体验了一下Redis，感觉还是很不错的。而且Redis学习起来也很容易，差不多花几个小时应该就能入门了。当时我是看的<a href="https://github.com/karlseguin/the-little-redis-book">《the little redis book》</a>，初学者可以看看。</p>
+
+
+<h2>安装</h2>
+
+
+<p>下载软件包： http://redis.io/download</p>
+
+
+<p>首先运行服务器程序：</p>
+
+
+<pre><code>$ redis-server
+</code></pre>
+
+
+<p>程序默认是监听6379端口。</p>
+
+
+<p>然后再运行客户端程序：</p>
+
+
+<pre><code>$ redis-cli
+</code></pre>
+
+
+<h2>基本数据类型</h2>
+
+
+<p>运行客户端程序连接上Redis服务之后，所有的操作都可以通过该命令行交互完成。</p>
+
+
+<p>Redis有5种不同的数据类型：字符串、散列表、列表、集合、有序集合。所有的数据在Redis中都是以键值对的形式保存的。</p>
+
+
+<p>以下介绍这几种类型数据的基本操作。</p>
+
+
+<h3>String</h3>
+
+
+<p>设置一个键的值为字符串：  </p>
+
+
+<pre><code>set &lt;key&gt; &lt;value&gt;
+</code></pre>
+
+
+<p>获取该键的值：  </p>
+
+
+<pre><code>get &lt;key&gt;
+</code></pre>
+
+
+<p>字符串相关的命令：  </p>
+
+
+<pre><code>help @string
+</code></pre>
+
+
+<h3>Hashes</h3>
+
+
+<p>设置一个散列值：  </p>
+
+
+<pre><code>hset &lt;key&gt; &lt;k&gt; &lt;v&gt;
+</code></pre>
+
+
+<p>获取该键的值：  </p>
+
+
+<pre><code>hget &lt;key&gt; &lt;k&gt;  
+hgetall &lt;key&gt;
+</code></pre>
+
+
+<p>散列相关的命令：  </p>
+
+
+<pre><code>help @hash
+</code></pre>
+
+
+<h3>Lists</h3>
+
+
+<p>添加值：  </p>
+
+
+<pre><code>lpush &lt;key&gt; &lt;v&gt;
+</code></pre>
+
+
+<p>移除值：  </p>
+
+
+<pre><code>lpop &lt;key&gt;  
+help @list
+</code></pre>
+
+
+<h3>Set</h3>
+
+
+<p>添加值：  </p>
+
+
+<pre><code>sadd &lt;key&gt; &lt;v&gt;[ &lt;v&gt; ..]  
+help set
+</code></pre>
+
+
+<h3>Sorted Sets</h3>
+
+
+<p>类似于集合(Set)，但是提供了排序（sorting）和秩划分（ranking）的功能。</p>
+
+
+<p>添加值：  </p>
+
+
+<pre><code>zadd key score member [score] [member]   
+help @sorted_set
+</code></pre>
+
+
+<h2>其他</h2>
+
+
+<h3>有效期</h3>
+
+
+<p>设置某个值在seconds秒后到期：  </p>
+
+
+<pre><code>expire &lt;key&gt; seconds
+</code></pre>
+
+
+<p>设置某个值在time时刻到期：  </p>
+
+
+<pre><code>expireat &lt;key&gt; time
+</code></pre>
+
+
+<p>查看到期时间：  </p>
+
+
+<pre><code>ttl &lt;key&gt;
+</code></pre>
+
+
+<p>清除到期时间：  </p>
+
+
+<pre><code>persist &lt;key&gt;
+</code></pre>
+
+
+<h3>事务（Transactions）</h3>
+
+
+<pre><code>multi  
+do something  
+exec
+</code></pre>
+
+
+<p>multi和exec之间的命令作为原子操作。</p>
+
+
+<p>在multi之前调用watch可监听值的变化，若该值被其他客户端修改，事务将会运行失败。</p>
+
+
+<h3>杂项</h3>
+
+
+<p>选择数据库：</p>
+
+
+<pre><code>select index
+</code></pre>
+
+
+<p>清除当前数据库所属key:</p>
+
+
+<pre><code>flushdb
+</code></pre>
+
+
+<p>清除所有数据库所属key:</p>
+
+
+<pre><code>flushall
+</code></pre>
+
+
+<p>查看key所储存的值的类型：</p>
+
+
+<pre><code>type key
+</code></pre>
+
+
+<p>Redis相关的命令手册： http://redis.io/commands</p>
+
+
+<h2>在应用程序中使用Redis</h2>
+
+
+<p>Redis提供了多种语言的绑定，以Ruby为例：</p>
+
+
+<pre><code>require 'redis'
+r = Redis.new
+r.set 'key', 1234
+puts r.get 'key'
+puts r.keys
+</code></pre>
+
+
+<p>输出结果应该为：</p>
+
+
+<pre><code>"1234"
+["key"]
+</code></pre>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[使用rvm进行ruby多版本管理]]></title>
+    <link href="http://www.xefan.com/archives/84105.html"/>
+    <updated>2014-06-16T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84105-使用rvm进行ruby多版本管理</id>
+    <content type="html"><![CDATA[<p>rvm与Python的virtualenv和Node的nvm类似。使用它可以很方便的在你的系统中安装多个Ruby环境。类似的工具还有rbenv、ry、rbfu等。  </p>
+
+
+<h3>安装rvm</h3>
+
+
+<p>以下的命令都是在当前用户权限下执行的，最好不要使用sudo。<br>
+下载安装rvm:</p>
+
+
+<pre><code>$ curl -sSL https://get.rvm.io | bash -s stable
+</code></pre>
+
+
+<p>安装完成之后再加载配置：</p>
+
+
+<pre><code>$ source ~/.profile
+</code></pre>
+
+
+<p>为了下次能直接使用，建议将该命令添加到 ~/.bash_profile 或者 ~/.zshrc 中。  </p>
+
+
+<p>使用rvm安装Ruby时会默认从官方网站上进行下载，为了提高下载速度这里建议将安装源修改为淘宝的镜像。</p>
+
+
+<pre><code>$ sed -i -e 's/ftp\.ruby-lang\.org\/pub\/ruby/ruby\.taobao\.org\/mirrors\/ruby/g' ~/.rvm/config/db
+</code></pre>
+
+
+<h3>使用</h3>
+
+
+<p>安装完成之后就可以使用了，以下介绍几条常用的命令。<br>
+列出已知的ruby版本:  </p>
+
+
+<pre><code>$ rvm list known
+</code></pre>
+
+
+<p>列出已经安装的ruby：  </p>
+
+
+<pre><code>$ rvm list
+</code></pre>
+
+
+<p>安装一个ruby版本：  </p>
+
+
+<pre><code>$ rvm install 2.1.0
+</code></pre>
+
+
+<p>这里安装最新的2.1.0版本的Ruby。</p>
+
+
+<p>如果安装了多个版本，想使用其中一个版本：  </p>
+
+
+<pre><code>$ rvm use 2.1.0
+</code></pre>
+
+
+<p>设置为默认版本：  </p>
+
+
+<pre><code>$ rvm use 2.1.0 --default
+</code></pre>
+
+
+<p>use了某个版本之后，可以使用 which ruby 命令查看当前的ruby命令信息。  </p>
+
+
+<p>删除一个已安装的版本：  </p>
+
+
+<pre><code>$ rvm remove 2.1.0
+</code></pre>
+
+
+<p>更多内容请参考官方文档： https://rvm.io/#docindex</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Rack开发简介]]></title>
+    <link href="http://www.xefan.com/archives/84103.html"/>
+    <updated>2014-05-02T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84103-Rack开发简介</id>
+    <content type="html"><![CDATA[<p>Rack是Ruby应用与web服务器之间的一个接口，它在服务器与应用程序之间作为中间件，可以对用户的请求和程序的返回数据进行处理。现在几乎所有主流的Ruby web框架都是支持Rack接口的。</p>
+
+
+<p>Rack与Python的wsgi很相似，在它的规格书（http://rack.rubyforge.org/doc/SPEC.html）中也说道它采用了WSGI的一些内容。</p>
+
+
+<h2>开始</h2>
+
+
+<p>首先安装Rack:</p>
+
+
+<pre><code>[sudo] gem install rack
+</code></pre>
+
+
+<p>然后通过一个简单的例子来讲解。</p>
+
+
+<pre><code>require "rack"
+rack_app = lambda{|env| [200, {}, ["Hello World!"]]}
+Rack::Handler::WEBrick.run rack_app, :Port =&gt; 3000
+</code></pre>
+
+
+<p>执行上述代码，然后访问 http://127.0.0.1:3000 会看到 &#8220;Hello World!&#8221;。</p>
+
+
+<p>上面代码中的rack_app即是一个Rack应用。Rack应用除了lambda之外也还可以使用其他对象，只要满足以下条件即可：<br>
+  * 可响应call方法的对象；<br>
+  * 接收一个参数rack环境 environment 。它是一个散列表，包含了CGI的信息和rack的一些变量；<br>
+  * 返回一个有三个值的数组，第一个值为返回状态 status；第二个值为返回头 headers，也是一个散列表；第三个值为返回正文 body，它必须是一个可响应each方法并生成字符串的对象，例如字符串数组。</p>
+
+
+<p>WEBrick是Handler的一种。Handler用于将web服务器与Rack连接。使用 Rack::Handler.constants 可以查看Rack包含的所有Handler。</p>
+
+
+<h2>请求/Request</h2>
+
+
+<p>在Rack应用中可以直接操作env参数来访问请求信息，但是这种方法不太方便。对于这种操作Rack::Request对象提供了方便的接口。</p>
+
+
+<pre><code>request = Rack::Request.new env
+</code></pre>
+
+
+<p>创建request对象时传入env参数。</p>
+
+
+<h2>响应/Response</h2>
+
+
+<p>Rack应用的返回值是一个有三个值的数组，包含了返回状态、返回头和返回正文。对于简单的程序手动构建数组还行，如果是复杂的程序则要考虑自动构建了。<br>
+同样的可以使用Rack::Request对象来创建返回数据。</p>
+
+
+<pre><code>response = Rack::Response.new
+response.finish
+</code></pre>
+
+
+<p>内容填充完之后调用response对象的finish方法生成符合Rack规范的数组对象。</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[平铺式窗口管理器——awesome和i3]]></title>
+    <link href="http://www.xefan.com/archives/84100.html"/>
+    <updated>2014-04-23T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84100-平铺式窗口管理器——awesome和i3</id>
+    <content type="html"><![CDATA[<p>最近折腾了一下平铺式的窗口管理器 awesome 和 i3。感觉这两个都很不错，现在进行一下简单的总结。  </p>
+
+
+<h2>Awesome</h2>
+
+
+<p>先说一下Awesome吧。安装过程很简单。<br>
+对于ArchLinux的用户可以使用 pacman 直接进行安装：</p>
+
+
+<pre><code>$ [sudo] pacman install awesome
+</code></pre>
+
+
+<p>对于LinuxDeepin的用户可以使用 apt-get 进行安装：</p>
+
+
+<pre><code>$ [sudo] apt-get install awesome
+</code></pre>
+
+
+<h3>启动</h3>
+
+
+<p>如果是使用登陆管理器，那么在登陆是选择 awesome 即可。  </p>
+
+
+<p>如果没有使用登陆管理器，则在 ~/.xinitrc 脚本中添加 <em>exec awesome</em> 。</p>
+
+
+<h3>常用快捷键</h3>
+
+
+<p>awesome的快捷键是 $mod 加上其他键。在awesome中 $mod 默认为 Win(Mod4)键，可以通过修改配置文件将其改为其他按键。</p>
+
+
+<ul>
+<li>$mod + r : 运行命令</li>
+<li>$mod + Enter : 打开一个新终端</li>
+<li>$mod + Shift + c : 关闭当前窗口</li>
+<li>$mod + m : 最大化当前窗口</li>
+<li>$mod + Ctrl + r : 重新加载配置</li>
+<li>$mod + Shift + q : 退出awesome</li>
+<li></li>
+<li>$mod + j : 切换到下一个窗口</li>
+<li>$mod + k : 切换到前一个窗口</li>
+<li>$mod + Left : 查看前一个桌面</li>
+<li>$mod + Right : 查看后一个桌面</li>
+<li>$mod + 1-9 : 切换到桌面 1-9</li>
+<li>$mod + Shift + j : 当前窗口和前一个窗口互换位置</li>
+<li>$mod + Shift + k : 当前窗口和后一个窗口互换位置</li>
+<li>$mod + h : 把主区域(master width)的宽度增大5%</li>
+<li>$mod + l : 把主区域(master width)的宽度减少5%</li>
+<li></li>
+<li>$mod + space : 把当前tag更换为下一种布局</li>
+<li>$mod + Shift + space : 把当前tag更换为前一种布局</li>
+<li>$mod + Ctrl + space : 切换当前窗口是否为浮动的</li>
+<li>$mod + Shift + r : 重绘当前窗口</li>
+<li>$mod + t : 标记窗口（可标记多个）</li>
+<li>$mod + Shift + 1~9 : 把标记的窗口移动到第一~第九桌面上</li>
+<li>$mod + Ctrl + 1~9 : 把当前桌面和1~9桌面同时显示</li>
+<li>$mod + Esc : 快速切换到上一个桌面 </li>
+</ul>
+
+
+<h3>配置</h3>
+
+
+<p>awesome 的配置文件是一个lua脚本，要想自己进行配置可能得稍微了解一下lua语言。</p>
+
+
+<pre><code>$ mkdir -p ~/.config/awesome/
+$ cp /etc/xdg/awesome/rc.lua ~/.config/awesome
+</code></pre>
+
+
+<h2>I3</h2>
+
+
+<p>同样的i3也可以直接从软件源里进行安装。执行如下命令：</p>
+
+
+<pre><code>$ [sudo] pacman install i3-wm i3lock i3status dmenu
+</code></pre>
+
+
+<p>或者：</p>
+
+
+<pre><code>$ [sudo] apt-get install i3-wm i3lock i3status dmenu
+</code></pre>
+
+
+<p>启动方式与awesome类似。  </p>
+
+
+<p>i3对应的配置文件为 ~/.i3/config ，状态栏的配置文件为 ~/.i3status.conf 。与awesome类似，i3的快捷键也是 $mod 加上其他键。</p>
+
+
+<p>它的配置文件比较简单。由于不习惯它默认的按键，于是我就修改成了vim风格的按键。我的配置放在了 https://github.com/wusuopu/my-i3-config ，各位感兴趣的可以参考下。  </p>
+
+
+<p>我设置的快捷键如下：</p>
+
+
+<ul>
+<li>$mod + Enter : 打开一个新终端</li>
+<li>$mod + q : 关闭当前窗口</li>
+<li>$mod + Shift + q : 退出i3</li>
+<li>$mod + d : 运行dmenu</li>
+<li>$mod + e : 运行pcmanfm文件管理器</li>
+<li>$mod + c : 运行i3lock锁屏</li>
+<li>$mod + h : 选中左边的窗口</li>
+<li>$mod + j : 选中下边的窗口</li>
+<li>$mod + k : 选中上边的窗口</li>
+<li>$mod + l : 选中右边的窗口</li>
+</ul>
+
+
+<h2>总结</h2>
+
+
+<p>两个都试用了几天，我个人的感受是awesome比较强大，配置文件就是一个lua有脚本，因此可以在配置文件里完成一些比较复杂的功能。但是同时lua脚本作为配置，修改起来比较复杂，需要会一点lua语言。<br>
+相对而言i3就比较简洁了，同时功能也会少一些，不过我感觉也够用了。</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[使用C语言编写Python扩展5——垃圾回收管理]]></title>
+    <link href="http://www.xefan.com/archives/84096.html"/>
+    <updated>2014-04-15T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84096-使用C语言编写Python扩展5——垃圾回收管理</id>
+    <content type="html"><![CDATA[<p>上一节介绍了创建一个具有属性的类，由于对象具有属性数据，因此在进行内存管理时要多加注意。这一节就介绍一下Python的垃圾回收管理。<br>
+在Python中垃圾回收主要是靠的计数引用方法，但是单凭计数引用还是不够的。先看看下面这段Python代码。  </p>
+
+
+<pre><code>n = []
+m = []
+n.append(m)
+m.append(n)
+del m
+del n
+</code></pre>
+
+
+<p>如果只靠计数引用的话执行上面这段代码之后n和m都不能被回收，因为它们的引用计算值都不为0。<br>
+像上面例子这样相互循环引用称作循环引用垃圾，在Python中有循环垃圾回收器（cyclic-garbage collector）专门用于回收此类计数引用无法处理的垃圾内存。  </p>
+
+
+<p>接着上一节的例子，继续编辑<em>noddy.c</em>。  </p>
+
+
+<p>为了让该对象类型支持垃圾回收，将PyTypeObject的tp_flags字段增加Py_TPFLAGS_HAVE_GC这个标志位。同时与GC(Garbage Collection)相关的tp_traverse和tp_clear这两个字段也要设置。  </p>
+
+
+<ul>
+<li>tp_traverse是用于垃圾回收器（garbage collector）遍历该实例对象中所有需要回收的属性对象。  </li>
+<li>tp_clear是用于清除内部各个属性对象的。  </li>
+</ul>
+
+
+<p>首先定义tp_traverse和tp_clear所对应的函数：  </p>
+
+
+<pre><code>static int Noddy_traverse(noddy_NoddyObject *self, visitproc visit, void *arg)
+{
+    Py_VISIT(self-&gt;first);
+    Py_VISIT(self-&gt;last);
+    return 0;
+}
+static int Noddy_clear(noddy_NoddyObject *self)
+{
+    Py_CLEAR(self-&gt;first);
+    Py_CLEAR(self-&gt;last);
+    return 0;
+}
+</code></pre>
+
+
+<p>Py_VISIT和Py_CLEAR是两个宏，简化了visit操作和clear操作。  </p>
+
+
+<p>然后再修改noddy_NoddyType结构体定义：  </p>
+
+
+<pre><code>static PyTypeObject noddy_NoddyType = {
+    PyObject_HEAD_INIT(NULL)
+    0,                         /*ob_size*/
+    "noddy.Noddy",             /*tp_name*/
+    sizeof(noddy_NoddyObject), /*tp_basicsize*/
+    0,                         /*tp_itemsize*/
+    (destructor)Noddy_dealloc, /*tp_dealloc*/
+    0,                         /*tp_print*/
+    0,                         /*tp_getattr*/
+    0,                         /*tp_setattr*/
+    0,                         /*tp_compare*/
+    0,                         /*tp_repr*/
+    0,                         /*tp_as_number*/
+    0,                         /*tp_as_sequence*/
+    0,                         /*tp_as_mapping*/
+    0,                         /*tp_hash */
+    0,                         /*tp_call*/
+    0,                         /*tp_str*/
+    0,                         /*tp_getattro*/
+    0,                         /*tp_setattro*/
+    0,                         /*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE | Py_TPFLAGS_HAVE_GC,  /*tp_flags*/
+    "Noddy objects",           /*tp_doc*/
+    (traverseproc)Noddy_traverse,   /* tp_traverse */
+    (inquiry)Noddy_clear,      /* tp_clear */
+    0,                         /* tp_richcompare */
+    0,                         /* tp_weaklistoffset */
+    0,                         /* tp_iter */
+    0,                         /* tp_iternext */
+    Noddy_methods,             /* tp_methods */
+    Noddy_members,             /* tp_members */
+    0,                         /* tp_getset */
+    0,                         /* tp_base */
+    0,                         /* tp_dict */
+    0,                         /* tp_descr_get */
+    0,                         /* tp_descr_set */
+    0,                         /* tp_dictoffset */
+    (initproc)Noddy_init,      /* tp_init */
+    0,                         /* tp_alloc */
+    Noddy_new,                 /* tp_new */
+};
+</code></pre>
+
+
+<p><strong>注意</strong>：<br>
+Python的官方手册中说道如果设置了Py_TPFLAGS_HAVE_GC这个标志位的话，那么就必须使用PyObject_GC_New这个函数来创建实例对象，使用PyObject_GC_Del来销毁已创建了的实例对象。  </p>
+
+
+<p>使用PyObject_GC_New创建实例对象之后再用PyObject_GC_Track将该实例添加到垃圾回收器所跟踪的对象集合中去。<br>
+在对象销毁时再执行PyObject_GC_UnTrack和PyObject_GC_Del函数。  </p>
+
+
+<p>然后再修改tp_new函数和tp_dealloc函数：  </p>
+
+
+<pre><code>static PyObject * Noddy_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
+{
+    noddy_NoddyObject*self;
+    self = (noddy_NoddyObject*)PyObject_GC_New(noddy_NoddyObject, type);
+    if (self != NULL) {
+        PyObject_GC_Track(self);
+        self-&gt;first = PyString_FromString("");
+        if (self-&gt;first == NULL)
+        {
+          Py_DECREF(self);
+          return NULL;
+        }
+        self-&gt;last = PyString_FromString("");
+        if (self-&gt;last == NULL)
+        {
+          Py_DECREF(self);
+          return NULL;
+        }
+        self-&gt;number = 0;
+    }
+    return (PyObject *)self;
+}
+
+static void Noddy_dealloc(noddy_NoddyObject* self)
+{
+    PyObject_GC_UnTrack(self);
+    Noddy_clear(self);
+    PyObject_GC_Del(self);
+}
+</code></pre>
+
+
+<p>最后再写一段Python程序来测试下该模块：  </p>
+
+
+<pre><code>import gc
+import noddy
+
+gc.set_debug(gc.DEBUG_STATS | gc.DEBUG_LEAK)
+
+o = noddy.Noddy()
+l = [o]
+o.first = l
+del l
+del o
+
+gc.collect()
+</code></pre>
+
+
+<p>本文中的示例代码可从 https://github.com/wusuopu/python-c-extension-sample 获取到。  </p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[使用C语言编写Python扩展4——创建自定义类型(2)]]></title>
+    <link href="http://www.xefan.com/archives/84093.html"/>
+    <updated>2014-04-14T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84093-使用C语言编写Python扩展4——创建自定义类型(2)</id>
+    <content type="html"><![CDATA[<p>上一节中我们创建了一个简单的类。这一节我们将对这个类进行扩展，添加属性、方法，并且支持子类。</p>
+
+
+<h2>为类型添加方法和数据</h2>
+
+
+<p>接着上一节的例子，继续编辑<em>noddy.c</em>。  </p>
+
+
+<pre><code>typedef struct {
+    PyObject_HEAD
+    /* Type-specific fields go here. */
+    PyObject *first; /* first name */
+    PyObject *last;  /* last name */
+    int number;
+} noddy_NoddyObject;
+</code></pre>
+
+
+<p>修改 noddy_NoddyObject 结构体，为其添加三个字段。  </p>
+
+
+<p>然后定义自己的__new__方法，为对象分配内存空间：  </p>
+
+
+<pre><code>static PyObject * Noddy_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
+{
+    noddy_NoddyObject*self;
+    self = (noddy_NoddyObject*)type-&gt;tp_alloc(type, 0);
+    if (self != NULL) {
+        self-&gt;first = PyString_FromString("");
+        if (self-&gt;first == NULL)
+        {
+          Py_DECREF(self);
+          return NULL;
+        }
+        self-&gt;last = PyString_FromString("");
+        if (self-&gt;last == NULL)
+        {
+          Py_DECREF(self);
+          return NULL;
+        }
+        self-&gt;number = 0;
+    }
+    return (PyObject *)self;
+}
+</code></pre>
+
+
+<p>接着定义对象的初始化函数__init__：  </p>
+
+
+<pre><code>static int Noddy_init(noddy_NoddyObject*self, PyObject *args, PyObject *kwds)
+{
+    PyObject *first=NULL, *last=NULL, *tmp;
+    static char *kwlist[] = {"first", "last", "number", NULL};
+
+    if (! PyArg_ParseTupleAndKeywords(args, kwds, "|OOi", kwlist, 
+                                      &amp;first, &amp;last, 
+                                      &amp;self-&gt;number))
+        return -1;
+
+    if (first) {
+        tmp = self-&gt;first;
+        Py_INCREF(first);
+        self-&gt;first = first;
+        Py_XDECREF(tmp);
+    }
+
+    if (last) {
+        tmp = self-&gt;last;
+        Py_INCREF(last);
+        self-&gt;last = last;
+        Py_XDECREF(tmp);
+    }
+    return 0;
+}
+</code></pre>
+
+
+<p>由于对象包含了几项数据，因此在对象销毁时需要先释放数据的资源。定义资源释放方法：</p>
+
+
+<pre><code>static void Noddy_dealloc(noddy_NoddyObject* self)
+{
+    Py_XDECREF(self-&gt;first);
+    Py_XDECREF(self-&gt;last);
+    Py_TYPE(self)-&gt;tp_free((PyObject*)self);
+}
+</code></pre>
+
+
+<p>然后再为该类定义一个方法用于返回该对象的first值和last值：  </p>
+
+
+<pre><code>static PyObject * Noddy_name(noddy_NoddyObject* self)
+{
+    static PyObject *format = NULL;
+    PyObject *args, *result;
+    if (format == NULL) {
+        format = PyString_FromString("%s %s");
+        if (format == NULL)
+            return NULL;
+    }
+    if (self-&gt;first == NULL) {
+        PyErr_SetString(PyExc_AttributeError, "first");
+        return NULL;
+    }
+    if (self-&gt;last == NULL) {
+        PyErr_SetString(PyExc_AttributeError, "last");
+        return NULL;
+    }
+    args = Py_BuildValue("OO", self-&gt;first, self-&gt;last);
+    if (args == NULL)
+        return NULL;
+    result = PyString_Format(format, args);
+    Py_DECREF(args);
+    return result;
+}
+static PyMethodDef Noddy_methods[] = {
+    {"name", (PyCFunction)Noddy_name, METH_NOARGS, "Return the name, combining the first and last name"},
+    {NULL}  /* Sentinel */
+};
+</code></pre>
+
+
+<p>最后在定义 noddy_NoddyType 变量时将对应字段进行填充：</p>
+
+
+<pre><code>static PyTypeObject noddy_NoddyType = {
+    PyObject_HEAD_INIT(NULL)
+    0,                         /*ob_size*/
+    "noddy.Noddy",             /*tp_name*/
+    sizeof(noddy_NoddyObject), /*tp_basicsize*/
+    0,                         /*tp_itemsize*/
+    (destructor)Noddy_dealloc, /*tp_dealloc*/
+    0,                         /*tp_print*/
+    0,                         /*tp_getattr*/
+    0,                         /*tp_setattr*/
+    0,                         /*tp_compare*/
+    0,                         /*tp_repr*/
+    0,                         /*tp_as_number*/
+    0,                         /*tp_as_sequence*/
+    0,                         /*tp_as_mapping*/
+    0,                         /*tp_hash */
+    0,                         /*tp_call*/
+    0,                         /*tp_str*/
+    0,                         /*tp_getattro*/
+    0,                         /*tp_setattro*/
+    0,                         /*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,  /*tp_flags*/
+    "Noddy objects",           /*tp_doc*/
+    0,                         /* tp_traverse */
+    0,                         /* tp_clear */
+    0,                         /* tp_richcompare */
+    0,                         /* tp_weaklistoffset */
+    0,                         /* tp_iter */
+    0,                         /* tp_iternext */
+    Noddy_methods,             /* tp_methods */
+    0,                         /* tp_members */
+    0,                         /* tp_getset */
+    0,                         /* tp_base */
+    0,                         /* tp_dict */
+    0,                         /* tp_descr_get */
+    0,                         /* tp_descr_set */
+    0,                         /* tp_dictoffset */
+    (initproc)Noddy_init,      /* tp_init */
+    0,                         /* tp_alloc */
+    Noddy_new,                 /* tp_new */
+};
+</code></pre>
+
+
+<p>tp_flags字段增加了  Py_TPFLAGS_BASETYPE 属性，表示该类可以被继承。最后进行编译测试：  </p>
+
+
+<pre><code>import noddy
+
+o = noddy.Noddy("abc", "def", 12)
+print(o, o.name())
+print(type(o), type(noddy.Noddy))
+print(o.number, o.first, o.last)
+
+class A(noddy.Noddy):
+    pass
+</code></pre>
+
+
+<p>运行以上程序会发现Noddy对象没有number、first和last这几个属性。这是因为虽然在noddy_NoddyObject结构体中定义了这几个字段，但是它们仍然在Python中是不可见的。<br>
+为了能在Python中访问这几个属性，需要设置noddy_NoddyType的tp_members字段。  </p>
+
+
+<pre><code>static PyMemberDef Noddy_members[] = {
+    {"first", T_OBJECT_EX, offsetof(noddy_NoddyObject, first), 0, "first name"},
+    {"last", T_OBJECT_EX, offsetof(noddy_NoddyObject, last), 0, "last name"},
+    {"number", T_INT, offsetof(noddy_NoddyObject, number), 0, "noddy number"},
+    {NULL}  /* Sentinel */
+};
+</code></pre>
+
+
+<p>先定义一个 PyMemberDef 结构体类型的数组，然后将noddy_NoddyType的tp_members字段设为Noddy_members。PyMemberDef和T_OBJECT_EX以及T_INT均是在 <em>structmember.h</em> 头文件中定义的，因此还需要先包含该文件。  </p>
+
+
+<pre><code>#include &lt;structmember.h&gt;
+</code></pre>
+
+
+<h2>数据属性的访问控制</h2>
+
+
+<p>数据属性的访问控制可以对属性的设置进行合法性检查，例如这里我们想要确保 Noddy 对象的first属性和last属性都必须是字符串。<br>
+首先定义属性的get方法和set方法：  </p>
+
+
+<pre><code>static PyObject * Noddy_getfirst(noddy_NoddyObject *self, void *closure)
+{
+    Py_INCREF(self-&gt;first);
+    return self-&gt;first;
+}
+static int Noddy_setfirst(noddy_NoddyObject *self, PyObject *value, void *closure)
+{
+  if (value == NULL) {
+    PyErr_SetString(PyExc_TypeError, "Cannot delete the first attribute");
+    return -1;
+  }
+  if (! PyString_Check(value)) {
+    PyErr_SetString(PyExc_TypeError, 
+                    "The first attribute value must be a string");
+    return -1;
+  }
+  Py_DECREF(self-&gt;first);
+  Py_INCREF(value);
+  self-&gt;first = value;    
+  return 0;
+}
+static PyObject * Noddy_getlast(noddy_NoddyObject *self, void *closure)
+{
+    Py_INCREF(self-&gt;last);
+    return self-&gt;last;
+}
+static int Noddy_setlast(noddy_NoddyObject *self, PyObject *value, void *closure)
+{
+  if (value == NULL) {
+    PyErr_SetString(PyExc_TypeError, "Cannot delete the last attribute");
+    return -1;
+  }
+  if (! PyString_Check(value)) {
+    PyErr_SetString(PyExc_TypeError, 
+                    "The last attribute value must be a string");
+    return -1;
+  }
+  Py_DECREF(self-&gt;last);
+  Py_INCREF(value);
+  self-&gt;last = value;    
+  return 0;
+}
+</code></pre>
+
+
+<p>然后创建一个 PyGetSetDef 结构类型的数组：  </p>
+
+
+<pre><code>static PyGetSetDef Noddy_getseters[] = {
+    {"first", (getter)Noddy_getfirst, (setter)Noddy_setfirst, "first name", NULL},
+    {"last", (getter)Noddy_getlast, (setter)Noddy_setlast, "last name", NULL},
+    {NULL}  /* Sentinel */
+};
+</code></pre>
+
+
+<p>最后再设置 noddy_NoddyType 的tp_getset字段的值为 Noddy_getseters 即可。  </p>
+
+
+<p><strong>注意</strong>：以上的代码均是针对Python2的，在Python3中略有不同。  </p>
+
+
+<p>本文中的示例代码可从 https://github.com/wusuopu/python-c-extension-sample 获取到。  </p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[使用C语言编写Python扩展3——创建自定义类型(1)]]></title>
+    <link href="http://www.xefan.com/archives/84091.html"/>
+    <updated>2014-04-13T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84091-使用C语言编写Python扩展3——创建自定义类型(1)</id>
+    <content type="html"><![CDATA[<p>在Python代码中如果要创建一个自定义类使用class关键字即可，但是在C代码中就没那么方便了。<br>
+首先简单介绍下Python中的类型。在python中一切皆对象，python中有两种对象：<br>
+一种是类型对象（class对象）：表示Python定义的类型，例如int, str, object等；<br>
+另一种是实例对象（instance对象）：表示由class对象创建的实例。 
+Python中的所有对象都是直接或者间接继承object，然后object又是typy类型。可以运行下面的例子看看输出结果：  </p>
+
+
+<pre><code>class A(object):
+    pass
+
+a = A()
+
+print(type(a))
+print(isinstance(a, A))
+print(isinstance(a, object))
+print(isinstance(a, type))
+
+print(type(A))
+print(A.__base__)
+print(isinstance(A, object))
+print(isinstance(A, type))
+
+print(type(object))
+print(isinstance(object, type))
+
+print(type(type))
+print(isinstance(type, object))
+</code></pre>
+
+
+<p>python是一门面向对象的编程语言，它是用C写的，而C又是面向过程的编程语言，那么python的类在C中是如何实现的呢？答案就是用结构体来模拟。  </p>
+
+
+<p>在Python的<em>object.h</em>头文件中定义了一个重要的结构体 PyTypeObject 。创建新的类型就是靠的它，该结构体定义如下：  </p>
+
+
+<pre><code>typedef struct _typeobject {
+    PyObject_VAR_HEAD
+    char *tp_name; /* For printing, in format "&lt;module&gt;.&lt;name&gt;" */
+    int tp_basicsize, tp_itemsize; /* For allocation */
+
+    /* Methods to implement standard operations */
+
+    destructor tp_dealloc;
+    printfunc tp_print;
+    getattrfunc tp_getattr;
+    setattrfunc tp_setattr;
+    cmpfunc tp_compare;
+    reprfunc tp_repr;
+
+    /* Method suites for standard classes */
+
+    PyNumberMethods *tp_as_number;
+    PySequenceMethods *tp_as_sequence;
+    PyMappingMethods *tp_as_mapping;
+
+    /* More standard operations (here for binary compatibility) */
+
+    hashfunc tp_hash;
+    ternaryfunc tp_call;
+    reprfunc tp_str;
+    getattrofunc tp_getattro;
+    setattrofunc tp_setattro;
+
+    /* Functions to access object as input/output buffer */
+    PyBufferProcs *tp_as_buffer;
+
+    /* Flags to define presence of optional/expanded features */
+    long tp_flags;
+
+    char *tp_doc; /* Documentation string */
+
+    /* Assigned meaning in release 2.0 */
+    /* call function for all accessible objects */
+    traverseproc tp_traverse;
+
+    /* delete references to contained objects */
+    inquiry tp_clear;
+
+    /* Assigned meaning in release 2.1 */
+    /* rich comparisons */
+    richcmpfunc tp_richcompare;
+
+    /* weak reference enabler */
+    long tp_weaklistoffset;
+
+    /* Added in release 2.2 */
+    /* Iterators */
+    getiterfunc tp_iter;
+    iternextfunc tp_iternext;
+
+    /* Attribute descriptor and subclassing stuff */
+    struct PyMethodDef *tp_methods;
+    struct PyMemberDef *tp_members;
+    struct PyGetSetDef *tp_getset;
+    struct _typeobject *tp_base;
+    PyObject *tp_dict;
+    descrgetfunc tp_descr_get;
+    descrsetfunc tp_descr_set;
+    long tp_dictoffset;
+    initproc tp_init;
+    allocfunc tp_alloc;
+    newfunc tp_new;
+    freefunc tp_free; /* Low-level free-memory routine */
+    inquiry tp_is_gc; /* For PyObject_IS_GC */
+    PyObject *tp_bases;
+    PyObject *tp_mro; /* method resolution order */
+    PyObject *tp_cache;
+    PyObject *tp_subclasses;
+    PyObject *tp_weaklist;
+} PyTypeObject;
+</code></pre>
+
+
+<p>这个比较庞大，里面包含的数据比较多，大部分都是一些函数指针而且可以为空，至于每个字段是什么意思请查看Python文档。  </p>
+
+
+<h2>创建自定义类型</h2>
+
+
+<p>创建一个新的C代码文件 <em>noddy.c</em> ，然后我们编写一个名为 noddy 的扩展模块，该模块包含了一个名为 Noddy 的类。  </p>
+
+
+<p>首先创建一个新的 PyTypeObject 类型的变量：</p>
+
+
+<pre><code>typedef struct {
+    PyObject_HEAD
+    /* Type-specific fields go here. */
+} noddy_NoddyObject;
+static PyTypeObject noddy_NoddyType = {
+    PyVarObject_HEAD_INIT(NULL, 0)
+    "noddy.Noddy",             /*tp_name*/
+    sizeof(noddy_NoddyObject), /*tp_basicsize*/
+    0,                         /*tp_itemsize*/
+    0,                         /*tp_dealloc*/
+    0,                         /*tp_print*/
+    0,                         /*tp_getattr*/
+    0,                         /*tp_setattr*/
+    0,                         /*tp_compare*/
+    0,                         /*tp_repr*/
+    0,                         /*tp_as_number*/
+    0,                         /*tp_as_sequence*/
+    0,                         /*tp_as_mapping*/
+    0,                         /*tp_hash */
+    0,                         /*tp_call*/
+    0,                         /*tp_str*/
+    0,                         /*tp_getattro*/
+    0,                         /*tp_setattro*/
+    0,                         /*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT,        /*tp_flags*/
+    "Noddy objects",           /*tp_doc*/
+};
+</code></pre>
+
+
+<p>这里是定义了一个noddy_NoddyObject结构体，它的第一个字段为 PyObject_HEAD ，因此相当于一个PyObject类型；然后还有一个 noddy_NoddyType 变量，它的第一个字段为 <em>PyVarObject_HEAD_INIT(NULL, 0)</em> ，这个很很重要，按理说这个应该写成 <em>PyVarObject_HEAD_INIT(&amp;PyType_Type, 0)</em> ，即表示Noddy这个类是一个type类型的对象。不过有的C编译器会对这个报错，因此这一项将在后面调用PyType_Ready函数来填充。<br>
+noddy_NoddyType 即是 Noddy 类，它保存了该类的元信息；noddy_NoddyObject结构体用于保存该类的实例对象的数据。<br>
+<em>只要是定义的结构体以PyObject_HEAD开始就属于是一个PyObject类型。PyObject_VAR_HEAD与PyObject_HEAD相似，只是PyObject_HEAD表示的是该类型占用内存大小是固定的如int、float；而PyObject_VAR_HEAD表示该类型占用的内存是可变的如list、dict。</em>   </p>
+
+
+<p>然后创建一个新扩展模块，并完成初始化：</p>
+
+
+<pre><code>static PyMethodDef noddy_methods[] = {
+    {NULL}  /* Sentinel */
+};
+PyMODINIT_FUNC
+initnoddy(void) 
+{
+    PyObject* m;
+
+    noddy_NoddyType.tp_new = PyType_GenericNew;
+    if (PyType_Ready(&amp;noddy_NoddyType) &lt; 0)
+        return;
+
+    m = Py_InitModule3("noddy", noddy_methods,
+                       "Example module that creates an extension type.");
+
+    Py_INCREF(&amp;noddy_NoddyType);
+    PyModule_AddObject(m, "Noddy", (PyObject *)&amp;noddy_NoddyType);
+}
+</code></pre>
+
+
+<p><strong><em>注意</em></strong>：以上是针对Python2的，在Python3中模块的初始化操作略有不同。请参考第一节的内容。  </p>
+
+
+<p>noddy_NoddyType即是我们要创建的 Noddy 类，它是 PyTypeObject 类型的结构变量。为了创建新的类型，我们需要指明 tp_new 方法，它相当于Python中的 __new__，这里我们使用默认的 PyType_GenericNew 即可。<br>
+然后调用 PyType_Ready 完成新类型的创建。<br>
+最后调用 PyModule_AddObject 在该模块中添加刚刚创建的新类型。  </p>
+
+
+<h2>测试</h2>
+
+
+<p>最后就是编写一个小程序来测试刚刚的模块是否可用。</p>
+
+
+<pre><code>import noddy
+
+o = noddy.Noddy()
+print(o)
+print(type(o), type(noddy.Noddy))
+
+# 这个会报错，noddy.Noddy 类不能被继承
+class A(noddy.Noddy):
+    pass
+</code></pre>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[使用C语言编写Python扩展2——函数]]></title>
+    <link href="http://www.xefan.com/archives/84085.html"/>
+    <updated>2014-04-13T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84085-使用C语言编写Python扩展2——函数</id>
+    <content type="html"><![CDATA[<p>上一节介绍了编写扩展的基本流程。这一回介绍一下在扩展模块中的函数调用，包括在扩展函数的参数提取和关键字参数解析，以及在C语言中调用Python方法。</p>
+
+
+<p>同样的本文中的示例代码可从 https://github.com/wusuopu/python-c-extension-sample 获取到。  </p>
+
+
+<h2>参数提取</h2>
+
+
+<p>接着上一节的例子，我们继续编辑lc_hello.c文件。先往模块中添加一个名为  func1 的函数，即就是在 lc_hello_world_methods 数组中添加一项：  </p>
+
+
+<pre><code>{"func1", (PyCFunction)func1_function, METH_VARARGS, NULL},
+</code></pre>
+
+
+<p>然后就是对该函数的实现。<br>
+参数提取是使用 PyArg_ParseTuple 方法，其定义如下：  </p>
+
+
+<pre><code>int PyArg_ParseTuple(PyObject *arg, char *format, ...);
+</code></pre>
+
+
+<p>其中 <em>arg</em> 参数为Python向C函数传递的参数列表，是一个无组对象；<em>format</em> 参数是一个格式化字符串，它的格式可以参考 Python/C API 文档。<br>
+func1_function 函数实现如下：  </p>
+
+
+<pre><code>static PyObject* func1_function(PyObject *self, PyObject *args)
+{
+    int num, i, j;
+    long lnum=0;
+    const char* s1 = NULL;
+    PyObject *obj = NULL;
+    if (!PyArg_ParseTuple(args, "is(ii)|l",
+                          &amp;num, &amp;s1, &amp;i, &amp;j, &amp;lnum)) {
+        printf("传入参数错误！\n");
+        return NULL;
+    }
+    printf("num: %d\tstr1: %s\n"
+           "i: %d\tj: %d\tlnum: %ld\n",
+           num, s1, i, j, lnum);
+
+    obj = Py_BuildValue("{sisisislss}",
+                        "num", num, "i", i, "j", j, "lnum", lnum, "s1", s1);
+    return obj;
+}
+</code></pre>
+
+
+<p>在Python中该函数可以接收3个或者4个参数。同时该函数使用了 Py_BuildValue 方法构造了一个字典对象并返回。Py_BuildValue的用法与PyArg_ParseTuple类似。<br>
+接下来可以在Python中进行测试：  </p>
+
+
+<pre><code>print(lc_hello_world.func1(11, 'abc', (2, 3), 100))
+print(lc_hello_world.func1(11, 'abc', (2, 3)))
+</code></pre>
+
+
+<h2>关键字参数</h2>
+
+
+<p>再在 lc_hello_world_methods 数组中添加一项：  </p>
+
+
+<pre><code>{"func2", (PyCFunction)func2_function, METH_VARARGS | METH_KEYWORDS, NULL},
+</code></pre>
+
+
+<p>关键字参数解析是使用 PyArg_ParseTupleAndKeywords 方法，其定义如下：  </p>
+
+
+<pre><code>int PyArg_ParseTupleAndKeywords(PyObject *arg, PyObject *kwdict,
+                                char *format, char *kwlist[], ...);
+</code></pre>
+
+
+<p>其中 <em>arg</em> 参数和 <em>format</em> 参数与PyArg_ParseTuple一样。<em>kwdict</em>参数是一个字典对象，保存了关键字参数。<em>kwlist</em>是一个以NULL结尾的字符串数组。<br>
+func2_function 函数实现如下：  </p>
+
+
+<pre><code>static PyObject* func2_function(PyObject *self, PyObject *args, PyObject *kwargs)
+{
+    int voltage;
+    char *state = "a stiff";
+    char *action = "voom";
+    char *type = "Norwegian Blue";
+
+    static char *kwlist[] = {"voltage", "state", "action", "type", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "i|sss", kwlist,
+                                     &amp;voltage, &amp;state, &amp;action, &amp;type))
+        return NULL;
+
+    printf("-- This parrot wouldn't %s if you put %i Volts through it.\n",
+           action, voltage);
+    printf("-- Lovely plumage, the %s -- It's %s!\n", type, state);
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+</code></pre>
+
+
+<p>接下来可以在Python中进行测试：  </p>
+
+
+<pre><code>lc_hello_world.func2(state="ok", action="test", type="func", voltage=13)
+lc_hello_world.func2(20)
+</code></pre>
+
+
+<h2>在扩展模块中调用Python方法</h2>
+
+
+<p>在扩展模块中可以使用  PyObject_CallObject 方法来调用Python的函数方法。其定义如下：  </p>
+
+
+<pre><code>PyObject* PyObject_CallObject(PyObject *callable_object, PyObject *args)
+</code></pre>
+
+
+<p>再在 lc_hello_world_methods 数组中添加一项：  </p>
+
+
+<pre><code>{"func3", (PyCFunction)func3_function, METH_VARARGS, NULL},
+</code></pre>
+
+
+<p>func3_function 函数实现如下：  </p>
+
+
+<pre><code>static PyObject* func3_function(PyObject *self, PyObject *args)
+{
+    PyObject *my_callback = NULL;
+    PyObject *result = NULL;
+    PyObject *arg = NULL;
+    if (!PyArg_ParseTuple(args, "OO:set_callback;argument;", &amp;my_callback, &amp;arg)) {
+        printf("传入参数错误！\n");
+        return NULL;
+    }
+    if (!PyCallable_Check(my_callback)) {
+        PyErr_SetString(PyExc_TypeError, "parameter must be callable");
+        return NULL;
+    }
+    result = PyObject_CallObject(my_callback, arg);
+    if (!result) {
+        Py_INCREF(Py_None);
+        result = Py_None;
+    }
+    return result;
+}
+</code></pre>
+
+
+<p>接下来可以在Python中进行测试：  </p>
+
+
+<pre><code>print(lc_hello_world.func3(int, (1.234, )))
+</code></pre>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[使用C语言编写Python扩展1——Hello World]]></title>
+    <link href="http://www.xefan.com/archives/84082.html"/>
+    <updated>2014-04-12T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84082-使用C语言编写Python扩展1——Hello World</id>
+    <content type="html"><![CDATA[<p>能够使用C语言编写扩展是Python一大卖点吧，这可以将一些关键的代码使用C来写以提升程序的性能。本文是参考了Python的官方文档整理而来的，同时结合了Python2跟Python3。按照惯例现在先从一个Hello World开始讲解一下写扩展的基本流程。</p>
+
+
+<p>详细的内容可以参考官方文档：<br>
+https://docs.python.org/2.7/extending/index.html <br>
+https://docs.python.org/3/extending/index.html  </p>
+
+
+<p>https://docs.python.org/2.7/c-api/index.html<br>
+https://docs.python.org/3/c-api/index.html  </p>
+
+
+<p>同时本文中的示例代码可从 https://github.com/wusuopu/python-c-extension-sample 获取到。  </p>
+
+
+<p>首先介绍一下我当前的开发环境：<br>
+ * ArchLinux<br>
+ * gcc 4.8.2<br>
+ * glibc 2.19<br>
+ * Python 2.7.6<br>
+ * Python 3.3.5  </p>
+
+
+<h2>开始</h2>
+
+
+<p>先创建一个新的C代码文件 lc_hello.c。为了能够正常使用python的api，需要导入Python.h这个头文件。</p>
+
+
+<pre><code>#include &lt;Python.h&gt;
+</code></pre>
+
+
+<p>然后再定义一个模块的初始化函数。</p>
+
+
+<pre><code>PyMODINIT_FUNC initlc_hello_world(void)
+{
+    Py_InitModule("lc_hello_world", lc_hello_world_methods);
+    printf("init lc_hello_world module\n");
+}
+</code></pre>
+
+
+<p>这个函数是用于模块初始化的，即是在第一次使用import语句导入模块时会执行。其函数名必须为initmodule_name这样的格式，在这里我们的模块名为lc_hello_world，所以函数名就是initlc_hello_world。<br>
+在这个函数中又调用了Py_InitModule函数，它执行了模块初始化的操作。Py_InitModule函数传入了两个参数，第一个参数为字符串，表示模块的名称；第二个参数是一个PyMethodDef的结构体数组，表示该模块都具有哪些方法。与Py_InitModule相似的方法还有Py_InitModule3和Py_InitModule4。因此在initlc_hello_world方法之前还需要先定义 lc_hello_world_methods 数组。  </p>
+
+
+<pre><code>static PyMethodDef lc_hello_world_methods[] = {
+    {"test", (PyCFunction)test_function, METH_NOARGS, "lc_hello_world extending test"},
+    {"add", (PyCFunction)add_function, METH_VARARGS, NULL},
+    {NULL, NULL, 0, NULL}
+};
+</code></pre>
+
+
+<p>PyMethodDef结构体有四个字段。<br>
+  * 第一个是一个字符串，表示在Python中对应的方法的名称；<br>
+  * 第二个是对应的C代码的函数；<br>
+  * 第三个是一个标致位，表示该Python方法是否需要参数，METH_NOARGS表示不需要参数，METH_VARARGS表示需要参数；<br>
+  * 第四个是一个字符串，它是该方法的__doc__属性，这个不是必须的，可以为NULL。<br>
+PyMethodDef结构体数组最后以 {NULL, NULL, 0, NULL}结尾。（感觉好像不是必须的，但是通常都这么做那我们也这么做吧）  </p>
+
+
+<p><strong>注意</strong>：以上的用法都是针对Python2的，在Python3中又有些不同。<br>
+在Python3中模块的初始化函数的函数名变为了PyInit_module_name这样的形式了，因此这里就需要定义一个函数 PyMODINIT_FUNC PyInit_lc_hello_world。并且还需要返回一个 module 类型的变量。<br>
+其次在Python3中创建module对象的函数也由 Py_InitModule 变为了 PyModule_Create。<br>
+因此在Python3中模块的初始化函数应该定义如下：  </p>
+
+
+<pre><code>PyMODINIT_FUNC PyInit_lc_hello_world(void)
+{
+    PyObject *m;
+    m = PyModule_Create(&amp;lc_hello_world_module);
+    if (m == NULL)
+        return NULL;
+    printf("init lc_hello_world module\n");
+    return m;
+}
+</code></pre>
+
+
+<p>PyModule_Create函数需要传入一个 PyModuleDef 类型的指针。<br>
+因此在此之前还需要先定义 lc_hello_world_module 变量。  </p>
+
+
+<pre><code>static struct PyModuleDef lc_hello_world_module = {
+    PyModuleDef_HEAD_INIT,
+    "lc_hello_world",        /* name of module */
+    NULL,                    /* module documentation, may be NULL */
+    -1,                      /* size of per-interpreter state of the module, or -1 if the module keeps state in global variables. */
+    lc_hello_world_methods   /* A pointer to a table of module-level functions, described by PyMethodDef values. Can be NULL if no functions are present. */
+};
+</code></pre>
+
+
+<p>在 lc_hello_world_methods 中我们为模块指定了两个方法，接下来我们需要实现这两个方法。  </p>
+
+
+<pre><code>static PyObject* test_function(PyObject *self)
+{
+    PyObject_Print(self, stdout, 0);
+    printf("lc_hello_world test\n");
+    Py_INCREF(Py_True);
+    return Py_True;
+}
+</code></pre>
+
+
+<p>这段代码定义了Python的test方法所对应的C函数。在这个函数中就只执行了一条printf语句，然后就返回了Py_True。<br>
+Py_True即是Python中的True，Py_INCREF函数执行的操作是对Python对象的计数引用值进行加1。与Py_INCREF对应的是Py_DECREF，它是对计数引用减1,并且计数引用为0时就销毁对象并回收内存。  </p>
+
+
+<pre><code>static PyObject* add_function(PyObject *self, PyObject *args)
+{
+    int num1, num2;
+    PyObject *result=NULL;
+    if (!PyArg_ParseTuple(args, "nn", &amp;num1, &amp;num2)) {
+        printf("传入参数错误！\n");
+        return NULL;
+    }
+    result = PyInt_FromLong(num1+num2);
+    return result;
+}
+</code></pre>
+
+
+<p>这须代码定义了Python的add方法所对应的C函数。该函数需要传入两个整数类型的参数。<br>
+PyArg_ParseTuple是对传入的参数进行解析，关于这个函数的说明请查看Python手册。  </p>
+
+
+<p><strong>注意</strong>：在Python3中整数都是 long 类型的，因此这里的 PyInt_FromLong 需要改为 PyLong_FromLong，其作用是将C的int类型转为Python的int类型。  </p>
+
+
+<h2>编译</h2>
+
+
+<p>扩展模块编写完成后，接下来就是对其进行编译了。先编写一个 setup.py 脚本。  </p>
+
+
+<pre><code>#!/usr/bin/env python
+#-*- coding:utf-8 -*-
+
+from setuptools import setup, Extension
+
+hello_world = Extension('lc_hello_world', sources=["lc_hello.c"])
+setup(ext_modules=[hello_world])
+</code></pre>
+
+
+<p>然后再执行命令进行编译：</p>
+
+
+<pre><code>$ python setup.py build
+</code></pre>
+
+
+<p>执行成功后会在当前目录下的build目录中生成扩展模块文件。</p>
+
+
+<h2>测试</h2>
+
+
+<p>最后就是编写一个小程序来测试刚刚的模块是否可用。</p>
+
+
+<pre><code>import lc_hello_world
+
+print(lc_hello_world.test.__doc__)
+print(lc_hello_world.add.__doc__)
+print(lc_hello_world.test())
+print(lc_hello_world.add(1, 2))
+print(lc_hello_world.add(1, '2'))    # 这个会报错
+</code></pre>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Mongoengine教程(5)——信号]]></title>
+    <link href="http://www.xefan.com/archives/84076.html"/>
+    <updated>2014-04-06T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84076-mongoengine教程(5)——信号</id>
+    <content type="html"><![CDATA[<p>MongoEngine在进行数据操作时会发出一些信号，我们可以连接这些信号进行一些额外的操作。注意：要在MongoEngine中使用信号，需要安装 <em>blinker</em> 这个库。  </p>
+
+
+<pre><code>$ pip install blinker
+</code></pre>
+
+
+<p>MongoEngine提供的信号如下：  </p>
+
+
+<ul>
+<li>pre_init: 在创建一个新的 Document 或者 EmbeddedDocument 实例对象之后，并且对象初始化之前调用。  </li>
+<li>post_init:在 Document 或者 EmbeddedDocument 实例对象初始化完成之后调用。  </li>
+<li>pre_save:在 save 方法执行之前调用。  </li>
+<li>pre_save_post_validation:在数据检验完成之后，数据保存之前调用。  </li>
+<li>post_save:在数据保存完成之后调用。  </li>
+<li>pre_delete:在 delete 方法执行之前调用。  </li>
+<li>post_delete:在记录成功删除之后调用。  </li>
+<li>pre_bulk_insert:在数据检验之后，数据插入之前调用。  </li>
+<li>post_bulk_insert:在数据成功插入之后调用。</li>
+</ul>
+
+
+<h2>事件连接</h2>
+
+
+<p>使用 signals 将信号与回调函数进行连接。</p>
+
+
+<pre><code>from mongoengine import *
+from mongoengine import signals
+
+class Author(Document):
+    name = StringField()
+
+    @classmethod
+    def pre_save(cls, sender, document, **kwargs):
+        print("Pre Save: %s" % document.name)
+
+    @classmethod
+    def post_save(cls, sender, document, **kwargs):
+        print("Post Save: %s" % document.name)
+        if 'created' in kwargs:
+            if kwargs['created']:
+                print("Created")
+            else:
+                print("Updated")
+
+signals.pre_save.connect(Author.pre_save, sender=Author)
+signals.post_save.connect(Author.post_save, sender=Author)
+</code></pre>
+
+
+<p>注意：对于 RefereneField 的<em>reverse_delete_rules</em>参数不会触发信号。</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Mongoengine教程(4)——文件存储]]></title>
+    <link href="http://www.xefan.com/archives/84072.html"/>
+    <updated>2014-04-05T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84072-mongoengine教程(4)——文件存储</id>
+    <content type="html"><![CDATA[<p>MongoDB的GridFS支持直接在数据库中存储文件。要在MongoEngine中使用GridFS，只要使用 FileField 对象即可。以下是一个例子：</p>
+
+
+<pre><code>class Animal(Document):
+    genus = StringField()
+    family = StringField()
+    photo = FileField()
+
+marmot = Animal(genus='Marmota', family='Sciuridae')
+
+marmot_photo = open('gtk.png', 'rb')
+marmot.photo.put(marmot_photo, content_type = 'image/png')
+marmot.save()
+</code></pre>
+
+
+<p>这个例子将 gtk.png 这个图片存入了数据库中。<br>
+文件的读取也很简单：</p>
+
+
+<pre><code>marmot = Animal.objects(genus='Marmota').first()
+photo = marmot.photo.read()
+content_type = marmot.photo.content_type
+</code></pre>
+
+
+<p>FileField不仅可以存储文件，还可以用来存储数据流。只是操作上略微不同。</p>
+
+
+<p>要存储数据流，首先先创建一个新的文件，然后再往里面写入数据。</p>
+
+
+<pre><code>marmot.photo.new_file()
+marmot.photo.write('some_image_data')
+marmot.photo.write('some_more_image_data')
+marmot.photo.close()
+marmot.save()
+</code></pre>
+
+
+<p>如果要删除存储在数据库中的文件，只需要调用该文件对象的 delete 方法：</p>
+
+
+<pre><code>marmot.photo.delete()
+</code></pre>
+
+
+<p>注意：一条文档记录中的FileField字段只保存了对GridFS集合中该文件的ID引用。这意味着如果该文档被删除了，对用的文件不会被删除。因此在删除这类文档时需要小心，以免出现孤立文件。</p>
+
+
+<p>对于已存储的文件可以进行替换修改：</p>
+
+
+<pre><code>another_marmot = open('python.png', 'rb')
+marmot.photo.replace(another_marmot, content_type='image/png')
+</code></pre>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Mongoengine教程(3)——数据查询]]></title>
+    <link href="http://www.xefan.com/archives/84069.html"/>
+    <updated>2014-04-05T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84069-mongoengine教程(3)——数据查询</id>
+    <content type="html"><![CDATA[<p>与Django一样，Document类都有一个 objects 属性。它用于将类与数据库关联起来。objects属性是一个QuerySetManager类型的对象，它的操作会返回一个QuerySet类型的对象。可以通过对QuerySet对象的迭代获取数据库中的数据。</p>
+
+
+<pre><code>class User(Document):
+    name = StringField()
+    country = StringField()
+
+class Paper(Document):
+    content = StringField()
+    author = ReferenceField(User)
+</code></pre>
+
+
+<h2>查询过滤</h2>
+
+
+<p>可以在查询是指定过滤条件以获取想要的结果。例如想要查询英国的用户：</p>
+
+
+<pre><code>uk_users = User.objects(country='uk')
+</code></pre>
+
+
+<p>与Django类似，要查询引用的对象只需要使用双下划线即可。例如想要查询英国用户的论文：</p>
+
+
+<pre><code>uk_papers = Paper.objects(author__country='uk')
+</code></pre>
+
+
+<h2>查询操作</h2>
+
+
+<p>与Django类似，MongoEngine同样也提供了一些条件语句。</p>
+
+
+<ul>
+<li>ne - 不相等</li>
+<li>lt - 小于</li>
+<li>lte - 小于等于</li>
+<li>gt - 大于</li>
+<li>gte - 大于等于</li>
+<li>not - 取反</li>
+<li>in - 值在列表中</li>
+<li>nin - 值不在列表中</li>
+<li>mod - 取模</li>
+<li>all - 与列表的值相同</li>
+<li>size - 数组的大小</li>
+<li>exists - 字段的值存在</li>
+</ul>
+
+
+<p>例如查询年龄小于等于18岁的用户：</p>
+
+
+<pre><code>young_users = Users.objects(age__lte=18)
+</code></pre>
+
+
+<p>对于不同类型的数据提供了不同的条件语句。</p>
+
+
+<h3>查询结果个数限制</h3>
+
+
+<p>跟传统的ORM一样，MongoEngine也可以限制查询结果的个数。一种方法是在QuerySet对象上调用limit和skip方法；另一种方法是使用数组的分片的语法。例如：</p>
+
+
+<pre><code>users = User.objects[10:15]
+users = User.objects.skip(10).limit(5)
+</code></pre>
+
+
+<h2>聚合操作</h2>
+
+
+<p>MongoEngine提供了一些数据库的聚合操作。</p>
+
+
+<p>统计结果个数即可以使用QuerySet的count方法，也可以使用Python风格的方法：</p>
+
+
+<pre><code>num_users = len(User.objects)
+num_users = User.objects.count()
+</code></pre>
+
+
+<p>其他的一些聚合操作。<br>
+求和：</p>
+
+
+<pre><code>yearly_expense = Employee.objects.sum('salary')
+</code></pre>
+
+
+<p>求平均数：</p>
+
+
+<pre><code>mean_age = User.objects.average('age')
+</code></pre>
+
+
+<h2>高级查询</h2>
+
+
+<p>有时需要将多个条件进行组合，前面提到的方法就不能满足需求了。这时可以使用MongoEngine的Q类。它可以将多个查询条件进行 &amp;(与) 和 |(或) 操作。</p>
+
+
+<p>例如下面的语句是查询所有年龄大于等于18岁的英国用户，或者所有年龄大于等于20岁的用户。</p>
+
+
+<pre><code>User.objects((Q(country='uk') &amp; Q(age__gte=18)) | Q(age__gte=20))
+</code></pre>
+
+
+<h2>在服务器端执行javascript代码</h2>
+
+
+<p>通过MongoEngine QuerySet对象的 exec_js 方法可以将javascript代码作为字符串发送给服务器端执行，然后返回执行的结果。</p>
+
+
+<p>例如查询该数据库都有那些集合：</p>
+
+
+<pre><code>User.objects.exec_js("db.getCollectionNames()")
+</code></pre>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Mongoengine教程(2)——文档模式]]></title>
+    <link href="http://www.xefan.com/archives/84066.html"/>
+    <updated>2014-04-03T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84066-mongoengine教程(2)——文档模式</id>
+    <content type="html"><![CDATA[<p>在MongoDB中一个文档(document)与关系型数据库中的一行(row)相似；文档保存在集合(collection)中，行保存在表(table)中。</p>
+
+
+<h2>定义文档的模式</h2>
+
+
+<p>与django类似，要定义一个文档模式只需要创建一个类继承自 Document，并添加一些 Field 对象。</p>
+
+
+<pre><code>from mongoengine import *
+import datetime
+
+class Page(Document):
+    title = StringField(max_length=200, required=True)
+    date_modified = DateTimeField(default=datetime.datetime.now)
+</code></pre>
+
+
+<p>如上定义了一个文档模式具有 title和date_modified 两个字段。</p>
+
+
+<p>同时MongoDB本身就是无模式的，因此我们还可以创建动态的文档模式。它可以在添加数据时为不同的数据设置不同的字段。</p>
+
+
+<pre><code>class Page(DynamicDocument):
+    title = StringField(max_length=200, required=True)
+</code></pre>
+
+
+<p>添加数据：</p>
+
+
+<pre><code>page = Page(title='Using MongoEngine')
+page.tags = ['mongodb', 'mongoengine']
+page.save()
+</code></pre>
+
+
+<h2>文档字段</h2>
+
+
+<p>文档字段(Field)不是必需的，但是使用它来进行数据验证、设置默认值等操作会比较方便。</p>
+
+
+<p>MongoEngine提供了如下这些类型的Field:</p>
+
+
+<ul>
+<li>BinaryField  </li>
+<li>BooleanField  </li>
+<li>ComplexDateTimeField  </li>
+<li>DateTimeField  </li>
+<li>DecimalField  </li>
+<li>DictField  </li>
+<li>DynamicField  </li>
+<li>EmailField  </li>
+<li>EmbeddedDocumentField  </li>
+<li>FileField  </li>
+<li>FloatField  </li>
+<li>GenericEmbeddedDocumentField  </li>
+<li>GenericReferenceField  </li>
+<li>GeoPointField  </li>
+<li>ImageField  </li>
+<li>IntField  </li>
+<li>ListField  </li>
+<li>MapField  </li>
+<li>ObjectIdField  </li>
+<li>ReferenceField  </li>
+<li>SequenceField  </li>
+<li>SortedListField  </li>
+<li>StringField  </li>
+<li>URLField  </li>
+<li>UUIDField  </li>
+</ul>
+
+
+<h2>文档之间引用关系</h2>
+
+
+<p>在关系型数据库中多个表可以使用外键进行关联。然而MongoDB是无模式的，因此想要达到这样的效果就这能在应用程序中自己手动的进行关联了。</p>
+
+
+<p>不过还好，使用MongoEngine的ReferenceField可以很方便的实现。</p>
+
+
+<pre><code>class User(Document):
+    name = StringField()
+
+class Page(Document):
+    content = StringField()
+    author = ReferenceField(User)
+
+john = User(name="John Smith")
+john.save()
+
+post = Page(content="Test Page")
+post.author = john
+post.save()
+</code></pre>
+
+
+<h3>一对多的关系</h3>
+
+
+<p>对于一对多的关系可以使用ListField来保存一个ReferenceField列表。在进行查询操作是需要传入一个实例对象。</p>
+
+
+<pre><code>class User(Document):
+    name = StringField()
+
+class Page(Document):
+    content = StringField()
+    authors = ListField(ReferenceField(User))
+
+bob = User(name="Bob Jones").save()
+john = User(name="John Smith").save()
+
+Page(content="Test Page", authors=[bob, john]).save()
+Page(content="Another Page", authors=[john]).save()
+
+# Find all pages Bob authored
+Page.objects(authors__in=[bob])
+</code></pre>
+
+
+<h3>引用对象的删除操作</h3>
+
+
+<p>MongoDB默认不会检查数据的完整性，因此在删除一个对象是就需要自己手动的处理引用了该对象的其他对象。</p>
+
+
+<p>同样的MongoEngine也提供了一样的功能。ReferenceField有一个 reverse_delete_rule 参数可以进行设置。它的取值如下：  </p>
+
+
+<ul>
+<li>mongoengine.DO_NOTHING:默认就是这个值，它不会进行任何操作。  </li>
+<li>mongoengine.DENY:如果该对象还被其他对象引用，则拒绝删除。  </li>
+<li>mongoengine.NULLIFY:将其他对象对该对象的引用字段设为null。  </li>
+<li>mongoengine.CASCADE:将引用了该对象的其他对象也删除掉。  </li>
+<li>mongoengine.PULL:移除对该对象的引用。  </li>
+</ul>
+
+
+<h2>索引</h2>
+
+
+<p>与django的Model相似，MongoEngine的Document也可以在meta属性中设置索引。</p>
+
+
+<pre><code>class Page(Document):
+    title = StringField()
+    rating = StringField()
+    meta = {
+        'indexes': ['title', ('title', '-rating')]
+    }
+</code></pre>
+
+
+<p>meta中的indexes可以是一个列表，也可以是一个字典。</p>
+
+]]></content>
+  </entry>
+  
+</feed>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Tag: Asp | 龍昌博客]]></title>
+  <link href="http://www.xefan.com/tags/asp/atom.xml" rel="self"/>
+  <link href="http://www.xefan.com/"/>
+  <updated>2014-11-04T14:10:28+08:00</updated>
+  <id>http://www.xefan.com/</id>
+  <author>
+    <name><![CDATA[龍昌]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[ASP与MySQL数据处理]]></title>
+    <link href="http://www.xefan.com/archives/66047.html"/>
+    <updated>2009-08-16T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/66047-ASP与MySQL数据处理</id>
+    <content type="html"><![CDATA[<p>首先连接数据库，方法：<a href="http://www.xefan.cn/archives/66045.html" target="_blank"><a href="http://www.xefan.cn/archives/66045.html">http://www.xefan.cn/archives/66045.html</a></a>。以下语句为示例语句，请根据实际情况修改
+<strong>查询数据：</strong></p>
+
+<p>Set RS = conn.Execute(&ldquo;SELECT * FROM user&rdquo;) <br/>
+While Not RS.EOF      &lsquo;while&hellip;wend循环，用于读取所有的信息 <br/>
+    Response.Write RS.Fields(&ldquo;username&rdquo;) &amp; &ldquo;, &rdquo; &amp; RS.Fields(&ldquo;password&rdquo;) &amp; &ldquo;&lt;br&gt;&rdquo; <br/>
+    RS.MoveNext   &#8216;记录集指针下移  <br/>
+Wend</p>
+
+<p><strong>插入数据：</strong></p>
+
+<p>Set rs = Conn.Execute(&ldquo;insert into user (nm,pw) values (test&#8217;,&lsquo;test&rsquo;)&rdquo;)</p>
+
+<p><strong>更新数据：</strong></p>
+
+<p>Set rs = Conn.Execute(&ldquo;update user set nm=&lsquo;用户ASPupdate&rsquo;,pw=&lsquo;pwaspupdate&rsquo; where id=24&rdquo;)</p>
+
+<p><strong>删除数据：</strong></p>
+
+<p>Set rs = Conn.Execute(&ldquo;delete from user where id=25&rdquo;)</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[ASP与MySQL连接]]></title>
+    <link href="http://www.xefan.com/archives/66045.html"/>
+    <updated>2009-08-16T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/66045-ASP与MySQL连接</id>
+    <content type="html"><![CDATA[<p>首先你的服务器得安装有MySQL ODBC驱动，下载地址：<a href="http://cn.ziddu.com/download/370567/mysql-connector-odbc-noinstall-5.1.5-win32.zip.html" target="_blank"><a href="http://cn.ziddu.com/download/370567/mysql-connector-odbc-noinstall-5.1.5-win32.zip.html">http://cn.ziddu.com/download/370567/mysql-connector-odbc-noinstall-5.1.5-win32.zip.html</a></a></p>
+
+<p><strong>数据库链接</strong></p>
+
+<p>Dim connstr, conn , rs     <br/>
+&lsquo;SERVER为数据库主机名（本地主机用localhost,远程用IP地址）；DATABASE为数据库名；UID为用户名；PASSWORD为密码 <br/>
+connstr = &ldquo;DRIVER={MySQL ODBC 5.1 Driver}; SERVER=localhost; DATABASE=data;   UID=root;PASSWORD=root; OPTION=3&rdquo; <br/>
+Set conn = Server.CreateObject(&ldquo;ADODB.Connection&rdquo;)  <br/>
+conn.Open(connstr)</p>
+
+<p><strong>关闭数据库链接</strong></p>
+
+<p>Conn.Close  &lsquo;关闭数据库链接 <br/>
+Set Conn = Nothing &#8216;清空数据库链接，释放内存</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[ASP删除ACCESS数据]]></title>
+    <link href="http://www.xefan.com/archives/65922.html"/>
+    <updated>2009-08-15T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/65922-ASP删除ACCESS数据</id>
+    <content type="html"><![CDATA[<p>首先连接数据库，方法：<a href="http://www.xefan.cn/archives/65914.html" target="_blank"><a href="http://www.xefan.cn/archives/65914.html">http://www.xefan.cn/archives/65914.html</a></a>。</p>
+
+<blockquote>
+ID = 3  
+sql = &#8220;delete from test where ID=&#8221;&amp;ID  
+Conn.Execute(sql)  
+</blockquote>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[ASP更新ACCESS数据]]></title>
+    <link href="http://www.xefan.com/archives/65920.html"/>
+    <updated>2009-08-15T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/65920-ASP更新ACCESS数据</id>
+    <content type="html"><![CDATA[<p>首先连接数据库，方法：<a href="http://www.xefan.cn/archives/65914.html" target="_blank"><a href="http://www.xefan.cn/archives/65914.html">http://www.xefan.cn/archives/65914.html</a></a>。</p>
+
+<p>法一：</p>
+
+<pre><code>ID = "4"
+nm= "www.xefan.cn"
+pw = "xefan.cn"
+sql="update test set password='"&amp;amp;pw&amp;amp;"',username='"&amp;amp;nm&amp;amp;"' where ID="&amp;amp;ID&amp;amp;" "
+conn.Execute(sql)
+</code></pre>
+
+<p>法二：</p>
+
+<pre><code>ID = "4"
+nm= "www.xefan.cn"
+pw = "xefan.cn"
+sql = "select * from 44 where ID="&amp;amp;ID&amp;amp;""
+rs.Open sql,conn,1,3
+rs("password")=pw
+rs("username")=nm
+rs.update
+</code></pre>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[ASP往ACCESS插入数据]]></title>
+    <link href="http://www.xefan.com/archives/65918.html"/>
+    <updated>2009-08-15T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/65918-ASP往ACCESS插入数据</id>
+    <content type="html"><![CDATA[<p>首先连接数据库，方法：<a href="http://www.xefan.cn/archives/65914.html" target="_blank"><a href="http://www.xefan.cn/archives/65914.html">http://www.xefan.cn/archives/65914.html</a></a>。往数据库的test表中字段名为username、password插入数据。</p>
+
+<p>法一：</p>
+
+<pre><code>username = "www.xefan.cn"
+password = "xefan.cn"
+sql="select * from test" 
+rs.open sql,conn,1,3
+rs.addnew
+rs("username")=username
+rs("password")=password
+rs.update
+rs.close
+</code></pre>
+
+<p>法二：</p>
+
+<pre><code>username = "www.xefan.cn"
+password = "xefan.cn"
+sql="insert into test (username,password) values ('"&amp;username"','"&amp;password"')"
+conn.execute(sql)
+</code></pre>
+]]></content>
+  </entry>
+  
+</feed>

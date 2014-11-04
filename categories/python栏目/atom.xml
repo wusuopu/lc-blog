@@ -1,0 +1,1040 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Python栏目 | 龍昌博客]]></title>
+  <link href="http://www.xefan.com/categories/python栏目/atom.xml" rel="self"/>
+  <link href="http://www.xefan.com/"/>
+  <updated>2014-11-04T14:10:28+08:00</updated>
+  <id>http://www.xefan.com/</id>
+  <author>
+    <name><![CDATA[龍昌]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[使用C语言编写Python扩展5——垃圾回收管理]]></title>
+    <link href="http://www.xefan.com/archives/84096.html"/>
+    <updated>2014-04-15T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84096-使用C语言编写Python扩展5——垃圾回收管理</id>
+    <content type="html"><![CDATA[<p>上一节介绍了创建一个具有属性的类，由于对象具有属性数据，因此在进行内存管理时要多加注意。这一节就介绍一下Python的垃圾回收管理。<br>
+在Python中垃圾回收主要是靠的计数引用方法，但是单凭计数引用还是不够的。先看看下面这段Python代码。  </p>
+
+
+<pre><code>n = []
+m = []
+n.append(m)
+m.append(n)
+del m
+del n
+</code></pre>
+
+
+<p>如果只靠计数引用的话执行上面这段代码之后n和m都不能被回收，因为它们的引用计算值都不为0。<br>
+像上面例子这样相互循环引用称作循环引用垃圾，在Python中有循环垃圾回收器（cyclic-garbage collector）专门用于回收此类计数引用无法处理的垃圾内存。  </p>
+
+
+<p>接着上一节的例子，继续编辑<em>noddy.c</em>。  </p>
+
+
+<p>为了让该对象类型支持垃圾回收，将PyTypeObject的tp_flags字段增加Py_TPFLAGS_HAVE_GC这个标志位。同时与GC(Garbage Collection)相关的tp_traverse和tp_clear这两个字段也要设置。  </p>
+
+
+<ul>
+<li>tp_traverse是用于垃圾回收器（garbage collector）遍历该实例对象中所有需要回收的属性对象。  </li>
+<li>tp_clear是用于清除内部各个属性对象的。  </li>
+</ul>
+
+
+<p>首先定义tp_traverse和tp_clear所对应的函数：  </p>
+
+
+<pre><code>static int Noddy_traverse(noddy_NoddyObject *self, visitproc visit, void *arg)
+{
+    Py_VISIT(self-&gt;first);
+    Py_VISIT(self-&gt;last);
+    return 0;
+}
+static int Noddy_clear(noddy_NoddyObject *self)
+{
+    Py_CLEAR(self-&gt;first);
+    Py_CLEAR(self-&gt;last);
+    return 0;
+}
+</code></pre>
+
+
+<p>Py_VISIT和Py_CLEAR是两个宏，简化了visit操作和clear操作。  </p>
+
+
+<p>然后再修改noddy_NoddyType结构体定义：  </p>
+
+
+<pre><code>static PyTypeObject noddy_NoddyType = {
+    PyObject_HEAD_INIT(NULL)
+    0,                         /*ob_size*/
+    "noddy.Noddy",             /*tp_name*/
+    sizeof(noddy_NoddyObject), /*tp_basicsize*/
+    0,                         /*tp_itemsize*/
+    (destructor)Noddy_dealloc, /*tp_dealloc*/
+    0,                         /*tp_print*/
+    0,                         /*tp_getattr*/
+    0,                         /*tp_setattr*/
+    0,                         /*tp_compare*/
+    0,                         /*tp_repr*/
+    0,                         /*tp_as_number*/
+    0,                         /*tp_as_sequence*/
+    0,                         /*tp_as_mapping*/
+    0,                         /*tp_hash */
+    0,                         /*tp_call*/
+    0,                         /*tp_str*/
+    0,                         /*tp_getattro*/
+    0,                         /*tp_setattro*/
+    0,                         /*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE | Py_TPFLAGS_HAVE_GC,  /*tp_flags*/
+    "Noddy objects",           /*tp_doc*/
+    (traverseproc)Noddy_traverse,   /* tp_traverse */
+    (inquiry)Noddy_clear,      /* tp_clear */
+    0,                         /* tp_richcompare */
+    0,                         /* tp_weaklistoffset */
+    0,                         /* tp_iter */
+    0,                         /* tp_iternext */
+    Noddy_methods,             /* tp_methods */
+    Noddy_members,             /* tp_members */
+    0,                         /* tp_getset */
+    0,                         /* tp_base */
+    0,                         /* tp_dict */
+    0,                         /* tp_descr_get */
+    0,                         /* tp_descr_set */
+    0,                         /* tp_dictoffset */
+    (initproc)Noddy_init,      /* tp_init */
+    0,                         /* tp_alloc */
+    Noddy_new,                 /* tp_new */
+};
+</code></pre>
+
+
+<p><strong>注意</strong>：<br>
+Python的官方手册中说道如果设置了Py_TPFLAGS_HAVE_GC这个标志位的话，那么就必须使用PyObject_GC_New这个函数来创建实例对象，使用PyObject_GC_Del来销毁已创建了的实例对象。  </p>
+
+
+<p>使用PyObject_GC_New创建实例对象之后再用PyObject_GC_Track将该实例添加到垃圾回收器所跟踪的对象集合中去。<br>
+在对象销毁时再执行PyObject_GC_UnTrack和PyObject_GC_Del函数。  </p>
+
+
+<p>然后再修改tp_new函数和tp_dealloc函数：  </p>
+
+
+<pre><code>static PyObject * Noddy_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
+{
+    noddy_NoddyObject*self;
+    self = (noddy_NoddyObject*)PyObject_GC_New(noddy_NoddyObject, type);
+    if (self != NULL) {
+        PyObject_GC_Track(self);
+        self-&gt;first = PyString_FromString("");
+        if (self-&gt;first == NULL)
+        {
+          Py_DECREF(self);
+          return NULL;
+        }
+        self-&gt;last = PyString_FromString("");
+        if (self-&gt;last == NULL)
+        {
+          Py_DECREF(self);
+          return NULL;
+        }
+        self-&gt;number = 0;
+    }
+    return (PyObject *)self;
+}
+
+static void Noddy_dealloc(noddy_NoddyObject* self)
+{
+    PyObject_GC_UnTrack(self);
+    Noddy_clear(self);
+    PyObject_GC_Del(self);
+}
+</code></pre>
+
+
+<p>最后再写一段Python程序来测试下该模块：  </p>
+
+
+<pre><code>import gc
+import noddy
+
+gc.set_debug(gc.DEBUG_STATS | gc.DEBUG_LEAK)
+
+o = noddy.Noddy()
+l = [o]
+o.first = l
+del l
+del o
+
+gc.collect()
+</code></pre>
+
+
+<p>本文中的示例代码可从 https://github.com/wusuopu/python-c-extension-sample 获取到。  </p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[使用C语言编写Python扩展4——创建自定义类型(2)]]></title>
+    <link href="http://www.xefan.com/archives/84093.html"/>
+    <updated>2014-04-14T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84093-使用C语言编写Python扩展4——创建自定义类型(2)</id>
+    <content type="html"><![CDATA[<p>上一节中我们创建了一个简单的类。这一节我们将对这个类进行扩展，添加属性、方法，并且支持子类。</p>
+
+
+<h2>为类型添加方法和数据</h2>
+
+
+<p>接着上一节的例子，继续编辑<em>noddy.c</em>。  </p>
+
+
+<pre><code>typedef struct {
+    PyObject_HEAD
+    /* Type-specific fields go here. */
+    PyObject *first; /* first name */
+    PyObject *last;  /* last name */
+    int number;
+} noddy_NoddyObject;
+</code></pre>
+
+
+<p>修改 noddy_NoddyObject 结构体，为其添加三个字段。  </p>
+
+
+<p>然后定义自己的__new__方法，为对象分配内存空间：  </p>
+
+
+<pre><code>static PyObject * Noddy_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
+{
+    noddy_NoddyObject*self;
+    self = (noddy_NoddyObject*)type-&gt;tp_alloc(type, 0);
+    if (self != NULL) {
+        self-&gt;first = PyString_FromString("");
+        if (self-&gt;first == NULL)
+        {
+          Py_DECREF(self);
+          return NULL;
+        }
+        self-&gt;last = PyString_FromString("");
+        if (self-&gt;last == NULL)
+        {
+          Py_DECREF(self);
+          return NULL;
+        }
+        self-&gt;number = 0;
+    }
+    return (PyObject *)self;
+}
+</code></pre>
+
+
+<p>接着定义对象的初始化函数__init__：  </p>
+
+
+<pre><code>static int Noddy_init(noddy_NoddyObject*self, PyObject *args, PyObject *kwds)
+{
+    PyObject *first=NULL, *last=NULL, *tmp;
+    static char *kwlist[] = {"first", "last", "number", NULL};
+
+    if (! PyArg_ParseTupleAndKeywords(args, kwds, "|OOi", kwlist, 
+                                      &amp;first, &amp;last, 
+                                      &amp;self-&gt;number))
+        return -1;
+
+    if (first) {
+        tmp = self-&gt;first;
+        Py_INCREF(first);
+        self-&gt;first = first;
+        Py_XDECREF(tmp);
+    }
+
+    if (last) {
+        tmp = self-&gt;last;
+        Py_INCREF(last);
+        self-&gt;last = last;
+        Py_XDECREF(tmp);
+    }
+    return 0;
+}
+</code></pre>
+
+
+<p>由于对象包含了几项数据，因此在对象销毁时需要先释放数据的资源。定义资源释放方法：</p>
+
+
+<pre><code>static void Noddy_dealloc(noddy_NoddyObject* self)
+{
+    Py_XDECREF(self-&gt;first);
+    Py_XDECREF(self-&gt;last);
+    Py_TYPE(self)-&gt;tp_free((PyObject*)self);
+}
+</code></pre>
+
+
+<p>然后再为该类定义一个方法用于返回该对象的first值和last值：  </p>
+
+
+<pre><code>static PyObject * Noddy_name(noddy_NoddyObject* self)
+{
+    static PyObject *format = NULL;
+    PyObject *args, *result;
+    if (format == NULL) {
+        format = PyString_FromString("%s %s");
+        if (format == NULL)
+            return NULL;
+    }
+    if (self-&gt;first == NULL) {
+        PyErr_SetString(PyExc_AttributeError, "first");
+        return NULL;
+    }
+    if (self-&gt;last == NULL) {
+        PyErr_SetString(PyExc_AttributeError, "last");
+        return NULL;
+    }
+    args = Py_BuildValue("OO", self-&gt;first, self-&gt;last);
+    if (args == NULL)
+        return NULL;
+    result = PyString_Format(format, args);
+    Py_DECREF(args);
+    return result;
+}
+static PyMethodDef Noddy_methods[] = {
+    {"name", (PyCFunction)Noddy_name, METH_NOARGS, "Return the name, combining the first and last name"},
+    {NULL}  /* Sentinel */
+};
+</code></pre>
+
+
+<p>最后在定义 noddy_NoddyType 变量时将对应字段进行填充：</p>
+
+
+<pre><code>static PyTypeObject noddy_NoddyType = {
+    PyObject_HEAD_INIT(NULL)
+    0,                         /*ob_size*/
+    "noddy.Noddy",             /*tp_name*/
+    sizeof(noddy_NoddyObject), /*tp_basicsize*/
+    0,                         /*tp_itemsize*/
+    (destructor)Noddy_dealloc, /*tp_dealloc*/
+    0,                         /*tp_print*/
+    0,                         /*tp_getattr*/
+    0,                         /*tp_setattr*/
+    0,                         /*tp_compare*/
+    0,                         /*tp_repr*/
+    0,                         /*tp_as_number*/
+    0,                         /*tp_as_sequence*/
+    0,                         /*tp_as_mapping*/
+    0,                         /*tp_hash */
+    0,                         /*tp_call*/
+    0,                         /*tp_str*/
+    0,                         /*tp_getattro*/
+    0,                         /*tp_setattro*/
+    0,                         /*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,  /*tp_flags*/
+    "Noddy objects",           /*tp_doc*/
+    0,                         /* tp_traverse */
+    0,                         /* tp_clear */
+    0,                         /* tp_richcompare */
+    0,                         /* tp_weaklistoffset */
+    0,                         /* tp_iter */
+    0,                         /* tp_iternext */
+    Noddy_methods,             /* tp_methods */
+    0,                         /* tp_members */
+    0,                         /* tp_getset */
+    0,                         /* tp_base */
+    0,                         /* tp_dict */
+    0,                         /* tp_descr_get */
+    0,                         /* tp_descr_set */
+    0,                         /* tp_dictoffset */
+    (initproc)Noddy_init,      /* tp_init */
+    0,                         /* tp_alloc */
+    Noddy_new,                 /* tp_new */
+};
+</code></pre>
+
+
+<p>tp_flags字段增加了  Py_TPFLAGS_BASETYPE 属性，表示该类可以被继承。最后进行编译测试：  </p>
+
+
+<pre><code>import noddy
+
+o = noddy.Noddy("abc", "def", 12)
+print(o, o.name())
+print(type(o), type(noddy.Noddy))
+print(o.number, o.first, o.last)
+
+class A(noddy.Noddy):
+    pass
+</code></pre>
+
+
+<p>运行以上程序会发现Noddy对象没有number、first和last这几个属性。这是因为虽然在noddy_NoddyObject结构体中定义了这几个字段，但是它们仍然在Python中是不可见的。<br>
+为了能在Python中访问这几个属性，需要设置noddy_NoddyType的tp_members字段。  </p>
+
+
+<pre><code>static PyMemberDef Noddy_members[] = {
+    {"first", T_OBJECT_EX, offsetof(noddy_NoddyObject, first), 0, "first name"},
+    {"last", T_OBJECT_EX, offsetof(noddy_NoddyObject, last), 0, "last name"},
+    {"number", T_INT, offsetof(noddy_NoddyObject, number), 0, "noddy number"},
+    {NULL}  /* Sentinel */
+};
+</code></pre>
+
+
+<p>先定义一个 PyMemberDef 结构体类型的数组，然后将noddy_NoddyType的tp_members字段设为Noddy_members。PyMemberDef和T_OBJECT_EX以及T_INT均是在 <em>structmember.h</em> 头文件中定义的，因此还需要先包含该文件。  </p>
+
+
+<pre><code>#include &lt;structmember.h&gt;
+</code></pre>
+
+
+<h2>数据属性的访问控制</h2>
+
+
+<p>数据属性的访问控制可以对属性的设置进行合法性检查，例如这里我们想要确保 Noddy 对象的first属性和last属性都必须是字符串。<br>
+首先定义属性的get方法和set方法：  </p>
+
+
+<pre><code>static PyObject * Noddy_getfirst(noddy_NoddyObject *self, void *closure)
+{
+    Py_INCREF(self-&gt;first);
+    return self-&gt;first;
+}
+static int Noddy_setfirst(noddy_NoddyObject *self, PyObject *value, void *closure)
+{
+  if (value == NULL) {
+    PyErr_SetString(PyExc_TypeError, "Cannot delete the first attribute");
+    return -1;
+  }
+  if (! PyString_Check(value)) {
+    PyErr_SetString(PyExc_TypeError, 
+                    "The first attribute value must be a string");
+    return -1;
+  }
+  Py_DECREF(self-&gt;first);
+  Py_INCREF(value);
+  self-&gt;first = value;    
+  return 0;
+}
+static PyObject * Noddy_getlast(noddy_NoddyObject *self, void *closure)
+{
+    Py_INCREF(self-&gt;last);
+    return self-&gt;last;
+}
+static int Noddy_setlast(noddy_NoddyObject *self, PyObject *value, void *closure)
+{
+  if (value == NULL) {
+    PyErr_SetString(PyExc_TypeError, "Cannot delete the last attribute");
+    return -1;
+  }
+  if (! PyString_Check(value)) {
+    PyErr_SetString(PyExc_TypeError, 
+                    "The last attribute value must be a string");
+    return -1;
+  }
+  Py_DECREF(self-&gt;last);
+  Py_INCREF(value);
+  self-&gt;last = value;    
+  return 0;
+}
+</code></pre>
+
+
+<p>然后创建一个 PyGetSetDef 结构类型的数组：  </p>
+
+
+<pre><code>static PyGetSetDef Noddy_getseters[] = {
+    {"first", (getter)Noddy_getfirst, (setter)Noddy_setfirst, "first name", NULL},
+    {"last", (getter)Noddy_getlast, (setter)Noddy_setlast, "last name", NULL},
+    {NULL}  /* Sentinel */
+};
+</code></pre>
+
+
+<p>最后再设置 noddy_NoddyType 的tp_getset字段的值为 Noddy_getseters 即可。  </p>
+
+
+<p><strong>注意</strong>：以上的代码均是针对Python2的，在Python3中略有不同。  </p>
+
+
+<p>本文中的示例代码可从 https://github.com/wusuopu/python-c-extension-sample 获取到。  </p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[使用C语言编写Python扩展3——创建自定义类型(1)]]></title>
+    <link href="http://www.xefan.com/archives/84091.html"/>
+    <updated>2014-04-13T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84091-使用C语言编写Python扩展3——创建自定义类型(1)</id>
+    <content type="html"><![CDATA[<p>在Python代码中如果要创建一个自定义类使用class关键字即可，但是在C代码中就没那么方便了。<br>
+首先简单介绍下Python中的类型。在python中一切皆对象，python中有两种对象：<br>
+一种是类型对象（class对象）：表示Python定义的类型，例如int, str, object等；<br>
+另一种是实例对象（instance对象）：表示由class对象创建的实例。 
+Python中的所有对象都是直接或者间接继承object，然后object又是typy类型。可以运行下面的例子看看输出结果：  </p>
+
+
+<pre><code>class A(object):
+    pass
+
+a = A()
+
+print(type(a))
+print(isinstance(a, A))
+print(isinstance(a, object))
+print(isinstance(a, type))
+
+print(type(A))
+print(A.__base__)
+print(isinstance(A, object))
+print(isinstance(A, type))
+
+print(type(object))
+print(isinstance(object, type))
+
+print(type(type))
+print(isinstance(type, object))
+</code></pre>
+
+
+<p>python是一门面向对象的编程语言，它是用C写的，而C又是面向过程的编程语言，那么python的类在C中是如何实现的呢？答案就是用结构体来模拟。  </p>
+
+
+<p>在Python的<em>object.h</em>头文件中定义了一个重要的结构体 PyTypeObject 。创建新的类型就是靠的它，该结构体定义如下：  </p>
+
+
+<pre><code>typedef struct _typeobject {
+    PyObject_VAR_HEAD
+    char *tp_name; /* For printing, in format "&lt;module&gt;.&lt;name&gt;" */
+    int tp_basicsize, tp_itemsize; /* For allocation */
+
+    /* Methods to implement standard operations */
+
+    destructor tp_dealloc;
+    printfunc tp_print;
+    getattrfunc tp_getattr;
+    setattrfunc tp_setattr;
+    cmpfunc tp_compare;
+    reprfunc tp_repr;
+
+    /* Method suites for standard classes */
+
+    PyNumberMethods *tp_as_number;
+    PySequenceMethods *tp_as_sequence;
+    PyMappingMethods *tp_as_mapping;
+
+    /* More standard operations (here for binary compatibility) */
+
+    hashfunc tp_hash;
+    ternaryfunc tp_call;
+    reprfunc tp_str;
+    getattrofunc tp_getattro;
+    setattrofunc tp_setattro;
+
+    /* Functions to access object as input/output buffer */
+    PyBufferProcs *tp_as_buffer;
+
+    /* Flags to define presence of optional/expanded features */
+    long tp_flags;
+
+    char *tp_doc; /* Documentation string */
+
+    /* Assigned meaning in release 2.0 */
+    /* call function for all accessible objects */
+    traverseproc tp_traverse;
+
+    /* delete references to contained objects */
+    inquiry tp_clear;
+
+    /* Assigned meaning in release 2.1 */
+    /* rich comparisons */
+    richcmpfunc tp_richcompare;
+
+    /* weak reference enabler */
+    long tp_weaklistoffset;
+
+    /* Added in release 2.2 */
+    /* Iterators */
+    getiterfunc tp_iter;
+    iternextfunc tp_iternext;
+
+    /* Attribute descriptor and subclassing stuff */
+    struct PyMethodDef *tp_methods;
+    struct PyMemberDef *tp_members;
+    struct PyGetSetDef *tp_getset;
+    struct _typeobject *tp_base;
+    PyObject *tp_dict;
+    descrgetfunc tp_descr_get;
+    descrsetfunc tp_descr_set;
+    long tp_dictoffset;
+    initproc tp_init;
+    allocfunc tp_alloc;
+    newfunc tp_new;
+    freefunc tp_free; /* Low-level free-memory routine */
+    inquiry tp_is_gc; /* For PyObject_IS_GC */
+    PyObject *tp_bases;
+    PyObject *tp_mro; /* method resolution order */
+    PyObject *tp_cache;
+    PyObject *tp_subclasses;
+    PyObject *tp_weaklist;
+} PyTypeObject;
+</code></pre>
+
+
+<p>这个比较庞大，里面包含的数据比较多，大部分都是一些函数指针而且可以为空，至于每个字段是什么意思请查看Python文档。  </p>
+
+
+<h2>创建自定义类型</h2>
+
+
+<p>创建一个新的C代码文件 <em>noddy.c</em> ，然后我们编写一个名为 noddy 的扩展模块，该模块包含了一个名为 Noddy 的类。  </p>
+
+
+<p>首先创建一个新的 PyTypeObject 类型的变量：</p>
+
+
+<pre><code>typedef struct {
+    PyObject_HEAD
+    /* Type-specific fields go here. */
+} noddy_NoddyObject;
+static PyTypeObject noddy_NoddyType = {
+    PyVarObject_HEAD_INIT(NULL, 0)
+    "noddy.Noddy",             /*tp_name*/
+    sizeof(noddy_NoddyObject), /*tp_basicsize*/
+    0,                         /*tp_itemsize*/
+    0,                         /*tp_dealloc*/
+    0,                         /*tp_print*/
+    0,                         /*tp_getattr*/
+    0,                         /*tp_setattr*/
+    0,                         /*tp_compare*/
+    0,                         /*tp_repr*/
+    0,                         /*tp_as_number*/
+    0,                         /*tp_as_sequence*/
+    0,                         /*tp_as_mapping*/
+    0,                         /*tp_hash */
+    0,                         /*tp_call*/
+    0,                         /*tp_str*/
+    0,                         /*tp_getattro*/
+    0,                         /*tp_setattro*/
+    0,                         /*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT,        /*tp_flags*/
+    "Noddy objects",           /*tp_doc*/
+};
+</code></pre>
+
+
+<p>这里是定义了一个noddy_NoddyObject结构体，它的第一个字段为 PyObject_HEAD ，因此相当于一个PyObject类型；然后还有一个 noddy_NoddyType 变量，它的第一个字段为 <em>PyVarObject_HEAD_INIT(NULL, 0)</em> ，这个很很重要，按理说这个应该写成 <em>PyVarObject_HEAD_INIT(&amp;PyType_Type, 0)</em> ，即表示Noddy这个类是一个type类型的对象。不过有的C编译器会对这个报错，因此这一项将在后面调用PyType_Ready函数来填充。<br>
+noddy_NoddyType 即是 Noddy 类，它保存了该类的元信息；noddy_NoddyObject结构体用于保存该类的实例对象的数据。<br>
+<em>只要是定义的结构体以PyObject_HEAD开始就属于是一个PyObject类型。PyObject_VAR_HEAD与PyObject_HEAD相似，只是PyObject_HEAD表示的是该类型占用内存大小是固定的如int、float；而PyObject_VAR_HEAD表示该类型占用的内存是可变的如list、dict。</em>   </p>
+
+
+<p>然后创建一个新扩展模块，并完成初始化：</p>
+
+
+<pre><code>static PyMethodDef noddy_methods[] = {
+    {NULL}  /* Sentinel */
+};
+PyMODINIT_FUNC
+initnoddy(void) 
+{
+    PyObject* m;
+
+    noddy_NoddyType.tp_new = PyType_GenericNew;
+    if (PyType_Ready(&amp;noddy_NoddyType) &lt; 0)
+        return;
+
+    m = Py_InitModule3("noddy", noddy_methods,
+                       "Example module that creates an extension type.");
+
+    Py_INCREF(&amp;noddy_NoddyType);
+    PyModule_AddObject(m, "Noddy", (PyObject *)&amp;noddy_NoddyType);
+}
+</code></pre>
+
+
+<p><strong><em>注意</em></strong>：以上是针对Python2的，在Python3中模块的初始化操作略有不同。请参考第一节的内容。  </p>
+
+
+<p>noddy_NoddyType即是我们要创建的 Noddy 类，它是 PyTypeObject 类型的结构变量。为了创建新的类型，我们需要指明 tp_new 方法，它相当于Python中的 __new__，这里我们使用默认的 PyType_GenericNew 即可。<br>
+然后调用 PyType_Ready 完成新类型的创建。<br>
+最后调用 PyModule_AddObject 在该模块中添加刚刚创建的新类型。  </p>
+
+
+<h2>测试</h2>
+
+
+<p>最后就是编写一个小程序来测试刚刚的模块是否可用。</p>
+
+
+<pre><code>import noddy
+
+o = noddy.Noddy()
+print(o)
+print(type(o), type(noddy.Noddy))
+
+# 这个会报错，noddy.Noddy 类不能被继承
+class A(noddy.Noddy):
+    pass
+</code></pre>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[使用C语言编写Python扩展2——函数]]></title>
+    <link href="http://www.xefan.com/archives/84085.html"/>
+    <updated>2014-04-13T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84085-使用C语言编写Python扩展2——函数</id>
+    <content type="html"><![CDATA[<p>上一节介绍了编写扩展的基本流程。这一回介绍一下在扩展模块中的函数调用，包括在扩展函数的参数提取和关键字参数解析，以及在C语言中调用Python方法。</p>
+
+
+<p>同样的本文中的示例代码可从 https://github.com/wusuopu/python-c-extension-sample 获取到。  </p>
+
+
+<h2>参数提取</h2>
+
+
+<p>接着上一节的例子，我们继续编辑lc_hello.c文件。先往模块中添加一个名为  func1 的函数，即就是在 lc_hello_world_methods 数组中添加一项：  </p>
+
+
+<pre><code>{"func1", (PyCFunction)func1_function, METH_VARARGS, NULL},
+</code></pre>
+
+
+<p>然后就是对该函数的实现。<br>
+参数提取是使用 PyArg_ParseTuple 方法，其定义如下：  </p>
+
+
+<pre><code>int PyArg_ParseTuple(PyObject *arg, char *format, ...);
+</code></pre>
+
+
+<p>其中 <em>arg</em> 参数为Python向C函数传递的参数列表，是一个无组对象；<em>format</em> 参数是一个格式化字符串，它的格式可以参考 Python/C API 文档。<br>
+func1_function 函数实现如下：  </p>
+
+
+<pre><code>static PyObject* func1_function(PyObject *self, PyObject *args)
+{
+    int num, i, j;
+    long lnum=0;
+    const char* s1 = NULL;
+    PyObject *obj = NULL;
+    if (!PyArg_ParseTuple(args, "is(ii)|l",
+                          &amp;num, &amp;s1, &amp;i, &amp;j, &amp;lnum)) {
+        printf("传入参数错误！\n");
+        return NULL;
+    }
+    printf("num: %d\tstr1: %s\n"
+           "i: %d\tj: %d\tlnum: %ld\n",
+           num, s1, i, j, lnum);
+
+    obj = Py_BuildValue("{sisisislss}",
+                        "num", num, "i", i, "j", j, "lnum", lnum, "s1", s1);
+    return obj;
+}
+</code></pre>
+
+
+<p>在Python中该函数可以接收3个或者4个参数。同时该函数使用了 Py_BuildValue 方法构造了一个字典对象并返回。Py_BuildValue的用法与PyArg_ParseTuple类似。<br>
+接下来可以在Python中进行测试：  </p>
+
+
+<pre><code>print(lc_hello_world.func1(11, 'abc', (2, 3), 100))
+print(lc_hello_world.func1(11, 'abc', (2, 3)))
+</code></pre>
+
+
+<h2>关键字参数</h2>
+
+
+<p>再在 lc_hello_world_methods 数组中添加一项：  </p>
+
+
+<pre><code>{"func2", (PyCFunction)func2_function, METH_VARARGS | METH_KEYWORDS, NULL},
+</code></pre>
+
+
+<p>关键字参数解析是使用 PyArg_ParseTupleAndKeywords 方法，其定义如下：  </p>
+
+
+<pre><code>int PyArg_ParseTupleAndKeywords(PyObject *arg, PyObject *kwdict,
+                                char *format, char *kwlist[], ...);
+</code></pre>
+
+
+<p>其中 <em>arg</em> 参数和 <em>format</em> 参数与PyArg_ParseTuple一样。<em>kwdict</em>参数是一个字典对象，保存了关键字参数。<em>kwlist</em>是一个以NULL结尾的字符串数组。<br>
+func2_function 函数实现如下：  </p>
+
+
+<pre><code>static PyObject* func2_function(PyObject *self, PyObject *args, PyObject *kwargs)
+{
+    int voltage;
+    char *state = "a stiff";
+    char *action = "voom";
+    char *type = "Norwegian Blue";
+
+    static char *kwlist[] = {"voltage", "state", "action", "type", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "i|sss", kwlist,
+                                     &amp;voltage, &amp;state, &amp;action, &amp;type))
+        return NULL;
+
+    printf("-- This parrot wouldn't %s if you put %i Volts through it.\n",
+           action, voltage);
+    printf("-- Lovely plumage, the %s -- It's %s!\n", type, state);
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+</code></pre>
+
+
+<p>接下来可以在Python中进行测试：  </p>
+
+
+<pre><code>lc_hello_world.func2(state="ok", action="test", type="func", voltage=13)
+lc_hello_world.func2(20)
+</code></pre>
+
+
+<h2>在扩展模块中调用Python方法</h2>
+
+
+<p>在扩展模块中可以使用  PyObject_CallObject 方法来调用Python的函数方法。其定义如下：  </p>
+
+
+<pre><code>PyObject* PyObject_CallObject(PyObject *callable_object, PyObject *args)
+</code></pre>
+
+
+<p>再在 lc_hello_world_methods 数组中添加一项：  </p>
+
+
+<pre><code>{"func3", (PyCFunction)func3_function, METH_VARARGS, NULL},
+</code></pre>
+
+
+<p>func3_function 函数实现如下：  </p>
+
+
+<pre><code>static PyObject* func3_function(PyObject *self, PyObject *args)
+{
+    PyObject *my_callback = NULL;
+    PyObject *result = NULL;
+    PyObject *arg = NULL;
+    if (!PyArg_ParseTuple(args, "OO:set_callback;argument;", &amp;my_callback, &amp;arg)) {
+        printf("传入参数错误！\n");
+        return NULL;
+    }
+    if (!PyCallable_Check(my_callback)) {
+        PyErr_SetString(PyExc_TypeError, "parameter must be callable");
+        return NULL;
+    }
+    result = PyObject_CallObject(my_callback, arg);
+    if (!result) {
+        Py_INCREF(Py_None);
+        result = Py_None;
+    }
+    return result;
+}
+</code></pre>
+
+
+<p>接下来可以在Python中进行测试：  </p>
+
+
+<pre><code>print(lc_hello_world.func3(int, (1.234, )))
+</code></pre>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[使用C语言编写Python扩展1——Hello World]]></title>
+    <link href="http://www.xefan.com/archives/84082.html"/>
+    <updated>2014-04-12T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84082-使用C语言编写Python扩展1——Hello World</id>
+    <content type="html"><![CDATA[<p>能够使用C语言编写扩展是Python一大卖点吧，这可以将一些关键的代码使用C来写以提升程序的性能。本文是参考了Python的官方文档整理而来的，同时结合了Python2跟Python3。按照惯例现在先从一个Hello World开始讲解一下写扩展的基本流程。</p>
+
+
+<p>详细的内容可以参考官方文档：<br>
+https://docs.python.org/2.7/extending/index.html <br>
+https://docs.python.org/3/extending/index.html  </p>
+
+
+<p>https://docs.python.org/2.7/c-api/index.html<br>
+https://docs.python.org/3/c-api/index.html  </p>
+
+
+<p>同时本文中的示例代码可从 https://github.com/wusuopu/python-c-extension-sample 获取到。  </p>
+
+
+<p>首先介绍一下我当前的开发环境：<br>
+ * ArchLinux<br>
+ * gcc 4.8.2<br>
+ * glibc 2.19<br>
+ * Python 2.7.6<br>
+ * Python 3.3.5  </p>
+
+
+<h2>开始</h2>
+
+
+<p>先创建一个新的C代码文件 lc_hello.c。为了能够正常使用python的api，需要导入Python.h这个头文件。</p>
+
+
+<pre><code>#include &lt;Python.h&gt;
+</code></pre>
+
+
+<p>然后再定义一个模块的初始化函数。</p>
+
+
+<pre><code>PyMODINIT_FUNC initlc_hello_world(void)
+{
+    Py_InitModule("lc_hello_world", lc_hello_world_methods);
+    printf("init lc_hello_world module\n");
+}
+</code></pre>
+
+
+<p>这个函数是用于模块初始化的，即是在第一次使用import语句导入模块时会执行。其函数名必须为initmodule_name这样的格式，在这里我们的模块名为lc_hello_world，所以函数名就是initlc_hello_world。<br>
+在这个函数中又调用了Py_InitModule函数，它执行了模块初始化的操作。Py_InitModule函数传入了两个参数，第一个参数为字符串，表示模块的名称；第二个参数是一个PyMethodDef的结构体数组，表示该模块都具有哪些方法。与Py_InitModule相似的方法还有Py_InitModule3和Py_InitModule4。因此在initlc_hello_world方法之前还需要先定义 lc_hello_world_methods 数组。  </p>
+
+
+<pre><code>static PyMethodDef lc_hello_world_methods[] = {
+    {"test", (PyCFunction)test_function, METH_NOARGS, "lc_hello_world extending test"},
+    {"add", (PyCFunction)add_function, METH_VARARGS, NULL},
+    {NULL, NULL, 0, NULL}
+};
+</code></pre>
+
+
+<p>PyMethodDef结构体有四个字段。<br>
+  * 第一个是一个字符串，表示在Python中对应的方法的名称；<br>
+  * 第二个是对应的C代码的函数；<br>
+  * 第三个是一个标致位，表示该Python方法是否需要参数，METH_NOARGS表示不需要参数，METH_VARARGS表示需要参数；<br>
+  * 第四个是一个字符串，它是该方法的__doc__属性，这个不是必须的，可以为NULL。<br>
+PyMethodDef结构体数组最后以 {NULL, NULL, 0, NULL}结尾。（感觉好像不是必须的，但是通常都这么做那我们也这么做吧）  </p>
+
+
+<p><strong>注意</strong>：以上的用法都是针对Python2的，在Python3中又有些不同。<br>
+在Python3中模块的初始化函数的函数名变为了PyInit_module_name这样的形式了，因此这里就需要定义一个函数 PyMODINIT_FUNC PyInit_lc_hello_world。并且还需要返回一个 module 类型的变量。<br>
+其次在Python3中创建module对象的函数也由 Py_InitModule 变为了 PyModule_Create。<br>
+因此在Python3中模块的初始化函数应该定义如下：  </p>
+
+
+<pre><code>PyMODINIT_FUNC PyInit_lc_hello_world(void)
+{
+    PyObject *m;
+    m = PyModule_Create(&amp;lc_hello_world_module);
+    if (m == NULL)
+        return NULL;
+    printf("init lc_hello_world module\n");
+    return m;
+}
+</code></pre>
+
+
+<p>PyModule_Create函数需要传入一个 PyModuleDef 类型的指针。<br>
+因此在此之前还需要先定义 lc_hello_world_module 变量。  </p>
+
+
+<pre><code>static struct PyModuleDef lc_hello_world_module = {
+    PyModuleDef_HEAD_INIT,
+    "lc_hello_world",        /* name of module */
+    NULL,                    /* module documentation, may be NULL */
+    -1,                      /* size of per-interpreter state of the module, or -1 if the module keeps state in global variables. */
+    lc_hello_world_methods   /* A pointer to a table of module-level functions, described by PyMethodDef values. Can be NULL if no functions are present. */
+};
+</code></pre>
+
+
+<p>在 lc_hello_world_methods 中我们为模块指定了两个方法，接下来我们需要实现这两个方法。  </p>
+
+
+<pre><code>static PyObject* test_function(PyObject *self)
+{
+    PyObject_Print(self, stdout, 0);
+    printf("lc_hello_world test\n");
+    Py_INCREF(Py_True);
+    return Py_True;
+}
+</code></pre>
+
+
+<p>这段代码定义了Python的test方法所对应的C函数。在这个函数中就只执行了一条printf语句，然后就返回了Py_True。<br>
+Py_True即是Python中的True，Py_INCREF函数执行的操作是对Python对象的计数引用值进行加1。与Py_INCREF对应的是Py_DECREF，它是对计数引用减1,并且计数引用为0时就销毁对象并回收内存。  </p>
+
+
+<pre><code>static PyObject* add_function(PyObject *self, PyObject *args)
+{
+    int num1, num2;
+    PyObject *result=NULL;
+    if (!PyArg_ParseTuple(args, "nn", &amp;num1, &amp;num2)) {
+        printf("传入参数错误！\n");
+        return NULL;
+    }
+    result = PyInt_FromLong(num1+num2);
+    return result;
+}
+</code></pre>
+
+
+<p>这须代码定义了Python的add方法所对应的C函数。该函数需要传入两个整数类型的参数。<br>
+PyArg_ParseTuple是对传入的参数进行解析，关于这个函数的说明请查看Python手册。  </p>
+
+
+<p><strong>注意</strong>：在Python3中整数都是 long 类型的，因此这里的 PyInt_FromLong 需要改为 PyLong_FromLong，其作用是将C的int类型转为Python的int类型。  </p>
+
+
+<h2>编译</h2>
+
+
+<p>扩展模块编写完成后，接下来就是对其进行编译了。先编写一个 setup.py 脚本。  </p>
+
+
+<pre><code>#!/usr/bin/env python
+#-*- coding:utf-8 -*-
+
+from setuptools import setup, Extension
+
+hello_world = Extension('lc_hello_world', sources=["lc_hello.c"])
+setup(ext_modules=[hello_world])
+</code></pre>
+
+
+<p>然后再执行命令进行编译：</p>
+
+
+<pre><code>$ python setup.py build
+</code></pre>
+
+
+<p>执行成功后会在当前目录下的build目录中生成扩展模块文件。</p>
+
+
+<h2>测试</h2>
+
+
+<p>最后就是编写一个小程序来测试刚刚的模块是否可用。</p>
+
+
+<pre><code>import lc_hello_world
+
+print(lc_hello_world.test.__doc__)
+print(lc_hello_world.add.__doc__)
+print(lc_hello_world.test())
+print(lc_hello_world.add(1, 2))
+print(lc_hello_world.add(1, '2'))    # 这个会报错
+</code></pre>
+
+]]></content>
+  </entry>
+  
+</feed>

@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Tag: Vim | 龍昌博客]]></title>
+  <link href="http://www.xefan.com/tags/vim/atom.xml" rel="self"/>
+  <link href="http://www.xefan.com/"/>
+  <updated>2014-11-04T14:10:28+08:00</updated>
+  <id>http://www.xefan.com/</id>
+  <author>
+    <name><![CDATA[龍昌]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[配置elixir的vim环境]]></title>
+    <link href="http://www.xefan.com/archives/84132.html"/>
+    <updated>2014-10-29T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84132-配置elixir的vim环境</id>
+    <content type="html"><![CDATA[<p>elixir是建立在Erlang虚拟机之上的一种函数式编程语言。下面介绍elixir的两个vim插件。</p>
+
+
+<p>首先是语法高亮支持： https://github.com/elixir-lang/vim-elixir</p>
+
+
+<p>其次是snippets支持： https://github.com/carlosgaldino/elixir-snippets
+这个需要先安装 snipMate 插件。</p>
+
+
+<p>如果也是用的 vundle 进行插件管理的话，可以直接在 .vimrc 配置中添加如下内容即可：</p>
+
+
+<pre><code>Bundle 'elixir-lang/vim-elixir'
+Bundle 'carlosgaldino/elixir-snippets'
+
+au BufNewFile,BufRead *.exs set ft=elixir
+</code></pre>
+
+
+
+
+<p>然后再在vim执行命令 :BundleInstall 即可。</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[配置coffeescript的vim环境]]></title>
+    <link href="http://www.xefan.com/archives/84130.html"/>
+    <updated>2014-10-24T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84130-配置coffeescript的vim环境</id>
+    <content type="html"><![CDATA[<p>coffeescript是构建在javascript基础上一门语言，它在运行时会编译在javascript。下面介绍vim用来开发coffeescript的两个插件。</p>
+
+
+<p>首先是语法高亮支持： https://github.com/kchmck/vim-coffee-script</p>
+
+
+<p>其次是snippets支持： https://github.com/carlosvillu/coffeScript-VIM-Snippets
+这个需要先安装 snipMate 插件。</p>
+
+
+<p>如果也是用的 vundle 进行插件管理的话，可以直接在 .vimrc 配置中添加如下内容即可：</p>
+
+
+<pre><code>Bundle 'kchmck/vim-coffee-script'
+Bundle 'carlosvillu/coffeScript-VIM-Snippets'
+
+au BufNewFile,BufRead *.coffee set ft=coffee
+</code></pre>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[VIM编译参数]]></title>
+    <link href="http://www.xefan.com/archives/84127.html"/>
+    <updated>2014-10-18T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84127-VIM编译参数</id>
+    <content type="html"><![CDATA[<p>每次重装系统之后都要重新编译一次VIM，为了方便就将编译参数记录如下：</p>
+
+
+<pre><code>./configure --prefix=/opt/vim --enable-acl --enable-cscope --enable-largefile --enable-multibyte --enable-sniff --enable-mzschemeinterp --enable-xim --enable-tclinterp --enable-perlinterp --enable-python3interp --enable-pythonint
+erp --enable-rubyinterp --enable-netbeans --enable-gui --enable-luainterp --enable-nls --enable-xsmp --enable-xsmp-interact --enable-fontset --with-features=huge --with-x
+</code></pre>
+
+
+
+
+<p>上面的参数中启用了对tcl、perl、python、ruby、lau的支持。同时为了使用系统的剪切板还启用了对X的支持。</p>
+
+
+<p>我的VIM配置文件： https://github.com/wusuopu/my-vimrc</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[使用ruby开发vim插件]]></title>
+    <link href="http://www.xefan.com/archives/84117.html"/>
+    <updated>2014-07-03T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84117-使用ruby开发vim插件</id>
+    <content type="html"><![CDATA[<p>作为一个Vimmer和Pythoner，之前折腾过用python编写vim插件。现在作为半个Rubist，又开始继续折腾。</p>
+
+
+<p>在开始编写插件之前，你需要确认 Vim 是否支持 Ruby，通过以下命令来判别：</p>
+
+
+<pre><code>$ vim --version | grep +ruby
+</code></pre>
+
+
+<p>如果输出为空，则表示你当前的vim不支持Ruby，需要重新编译一下，并启用对Ruby的支持。</p>
+
+
+<p>顺便说下我当前的环境是：</p>
+
+
+<ul>
+<li>vim 7.4  </li>
+<li>ruby 2.1.0  </li>
+</ul>
+
+
+<p>环境检查没有问题那么就开始吧。<br>
+在~/.vim/plugin目录下创建一个 demo.vim 文件。</p>
+
+
+<p>在开头写上以下代码：</p>
+
+
+<pre><code>if !has('ruby')
+    echo "Error: Required vim compiled with +ruby"
+    finish
+endif
+</code></pre>
+
+
+<p>这段代码就是用 VimL 编写的，它将检查 Vim 是否支持 Ruby。</p>
+
+
+<p>接下来再判断该插件是否已经加载过了，以免重复加载：</p>
+
+
+<pre><code>if exists('g:loaded_ruby_demo_plugin')
+    finish
+endif
+let g:loaded_ruby_demo_plugin = 1
+</code></pre>
+
+
+<p>所有的检查都没有问题，则开始插件的正文了。先定义一个函数。</p>
+
+
+<pre><code>function! DemoFun1()
+ruby&lt;&lt;EOF
+buf = VIM::Buffer.current
+puts "current buffer name: #{buf.name} number: #{buf.number} length: #{buf.length}"
+EOF
+endfunction
+</code></pre>
+
+
+<p>function与endfunction是vim中用于定义函数的，在”ruby&lt;&lt;EOF”和”EOF”之间部分的是Ruby代码。这个例子是输出当前缓冲区的名字、编号以及总行数。<br>
+执行命令:call DemoFun1()，应该就可以看到输出结果了。</p>
+
+
+<p>然后再举个例子说下函数的参数处理。</p>
+
+
+<pre><code>function! DemoFun2(arg1)
+ruby&lt;&lt; EOF
+puts "you input: #{VIM.evaluate('a:arg1')}"
+EOF
+endfunction
+</code></pre>
+
+
+<p>这里定义了一个函数接收一个参数，然后将其输出。使用 VIM.evaluate 将vim的变量转化为Ruby的变量。</p>
+
+
+<p>为了方便我们再定义两个命令，以简化对这两个函数的调用。</p>
+
+
+<pre><code>command! -nargs=0 DemoFun1 call DemoFun1()  
+command! -nargs=1 -rang DemoFun2 call DemoFun2(&lt;f-args&gt;)
+</code></pre>
+
+
+<p>要获取完整的代码可以访问： https://gist.github.com/wusuopu/c1182efefa85d4f6839b</p>
+
+
+<p>接下来再简单说下vim中Ruby的使用。</p>
+
+
+<p>vim为Ruby提供了一个VIM模块，通过它可以在Ruby中访问vim的接口。同时还提供了两个全局变量：$curwin、$curbuf，它们分别代表了当前窗口对象以及当前缓冲区对象。</p>
+
+
+<p>VIM模块中有 Buffer 和 Window 两个对象，分别是用来对缓冲区和窗口进行操作的。同时VIM模块还提供了message、set_option、command和evaluate四个函数。</p>
+
+
+<p>想要查看更多的帮忙信息，可以在vim中执行如下命令：</p>
+
+
+<pre><code>:help ruby
+</code></pre>
+
+
+<p>好了，先写这么多吧，其余的自己去尝试吧。</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Vim的symfony2开发环境配置]]></title>
+    <link href="http://www.xefan.com/archives/84114.html"/>
+    <updated>2014-06-26T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84114-vim的symfony2开发环境配置</id>
+    <content type="html"><![CDATA[<h2>安装</h2>
+
+
+<p>最近在用Symfony2框架进行开发，正所谓工欲善其事必先利其器。为了提高开发效率，因此将vim配置为symfony的IDE。</p>
+
+
+<p>我安装的是phpcomplete-extended-symfony这款插件 https://github.com/m2mdas/phpcomplete-extended-symfony</p>
+
+
+<p>它有些依赖在文档中没写清楚，我也是折腾了好久才搞定的，于是做个笔记记录一下。</p>
+
+
+<p>我总共安装了以下插件：</p>
+
+
+<ul>
+<li>neocomplete.vim  </li>
+<li>vimproc.vim  </li>
+<li>unite.vim  </li>
+<li>phpcomplete.vim  </li>
+<li>phpcomplete-extended  </li>
+<li>phpcomplete-extended-symfony  </li>
+<li>vim-twig  </li>
+</ul>
+
+
+<p>我是使用的Vundle进行vim插件管理，因此在 .vimrc 配置中添加以下内容：</p>
+
+
+<pre><code>Bundle 'Shougo/neocomplete.vim'
+Bundle 'Shougo/vimproc.vim'
+Bundle 'Shougo/unite.vim'
+Bundle 'shawncplus/phpcomplete.vim'
+Bundle 'm2mdas/phpcomplete-extended'
+Bundle 'm2mdas/phpcomplete-extended-symfony'
+Bundle 'evidens/vim-twig'
+</code></pre>
+
+
+<p>然后再执行BundleInstall命令进行下载安装。</p>
+
+
+<p>注意：vim-twig插件不是必需的，安装它只是为了编写twig模板时能够高亮。  </p>
+
+
+<h2>使用</h2>
+
+
+<p>接下来说说使用流程。</p>
+
+
+<p>1.vimproc需要编译<br>
+进行vimproc的安装目录，执行make命令进行编译。详细内容请阅读它的README文件。</p>
+
+
+<p>2.安装ctags工具<br>
+由于当前的ctags工具不支持PHP的新特性，如命名空间、traits、interface，于是就需要给ctags打补丁。  </p>
+
+
+<p>下载打过补丁的ctags源代码：  </p>
+
+
+<pre><code>$ wget "https://github.com/shawncplus/phpcomplete.vim/blob/master/misc/ctags-better-php-parser.tar.bz2?raw=true" -O ctags-better-php-parser.tar.bz2
+</code></pre>
+
+
+<p>编译安装：  </p>
+
+
+<pre><code>$ tar xvjf ctags-better-php-parser.tar.bz2  
+$ ./configure  
+$ make  
+$ sudo make install
+</code></pre>
+
+
+<p>3.安装 composer.phar  </p>
+
+
+<pre><code>$ curl -s https://getcomposer.org/installer | php
+</code></pre>
+
+
+<p>4.修改vim配置<br>
+在vim中添加如下配置：  </p>
+
+
+<pre><code>au FileType php setlocal omnifunc=phpcomplete_extended#CompletePHP  
+let g:phpcomplete_index_composer_command = 'composer.phar'
+</code></pre>
+
+
+<p>5.开始使用<br>
+进入Symfony项目的根目录，执行命令生成tags文件：</p>
+
+
+<pre><code>$ ctags -R --fields=+aimS --languages=php
+</code></pre>
+
+
+<p>然后使用vim打开该tags文件，根据提示创建索引文件。完成之后索引文件会创建在 .phpcomplete_extended 目录中。下次在项目的根目录下打开vim，如果提示 “Index Loaded.”则表示配置成功了。接下来编写代码时就会有补全提示以及use语句的自动补全了。</p>
+
+
+<p><strong>注意：</strong>在使用该插件时需要把自动切换目录功能给禁用掉，添加设置： set autochdir! 。否则会出现无法加载索引，从而补全不了。这个问题在文档中没说，我也是折腾了好久才发现的。</p>
+
+]]></content>
+  </entry>
+  
+</feed>

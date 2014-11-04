@@ -1,0 +1,281 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Pygame学习笔记10：鼠标 - 龍昌博客</title>
+  <meta name="author" content="龍昌">
+
+  
+  <meta name="description" content="鼠标 当显示模式设置后，事件队列就会开始收到鼠标事件。当按下和释放鼠标的按键时，会产生 pygame.MOUSEBUTTONDOWN和pygame.MOUSEBUTTONUP事件。这些事件包含一个button属性表示哪些键被按下。滚动鼠标滚轮会产生pygame.MOUSEBUTTONDOWN事件。 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.xefan.com/archives/83603.html">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="龍昌博客" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.useso.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.useso.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.useso.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">龍昌博客</a></h1>
+  
+    <h2>从Pythoner转向Rubist</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.xefan.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+ <li><a href="/about/">About</a></li>  <li><a href="/gbook/">留言板</a></li> 
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Pygame学习笔记10：鼠标</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2011-09-17T00:00:00+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><strong>鼠标</strong></p>
+
+<p>当显示模式设置后，事件队列就会开始收到鼠标事件。当按下和释放鼠标的按键时，会产生 pygame.MOUSEBUTTONDOWN和pygame.MOUSEBUTTONUP事件。这些事件包含一个button属性表示哪些键被按下。滚动鼠标滚轮会产生pygame.MOUSEBUTTONDOWN事件。当向上滚动滚轮时button的值是4，向下滚动时button的值是5。除此外还有一个pos属性，表示按键按下或释放时鼠标指针的位置。当移动鼠标时，会产生pygame.MOUSEMOTION事件。鼠标移动事件会被分解成一组较小的精确的移动事件。当鼠标移动时，会有很多事件被放在队列中。鼠标移动事件没有被正确的清除，常常是事件队列被填满的主要原因。鼠标移动事件包括一个buttons属性，表示鼠标移动时，鼠标键的状态。还有一个pos属性，表示鼠标指针的位置。还有一个rel属性表示当前位置相对于上一次事件发生时指针位置的偏移量。</p>
+
+<p>除了可以通过事件来接受鼠标输入外，还可以直接调用函数检查鼠标的状态。pygame.mouse.get_pressed可以获得当前所有鼠标按键的状态。pygame.mouse.get_pos获得当前鼠标的位置。pygame.mouse.get_rel获得当前鼠标位置相对于前一个位置的位移。</p>
+
+<p>用pygame.mouse.set_visible可以隐藏鼠标的指针。如果鼠标指针被隐藏，输入被当前的display捕获，鼠标会进入虚拟输入模式，这种模式下鼠标的相对位移不会收到屏幕边界的影响。</p>
+
+<p>通过pygame.mouse.set_cursor可以设置鼠标指针的形状。</p>
+
+<p><em>pygame.mouse.set_cursor(size, hotspot, xormasks, andmasks): return None</em></p>
+
+<p>当鼠标指针可见时，它会显示为给定的位域数组指定的黑白色的位图。size是包含指针高度和宽度的列表。hotspot是表示指针的热点位置的列表。xormasks是序列包含指针异或数据位域的序列，andmask是一组包含指针位域数据的序列。宽度必须是8的倍数，位域数组必须是size给定的正确的大小。</p>
+
+<p>pygame.cursors模块包括了几个内置的指针形状。可以这样使用</p>
+
+<p><em>pygame.mouse.set_cursor(*pygame.cursors.arrow)</em></p>
+
+<p>可以使用的指针形状有：</p>
+
+<p>pygame.cursors.arrow<br/>
+pygame.cursors.diamond<br/>
+pygame.cursors.broken_x<br/>
+pygame.cursors.tri_left<br/>
+pygame.cursors.tri_right</p>
+
+<p>偶自己写的一个扫雷小游戏，全鼠标操作的。下载地址：<a href="http://app.xefan.com/小游戏/扫雷/" target="_blank"><a href="http://app.xefan.com/%E5%B0%8F%E6%B8%B8%E6%88%8F/%E6%89%AB%E9%9B%B7/">http://app.xefan.com/%E5%B0%8F%E6%B8%B8%E6%88%8F/%E6%89%AB%E9%9B%B7/</a></a></p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">龍昌</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2011-09-17T00:00:00+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
+    </p>
+    <p class="meta">
+      Categories: 
+
+<span class="categories">
+  
+    <a class='category' href='/categories/python栏目/index.html'>python栏目</a>
+  
+</span>
+
+
+    </p>
+    <p class="meta">
+      Tags: 
+
+<span class="tags">
+  
+    <a class='tag' href='/tags/pygame/index.html'>pygame</a>, <a class='tag' href='/tags/python/index.html'>python</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/archives/83601.html" title="Previous Post: Pygame学习笔记9：键盘">&laquo; Pygame学习笔记9：键盘</a>
+      
+      
+        <a class="basic-alignment right" href="/archives/83605.html" title="Next Post: Pygame学习笔记11：手柄">Pygame学习笔记11：手柄 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Subscription</h1>
+  <!--以下是QQ邮件列表订阅嵌入代码--><script >var nId = "e7ee5da6d322dc7157c25cfd8a7700bb23a056dd1fb18cb4",nWidth="auto",sColor="light",sText="请输入邮件地址：" ;</script><script src="http://list.qq.com/zh_CN/htmledition/js/qf/page/qfcode.js" charset="gb18030"></script>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84132.html">配置elixir的vim环境</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84130.html">配置coffeescript的vim环境</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84127.html">VIM编译参数</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84124.html">Docker使用笔记</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84121.html">Nginx + Php + FastCGI配置</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (47)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (32)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (26)</a></li><li><a href='/categories/web开发/index.html'>web开发 (16)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (7)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (10)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (21)</a></li></ul>
+</section>
+<section>
+  <h1>Tag Cloud</h1>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.45454545454545%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.9090909090909%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.81818181818181%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.9090909090909%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.36363636363636%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.27272727272727%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.36363636363636%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.81818181818181%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.81818181818181%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 100.9090909090909%'>Django(1)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.9090909090909%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.81818181818181%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.72727272727273%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.9090909090909%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.9090909090909%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.45454545454545%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.81818181818181%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.63636363636364%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.45454545454545%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.9090909090909%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.45454545454545%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.9090909090909%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.9090909090909%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.9090909090909%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(66)</a> <a href='/tags/mongodb/index.html' style='font-size: 109.0909090909091%'>mongodb(10)</a> <a href='/tags/mysql/index.html' style='font-size: 103.63636363636364%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.9090909090909%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.9090909090909%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.18181818181819%'>php(9)</a> <a href='/tags/ps/index.html' style='font-size: 105.45454545454545%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.9090909090909%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 144.54545454545456%'>python(49)</a> <a href='/tags/qt/index.html' style='font-size: 101.81818181818181%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.9090909090909%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 123.63636363636364%'>Ruby(26)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.72727272727273%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.9090909090909%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.54545454545455%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.36363636363636%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.72727272727273%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 121.81818181818181%'>vim(24)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.72727272727273%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.9090909090909%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.9090909090909%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 112.72727272727272%'>Web开发(14)</a> <a href='/tags/windows/index.html' style='font-size: 106.36363636363636%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.9090909090909%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.9090909090909%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.9090909090909%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.9090909090909%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.45454545454545%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.81818181818181%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.9090909090909%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.18181818181819%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.18181818181819%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.9090909090909%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.9090909090909%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.9090909090909%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.81818181818181%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 109.0909090909091%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.18181818181819%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.9090909090909%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.54545454545455%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.9090909090909%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.9090909090909%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 104.54545454545455%'>网络日志(5)</a> <a href='/tags/翻译/index.html' style='font-size: 120.9090909090909%'>翻译(23)</a> <a href='/tags/视频教程/index.html' style='font-size: 109.0909090909091%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.9090909090909%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.81818181818181%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.9090909090909%'>随笔(1)</a> </span>
+</section>
+<section>
+  <h1>Link</h1>
+    <ul id="category-list">
+      <li><a target="_blank" title="我的Github" href="https://github.com/wusuopu">@Github</a></li>
+      <li><a target="_blank" title="我的微博" href="http://www.weibo.com/u/1768691343">@Weibo</a></li>
+      <li><a target="_blank" title="我的Twitter" href="https://twitter.com/longchangjin">@Twitter</a></li>
+      <li><a target="_blank" title="我的豆瓣" href="http://www.douban.com/people/lchj/">@Douban</a></li>
+
+      <li><a target="_blank" title="" href="http://www.vimer.cn/">Vimer的程序世界</a></li>
+      <li><a target="_blank" title="" href="http://pythoner.net/">python开发者社区</a></li>
+      <li><a target="_blank" title="" href="http://simple-is-better.com/">python.cn(news, jobs)</a></li>
+      <li><a target="_blank" title="" href="http://gtk.awaysoft.com/">GTK+ 中文社区</a></li>
+    </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - 龍昌 -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+<div style="display:none;"><script src="http://s94.cnzz.com/stat.php?id=1259846&web_id=1259846&show=pic" language="JavaScript"></script></div>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'longchang';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://www.xefan.com/archives/83603.html';
+        var disqus_url = 'http://www.xefan.com/archives/83603.html';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

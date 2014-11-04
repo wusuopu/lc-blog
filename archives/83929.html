@@ -1,0 +1,919 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>[翻译]Ruby教程9——控制流 - 龍昌博客</title>
+  <meta name="author" content="龍昌">
+
+  
+  <meta name="description" content="控制流 这章的教程我们将讨论控制流。 条件和循环改变了Ruby程序的流程。条件式是执行条件语句下面的特定语句。循环是执行多次的代码块。程序开始后，语句从源文件顶部到底部一行一行的执行。 if语句 if关键字用于检查一个表达式是否为真。如果为真则执行语句。这个语句可以是单一的语句，也可以是复合语句。 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.xefan.com/archives/83929.html">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="龍昌博客" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.useso.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.useso.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.useso.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">龍昌博客</a></h1>
+  
+    <h2>从Pythoner转向Rubist</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.xefan.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+ <li><a href="/about/">About</a></li>  <li><a href="/gbook/">留言板</a></li> 
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">[翻译]Ruby教程9——控制流</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-11-12T00:00:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>12</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h1>控制流</h1>
+
+
+<p>这章的教程我们将讨论控制流。</p>
+
+
+<p>条件和循环改变了Ruby程序的流程。条件式是执行条件语句下面的特定语句。循环是执行多次的代码块。程序开始后，语句从源文件顶部到底部一行一行的执行。</p>
+
+
+<h2>if语句</h2>
+
+
+<p>if关键字用于检查一个表达式是否为真。如果为真则执行语句。这个语句可以是单一的语句，也可以是复合语句。复合语句是由多条语句构成的闭合代码块。代码块用<em>end</em>关键字闭合，<em>then</em>关键字是可选的。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+num = gets.to_i
+
+if num &gt; 0 then
+
+    puts "num variable is positive"
+    puts "num variable equals to #{num}"
+end
+</code></pre>
+
+
+<p>输入一个数字，如果这个数字大于0则打印两条消息，否则什么也不做。</p>
+
+
+<p>$ ./simpleif.rb <br>
+4<br>
+num variable is positive<br>
+num variable equals to 4  </p>
+
+
+<p>条件为真并且消息在终端上打印了。</p>
+
+
+<hr>
+
+
+<p>我们可以使用<em>else</em>关键字不创建一个简单的分支。如果<em>if</em>关键字后的表达式求值为假，那么<em>else</em>后面的语句将自动执行。这些代码使用<em>end</em>关键字闭合起来。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+age = 17
+
+if age &gt; 18
+
+    puts "Driving licence issued"
+else
+
+    puts "Driving licence not permitted"
+end
+</code></pre>
+
+
+<p>这里创建了一个<em>age</em>变量，布尔表达式求值为假，因此在终端上打印&#8221;Driving licence not permitted&#8221;。</p>
+
+
+<p>$ ./licence.rb <br>
+Driving licence not permitted  </p>
+
+
+<p>我们可以使用<em>elsif</em>关键字创建多个分支。仅当前一个条件不为真时<em>elsif</em>关键字才会测试另一个条件。注意我们可以使用多个<em>elsif</em>关键字。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+print "Enter a number: "
+
+num = gets.to_i
+
+if num &lt; 0
+
+    puts "#{num} is negative"
+elsif num == 0
+
+   puts "#{num} is zero"
+elsif num &gt; 0
+
+   puts "#{num} is positive"
+end
+</code></pre>
+
+
+<p>创建一个数字变量判断它是正数、负数还是0。根据输入值的不同将打印不同的消息。</p>
+
+
+<h2>case语句</h2>
+
+
+<p><em>case</em>语句是一个程序控制流语句。它允许一个变量或者表达式的值控制程序的执行流程。相比<em>if</em>、<em>elsif</em>它创建多分支更简单。</p>
+
+
+<p>我们创建一个变量或者表达式。<em>case</em>关键字用于针对一个列表的值测试这个变量或者表达式的值。这个列表的值是使用<em>when</em>关键字呈现出来。如果值匹配，那么<em>when</em>关键字后面的语句将执行。有一个可选的<em>else</em>语句，如果没有匹配的它将执行。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+print "Enter top level domain: "
+
+domain = gets.chomp
+
+case domain
+    when "us"
+        puts "United States"
+    when "de" 
+        puts "Germany"
+    when "sk" 
+        puts "Slovakia"
+    when "hu" 
+        puts "Hungary"
+    else
+        puts "Unknown"
+end
+</code></pre>
+
+
+<p>这个程序中我们创建了一个<em>domain</em>变量，它的值从命令行读取。使用<em>when</em>语句测试这个变量的值。这有些选项。如果值等于&#8221;us&#8221;则打印&#8221;United States&#8221;字符串。</p>
+
+
+<pre><code>domain = gets.chomp
+</code></pre>
+
+
+<p>我们使用<em>gets</em>方法获取一个输入值。使用<em>chomp</em>方法去掉换行符。</p>
+
+
+<p>$ ./domains.rb <br>
+Enter top level domain: hu<br>
+Hungary  </p>
+
+
+<p>我们输入&#8221;hu&#8221;，程序返回&#8221;Hungary&#8221;。</p>
+
+
+<h2>while、until语句</h2>
+
+
+<p><em>while</em>语句是一个控制流语句允许代码多次执行。当的条件为真时代码将执行。</p>
+
+
+<p><em>while</em>关键字执行使用<em>end</em>闭合的代码块语句。每次表达式为真时这些语句将执行。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+i = 0
+sum = 0
+
+while i &lt; 10  do
+   i = i + 1
+   sum = sum + i
+end
+
+puts "The sum of 0..9 values is #{sum}"
+</code></pre>
+
+
+<p>这个例子计算了一个范围数的和。</p>
+
+
+<p>while循环有三部分：初始化、测试和更新。每次执行语句称为周期。</p>
+
+
+<pre><code>i = 0
+sum = 0
+</code></pre>
+
+
+<p>初始化变量<em>i</em>和<em>sum</em>。<em>i</em>用于计数。</p>
+
+
+<pre><code>while i &lt; 10  do
+   ...
+end
+</code></pre>
+
+
+<p><em>while</em>和<em>do</em>之间的表达式是第二阶段，测试。注意<em>do</em>关键字是可选的。，内部的语句将会执行直到表达式的值为假。</p>
+
+
+<pre><code>i = i + 1
+</code></pre>
+
+
+<p>这是循环的第三阶段——更新。我们增加计数值。注意不当的处理会导致死循环。</p>
+
+
+<p>$ ./while.rb <br>
+The sum of 0..9 values is 55  </p>
+
+
+<p>This is the output of the example. </p>
+
+
+<hr>
+
+
+<p>当条件为假时<em>until</em>控制流语句将执行。当条件为真时循环停止。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+hours_left = 12
+
+until hours_left == 0
+
+    if hours_left == 1
+        puts "There is #{hours_left} hour left"
+    else
+        puts "There are #{hours_left} hours left"
+    end
+
+    hours_left -= 1
+end
+</code></pre>
+
+
+<p>这个例子中创建了一个变量<em>hours_left</em>。我们开始计数，每次循环打印还有几个小时。当变量值等于0时循环停止。</p>
+
+
+<p>$ ./until.rb <br>
+There are 12 hours left<br>
+There are 11 hours left<br>
+There are 10 hours left<br>
+There are 9 hours left<br>
+There are 8 hours left<br>
+There are 7 hours left<br>
+There are 6 hours left<br>
+There are 5 hours left<br>
+There are 4 hours left<br>
+There are 3 hours left<br>
+There are 2 hours left<br>
+There is 1 hour left  </p>
+
+
+<p>程序运行的结果。</p>
+
+
+<h2>for语句</h2>
+
+
+<p>当循环次数是已知时，我们可以使用<em>for</em>语句。<em>for</em>循环使用<em>in</em>接着一个范围。对这个范围的每个元素都执行代码块的语句。这些语句使用<em>end</em>关键字闭合。<em>do</em>关键字是可选的。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+for i in 0..9 do
+
+    puts "#{i}"
+end
+</code></pre>
+
+
+<p>这个例子中我们打印了0到9的数。每次循环<em>i</em>变量保存了这个范围的一个数，这个数将在终端上打印。</p>
+
+
+<p>$ ./forloop.rb <br>
+0<br>
+1<br>
+2<br>
+3<br>
+4<br>
+5<br>
+6<br>
+7<br>
+8<br>
+9  </p>
+
+
+<p>例子运行结果。</p>
+
+
+<hr>
+
+
+<p>要遍历一个数组的元素可以使用数组的<em>length</em>方法。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+planets = ["Mercury", "Venus", "Earth", "Mars", "Jupiter",
+    "Saturn", "Uranus", "Neptune"]
+
+for i in 0...planets.length
+
+    puts planets[i]
+end
+</code></pre>
+
+
+<p>这个例子中我们创建了一个数组<em>planets</em>，我们遍历这个数组打印这个数组的每个元素。</p>
+
+
+<pre><code>planets = ["Mercury", "Venus", "Earth", "Mars", "Jupiter",
+    "Saturn", "Uranus", "Neptune"]
+</code></pre>
+
+
+<p><em>planets</em>数组。</p>
+
+
+<pre><code>for i in 0...planets.length
+</code></pre>
+
+
+<p><em>length</em>方法返回数组的长度。数组从0开始，最后一个索引是n-1。</p>
+
+
+<pre><code>puts planets[i]
+</code></pre>
+
+
+<p>打印数组指定的一个元素。</p>
+
+
+<p>$ ./planets2.rb <br>
+Mercury<br>
+Venus<br>
+Earth<br>
+Mars<br>
+Jupiter<br>
+Saturn<br>
+Uranus<br>
+Neptune  </p>
+
+
+<p>程序的运行结果。</p>
+
+
+<h2>each方法</h2>
+
+
+<p>在Ruby中我们可以使用<em>each</em>方法遍历数组的每个元素。它接受两个参数。一个元素和一个代码块。元素放在管道之间，它保存了当前循环的数据项。代码块是每次要执行的内容。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+planets = ["Mercury", "Venus", "Earth", "Mars", "Jupiter",
+    "Saturn", "Uranus", "Neptune"]
+
+planets.each do |planet|
+
+    puts planet
+end
+</code></pre>
+
+
+<p>这个例子我们使用<em>each</em>迭代器遍历<em>planets</em>数组。</p>
+
+
+<pre><code>planets.each do |planet|
+
+    puts planet
+end
+</code></pre>
+
+
+<p><em>each</em>迭代器是<em>planets</em>数组的一个方法。<em>planet</em>保存了此次迭代的数据项。我们可以使用任何我们想使用的字符。我们可以使用{}代替<em>do</em>和<em>end</em>关键字。</p>
+
+
+<h2>break、next语句</h2>
+
+
+<p><em>break</em>语句用于终止<em>while</em>、<em>for</em>或者<em>case</em>的代码块语句。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+while true
+
+    r = 1 + rand(30)
+    print "#{r} "
+
+    if r == 22
+        break
+    end
+end
+
+puts
+</code></pre>
+
+
+<p>我们定义了一个无限循环，使用<em>break</em>语句退出这个循环。我们选择1到30的数，打印它。如果等于22则结束<em>while</em>循环。</p>
+
+
+<pre><code>while true
+   ...
+end
+</code></pre>
+
+
+<p>这是一个无限循环，<em>while</em>的条件总是为真。退出无限循环的唯一方法是使用<em>break</em>。</p>
+
+
+<pre><code>r = 1 + rand(30)
+print "#{r} "
+</code></pre>
+
+
+<p>计算从1到30的随机数，并将其打印。</p>
+
+
+<pre><code>if r == 22
+    break
+end
+</code></pre>
+
+
+<p>如果数等于22,结束循环。</p>
+
+
+<p>$ ./break.rb <br>
+20 14 6 26 30 12 2 10 18 29 28 11 30 26 20 22   </p>
+
+
+<p>可能的输出结果。</p>
+
+
+<hr>
+
+
+<p><em>next</em>语句用于跳过此次循环，继续下次循环。它可与<em>for</em>和<em>while</em>联合使用。</p>
+
+
+<p>接下来的例子我们打印不能被2整除的数一列表。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+num = 0
+
+while num &lt; 100
+
+    num += 1
+
+    if (num % 2 == 0)
+        next
+    end
+
+    print "#{num} " 
+end
+
+puts
+</code></pre>
+
+
+<p>我们使用<em>while</em>循环迭代1到99的数。</p>
+
+
+<pre><code>if (num % 2 == 0)
+    next
+end
+</code></pre>
+
+
+<p>如果这个数可以被2整除，<em>next</em>语句将执行，循环的其余将跳过。</p>
+
+
+<p>$ ./next.rb <br>
+1 3 5 7 9 11 13 15 17 19 21 23 25 27 29 31 33 35 37 39 <br>
+41 43 45 47 49 51 53 55 57 59 61 63 65 67 69 71 73 75 77 <br>
+79 81 83 85 87 89 91 93 95 97 99   </p>
+
+
+<p>程序的输出结果。</p>
+
+
+<h2>redo语句</h2>
+
+
+<p><em>redo</em>语句重新开始循环而不检查循环的条件式。下面的例子有点复杂，它展示了<em>redo</em>语句和其它的一些特性。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+options = ["rock", "scissors", "paper"]
+
+while true
+
+    print &lt;&lt;TEXT
+1 - rock
+2 - scissors
+3 - paper
+9 - end game
+TEXT
+
+    val = gets.to_i
+
+    r = rand(3) + 1
+
+    if val == 9 
+        puts "End"
+        exit
+    end
+
+    if ![1, 2, 3, 9].include?(val)
+        puts "Invalid option"
+        redo
+    end
+
+    computer = options[r-1]
+    human = options[val-1]
+
+    puts "I have #{computer}, you have #{human}"
+
+    if val == r
+        puts "Tie, next throw"
+        redo
+    end
+
+
+    if val == 1 and r == 2
+        puts "Rock blunts scissors, you win"
+
+    elsif val == 2 and r == 1
+        puts "Rock blunts scissors, you loose"
+
+    elsif val == 2 and r == 3
+        puts "Scissors cut paper, you win"
+
+    elsif val == 3 and r == 2
+        puts "Scissors cut paper, you loose"
+
+    elsif val == 3 and r == 1
+        puts "Paper covers rock, you win"
+
+    elsif val == 1 and r == 3
+        puts "Paper covers rock, you loose"
+
+    end    
+end
+</code></pre>
+
+
+<p>这是一个简单的Rock-paper-scissors游戏。这个例子中我们用到了<em>redo</em>语句、条件式、随机数、数组和输入。</p>
+
+
+<pre><code>options = ["rock", "scissors", "paper"]
+</code></pre>
+
+
+<p>定义了游戏可能用到的选项数组。这三个词在打印消息时会用到。</p>
+
+
+<pre><code>    print &lt;&lt;TEXT
+1 - rock
+2 - scissors
+3 - paper
+9 - end game
+TEXT
+</code></pre>
+
+
+<p>使用定界符在终端上打印一个菜单。菜单在每次游戏循环时都打印。</p>
+
+
+<pre><code>val = gets.to_i
+
+r = rand(3) + 1
+</code></pre>
+
+
+<p>这几行代码从终端输入一个值，然后选择一个1、2、3的随机数。</p>
+
+
+<pre><code>if val == 9 
+    puts "End"
+    exit
+end
+</code></pre>
+
+
+<p>如果输入为9，打印&#8217;End&#8217;并退出程序。</p>
+
+
+<pre><code>if ![1, 2, 3, 9].include?(val)
+    puts "Invalid option"
+    redo
+end
+</code></pre>
+
+
+<p>如果用户选择了一个不是菜单的值，我们提示无效选项并重新循环。</p>
+
+
+<pre><code>computer = options[r-1]
+human = options[val-1]
+
+puts "I have #{computer}, you have #{human}"
+</code></pre>
+
+
+<p>将数字转化为字符串，并同时打印用户的选择和计算机的选择。</p>
+
+
+<pre><code>if val == r
+    puts "Tie, next throw"
+    redo
+end
+</code></pre>
+
+
+<p>如果选择相同则是平局，开始新的游戏循环。</p>
+
+
+<pre><code>if val == 1 and r == 2
+    puts "Rock blunts scissors, you win"
+
+elsif val == 2 and r == 1
+    puts "Rock blunts scissors, you loose"
+...
+</code></pre>
+
+
+<p>使用多个<em>if</em>、<em>elsif</em>分支，比较用户和计算机的选择以决定谁是赢家。</p>
+
+
+<p>$ ./redo.rb <br>
+1 - rock<br>
+2 - scissors<br>
+3 - paper<br>
+9 - end game<br>
+3<br>
+I have paper, you have paper<br>
+Tie, next throw<br>
+1 - rock<br>
+2 - scissors<br>
+3 - paper<br>
+9 - end game<br>
+2<br>
+I have rock, you have scissors<br>
+Rock blunts scissors, you loose<br>
+1 - rock<br>
+2 - scissors<br>
+3 - paper<br>
+9 - end game<br>
+1<br>
+I have scissors, you have rock<br>
+Rock blunts scissors, you win<br>
+1 - rock<br>
+2 - scissors<br>
+3 - paper<br>
+9 - end game<br>
+9<br>
+End  </p>
+
+
+<p>程序输出结果。</p>
+
+
+<p>这部分的Ruby教程我们谈论了结构控制流。</p>
+
+
+<hr>
+
+
+<p>原文地址： <a href="http://zetcode.com/lang/rubytutorial/flowcontrol/">http://zetcode.com/lang/rubytutorial/flowcontrol/</a><br>
+翻译：龙昌  admin@longchangjin.cn<br>
+完整教程：<a href="https://github.com/wusuopu/Ruby-tutorial">https://github.com/wusuopu/Ruby-tutorial</a> </p>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">龍昌</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2013-11-12T00:00:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>12</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+    </p>
+    <p class="meta">
+      Categories: 
+
+<span class="categories">
+  
+    <a class='category' href='/categories/ruby栏目/index.html'>ruby栏目</a>
+  
+</span>
+
+
+    </p>
+    <p class="meta">
+      Tags: 
+
+<span class="tags">
+  
+    <a class='tag' href='/tags/Ruby/index.html'>Ruby</a>, <a class='tag' href='/tags/翻译/index.html'>翻译</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/archives/83926.html" title="Previous Post: [翻译]Ruby教程8——表达式">&laquo; [翻译]Ruby教程8——表达式</a>
+      
+      
+        <a class="basic-alignment right" href="/archives/83932.html" title="Next Post: [翻译]Ruby教程10——数组">[翻译]Ruby教程10——数组 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Subscription</h1>
+  <!--以下是QQ邮件列表订阅嵌入代码--><script >var nId = "e7ee5da6d322dc7157c25cfd8a7700bb23a056dd1fb18cb4",nWidth="auto",sColor="light",sText="请输入邮件地址：" ;</script><script src="http://list.qq.com/zh_CN/htmledition/js/qf/page/qfcode.js" charset="gb18030"></script>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84132.html">配置elixir的vim环境</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84130.html">配置coffeescript的vim环境</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84127.html">VIM编译参数</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84124.html">Docker使用笔记</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84121.html">Nginx + Php + FastCGI配置</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (47)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (32)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (26)</a></li><li><a href='/categories/web开发/index.html'>web开发 (16)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (7)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (10)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (21)</a></li></ul>
+</section>
+<section>
+  <h1>Tag Cloud</h1>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.45454545454545%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.9090909090909%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.81818181818181%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.9090909090909%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.36363636363636%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.27272727272727%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.36363636363636%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.81818181818181%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.81818181818181%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 100.9090909090909%'>Django(1)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.9090909090909%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.81818181818181%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.72727272727273%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.9090909090909%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.9090909090909%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.45454545454545%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.81818181818181%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.63636363636364%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.45454545454545%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.9090909090909%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.45454545454545%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.9090909090909%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.9090909090909%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.9090909090909%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(66)</a> <a href='/tags/mongodb/index.html' style='font-size: 109.0909090909091%'>mongodb(10)</a> <a href='/tags/mysql/index.html' style='font-size: 103.63636363636364%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.9090909090909%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.9090909090909%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.18181818181819%'>php(9)</a> <a href='/tags/ps/index.html' style='font-size: 105.45454545454545%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.9090909090909%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 144.54545454545456%'>python(49)</a> <a href='/tags/qt/index.html' style='font-size: 101.81818181818181%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.9090909090909%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 123.63636363636364%'>Ruby(26)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.72727272727273%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.9090909090909%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.54545454545455%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.36363636363636%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.72727272727273%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 121.81818181818181%'>vim(24)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.72727272727273%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.9090909090909%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.9090909090909%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 112.72727272727272%'>Web开发(14)</a> <a href='/tags/windows/index.html' style='font-size: 106.36363636363636%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.9090909090909%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.9090909090909%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.9090909090909%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.9090909090909%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.45454545454545%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.81818181818181%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.9090909090909%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.18181818181819%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.18181818181819%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.9090909090909%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.9090909090909%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.9090909090909%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.81818181818181%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 109.0909090909091%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.18181818181819%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.9090909090909%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.54545454545455%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.9090909090909%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.9090909090909%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 104.54545454545455%'>网络日志(5)</a> <a href='/tags/翻译/index.html' style='font-size: 120.9090909090909%'>翻译(23)</a> <a href='/tags/视频教程/index.html' style='font-size: 109.0909090909091%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.9090909090909%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.81818181818181%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.9090909090909%'>随笔(1)</a> </span>
+</section>
+<section>
+  <h1>Link</h1>
+    <ul id="category-list">
+      <li><a target="_blank" title="我的Github" href="https://github.com/wusuopu">@Github</a></li>
+      <li><a target="_blank" title="我的微博" href="http://www.weibo.com/u/1768691343">@Weibo</a></li>
+      <li><a target="_blank" title="我的Twitter" href="https://twitter.com/longchangjin">@Twitter</a></li>
+      <li><a target="_blank" title="我的豆瓣" href="http://www.douban.com/people/lchj/">@Douban</a></li>
+
+      <li><a target="_blank" title="" href="http://www.vimer.cn/">Vimer的程序世界</a></li>
+      <li><a target="_blank" title="" href="http://pythoner.net/">python开发者社区</a></li>
+      <li><a target="_blank" title="" href="http://simple-is-better.com/">python.cn(news, jobs)</a></li>
+      <li><a target="_blank" title="" href="http://gtk.awaysoft.com/">GTK+ 中文社区</a></li>
+    </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - 龍昌 -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+<div style="display:none;"><script src="http://s94.cnzz.com/stat.php?id=1259846&web_id=1259846&show=pic" language="JavaScript"></script></div>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'longchang';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://www.xefan.com/archives/83929.html';
+        var disqus_url = 'http://www.xefan.com/archives/83929.html';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

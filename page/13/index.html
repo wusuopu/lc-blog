@@ -1,0 +1,1776 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>龍昌博客</title>
+  <meta name="author" content="龍昌">
+
+  
+  <meta name="description" content="头文件： #include &lt;sys/ipc.h&gt; #include &lt;sys/msg.h&gt; #include &lt;sys/types.h&gt; 函数： key_t ftok(const char *filename, int proj_id); &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.xefan.com/page/13/index.html">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="龍昌博客" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.useso.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.useso.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.useso.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">龍昌博客</a></h1>
+  
+    <h2>从Pythoner转向Rubist</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.xefan.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+ <li><a href="/about/">About</a></li>  <li><a href="/gbook/">留言板</a></li> 
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83703.html">Linux进程通信——使用消息队列</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2012-02-24T00:00:00+08:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>24</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83703.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83703.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>头文件：<br/>
+  #include &lt;sys/ipc.h&gt;<br/>
+  #include &lt;sys/msg.h&gt;<br/>
+  #include &lt;sys/types.h&gt;</p>
+
+<p>函数： key_t ftok(const char *filename, int proj_id);<br/>
+通过文件名和项目号获得System V IPC键值（用于创建消息队列、共享内存所用）<br/>
+proj_id：项目号，不为0即可<br/>
+返回：成功则返回键值，失败则返回-1</p>
+
+<p>函数： int msgget(key_t key, int msgflg)；<br/>
+key：键值，当为IPC_PRIVATE时新建一块共享内存；<br/>
+shmflg：标志。<br/>
+IPC_CREAT：内存不存在则新建，否则打开；<br/>
+IPC_EXCL：只有在内存不存在时才创建，否则出错。<br/>
+返回：成功则返回标识符，出错返回-1</p>
+
+<p>函数： int msgsnd(int msgid, const void *msgp, size_t sz, int flg)；<br/>
+向消息队列发送消息<br/>
+msgid：通过msgget获取<br/>
+msgp：指向消息内容的指针<br/>
+sz：消息内容的大小<br/>
+flg：处理方式；如为IPC_NOWAIT时表示空间不足时不会阻塞<br/>
+返回：成功则返回0，失败返回-1</p>
+
+<p>函数： int msgrcv(int msgid, void *msgp, size_t sz, long type, int flg)；<br/>
+从消息队列读取消息<br/>
+msgid：通过msgget获取<br/>
+msgp：指向消息内容的指针<br/>
+sz：消息内容的大小<br/>
+type：指定接收的消息类型；若为0则队列第一条消息将被读取，而不管类型；若大于0则队列中同类型的消息将被读取，如在flg中设了MSG_RXCEPT位将读取指定类型的其他消息；若小于0读取绝对值小于type的消息。<br/>
+flg：处理方式；<br/>
+返回：成功返回收到消息长度，错误返回-1</p>
+
+<p>函数： int msgctl(int msgid, int cmd, struct msgid_ds *buf)；<br/>
+msgid：通过msgget获取<br/>
+cmd：控制命令，如下：<br/>
+IPC_STAT：获取消息队列状态<br/>
+IPC_SET：改变消息队列状态<br/>
+IPC_RMID：删除消息队列<br/>
+buf：结构体指针，用于存放消息队列状态<br/>
+返回：成功返回与cmd相关的正数，错误返回-1</p>
+
+<p><span style="color: #ff0000;">注意：消息队列一旦创建就会一直存在系统中，直到手动删除或者重启系统。可以使用ipcs -q命令来查看系统存在的消息队列。</span></p>
+
+<p>例子：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="cm">/****************************************</span>
+</span><span class='line'><span class="cm"> *</span>
+</span><span class='line'><span class="cm"> * 使用消息队列进行进程通信——写进程</span>
+</span><span class='line'><span class="cm"> * 该进程用于创建信号量</span>
+</span><span class='line'><span class="cm"> * 龙昌博客：http://www.xefan.com</span>
+</span><span class='line'><span class="cm"> *</span>
+</span><span class='line'><span class="cm"> ****************************************/</span>
+</span><span class='line'><span class="cp">#include &lt;sys/types.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;sys/ipc.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;sys/msg.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;stdio.h&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">typedef</span> <span class="k">struct</span> <span class="n">_msg_buf</span><span class="p">{</span>
+</span><span class='line'>    <span class="kt">long</span> <span class="n">type</span><span class="p">;</span>          <span class="c1">//消息类型</span>
+</span><span class='line'>    <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="mi">100</span><span class="p">];</span>      <span class="c1">//消息内容</span>
+</span><span class='line'><span class="p">}</span> <span class="n">msg_buf</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">key</span><span class="p">,</span> <span class="n">qid</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">msg_buf</span> <span class="n">buf</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">key</span> <span class="o">=</span> <span class="n">ftok</span><span class="p">(</span><span class="s">&quot;tmp&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">qid</span> <span class="o">=</span> <span class="n">msgget</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">IPC_CREAT</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;key: %d</span><span class="se">\n</span><span class="s">qid: %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">qid</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">buf</span><span class="p">.</span><span class="n">type</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="n">fgets</span><span class="p">(</span><span class="n">buf</span><span class="p">.</span><span class="n">buf</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">stdin</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">msgsnd</span><span class="p">(</span><span class="n">qid</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">buf</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="n">perror</span><span class="p">(</span><span class="s">&quot;msgsnd&quot;</span><span class="p">);</span>
+</span><span class='line'>            <span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="cm">/****************************************</span>
+</span><span class='line'><span class="cm"> *</span>
+</span><span class='line'><span class="cm"> * 使用消息队列进行进程通信——读进程</span>
+</span><span class='line'><span class="cm"> * 该进程用于创建信号量</span>
+</span><span class='line'><span class="cm"> * 龙昌博客：http://www.xefan.com</span>
+</span><span class='line'><span class="cm"> *</span>
+</span><span class='line'><span class="cm"> ****************************************/</span>
+</span><span class='line'><span class="cp">#include &lt;sys/types.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;sys/ipc.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;sys/msg.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;stdio.h&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">typedef</span> <span class="k">struct</span> <span class="n">_msg_buf</span><span class="p">{</span>
+</span><span class='line'>    <span class="kt">long</span> <span class="n">type</span><span class="p">;</span>          <span class="c1">//消息类型</span>
+</span><span class='line'>    <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="mi">100</span><span class="p">];</span>      <span class="c1">//消息内容</span>
+</span><span class='line'><span class="p">}</span> <span class="n">msg_buf</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">key</span><span class="p">,</span> <span class="n">qid</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">msg_buf</span> <span class="n">buf</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">key</span> <span class="o">=</span> <span class="n">ftok</span><span class="p">(</span><span class="s">&quot;tmp&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">qid</span> <span class="o">=</span> <span class="n">msgget</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">IPC_CREAT</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;key: %d</span><span class="se">\n</span><span class="s">qid: %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">qid</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">msgrcv</span><span class="p">(</span><span class="n">qid</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">buf</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="n">perror</span><span class="p">(</span><span class="s">&quot;msgrcv&quot;</span><span class="p">);</span>
+</span><span class='line'>            <span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="n">printf</span><span class="p">(</span><span class="s">&quot;type:%d</span><span class="se">\n</span><span class="s">get:%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">buf</span><span class="p">.</span><span class="n">type</span><span class="p">,</span> <span class="n">buf</span><span class="p">.</span><span class="n">buf</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>先运行写进程再运行读进程。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83700.html">Linux进程通信——使用信号量</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2012-02-23T00:00:00+08:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>23</span><span class='date-suffix'>rd</span>, <span class='date-year'>2012</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83700.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83700.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>头文件：<br/>
+  #include &lt;sys/ipc.h&gt;<br/>
+  #include &lt;sys/sem.h&gt;<br/>
+  #include &lt;sys/types.h&gt;</p>
+
+<p>函数： key_t ftok(const char *filename, int proj_id);<br/>
+通过文件名和项目号获得System V IPC键值（用于创建消息队列、共享内存所用）<br/>
+proj_id：项目号，不为0即可<br/>
+返回：成功则返回键值，失败则返回-1</p>
+
+<p>函数： int semget(key_t key, int nsems, int msgflg)；<br/>
+key：键值，当为IPC_PRIVATE时新建。<br/>
+nsems：信号个数。<br/>
+msgflg：标志。<br/>
+IPC_CREAT：不存在则新建，否则打开；<br/>
+IPC_EXCL：与IPC_CREAT一同使用时，只有在不存在时才创建，否则出错。<br/>
+返回：成功则返回IPC标识符，出错返回-1</p>
+
+<p>函数： int semop(int semid, struct sembuf *sops, unsigned nsops)；<br/>
+semid：通过semget获取<br/>
+sops：指向待操作的信号灯结构体，原型如下：<br/>
+struct sembuf{<br/>
+unsigned short sem_num; //信号灯编号，从0开始<br/>
+short sem_op; //为正数代表释放信号；为负代表获取信号<br/>
+Short sem_flg; //操作的标识；IPC_NOWAIT：不阻塞；IPC_UNDO：程序结束时释放信号量<br/>
+}<br/>
+nsops：要操作的信号量数<br/>
+返回：成功则返回共享内存起始地址，失败返回-1</p>
+
+<p>函数： void semctl(int semid, int semnum, int cmd, union semun arg)；<br/>
+semid：通过semget获取<br/>
+semnum：操作的信号灯编号<br/>
+cmd：控制命令，如下：<br/>
+GETPID：获取sempid<br/>
+GETVAL：获取semval<br/>
+SETVAL：设置semval<br/>
+IPC_RMID：删除信号灯<br/>
+arg：各个量使用与cmd设置有关<br/>
+返回：成功返回与cmd相关的正数，错误返回-1</p>
+
+<p><span style="color: #ff0000;">注意：信号量一旦创建就会一直存在系统中，直到手动删除或者重启系统。可以使用ipcs -s命令来查看系统存在的信号量。</span></p>
+
+<p>例子：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="cm">/****************************************</span>
+</span><span class='line'><span class="cm"> *</span>
+</span><span class='line'><span class="cm"> * 使用信号量进行进程通信——进程1</span>
+</span><span class='line'><span class="cm"> * 该进程用于创建信号量</span>
+</span><span class='line'><span class="cm"> * 龙昌博客：http://www.xefan.com</span>
+</span><span class='line'><span class="cm"> *</span>
+</span><span class='line'><span class="cm"> ****************************************/</span>
+</span><span class='line'><span class="cp">#include &lt;sys/types.h&gt;</span>
+</span><span class='line'><span class="c1">//书上说是用sys/ipc.h和sys/sem.h这两个头文件，但是我用了出错，</span>
+</span><span class='line'><span class="c1">//而用linux/ipc.h和linux/sem.h却没问题</span>
+</span><span class='line'><span class="c1">//#include &lt;sys/ipc.h&gt;</span>
+</span><span class='line'><span class="c1">//#include &lt;sys/sem.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;linux/sem.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;linux/ipc.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;errno.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;math.h&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">key</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">pid</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">union</span> <span class="n">semun</span> <span class="n">val</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">val</span><span class="p">.</span><span class="n">val</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">key</span> <span class="o">=</span> <span class="n">ftok</span><span class="p">(</span><span class="s">&quot;tmp&quot;</span><span class="p">,</span><span class="mi">10</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">((</span><span class="n">sid</span> <span class="o">=</span> <span class="n">semget</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">IPC_CREAT</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="n">perror</span><span class="p">(</span><span class="s">&quot;semget&quot;</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;key: %d  sid:%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">sid</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">if</span> <span class="p">((</span><span class="n">semctl</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">SETVAL</span><span class="p">,</span> <span class="n">val</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="n">perror</span><span class="p">(</span><span class="s">&quot;semctl&quot;</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">((</span><span class="n">semctl</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">GETVAL</span><span class="p">,</span> <span class="n">val</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="n">perror</span><span class="p">(</span><span class="s">&quot;semctl&quot;</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;sem_val:%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">val</span><span class="p">.</span><span class="n">val</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">struct</span> <span class="n">sembuf</span> <span class="n">p_op</span><span class="p">,</span> <span class="n">v_op</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">p_op</span><span class="p">.</span><span class="n">sem_num</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">p_op</span><span class="p">.</span><span class="n">sem_op</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>    <span class="c1">//获取信号</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">semop</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">p_op</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="c1">//p op</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="n">perror</span><span class="p">(</span><span class="s">&quot;smeop&quot;</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;father get the semaphore</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">sleep</span><span class="p">(</span><span class="mi">8</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;father release the senaphore</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">v_op</span><span class="p">.</span><span class="n">sem_num</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">v_op</span><span class="p">.</span><span class="n">sem_op</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">v_op</span><span class="p">.</span><span class="n">sem_flg</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="c1">//释放信号</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">semop</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">v_op</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="c1">//v op</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="n">perror</span><span class="p">(</span><span class="s">&quot;semop&quot;</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="cm">/****************************************</span>
+</span><span class='line'><span class="cm"> *</span>
+</span><span class='line'><span class="cm"> * 使用信号量进行进程通信——进程2</span>
+</span><span class='line'><span class="cm"> * 该进程用于获取信号量</span>
+</span><span class='line'><span class="cm"> * 龙昌博客：http://www.xefan.com</span>
+</span><span class='line'><span class="cm"> *</span>
+</span><span class='line'><span class="cm"> ****************************************/</span>
+</span><span class='line'><span class="cp">#include &lt;sys/types.h&gt;</span>
+</span><span class='line'><span class="c1">//书上说是用sys/ipc.h和sys/sem.h这两个头文件，但是我用了出错，</span>
+</span><span class='line'><span class="c1">//而用linux/ipc.h和linux/sem.h却没问题</span>
+</span><span class='line'><span class="c1">//#include &lt;sys/ipc.h&gt;</span>
+</span><span class='line'><span class="c1">//#include &lt;sys/sem.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;linux/sem.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;linux/ipc.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;errno.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;math.h&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">key</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">pid</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">key</span> <span class="o">=</span> <span class="n">ftok</span><span class="p">(</span><span class="s">&quot;tmp&quot;</span><span class="p">,</span><span class="mi">10</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">((</span><span class="n">sid</span> <span class="o">=</span> <span class="n">semget</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">IPC_CREAT</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="n">perror</span><span class="p">(</span><span class="s">&quot;semget&quot;</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;key: %d  sid:%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">sid</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">struct</span> <span class="n">sembuf</span> <span class="n">p_op</span><span class="p">,</span> <span class="n">v_op</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">p_op</span><span class="p">.</span><span class="n">sem_num</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">p_op</span><span class="p">.</span><span class="n">sem_op</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>    <span class="c1">//p_op.sem_flg = 0;</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">semop</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">p_op</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="c1">//p op</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="n">perror</span><span class="p">(</span><span class="s">&quot;smeop&quot;</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;father get the semaphore</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">sleep</span><span class="p">(</span><span class="mi">8</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;father release the senaphore</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">v_op</span><span class="p">.</span><span class="n">sem_num</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">v_op</span><span class="p">.</span><span class="n">sem_op</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">v_op</span><span class="p">.</span><span class="n">sem_flg</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">semop</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">v_op</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="c1">//v op</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="n">perror</span><span class="p">(</span><span class="s">&quot;semop&quot;</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>先运行进程1，再运行进程2查看效果</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83695.html">Linux进程通信——使用共享内存</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2012-02-22T00:00:00+08:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2012</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83695.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83695.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>头文件： <br/>
+  #include &lt;sys/ipc.h&gt;<br/>
+  #include &lt;sys/shm.h&gt;</p>
+
+<p>函数：shmget 分配共享内存<br/>
+函数原型： int shmget(key_t key, size_t size, int shmflg)；<br/>
+key：键值，当为IPC_PRIVATE时新建一块共享内存；若为0时而shmflg中设了IPC_PRIVATE也将新建。<br/>
+size：内存大小。<br/>
+shmflg：标志。<br/>
+IPC_CREAT：内存不存在则新建，否则打开；<br/>
+IPC_EXCL：只有在内存不存在时才创建，否则出错。<br/>
+返回：成功则返回标识符，出错返回-1</p>
+
+<p>函数： void <em>shmat(int shmid, char </em>shmaddr, int shmflg)；<br/>
+shmid：通过shmget获取<br/>
+shmaddr：映射到进程地址空间的起始地址，设为NULL将自动分配<br/>
+shmflg：标志；SHM-RDONLY为只读，否则可读可写<br/>
+返回：成功则返回内存起始地址，失败返回-1</p>
+
+<p>函数： int shmdt(const void *shmaddr)；<br/>
+使共享内存区脱离映射的进程的地址空间<br/>
+返回：成功返回0，错误返回-1</p>
+
+<p>函数： void shmctl(int shmid, int cmd, struct shmid_ds *buf)；<br/>
+shmid：通过shmget获取<br/>
+cmd：控制命令，如下：<br/>
+IPC_STAT：获取内存状态<br/>
+IPC_SET：改变内存状态<br/>
+IPC_RMID：删除内存<br/>
+buf：结构体指针，用于存放共享内存状态<br/>
+返回：成功返回0，错误返回-1</p>
+
+<p><span style="color: #ff0000;">注意：共享内存一旦创建就会一直存在系统中，直到手动删除或者重启系统。</span>
+例子：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="cm">/**************************************</span>
+</span><span class='line'><span class="cm"> *</span>
+</span><span class='line'><span class="cm"> * 使用共享内存进行进程通信</span>
+</span><span class='line'><span class="cm"> * 龙昌博客：http://www.xefan.com</span>
+</span><span class='line'><span class="cm"> *</span>
+</span><span class='line'><span class="cm">**************************************/</span>
+</span><span class='line'><span class="cp">#include &lt;sys/ipc.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;sys/shm.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;sys/stat.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;errno.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;string.h&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">argc</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Usage:%s str</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+</span><span class='line'>        <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">shmid</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">char</span> <span class="o">*</span><span class="n">p_addr</span><span class="p">,</span> <span class="o">*</span><span class="n">c_addr</span><span class="p">;</span>
+</span><span class='line'>    <span class="c1">//创建共享内存</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">((</span><span class="n">shmid</span><span class="o">=</span><span class="n">shmget</span><span class="p">(</span><span class="n">IPC_PRIVATE</span><span class="p">,</span> <span class="mi">1024</span><span class="p">,</span> <span class="n">IPC_CREAT</span><span class="p">))</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="n">perror</span><span class="p">(</span><span class="s">&quot;shmget&quot;</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">exit</span><span class="p">(</span><span class="n">errno</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">fork</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>   <span class="c1">//父进程向内存写入数据</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="c1">//获取内存起始地址</span>
+</span><span class='line'>  <span class="n">p_addr</span> <span class="o">=</span> <span class="n">shmat</span><span class="p">(</span><span class="n">shmid</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">memset</span><span class="p">(</span><span class="n">p_addr</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1024</span><span class="p">);</span>
+</span><span class='line'>  <span class="c1">//向内存中写入数据</span>
+</span><span class='line'>        <span class="n">strncpy</span><span class="p">(</span><span class="n">p_addr</span><span class="p">,</span> <span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1024</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">shmdt</span><span class="p">(</span><span class="n">p_addr</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">wait</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">else</span>       <span class="c1">//子进程从内存中读取数据</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="c1">//获取内存起始地址</span>
+</span><span class='line'>        <span class="n">c_addr</span> <span class="o">=</span> <span class="n">shmat</span><span class="p">(</span><span class="n">shmid</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">sleep</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">printf</span><span class="p">(</span><span class="s">&quot;child get %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">c_addr</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">shmdt</span><span class="p">(</span><span class="n">c_addr</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="c1">//删除共享内存</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">shmctl</span><span class="p">(</span><span class="n">shmid</span><span class="p">,</span> <span class="n">IPC_RMID</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="n">perror</span><span class="p">(</span><span class="s">&quot;shmctl&quot;</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83692.html">Linux进程通信——使用信号</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2012-02-22T00:00:00+08:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2012</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83692.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83692.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>函数：signal 设置某一信号对应的动作<br/>
+头文件： #include &lt;signal.h&gt;<br/>
+函数原型： void (<em>signal(int signum, void (</em>handler) (int))) (int)；<br/>
+signal：信号编号<br/>
+handler：信号处理函数，若该参数不是函数指针则必须为以下两个常数之一：<br/>
+SIG_IGN：忽略信号<br/>
+SIG_DFL：重设为预设的处理方式<br/>
+返回：成功则返回先前的信号处理函数指针，错误则返回SIG_ERR(-1)</p>
+
+<p>函数：pause 让进程暂停直到信号出现<br/>
+头文件：#include &lt;unistd.h&gt;<br/>
+函数原型： int pause(void)；<br/>
+只返回-1</p>
+
+<p>函数： kill 传送信号<br/>
+头文件：<br/>
+  #include &lt;signal.h&gt;<br/>
+  #include &lt;sys/types.h&gt;<br/>
+函数原型： int kill(pid_t pid, int sig)；<br/>
+pid：接收信号的进程号；当pid=0时为相同进程组的所有进程；当pid=-1时为系统内所有进程；当pid&gt;0时为指定进程；当pid&lt;-1时为进程组识别码为pid绝对值的所有进程。<br/>
+sig：要传送的信号<br/>
+返回：成功返回0，错误返回-1</p>
+
+<p>例子：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="cm">/****************************************</span>
+</span><span class='line'><span class="cm"> *</span>
+</span><span class='line'><span class="cm"> *设置信号处理</span>
+</span><span class='line'><span class="cm"> *等待2秒后向进程本身传送一个SIGALRM信号</span>
+</span><span class='line'><span class="cm"> *龙昌博客：http://www.xefan.com</span>
+</span><span class='line'><span class="cm"> *</span>
+</span><span class='line'><span class="cm"> ****************************************/</span>
+</span><span class='line'><span class="cp">#include &lt;signal.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;stdio.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;stdlib.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;unistd.h&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">void</span> <span class="nf">func</span><span class="p">(</span><span class="kt">int</span> <span class="n">sig_no</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">sig_no</span> <span class="o">==</span> <span class="n">SIGALRM</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="n">printf</span><span class="p">(</span><span class="s">&quot;get SIGALRM</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%d waiting for signal..</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">getpid</span><span class="p">());</span>
+</span><span class='line'>    <span class="n">alarm</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">signal</span><span class="p">(</span><span class="n">SIGALRM</span><span class="p">,</span> <span class="n">func</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">raise</span><span class="p">(</span><span class="n">SIGALRM</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">pause</span><span class="p">();</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83689.html">Linux进程通信——使用有名管道</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2012-02-21T00:00:00+08:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2012</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83689.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83689.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>无名管道只能用于父子进程通信，而有名管道可以用于任意进程间通信。<br/>
+头文件：</p>
+
+<p>  #include &lt;sys/types.h&gt;
+  #include &lt;sys/stat.h&gt;</p>
+
+<p>函数：<br/>
+int mkfifo(const char *filename, mode_t mode);<br/>
+创建有名管道对应的实名文件，该文件必须事先不存在。<br/>
+返回0代表创建成功，否则返回-1。<br/>
+filename：文件路径<br/>
+mode：文件权限</p>
+
+<p>创建成功之后可以像操作普通文件一样使用read、write进行读写操作。</p>
+
+<p>例子：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="cm">/**************************************</span>
+</span><span class='line'><span class="cm"> *</span>
+</span><span class='line'><span class="cm"> * 使用有名管道进行进程通信——写进程</span>
+</span><span class='line'><span class="cm"> * 文件名：fifo_write.c</span>
+</span><span class='line'><span class="cm"> * 龙昌博客：http://www.xefan.com</span>
+</span><span class='line'><span class="cm"> *</span>
+</span><span class='line'><span class="cm">**************************************/</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">#include &lt;sys/stat.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;sys/types.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;fcntl.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;errno.h&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">#define FIFO &quot;/tmp/myfifo&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">fd</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="mi">100</span><span class="p">];</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">num</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">unlink</span><span class="p">(</span><span class="n">FIFO</span><span class="p">);</span> <span class="c1">//先删除文件</span>
+</span><span class='line'>    <span class="c1">//创建有名管道</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span> <span class="p">(</span><span class="n">mkfifo</span><span class="p">(</span><span class="n">FIFO</span><span class="p">,</span> <span class="n">O_CREAT</span><span class="o">|</span><span class="n">O_EXCL</span><span class="o">|</span><span class="n">O_RDWR</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">errno</span> <span class="o">!=</span> <span class="n">EEXIST</span><span class="p">))</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="n">perror</span><span class="p">(</span><span class="s">&quot;mkfifo&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">fd</span> <span class="o">=</span> <span class="n">open</span><span class="p">(</span><span class="n">FIFO</span><span class="p">,</span> <span class="n">O_WRONLY</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">fd</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="n">perror</span><span class="p">(</span><span class="s">&quot;open&quot;</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="n">scanf</span><span class="p">(</span><span class="s">&quot;%s&quot;</span><span class="p">,</span> <span class="n">buf</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">((</span><span class="n">num</span><span class="o">=</span><span class="n">write</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="k">if</span><span class="p">(</span><span class="n">errno</span> <span class="o">==</span> <span class="n">EAGAIN</span><span class="p">)</span>
+</span><span class='line'>            <span class="p">{</span>
+</span><span class='line'>                <span class="n">printf</span><span class="p">(</span><span class="s">&quot;FIFO has not been read yet.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="n">close</span><span class="p">(</span><span class="n">fd</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="cm">/**************************************</span>
+</span><span class='line'><span class="cm"> *</span>
+</span><span class='line'><span class="cm"> * 使用有名管道进行进程通信——读进程</span>
+</span><span class='line'><span class="cm"> * 文件名：fifo_read.c</span>
+</span><span class='line'><span class="cm"> * 龙昌博客：http://www.xefan.com</span>
+</span><span class='line'><span class="cm"> *</span>
+</span><span class='line'><span class="cm">**************************************/</span>
+</span><span class='line'><span class="cp">#include &lt;sys/stat.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;sys/types.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;errno.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;fcntl.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;string.h&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">#define FIFO &quot;/tmp/myfifo&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">fd</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">num</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="mi">100</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">//打开管道文件</span>
+</span><span class='line'>    <span class="c1">//fd = open(FIFO, O_RDONLY|O_NONBLOCK);  //非阻塞方式打开</span>
+</span><span class='line'>    <span class="n">fd</span> <span class="o">=</span> <span class="n">open</span><span class="p">(</span><span class="n">FIFO</span><span class="p">,</span> <span class="n">O_RDONLY</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">fd</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="n">perror</span><span class="p">(</span><span class="s">&quot;open&quot;</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="n">memset</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">buf</span><span class="p">));</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">((</span><span class="n">num</span><span class="o">=</span><span class="n">read</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="n">errno</span> <span class="o">==</span> <span class="n">EAGAIN</span><span class="p">)</span>
+</span><span class='line'>            <span class="p">{</span>
+</span><span class='line'>                <span class="n">printf</span><span class="p">(</span><span class="s">&quot;no data yet</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>            <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>            <span class="k">continue</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="n">printf</span><span class="p">(</span><span class="s">&quot;read  %s  from FIFO</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">buf</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>先运行写进程再运行读进程</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83686.html">Linux进程通信——使用无名管道</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2012-02-21T00:00:00+08:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2012</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83686.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83686.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>头文件：</p>
+
+<p>  #include &lt;unistd.h&gt;</p>
+
+<p>函数：<br/>
+int pipe(int fd[2]);  创建无名管道。<br/>
+fd[2]：管道两个文件描述符，fd[0]代表读端（管道头），fd[1]代表写端（管道尾）。
+创建成功返回0，失败返回-1。</p>
+
+<p>创建成功之后可以像操作普通文件一样使用read、write进行读写操作。<br/>
+例子：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="cm">/**********************************</span>
+</span><span class='line'><span class="cm"> *</span>
+</span><span class='line'><span class="cm"> * 使用无名管道进行进程通信</span>
+</span><span class='line'><span class="cm"> * 龙昌博客：http://www.xefan.com</span>
+</span><span class='line'><span class="cm"> *</span>
+</span><span class='line'><span class="cm">***********************************/</span>
+</span><span class='line'><span class="cp">#include &lt;unistd.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;stdlib.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;stdio.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;string.h&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">pfd</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+</span><span class='line'>    <span class="kt">pid_t</span> <span class="n">pid</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="mi">100</span><span class="p">];</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">num</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">memset</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">buf</span><span class="p">));</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">pipe</span><span class="p">(</span><span class="n">pfd</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>  <span class="c1">//创建无名管道</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="n">perror</span><span class="p">(</span><span class="s">&quot;pipe&quot;</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="c1">//父进程向管道写数据，子进程从管道读数据</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">((</span><span class="n">pid</span><span class="o">=</span><span class="n">fork</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">((</span><span class="n">num</span><span class="o">=</span><span class="n">read</span><span class="p">(</span><span class="n">pfd</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">buf</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%d numbers read, %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">buf</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">pid</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">write</span><span class="p">(</span><span class="n">pfd</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s">&quot;Hello&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="n">perror</span><span class="p">(</span><span class="s">&quot;write&quot;</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">write</span><span class="p">(</span><span class="n">pfd</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s">&quot; Pipe&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="n">perror</span><span class="p">(</span><span class="s">&quot;write&quot;</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="n">waitpid</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="n">close</span><span class="p">(</span><span class="n">pfd</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+</span><span class='line'>    <span class="n">close</span><span class="p">(</span><span class="n">pfd</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83680.html">Linux多进程编程</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2012-02-20T00:00:00+08:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83680.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83680.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>创建进程
+所需头文件：</p>
+
+<p>  #include &lt;unistd.h&gt;<br/>
+  #include &lt;sys/types.h&gt;</p>
+
+<p>函数：<br/>
+pid_t fork();  创建一个子进程，在子进程中返回0，在父进程中返回子进程ID，出错则返回-1。<br/>
+pid_t vfor();  创建一个子进程，与fork()相似；区别如下：<br/>
+fork()子进程拷贝父进程数据段、堆栈段，vfork()则是共享；<br/>
+fork()父子进程执行顺序不确定，vfork()是先执行完子进程再执行父进程。</p>
+
+<p>pid_t getpid();  返回当前进程ID<br/>
+pid_t getppid(); 返回父进程ID</p>
+
+<p>进程等待<br/>
+头文件：<br/>
+  #include &lt;sys/wait.h&gt;</p>
+
+<p>函数：<br/>
+pid_t wait(int *status);  等子进程结束之后才运行。<br/>
+status：接收子进程返回状态</p>
+
+<p>pid_t waitpid(pid_t pid, int *status, int options);  与waitpid()相似。<br/>
+pid：指定的进程号，当pid=-1时等待任何子进程，相当于wait()；<br/>
+status：用于接收进程返回状态；<br/>
+option：为WNOHANG时若无任何已结束的子进程则马上返回，不予以等待；为WUNTRACES时若子进程暂停则马上返回，不予以理会结束状态。</p>
+
+<p>例子：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="c1">//使用vfor函数创建子进程</span>
+</span><span class='line'><span class="c1">//龙昌博客：http://www.xefan.com</span>
+</span><span class='line'><span class="cp">#include &lt;unistd.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;sys/types.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;sys/wait.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;stdio.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;stdlib.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;errno.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;math.h&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="kt">pid_t</span> <span class="n">child</span><span class="p">;</span>
+</span><span class='line'>        <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="cm">/* 创建子进程 */</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">((</span><span class="n">child</span><span class="o">=</span><span class="n">vfork</span><span class="p">())</span><span class="o">==-</span><span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">{</span>
+</span><span class='line'>      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Fork Error : %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="p">));</span>
+</span><span class='line'>      <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="k">else</span>
+</span><span class='line'>  <span class="p">{</span>
+</span><span class='line'>      <span class="k">if</span><span class="p">(</span><span class="n">child</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>      <span class="p">{</span>
+</span><span class='line'>                        <span class="n">i</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'>          <span class="n">printf</span><span class="p">(</span><span class="s">&quot;I am the father: %d ;i=%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">getpid</span><span class="p">(),</span> <span class="n">i</span><span class="p">);</span>
+</span><span class='line'>          <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>      <span class="k">else</span>
+</span><span class='line'>      <span class="p">{</span>
+</span><span class='line'>                        <span class="n">i</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'>          <span class="n">printf</span><span class="p">(</span><span class="s">&quot;I am the child:%d ;i=%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="n">getpid</span><span class="p">(),</span> <span class="n">i</span><span class="p">);</span>
+</span><span class='line'>                        <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>          <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83668.html">Windows下静态编译Qt4</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2011-12-29T00:00:00+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>29</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83668.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83668.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>既然是静态编译，那就要编译出来的程序不信赖于任何dll文件。<br/>
+首先下载qt-win-opensource-4.7.4-mingw.exe： <a href="http://get.qt.nokia.com/qt/source/qt-win-opensource-4.7.4-mingw.exe">http://get.qt.nokia.com/qt/source/qt-win-opensource-4.7.4-mingw.exe</a> 和MinGW-gcc440_1.zip： <a href="http://get.qt.nokia.com/misc/MinGW-gcc440_1.zip">http://get.qt.nokia.com/misc/MinGW-gcc440_1.zip</a></p>
+
+<p>然后依次解压MinGW-gcc440_1.zip、安装qt-win-opensource-4.7.4-mingw.exe。记得要将gcc的目录和qt的目录添加到环境变量中。</p>
+
+<p>然后打开DOS窗口并切换到Qt的目录（比如我的是D:\Qt\4.7.4），再设置两个变量<br/>
+<em>set QTDIR=D:\Qt\4.7.4</em><br/>
+<em> set QMAKESPEC=win32-g++</em></p>
+
+<p>再编辑D:\Qt\4.7.4\mkspecs\win32-g++\qmake.conf文件（最好先备份），改两处：<br/>
+<em>QMAKE_LFLAGS = -enable-stdcall-fixup -Wl,-enable-auto-import -Wl,-enable-runtime-pseudo-reloc</em><br/>
+修改为<br/>
+<em>QMAKE_LFLAGS = <span style="color: #ff0000;">-static</span> -enable-stdcall-fixup -Wl,-enable-auto-import -Wl,-enable-runtime-pseudo-reloc</em><br/>
+再将<br/>
+<em>QMAKE_LFLAGS_DLL = -shared</em><br/>
+修改为<br/>
+<em>QMAKE_LFLAGS_DLL = -static</em></p>
+
+<p>再执行命令：<br/>
+configure -platform win32-g++ <span style="color: #ff0000;">-release</span> -opensource <span style="color: #ff0000;">-static</span> -fast -qt-sql-sqlite -plugin-sql-sqlite -qt-zlib -qt-gif -qt-libpng -qt-libmng -qt-libtiff -qt-libjpeg -no-webkit -nomake examples -nomake docs -nomake demos</p>
+
+<p>如果有提问是否遵守LGPL协议，选y。配置完成后，最后两句是这样的：<br/>
+Qt is now configured for building. Just run mingw32-make.<br/>
+To reconfigure, run mingw32-make confclean and configure.</p>
+
+<p>cd src<br/>
+mingw32-make -i -k</p>
+
+<p>注意：我们只在在Qt子目录src里运行make。不要在整个qt库的大目录下运行make。只在src目录make，这样只编译核心的Qt库和一些插件，节省时间，而且有核心Qt库就够用了。<br/>
+如果在D:\Qt\4.7.4\ 整个大目录下运行make，那么make还会去重新编译生成tools目录下的代码，重新做工具程序，像assistant.exe、designer.exe、linguist.exe、qmlviewer.exe等等（生成后全在bin目录）。这些工具使用静态库生成后巨大无比。这些工具程序不管是静态链接还是动态链接生成的，对我们编程压根没影响，都一样用。</p>
+
+<p>好了，接下来就是漫长的等待。2个多小时左右就应该可以编译完成了。<br/>
+此时再用Qt编译生成的可执行文件不用再信赖Qt的动态库了,但是文件比较大随便一个都是10M以上，而且如果使用的是从qt官网下载的MinGW-gcc编译生成的可执行文件还是会信赖mingwm10.dll动态库。这个只需换一个版本的编译器即可，我用的是这个： <a href="http://115.com/file/dn3fkn1g">http://115.com/file/dn3fkn1g</a></p>
+
+<p>如果嫌这个过程太麻烦可以直接下载我编译好的静态库来使用：<br/>
+Qt4.7.4_Win32静态库.part1.rar： <a href="http://115.com/file/dn3zwayy  ">http://115.com/file/dn3zwayy  </a>
+Qt4.7.4_Win32静态库.part2.rar： <a href="http://115.com/file/dn3zwa9g  ">http://115.com/file/dn3zwa9g  </a>
+这个是完整版的，解压下来有2G多。如果觉得太大了可以下载精简版：<br/>
+Qt4.7.4_Win32静态库精简版.rar： <a href="http://115.com/file/bhy7bat6  ">http://115.com/file/bhy7bat6  </a>
+精简版只保留了编译时需要的库文件和qmake等必要的工具，解压下来有500M左右。<br/>
+注意：只有解压到D盘根目录下才能使用<br/>
+编译器用的是mingw-7.2.exe： <a href="http://115.com/file/dn3fkn1g">http://115.com/file/dn3fkn1g</a></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83665.html">Linux下静态编译win32的GTK程序</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2011-11-27T00:00:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83665.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83665.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>首先感谢hangyu网友分享的GTK静态库。<br/>
+原帖地址：<a href="http://forum.ubuntu.org.cn/viewtopic.php?f=162&amp;amp;t=354286">http://forum.ubuntu.org.cn/viewtopic.php?f=162&amp;amp;t=354286</a> <br>
+下载地址：<a href="http://code.google.com/p/static-gtk2-mingw32/">http://code.google.com/p/static-gtk2-mingw32/</a></p>
+
+<p>先说一下在Windows下编译的方法。</p>
+
+<p>解压文件，然后进入解压后的bin目录执行命令：<br/>
+<em>pkg-config.exe &ndash;libs &ndash;cflags &ldquo;gtk+-2.0&rdquo;</em><br/>
+如果出现以下错误<br/>
+Package gtk+-2.0 was not found in the pkg-config search path.<br/>
+Perhaps you should add the directory containing `gtk+-2.0.pc&#8217;<br/>
+to the PKG_CONFIG_PATH environment variable<br/>
+No package &lsquo;gtk+-2.0&rsquo; found<br/>
+则先执行命令：<em>set PKG_CONFIG_PATH=你的解压路径\lib\pkgconfig</em> 设置PKG_CONFIG_PATH环境变量</p>
+
+<p>我得到的结果是：<br/>
+-mms-bitfields -IE:/Dev-Cpp/gtk+-2.0/include/gtk-2.0 -IE:/Dev-Cpp/gtk+-2.0/lib/gtk-2.0/include -IE:/Dev-Cpp/gtk+-2.0/include/atk-1.0 -IE:/Dev-Cpp/gtk+-2.0/include/cairo -IE:/Dev-Cpp/gtk+-2.0/include/gdk-pixbuf-2.0 -IE:/Dev-Cpp/gtk+-2.0/include/pango-1.0 -IE:/Dev-Cpp/gtk+-2.0/include/glib-2.0 -IE:/Dev-Cpp/gtk+-2.0/lib/glib-2.0/include -IE:/Dev-Cpp/gtk+-2.0/include/pixman-1 -IE:/Dev-Cpp/gtk+-2.0/include -IE:/Dev-Cpp/gtk+-2.0/include/freetype2 -I/gtk-dev/include/libpng14 -LE:/Dev-Cpp/gtk+-2.0/lib -L/gtk-dev/lib -lgtk-win32-2.0 -lgdk-win32-2.0 -limm32 -lshell32 -luuid -latk-1.0 -lpangocairo-1.0 -lgio-2.0 -lshlwapi -ldnsapi -lgdk_pixbuf-2.0 -ltiff -ljpeg -ljasper -lpangoft2-1.0 -lpangowin32-1.0 -lusp10 -lfontconfig -lexpat -lpango-1.0 -lcairo -lpixman-1 -lfreetype -lmsimg32 -lgdi32 -lpng -lz -lm -lgobject-2.0 -lgmodule-2.0 -lgthread-2.0 -lglib-2.0 -lintl -liconv -lws2_32 -lole32</p>
+
+<p>记得保存这个结果，作为编译时的参数在后面要用到。<br/>
+然后编译一个程序试试，将以下代码保存为test.c文件。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="cp">#include &lt;gtk/gtk.h&gt;</span>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span><span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[]){</span>
+</span><span class='line'>    <span class="n">GtkWidget</span> <span class="o">*</span><span class="n">window</span><span class="p">,</span> <span class="o">*</span><span class="n">label</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">gtk_init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">argc</span><span class="p">,</span><span class="o">&amp;</span><span class="n">argv</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">window</span> <span class="o">=</span> <span class="n">gtk_window_new</span><span class="p">(</span><span class="n">GTK_WINDOW_TOPLEVEL</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">gtk_window_set_title</span><span class="p">(</span><span class="n">GTK_WINDOW</span><span class="p">(</span><span class="n">window</span><span class="p">),</span><span class="s">&quot;Hellow World&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">g_signal_connect</span><span class="p">(</span><span class="n">G_OBJECT</span><span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="s">&quot;destroy&quot;</span><span class="p">,</span> <span class="n">G_CALLBACK</span><span class="p">(</span><span class="n">gtk_main_quit</span><span class="p">),</span> <span class="nb">NULL</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">label</span> <span class="o">=</span> <span class="n">gtk_label_new</span><span class="p">(</span><span class="s">&quot;龙昌博客:http://www.xefan.com&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">gtk_container_add</span> <span class="p">(</span><span class="n">GTK_CONTAINER</span> <span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="n">label</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">gtk_widget_show_all</span><span class="p">(</span><span class="n">window</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">gtk_main</span><span class="p">();</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>执行命令进行编译：<br/>
+gcc -o test.exe test.c -mms-bitfields -IE:/Dev-Cpp/gtk+-2.0/include/gtk-2.0 -IE:/Dev-Cpp/gtk+-2.0/lib/gtk-2.0/include -IE:/Dev-Cpp/gtk+-2.0/include/atk-1.0 -IE:/Dev-Cpp/gtk+-2.0/include/cairo -IE:/Dev-Cpp/gtk+-2.0/include/gdk-pixbuf-2.0 -IE:/Dev-Cpp/gtk+-2.0/include/pango-1.0 -IE:/Dev-Cpp/gtk+-2.0/include/glib-2.0 -IE:/Dev-Cpp/gtk+-2.0/lib/glib-2.0/include -IE:/Dev-Cpp/gtk+-2.0/include/pixman-1 -IE:/Dev-Cpp/gtk+-2.0/include -IE:/Dev-Cpp/gtk+-2.0/include/freetype2 -I/gtk-dev/include/libpng14 -LE:/Dev-Cpp/gtk+-2.0/lib -L/gtk-dev/lib -lgtk-win32-2.0 -lgdk-win32-2.0 -limm32 -lshell32 -luuid -latk-1.0 -lpangocairo-1.0 -lgio-2.0 -lshlwapi -ldnsapi -lgdk_pixbuf-2.0 -ltiff -ljpeg -ljasper -lpangoft2-1.0 -lpangowin32-1.0 -lusp10 -lfontconfig -lexpat -lpango-1.0 -lcairo -lpixman-1 -lfreetype -lmsimg32 -lgdi32 -lpng -lz -lm -lgobject-2.0 -lgmodule-2.0 -lgthread-2.0 -lglib-2.0 -lintl -liconv -lws2_32 -lole32</p>
+
+<p>如果不出错的话则生成一个test.exe的可执行文件。<br/>
+如果没有gcc的话，可以下载安装一个MinGW程序，我之前用MinGW的gcc 4.4.0版本来编译结果出错了，然后换了个4.6版本的才能顺利编译，下载地址：<a href="http://nuwen.net/mingw.html">http://nuwen.net/mingw.html</a></p>
+
+<p>然后再介绍下在Linux下交叉编译的方法。</p>
+
+<p>前一篇文章介绍了在Linux下交叉编译Windows程序的方法。现在只需把上面的参数的路径改下即可。</p>
+
+<p>我的Windows的E盘在Linux下挂载到/mnt/Win_E ，再用上面的程序测试，执行命令：<br/>
+i486-mingw32-gcc -o test.exe test.c -mms-bitfields -I/mnt/Win_E/Dev-Cpp/gtk+-2.0/include/gtk-2.0 -I/mnt/Win_E/Dev-Cpp/gtk+-2.0/lib/gtk-2.0/include -I/mnt/Win_E/Dev-Cpp/gtk+-2.0/include/atk-1.0 -I/mnt/Win_E/Dev-Cpp/gtk+-2.0/include/cairo -I/mnt/Win_E/Dev-Cpp/gtk+-2.0/include/gdk-pixbuf-2.0 -I/mnt/Win_E/Dev-Cpp/gtk+-2.0/include/pango-1.0 -I/mnt/Win_E/Dev-Cpp/gtk+-2.0/include/glib-2.0 -I/mnt/Win_E/Dev-Cpp/gtk+-2.0/lib/glib-2.0/include -I/mnt/Win_E/Dev-Cpp/gtk+-2.0/include/pixman-1 -I/mnt/Win_E/Dev-Cpp/gtk+-2.0/include -I/mnt/Win_E/Dev-Cpp/gtk+-2.0/include/freetype2 -I/gtk-dev/include/libpng14  -L/mnt/Win_E/Dev-Cpp/gtk+-2.0/lib -L/gtk-dev/lib -lgtk-win32-2.0 -lgdk-win32-2.0 -limm32 -lshell32 -luuid -latk-1.0 -lpangocairo-1.0 -lgio-2.0 -lshlwapi -ldnsapi -lgdk_pixbuf-2.0 -ltiff -ljpeg -ljasper -lpangoft2-1.0 -lpangowin32-1.0 -lusp10 -lfontconfig -lexpat -lpango-1.0 -lcairo -lpixman-1 -lfreetype -lmsimg32 -lgdi32 -lpng -lz -lm -lgobject-2.0 -lgmodule-2.0 -lgthread-2.0 -lglib-2.0 -lintl -liconv -lws2_32 -lole32</p>
+
+<p>然后生成 test.exe文件，可以用wine来测试下是否可用。</p>
+
+<p>这个生成的文件好像有点大了，随便一个都是25M以上。使用命令：<br/>
+i486-mingw32-strip hellow.exe<br/>
+一下子可以减到7M左右。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83663.html">Linux下交叉编译windows程序</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2011-11-25T00:00:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>25</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83663.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83663.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>有时候需要编写在Windows下运行的程序，但是又不想切换到Windows下来编译，于是就想在Linux下来编译Windows下运行的exe文件。</p>
+
+<p>这个需要先安装mingw32交叉编译工具。<br/>
+ubuntu下使用命令：sudo apt-get install mingw32进行安装，<br/>
+Arch Linux下使用命令：sudo pacman -S mingw32-binutils mingw32-gcc mingw32-pthreads mingw32-runtime mingw32-w32api</p>
+
+<p>安装完后测试一下效果。<br/>
+将以下代码保存为mingw32_test.c文件。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Windows Compiler Test</span><span class="se">\n</span><span class="s">http://www.xefan.com</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后执行命令：</p>
+
+<pre><code>[lcj@lcj C]$ i486-mingw32-gcc -o mingw32_test.exe mingw32_test.c
+mingw32_test.c: In function 'main':
+mingw32_test.c:3:5: warning: incompatible implicit declaration of built-in function 'printf' [enabled by default]
+[lcj@lcj C]$ wine mingw32_test.exe
+Windows Compiler Test
+http://www.xefan.com
+[lcj@lcj C]$
+</code></pre>
+
+<p>经测试在wine下能正常运行，在虚拟机里的WinXP下测试也可正常运行。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/page/14">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/page/12">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Subscription</h1>
+  <!--以下是QQ邮件列表订阅嵌入代码--><script >var nId = "e7ee5da6d322dc7157c25cfd8a7700bb23a056dd1fb18cb4",nWidth="auto",sColor="light",sText="请输入邮件地址：" ;</script><script src="http://list.qq.com/zh_CN/htmledition/js/qf/page/qfcode.js" charset="gb18030"></script>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84132.html">配置elixir的vim环境</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84130.html">配置coffeescript的vim环境</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84127.html">VIM编译参数</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84124.html">Docker使用笔记</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84121.html">Nginx + Php + FastCGI配置</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (47)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (32)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (26)</a></li><li><a href='/categories/web开发/index.html'>web开发 (16)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (7)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (10)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (21)</a></li></ul>
+</section>
+<section>
+  <h1>Tag Cloud</h1>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.45454545454545%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.9090909090909%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.81818181818181%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.9090909090909%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.36363636363636%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.27272727272727%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.36363636363636%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.81818181818181%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.81818181818181%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 100.9090909090909%'>Django(1)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.9090909090909%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.81818181818181%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.72727272727273%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.9090909090909%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.9090909090909%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.45454545454545%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.81818181818181%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.63636363636364%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.45454545454545%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.9090909090909%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.45454545454545%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.9090909090909%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.9090909090909%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.9090909090909%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(66)</a> <a href='/tags/mongodb/index.html' style='font-size: 109.0909090909091%'>mongodb(10)</a> <a href='/tags/mysql/index.html' style='font-size: 103.63636363636364%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.9090909090909%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.9090909090909%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.18181818181819%'>php(9)</a> <a href='/tags/ps/index.html' style='font-size: 105.45454545454545%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.9090909090909%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 144.54545454545456%'>python(49)</a> <a href='/tags/qt/index.html' style='font-size: 101.81818181818181%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.9090909090909%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 123.63636363636364%'>Ruby(26)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.72727272727273%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.9090909090909%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.54545454545455%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.36363636363636%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.72727272727273%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 121.81818181818181%'>vim(24)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.72727272727273%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.9090909090909%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.9090909090909%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 112.72727272727272%'>Web开发(14)</a> <a href='/tags/windows/index.html' style='font-size: 106.36363636363636%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.9090909090909%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.9090909090909%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.9090909090909%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.9090909090909%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.45454545454545%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.81818181818181%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.9090909090909%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.18181818181819%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.18181818181819%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.9090909090909%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.9090909090909%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.9090909090909%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.81818181818181%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 109.0909090909091%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.18181818181819%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.9090909090909%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.54545454545455%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.9090909090909%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.9090909090909%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 104.54545454545455%'>网络日志(5)</a> <a href='/tags/翻译/index.html' style='font-size: 120.9090909090909%'>翻译(23)</a> <a href='/tags/视频教程/index.html' style='font-size: 109.0909090909091%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.9090909090909%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.81818181818181%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.9090909090909%'>随笔(1)</a> </span>
+</section>
+<section>
+  <h1>Link</h1>
+    <ul id="category-list">
+      <li><a target="_blank" title="我的Github" href="https://github.com/wusuopu">@Github</a></li>
+      <li><a target="_blank" title="我的微博" href="http://www.weibo.com/u/1768691343">@Weibo</a></li>
+      <li><a target="_blank" title="我的Twitter" href="https://twitter.com/longchangjin">@Twitter</a></li>
+      <li><a target="_blank" title="我的豆瓣" href="http://www.douban.com/people/lchj/">@Douban</a></li>
+
+      <li><a target="_blank" title="" href="http://www.vimer.cn/">Vimer的程序世界</a></li>
+      <li><a target="_blank" title="" href="http://pythoner.net/">python开发者社区</a></li>
+      <li><a target="_blank" title="" href="http://simple-is-better.com/">python.cn(news, jobs)</a></li>
+      <li><a target="_blank" title="" href="http://gtk.awaysoft.com/">GTK+ 中文社区</a></li>
+    </ul>
+</section>
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - 龍昌 -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+<div style="display:none;"><script src="http://s94.cnzz.com/stat.php?id=1259846&web_id=1259846&show=pic" language="JavaScript"></script></div>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'longchang';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

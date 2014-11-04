@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: 教程 | 龍昌博客]]></title>
+  <link href="http://www.xefan.com/categories/教程/atom.xml" rel="self"/>
+  <link href="http://www.xefan.com/"/>
+  <updated>2014-11-04T14:10:28+08:00</updated>
+  <id>http://www.xefan.com/</id>
+  <author>
+    <name><![CDATA[龍昌]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[自动生成.gitignore文件]]></title>
+    <link href="http://www.xefan.com/archives/84048.html"/>
+    <updated>2014-03-07T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84048-自动生成.gitignore文件</id>
+    <content type="html"><![CDATA[<p>.gitignore文件是用于对git进行设置，让其忽略对某些文件的跟踪。</p>
+
+
+<p>最近发现每创建一个新的仓库都要把.gitignore文件重新写一遍，甚是麻烦。于是就想能否自动生成.gitignore文件，这样的话就比较方便。最后找到了 gitignore.io 这个网站，它可以根据需求生成相应的.gitignore文件。比较你是用vim编辑器编写python代码，则输入vim  python就会生成对应vim和python的gitignore文件了。</p>
+
+
+<p>为了方便使用我编写了一个shell脚本。从 https://gist.github.com/wusuopu/9408486 下载代码，保存为mkgitignore，并加上执行权限。然后执行如下命令生成.gitignore文件。</p>
+
+
+<pre><code>$ mkgitignore vim,python
+$ mkgitignore vim,python .gitignore
+</code></pre>
+
+
+<p>第一条命令是直接将结果输出到终端，第二条命令是将结果输出到.gitignore文件中。</p>
+
+
+<p>最后补充一个git的小知识：<br>
+如果想要在所有的项目中都忽略掉某些文件的话，那么可以设置一个全局的gitignore。执行如下命令：</p>
+
+
+<pre><code>$ git config --global core.excludesfile ~/.gitignore
+</code></pre>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Vim Statusline设置]]></title>
+    <link href="http://www.xefan.com/archives/83820.html"/>
+    <updated>2013-05-19T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/83820-vim statusline设置</id>
+    <content type="html"><![CDATA[<p>vim中默认的状态行，左边显示当前打开的文件名，右边显示当前所处的行列位置。
+如果只需要默认的状态栏，这样就行了：<br/>
+set laststatus=2  &ldquo; 总是显示状态栏<br/>
+set ruler         &rdquo; 在状态栏显示行号和列号</p>
+
+<p>如果想根据自己的需求修改的话，可以用以下命令查看帮助信息。<br/>
+<code>:h statusline</code></p>
+
+<p>我们可以使用以下命令来定义状态行：<br/>
+<code>:set statusline=format</code><br/>
+这个format跟printf函数的参数有些相似。</p>
+
+<p>例如以下命令就是设置在状态栏显示文件名。<br/>
+<code>:set statusline="%f"</code></p>
+
+<p>例如想在状态栏显示当前的时间可以用这个命令。<br/>
+<code>:set statusline+=%-16{strftime(\"%Y-%m-%d\ %H:%M\")}</code></p>
+
+<p>以下是format的参数列表</p>
+
+<pre><code>%(...%)     定义一个项目组。
+%{n}*     %对其余的行使用高亮显示组Usern，直到另一个%n*。数字n必须从1到9。用%*或%0*可以恢复正常的高亮显示。
+%&amp;lt;     如果状态行过长，在何处换行。缺省是在开头。
+%=     左对齐和右对齐项目之间的分割点。
+%     字符%
+%B     光标下字符的十六进制形式
+%F     缓冲区的文件完整路径
+%H     如果为帮助缓冲区则显示为HLP
+%L     缓冲区中的行数
+%M     如果缓冲区修改过则显示为+
+%N     打印机页号
+%O     以十六进制方式显示文件中的字符偏移
+%P     文件中光标前的%
+%R     如果缓冲区只读则为RO
+%V     列数。如果与%c相同则为空字符串
+%W     如果窗口为预览窗口则为PRV
+%Y     缓冲区的文件类型，如vim
+%a     如果编辑多行文本，这个字行串就是({current} of {arguments})，例如：(5 of 18)。如果在命令行中只有一行，这个字符串为空
+%b     光标下的字符的十进制表示形式
+%c     列号
+%f     缓冲区的文件路径
+%h     如果为帮助缓冲区显示为[Help]
+%l     行号
+%m     如果缓冲区已修改则表示为[+]
+%n     缓冲区号
+%o     在光标前的字符数（包括光标下的字符）
+%p     文件中所在行的百分比
+%r     如果缓冲区为只读则表示为[RO]
+%t     文件名(无路径)
+%v     虚列号
+%w     如果为预览窗口则显示为[Preview]
+%y     缓冲区的文件类型，如[vim]
+%{expr}     表达式的结果
+</code></pre>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[使用vim在目录下查找字符串]]></title>
+    <link href="http://www.xefan.com/archives/83806.html"/>
+    <updated>2012-10-13T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/83806-使用vim在目录下查找字符串</id>
+    <content type="html"><![CDATA[<p>vim有个vimgrep命令，跟linux下的grep类似。用法如下：<br/>
+:vimgrep /{pattern}/[g][j] {file} &hellip;<br/>
+{pattern}为要查找的字符串;<br/>
+没有参数g的话,则行只查找一次关键字.反之会查找所有的关键字.<br/>
+没有参数j的话,查找后,VIM会跳转至第一个关键字所在的文件.反之,只更新结果列表(quickfix).<br/>
+{file}为要查找的文件，可以有多个。</p>
+
+<p>例如，要在当前目录及其子目录中的python文件查找&#8221;import&#8221;字符串。<br/>
+<code>:vimgrep /import/ **/*.py</code><br/>
+命令中的**表示递归查找。</p>
+
+<p>{pattern}也可以用正则表达式。搜索结果保存在quickfix中，可以使用以下方法查看。</p>
+
+<p>:cnext (:cn) 当前页下一个结果<br/>
+:cprevious (:cp) 当前页上一个结果<br/>
+:clist (:cl) 打开quickfix窗口，列出所有结果，不能直接用鼠标点击打开，只能看<br/>
+:copen (:cope) 打开quickfix窗口，列出所有结果，可以直接用鼠标点击打开<br/>
+:ccl[ose] 关闭 quickfix 窗口。<br/>
+ctrl + ww 切换编辑窗口和quickfix窗口，在quickfix里面和编辑窗口一样jk表示上下移动，回车选中进入编辑窗口</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[在vim中使用正则表达式]]></title>
+    <link href="http://www.xefan.com/archives/83797.html"/>
+    <updated>2012-10-10T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/83797-在vim中使用正则表达式</id>
+    <content type="html"><![CDATA[<p>元字符 说明<br/>
+. 匹配任意一个字符<br/>
+[abc] 匹配方括号中的任意一个字符。可以使用-表示字符范围，如[a-z0-9]匹配小写字母和阿拉伯数字。<br/>
+[^abc] 在方括号内开头使用^符号，表示匹配除方括号中字符之外的任意字符。<br/>
+\d 匹配数字，等同于[0-9]。<br/>
+\D 匹配非数字，等同于[^0-9]。<br/>
+\x 匹配十六进制数字，等同于[0-9A-Fa-f]。<br/>
+\X 匹配非十六进制数字，等同于[^0-9A-Fa-f]。<br/>
+\w 匹配单词字母，等同于[0-9A-Za-z<em>]。<br/>
+\W 匹配非单词字母，等同于[^0-9A-Za-z</em>]。<br/>
+\t 匹配&lt;TAB&gt;字符。<br/>
+\s 匹配空白字符，等同于[ /t]。<br/>
+\S 匹配非空白字符，等同于[^ /t]。<br/>
+\a 所有的字母字符. 等同于[a-zA-Z]<br/>
+\l 小写字母 [a-z]<br/>
+\L 非小写字母 [^a-z]<br/>
+\u 大写字母 [A-Z]<br/>
+\U 非大写字母 [^A-Z]</p>
+
+<p>表示数量的元字符<br/>
+元字符 说明<br/>
+*       匹配0-任意个<br/>
++      匹配1-任意个<br/>
+\?      匹配0-1个<br/>
+{n,m}  匹配n-m个<br/>
+{n}    匹配n个<br/>
+{n,}   匹配n-任意个<br/>
+{,m}   匹配0-m个<br/>
+_.     匹配包含换行在内的所有字符<br/>
+{-}    表示前一个字符可出现零次或多次，但在整个正则表达式可以匹配成功的前提下，匹配的字符数越少越好<br/>
+\=      匹配一个可有可无的项<br/>
+_s     匹配空格或断行<br/>
+_[]</p>
+
+<p>元字符 说明<br/>
+*      匹配 * 字符。<br/>
+.      匹配 . 字符。<br/>
+\/      匹配 / 字符。<br/>
+\/      匹配 / 字符。<br/>
+[      匹配 [ 字符。</p>
+
+<p>表示位置的符号<br/>
+元字符 说明<br/>
+$       匹配行尾<br/>
+^       匹配行首<br/>
+&amp;lt;      匹配单词词首<br/>
+&amp;gt;      匹配单词词尾</p>
+
+<p>替换变量<br/>
+在正规表达式中使用 ( 和 ) 符号括起正规表达式，即可在后面使用\1、\2等变量来访问 ( 和 ) 中的内容。</p>
+
+<p>懒惰模式<br/>
+{-n,m}  与{n,m}一样，尽可能少次数地重复<br/>
+{-}     匹配它前面的项一次或0次, 尽可能地少<br/>
+|       &ldquo;或&#8221;操作符<br/>
+&amp;amp;       并列</p>
+
+<p>函数式<br/>
+:s/替换字符串/\=函数式<br/>
+在函数式中可以使用 submatch(1)、submatch(2) 等来引用 \1、\2 等的内容，而submatch(0)可以引用匹配的整个内容。</p>
+
+<p>与Perl正则表达式的区别 ?<br/>
+元字符的区别<br/>
+Vim语法 Perl语法 含义<br/>
++       +       1-任意个<br/>
+\?       ?       0-1个<br/>
+{n,m}   {n,m}   n-m个<br/>
+(和)   (和)    分组</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[GRUB Error 28: Selected Item Cannot Fit Into Memory 解决方法]]></title>
+    <link href="http://www.xefan.com/archives/83529.html"/>
+    <updated>2011-02-23T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/83529-GRUB Error 28: Selected item cannot fit into memory 解决方法</id>
+    <content type="html"><![CDATA[<p>今天偶用wubi安装ubuntu10.10时，重启选择安装项却提示：</p>
+
+<pre><code>“Error:the initrd is too big!
+
+Press any key to continue”
+</code></pre>
+
+<p>然后再怎么也进不去了，这种情况以前没有遇到过。既然ubuntu装不了就改装Qomo Linux吧，于是下了镜像文件选择硬盘安装。可是重启选择安装项却提示：</p>
+
+<pre><code>“GRUB Error 28: Selected item cannot fit into memory”
+</code></pre>
+
+<p>然后也进不去了，然后偶就彻底无语了。根据提示的字面意思好像是内存不够，偶这台式机是前几年买的，512的内存。而到网上查了，这两个Linux要求的最低配置是300多内存就行了，所以偶这不可以是配置不行。然后又到网上查了解决办法，只需要改下BIOS设置即可。具体方法如下：</p>
+
+<p>开机进入BIOS设置－&gt;进入advanced chipset features的设置-&gt;将“memory Hole At 15M-16M”设置成[Disable]，问题解决！</p>
+
+<p>（注：部分机型可能会将chipset选项隐藏，如果找不到的话，按Ctrl+F1即可显示。）</p>
+]]></content>
+  </entry>
+  
+</feed>

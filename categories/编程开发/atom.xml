@@ -1,0 +1,854 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: 编程开发 | 龍昌博客]]></title>
+  <link href="http://www.xefan.com/categories/编程开发/atom.xml" rel="self"/>
+  <link href="http://www.xefan.com/"/>
+  <updated>2014-11-04T14:10:28+08:00</updated>
+  <id>http://www.xefan.com/</id>
+  <author>
+    <name><![CDATA[龍昌]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[使用distcc加快编译速度]]></title>
+    <link href="http://www.xefan.com/archives/84027.html"/>
+    <updated>2014-01-07T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84027-使用distcc加快编译速度</id>
+    <content type="html"><![CDATA[<p>distcc是一个分布式的C/C++编译工具，它可以组织一个网络内的多台计算机同时进行某个编译任务。</p>
+
+
+<p>对于Debian系列的系统可以执行如下命令进行安装：</p>
+
+
+<p>$ sudo apt-get install distcc</p>
+
+
+<h3>使用</h3>
+
+
+<p>1、首先得先运行服务器软件</p>
+
+
+<p>运行如下命令启动distccd服务，并接收192.168.1网段内的所有TCP连接：</p>
+
+
+<pre><code>$ distccd --allow 192.168.1.0/24 --log-level error --log-file /tmp/distccd.log --daemon
+</code></pre>
+
+
+<p>2、运行客户端软件</p>
+
+
+<p>设置服务器列表：<br>
+设置DISTCC_HOSTS环境变量；或者修改 ~/.distcc/hosts 或者 /etc/distcc/hosts 文件。<br>
+每行一个服务器主机地址，主机地址可以是如下格式：  </p>
+
+
+<pre><code>localhost       表示本地
+HOST            TCP连接到该主机的3632端口
+HOST:PORT       TCP连接到该主机的指定端口
+@HOST           使用ssh连接
+USER@HOST       使用指定用户进行ssh连接
+</code></pre>
+
+
+<p>所有的服务器的架构最好是相同的。都是32位或者都是64位。  </p>
+
+
+<p>3、在编译的时候使用distcc</p>
+
+
+<p>如果工程使用automake机制：<br>
+在configure阶段执行&#8221;CC=distcc ./configure&#8221; ，然后再执行&#8221;make -j XX; make install&#8221;。</p>
+
+
+<p>如果工程由GNU make管理：<br>
+修改Makefile使得在原来C/C++编译器名称前加上&#8221;distcc &#8220;，例如设置CC=&#8221;distcc arm-linux-gcc&#8221;。然后执行&#8221;make -j XX&#8221;。</p>
+
+
+<p>如果工程由SCons管理：<br>
+修改SConstruct使得在原来C/C++编译器名称前加上&#8221;distcc &#8220;。导出环境变量HOME和DISTCC_HOSTS到构建环境（注意SCons不会自动把系统环境变量导出到builder子进程）：</p>
+
+
+<pre><code>Environment(ENV={'HOME': os.environ['HOME'],'DISTCC_HOSTS': ‘localhost 10.0.0.2’},...)
+</code></pre>
+
+
+<p>然后执行&#8221;scons -j XX&#8221;。</p>
+
+
+<h3>实例</h3>
+
+
+<p>接下来编译Python源代码，测试一下distcc。</p>
+
+
+<pre><code>$ tar xfv Python-2.7.5.tar
+$ cd Python-2.7.5
+$ ./configure
+$ time make
+make  124.32s user 7.11s system 94% cpu 2:19.24 total
+$ time make
+make  0.17s user 0.04s system 89% cpu 0.241 total
+$ make clean
+$ time make
+make  123.52s user 7.32s system 96% cpu 2:16.12 total
+</code></pre>
+
+
+<p>正常编译花了2分10多秒的时间。</p>
+
+
+<pre><code>$ cat /etc/distcc/hosts
+10.0.0.129
+localhost
+$ tar xfv Python-2.7.5.tar
+$ cd Python-2.7.5
+$ CC=distcc ./configure
+$ time make -j 3
+make -j 3  49.58s user 5.53s system 30% cpu 3:01.40 total
+$ time make -j 3
+make -j 3  0.60s user 0.24s system 7% cpu 11.482 total
+$ make clean
+$ time make -j 3
+make -j 3  46.17s user 5.20s system 40% cpu 2:05.66 total
+</code></pre>
+
+
+<p>使用129这台主机和本机一起进行编译，结果花了3分钟的时间。好像使用distcc编译还比正常的编译方式更耗时，有可能是时间花费在了网络传输上。</p>
+
+
+<p>如果有多台主机的话效果应该会好些。还有可以配合使用ccache和distcc进一步加快编译速度。</p>
+
+
+<p>下图是distcc提供的监控工具，用于查看编译执行的情况：</p>
+
+
+<p><a href="http://www.xefan.com/wp-content/uploads/2014/01/distcc-Monitor.png"><img src="http://www.xefan.com/wp-content/uploads/2014/01/distcc-Monitor-300x194.png" alt="" title="distcc Monitor" width="300" height="194" class="aligncenter size-medium wp-image-84028" /></a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[使用ccache加快编译速度]]></title>
+    <link href="http://www.xefan.com/archives/84024.html"/>
+    <updated>2014-01-04T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84024-使用ccache加快编译速度</id>
+    <content type="html"><![CDATA[<p>ccache是一个编译器缓存，可以将编译的结果缓存起来。这样尽管第一次编译会花费长一点的时间，不过之后再次编译将变得非常非常快。 </p>
+
+
+<h3>1、安装</h3>
+
+
+<p>主流的linux发行版应该都有这个包，对于Debian系列的可以执行以下命令安装：</p>
+
+
+<pre><code>sudo apt-get install ccache
+</code></pre>
+
+
+<h3>2、使用</h3>
+
+
+<p>安装之后基本不用进行什么配置就可以直接使用了。<br>
+例如之前要编译一个hello.c文件要执行命令：  </p>
+
+
+<pre><code>gcc hello.c -o hello
+</code></pre>
+
+
+<p>现在是：</p>
+
+
+<pre><code>ccache gcc hello.c -o hello
+</code></pre>
+
+
+<p>ccache默认是将结果缓存保存到 $HOME/.ccache 目录下。如果想要修改这个目录，可以修改 CCACHE_DIR 环境变量。例如：</p>
+
+
+<pre><code>export CCACHE_DIR=/ramdisk/ccache
+</code></pre>
+
+
+<p>如果觉得每次都在命令前加上ccache比较麻烦的话，有一个一劳永逸的办法。执行如下命令：</p>
+
+
+<pre><code>cp ccache /usr/local/bin/
+ln -s ccache /usr/local/bin/gcc
+ln -s ccache /usr/local/bin/g++
+ln -s ccache /usr/local/bin/cc
+ln -s ccache /usr/local/bin/c++
+</code></pre>
+
+
+<p>不过这样的话每次都是使用的ccache，不太灵活。这个就要自己取舍了。</p>
+
+
+<h3>3、实例</h3>
+
+
+<p>接下来通过一个例子来看看使用ccache和不使用的差别。<br>
+作为一个Python程序员，我们就来编译一个Python试试。</p>
+
+
+<pre><code>$ tar xf Python-2.7.3.tar.gz
+$ cd Python-2.7.3
+$ ./configure
+$ time make
+make  96.49s user 5.10s system 93% cpu 1:48.77 total
+</code></pre>
+
+
+<p>首次编译花了1分48秒。</p>
+
+
+<pre><code>$ time make
+make  0.12s user 0.03s system 88% cpu 0.172 total
+$ make clean
+$ time make
+make  96.46s user 4.98s system 95% cpu 1:46.43 total
+</code></pre>
+
+
+<p>清除结果之后再次编译，还是花了1分46秒。</p>
+
+
+<p>再来看看使用ccache后的结果：</p>
+
+
+<pre><code>$ tar xf Python-2.7.3.tar.gz
+$ cd Python-2.7.3
+$ ./configure
+$ time make
+make  99.42s user 5.84s system 93% cpu 1:52.95 total
+
+$ time make
+make  0.16s user 0.00s system 89% cpu 0.178 total
+$ make clean
+$ time make
+make  3.36s user 1.41s system 52% cpu 9.093 total
+</code></pre>
+
+
+<p>首次编译花了1分52秒，之后都是只花了几秒。</p>
+
+
+<p>查看ccache的统计信息：</p>
+
+
+<pre><code>$ ccache -s
+cache directory                     /home/longchang/.ccache
+cache hit (direct)                   250
+cache hit (preprocessed)               4
+cache miss                           349
+called for link                      132
+alled for preprocessing              84
+compile failed                        29
+preprocessor error                    28
+bad compiler arguments                 5
+unsupported source language            6
+autoconf compile/link                224
+no input file                         24
+files in cache                       710
+cache size                          30.3 Mbytes
+max cache size                       1.0 Gbytes
+</code></pre>
+
+
+<p>清除掉缓存后再次编译：</p>
+
+
+<pre><code>$ ccache -c
+Cleaned cache
+
+$ make clean
+$ time make
+make  99.36s user 5.94s system 92% cpu 1:53.47 total
+
+$ make clean
+$ time make
+make  3.48s user 1.42s system 54% cpu 9.049 total
+</code></pre>
+
+
+<p>ccache手册： <a href="http://ccache.samba.org/manual.html">http://ccache.samba.org/manual.html</a></p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[SCons工具用法介绍]]></title>
+    <link href="http://www.xefan.com/archives/83823.html"/>
+    <updated>2013-06-29T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/83823-SCons工具用法介绍</id>
+    <content type="html"><![CDATA[<p>SCons是使用Python语言开发的一个软件自动构建工具，功能类似于UNIX上的make、autoconf与automake工具。它跨平台，能够帮助我们更方便，可靠，快速的构建软件。</p>
+
+<p>与make命令和Makefile文件类似，scons也需要编写一个SConstruct文件（实际上也是一个python脚本），scons可以根据此文件自动完成依赖关系的推导及编译链接等过程。</p>
+
+<p>下面通过一个简单的例子来介绍一下scons的用法，首先得先安装scons工具的gcc编译器。</p>
+
+<p>新建一个hello.c文件，内容如下：</p>
+
+<pre><code class="c">//hello.c
+#include&lt;stdio.h&gt;
+
+int main(){
+printf(&amp;quot;hello world!\n&amp;quot;);
+return 0;
+}
+</code></pre>
+
+<p>然后再创建一个SConstruct文件，内容为：</p>
+
+<pre><code>Program('hello.c')
+</code></pre>
+
+<p>这两个文件放在同一目录下，再执行命令scons即可完成编译，并生成名为hello.o的中间文件和名为hello的可执行文件。</p>
+
+<p>如果想要清除生成的文件，跟make clean类似可以执行scons &ndash;clean命令。</p>
+
+<p>上面只是一个简单的例子，如果你的程序中使用的第三方库，编译时就需要手动指定链接库。</p>
+
+<p>以gtk程序为例，编译一个名为gtk_test.c的源文件，SConstruct脚本可以用如下的方法。</p>
+
+<pre><code>env = Environment(CCFLAGS='-g')
+env.ParseConfig('pkg-config --cflags --libs gtk+-2.0')
+
+env.Program('gtk_test.c')
+</code></pre>
+
+<p>我个人感觉SConstruct比Makefile要更加简洁灵活，更多关于scons有用法以及SConstruct脚本的写法可以参考它的官方文档。</p>
+
+<p>scons主页： <a href="http://www.scons.org  ">http://www.scons.org  </a>
+scons文档： <a href="http://www.scons.org/documentation.php">http://www.scons.org/documentation.php</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[[转载]GObject 学习笔记：GObject 的子类继承]]></title>
+    <link href="http://www.xefan.com/archives/83776.html"/>
+    <updated>2012-05-30T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/83776-[转载]GObject 学习笔记：GObject 的子类继承</id>
+    <content type="html"><![CDATA[<p>在文档 [1] 中，我们构造了一个 KbBibtex 类，其构造过程看似挺复杂，但实际上只需要动手尝试一下，即可明白 GObject 子类化的各项步骤的意义与作用。许多事物之所以被认为复杂，是因为大家在观望。</p>
+
+<p>本文沿用文档 [1] 中的那个 KbBibtex 示例，学习如何对其进行子类化，构造新类，即面向对象程序设计方法中类的继承。</p>
+
+<p><b>文献有很多种类</b></p>
+
+<p>写过论文的人都知道，参考文献的形式有许多种类，例如期刊论文、技术报告、专著等，并非所有的文献格式都能表示文档 [1] 所给出的 KbBibtex 对象属性，即：</p>
+
+<pre><code class="c">typedef struct _KbBibtexPrivate KbBibtexPrivate;
+struct _KbBibtexPrivate {
+        GString *title;
+        GString *author;
+        GString *publisher;
+        guint   year;
+};
+</code></pre>
+
+<p>对于期刊论文而言，也许我们期望的数据结构是：</p>
+
+<pre><code class="c">typedef struct _KbBibtexPrivate KbBibtexPrivate;
+struct _KbBibtexPrivate {
+        GString *title;
+        GString *author;
+        GString *journal;
+        GString *volume;
+        GString *number;
+        GString *pages;
+        guint   year;
+        GString *publisher;
+};
+</code></pre>
+
+<p>对于技术报告，需求又要变成：</p>
+
+<pre><code class="c">typedef struct _KbBibtexPrivate KbBibtexPrivate;
+struct _KbBibtexPrivate {
+        GString *title;
+        GString *author;
+        GString *institution;
+        guint   year;
+};
+</code></pre>
+
+<p>这样的变化非常之多。因此，设计一个“万能”的 KbBibtex 类，使之可以表示任何文献类型，看上去会很美好。</p>
+
+<p><b>类的继承</b></p>
+
+<p>因为期刊论文这种对象只比文档 [1] 中的 KbBibtex 对象多出 4 个属性，即 journal、volume、number、pages，其他属性皆与 KbBibtex 对象相同。</p>
+
+<p>在程序猿的职业生涯中也许不断听到这样的警告：Don&rsquo;t Repeat Yourself（不要重复）！所以面向对象程序设计方法会告诉我们，既然 KbBibtex 对象已经拥有了一部分期刊论文对象所需要的属性，后者与前者都属于 KbBibtex 类（因为它们都是文献类型），那么只需设计一个期刊论文类，让它可以继承 KbBibtex 类的所以所拥有的一切，那么就可以不用 DRY 了。</p>
+
+<p>那么怎么来实现？和 GObject 子类化过程相似，只需建立一个 kb-article.h 头文件，与继承相关的代码如下：</p>
+
+<pre><code class="c">#include "kb-bibtex.h"
+
+typedef struct _KbArticle KbArticle;
+struct _KbArticle {
+        KbBibtex parent;
+};
+
+typedef struct _KbArticleClass KbArticleClass;
+struct _KbArticleClass {
+        KbBibtexClass parent_class;
+};
+</code></pre>
+
+<p>然后，再建立一个 kb-article.c 源文件，其中与继承相关的代码如下：</p>
+
+<pre><code class="c">G_DEFINE_TYPE (KbArticle, kb_article, KB_TYPE_BIBTEX);
+</code></pre>
+
+<p>另外，KbBibtex 对象的 kb_bibtex_printf 方法也需要被 KbArticle 对象继承，这只需在 kb_article_printf 函数中调用 kb_bibtex_printf 即可实现，例如：</p>
+
+<pre><code class="c">void
+kb_article_printf (KbArticle *self)
+{
+        kb_bibtex_printf (&amp;self-&gt;parent);
+
+        /* 剩下代码是 KbArticle 对象的 kb_article_printf 方法的具体实现 */
+        ... ...
+}
+</code></pre>
+
+<p>当然，kb-article.h 和 kb-article.c 中剩余代码需要类似文档 [1] 中实现 KbBibtex 类那样去实现 KbArticle 类。这部分代码，我希望你能动手去尝试一下。下面，我仅给出测试 KbArticle 类的 main.c 源文件内容：</p>
+
+<pre><code class="c">#include "kb-article.h"
+
+int
+main (void)
+{
+        g_type_init ();
+
+        KbArticle *entry = g_object_new (KB_TYPE_ARTICLE,
+                                         "title", "Breaking paragraphs into lines",
+                                         "author", "Knuth, D.E. and Plass, M.F.",
+                                         "publisher", "Wiley Online Library",
+                                         "journal", "Software: Practice and Experience",
+                                         "volume", "11",
+                                         "number", "11",
+                                         "year", 1981,
+                                         "pages", "1119-1184",
+                                         NULL);
+        kb_article_printf (entry);
+
+        g_object_unref (entry);
+        return 0;
+}
+</code></pre>
+
+<p>测试结果表明，一切尽在掌握之中：<br/>
+<code>
+$ ./test
+    Title: Breaking paragraphs into lines
+   Author: Knuth, D.E. and Plass, M.F.
+Publisher: Wiley Online Library
+     Year: 1981
+  Journal: Software: Practice and Experience
+   Volume: 11
+   Number: 11
+    Pages: 1119-1184
+</code></p>
+
+<p><b>继承真的很美好？</b></p>
+
+<p>通过类的继承来实现一部分的代码复用真的是很惬意。但是，《C 专家编程》一书的作者却不这么认为，为了说明类的继承通常很难解决现实问题，他运用了一个比喻，将程序比作一本书，并将程序库比作一个图书馆。当你基于一个程序库去写你个人的程序之时，好比你在利用图书馆中的藏书去写你个人的书，显然你不可能很轻松的在那些藏书中复印一部分拼凑出一本书。</p>
+
+<p>就本文开头所举的例子而言，就无法通过继承文档 [1] 所设计的 KbBibtex 类来建立技术报告类，因为技术报告对象是没有 publisher 属性的。</p>
+
+<p>也许你会说，那是 KbBibtex 类设计的太烂了。嗯，我承认这一点，但是你不可能要求别人在设计程序库时候知道你想要什么，就像你不能去抱怨为什么图书馆里的藏书怎么不是为你写书而准备的一样。</p>
+
+<p>基类设计的失误，对于它的所有子类是一场巨大的灾难。要避免这种灾难，还是认真考虑自己所要解决的问题吧。其实很多问题都可以不需要使用继承便可以很好的解决，还有许多问题不需要继承很多的层次也可以很好的解决。</p>
+
+<p>对于本文的问题，不采用继承的实现会更好。比如我们可以这样来改造 KbBibtex 类：</p>
+
+<pre><code>将 Bibtex 文献所有格式的属性都设为 KbBibtex 的类属性
+为 Bibtex 对象拥有一个链表或数组之类的线性表容器，或者效率更高的 Hash 表容器（GLib 库均已提供），容器的第一个单元存储 Bibtex 对象对应的文献类型，其他单元则存储文献的属性。
+在 kb_bibtex_set_property 与 kb_bibtex_get_property 函数中，实现 Bibtex 类属性与 Bibtex 对象属性的数据交换。
+</code></pre>
+
+<p>仅此而已。</p>
+
+<p>如果说继承是美好的，那么平坦一些会更美好。如果你不愿意选择平坦，那么可以选择接口（Interface），这是下一篇文档的主题。</p>
+
+<p>~ End ~</p>
+
+<p>原文出处：<a href="http://garfileo.is-programmer.com">http://garfileo.is-programmer.com</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[[转载]GObject 学习笔记：温故而知新]]></title>
+    <link href="http://www.xefan.com/archives/83773.html"/>
+    <updated>2012-05-29T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/83773-[转载]GObject 学习笔记：温故而知新</id>
+    <content type="html"><![CDATA[<p>也许很多人将孔子所说的“温故而知新”理解为：温习学过的知识，从中获得新的领悟。但是，我更倾向于另一种解释：温习学过的知识，继续学习新的知识。本文借助一个更加平易和现实的示例用以温习文档 [1-3] 中的 GObject 知识，并进一步学习类与对象的方法。</p>
+
+<h2>Bibtex 文献类的设计，代号Kill Bill</h2>
+
+
+<p>这个才是本文的主题。我们将此次行动（或者称为项目也可）命名为“Kill Bill”，缩写“Kb”，其中并无深意，只是因为我正在看这部电影。</p>
+
+<p><b>1. 类的声明</b></p>
+
+<p>建立 kb-bibtex.h 头文件，以 GObject 类作为基类，声明 KbBibtex 类：</p>
+
+<pre><code class="c">#ifndef KB_BIBTEX_H
+#define KB_BIBTEX_H
+
+#include &lt;glib-object.h&gt;
+
+#define KB_TYPE_BIBTEX (kb_bibtex_get_type ())
+
+#define KB_BIBTEX(object) \
+        G_TYPE_CHECK_INSTANCE_CAST ((object), KB_TYPE_BIBTEX, KbBibtex)
+
+typedef struct _KbBibtex KbBibtex;
+struct _KbBibtex {
+    GObject parent;
+};
+
+typedef struct _KbBibtexClass KbBibtexClass;
+struct _KbBibtexClass {
+    GObjectClass parent_class;
+};
+
+GType kb_bibtex_get_type (void);
+
+#endif
+</code></pre>
+
+<p><b>2. 类型注册</b></p>
+
+<p>建立 kb-bibtex.c 源文件，对 KbBibtex 类进行定义，首先向 GObject 库的类型系统注册 KbBibtex 类型，使之成为 GObject 库认可的一类公民：</p>
+
+<pre><code class="c">#include "kb-bibtex.h"
+
+G_DEFINE_TYPE (KbBibtex, kb_bibtex, G_TYPE_OBJECT);
+</code></pre>
+
+<p><b>3. 对象的私有属性</b></p>
+
+<p>在此，必须要澄清两个概念，它们在文档 [1-3] 中的描述有些混淆：</p>
+
+<pre><code>首先是对象属性，它指代隶属于实例结构体的数据，文档 [2] 主要讲述的是对象属性的隐藏。
+其次是类属性，它指代隶属于类结构体的数据，可被所有的对象所共享，在文档 [3] 中我们利用了这一点，实现了通过类属性来访问对象属性。
+</code></pre>
+
+<p>下面定义 KbBibtex 对象的私有属性：</p>
+
+<pre><code class="c">#define KB_BIBTEX_GET_PRIVATE(object) (\
+        G_TYPE_INSTANCE_GET_PRIVATE ((object), KB_TYPE_BIBTEX, KbBibtexPrivate))
+
+typedef struct _KbBibtexPrivate KbBibtexPrivate;
+struct _KbBibtexPrivate {
+        GString *title;
+        GString *author;
+        GString *publisher;
+        guint   year;
+};
+</code></pre>
+
+<p><b>4. 类结构体与实例结构体的构造函数（初始化函数）</b></p>
+
+<p>在 KbBibtex 类结构体构造函数中安装对象的私有属性：</p>
+
+<pre><code class="c">static void
+kb_bibtex_class_init (KbBibtexClass *klass)
+{
+        g_type_class_add_private (klass,
+                                  sizeof (KbBibtexPrivate));
+}
+</code></pre>
+
+<p>kb_bibtex_class_init 参数名之所以使用 klass 而不是 class，是因为 class 是 c++ 语言的关键字，如果使用 class，那么 KbBibtex 类如是被 C++ 程序调用，那么程序编译时就杯具了。</p>
+
+<p>KbBibtex 实例结构体的构造函数则什么也不做：</p>
+
+<pre><code class="c">static void
+kb_bibtex_init (KbBibtex *self)
+{
+}
+</code></pre>
+
+<p>因为我们打算采用文档 [3] 中的方式，通过类属性来访问对象属性。
+<b>5. 对象私有属性的外部访问</b></p>
+
+<p>首先要实现类属性与对象属性之间的映射，即 kb_bibtex_set_property 与 kb_bibtex_get_property 函数：</p>
+
+<pre><code class="c">static void
+kb_bibtex_set_property (GObject *object, guint property_id,
+                        const GValue *value, GParamSpec *pspec)
+{      
+        KbBibtex *self = KB_BIBTEX (object);
+        KbBibtexPrivate *priv = KB_BIBTEX_GET_PRIVATE (self);
+
+        switch (property_id) {
+        case PROPERTY_TITLE:
+                if (priv-&gt;title)
+                        g_string_free (priv-&gt;title, TRUE);
+                priv-&gt;title = g_string_new (g_value_get_string (value));
+                break;
+        case PROPERTY_AUTHOR:
+                if (priv-&gt;author)
+                        g_string_free (priv-&gt;author, TRUE);
+                priv-&gt;author = g_string_new (g_value_get_string (value));
+                break;
+        case PROPERTY_PUBLISHER:
+                if (priv-&gt;publisher)
+                        g_string_free (priv-&gt;publisher, TRUE);
+                priv-&gt;publisher = g_string_new (g_value_get_string (value));
+                break;
+        case PROPERTY_YEAR:
+                priv-&gt;year = g_value_get_uint (value);
+                break;
+        default:
+                G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+                break;
+        }
+}
+
+static void
+kb_bibtex_get_property (GObject *object, guint property_id,
+                        GValue *value, GParamSpec *pspec)
+{
+        KbBibtex *self = KB_BIBTEX (object);
+        KbBibtexPrivate *priv = KB_BIBTEX_GET_PRIVATE (self);
+        GString *similar = NULL;
+
+        switch (property_id) {
+        case PROPERTY_TITLE:
+                g_value_set_string (value, priv-&gt;title-&gt;str);
+                break;
+        case PROPERTY_AUTHOR:
+                g_value_set_string (value, priv-&gt;author-&gt;str);
+                break;
+        case PROPERTY_PUBLISHER:
+                g_value_set_string (value, priv-&gt;publisher-&gt;str);
+                break;
+        case PROPERTY_YEAR:
+                g_value_set_uint (value, priv-&gt;year);
+                break;
+        default:
+                G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+                break;
+        }
+}
+</code></pre>
+
+<p>为了是上述代码能够工作，需要在 kb-bibtex.c 文件中定义 KbBibtex 各个类属性的 ID：</p>
+
+<pre><code class="c">enum PROPERTY_BIBTEX {
+        PROPERTY_0,
+        PROPERTY_TITLE,
+        PROPERTY_AUTHOR,
+        PROPERTY_PUBLISHER,
+        PROPERTY_YEAR,
+        N_PROPERTIES
+};
+</code></pre>
+
+<p>注意，enum 类型中，第一个成员 PROPERTY_0 仅仅是个占位符，它不会被使用，而最后一个成员 N_PROPERTIES 则用于表示类属性的个数，它在向类中安装属性的时候可以用到，详见下文。</p>
+
+<p><b>6. 类属性的构造与安装</b></p>
+
+<p>一旦完成了 KbBibtex 类属性与 KbBibtex 对象属性之间的映射，即 kb_bibtex_set_property 与 kb_bibtex_get_property 函数，那么便可以在 KbBibtex 类结构体构造函数中使用 GObject 类的 setter 与 getter 指针指向它们：</p>
+
+<pre><code class="c">static void
+kb_bibtex_class_init (KbBibtexClass *klass)
+{
+        g_type_class_add_private (klass, sizeof (KbBibtexPrivate));
+
+        GObjectClass *base_class = G_OBJECT_CLASS (klass);
+        base_class-&gt;set_property = kb_bibtex_set_property;
+        base_class-&gt;get_property = kb_bibtex_get_property;
+/* 未完 */
+</code></pre>
+
+<p>然后，构造类属性，与文档 [3] 有所区别，本文采用的是 ParamSpec 类型的指针数组，一遍在类属性构造完毕后，使用 g_object_class_install_properties 函数一并安装到类结构体中，而不是像文档 [3] 那样使用 g_object_class_install_property 函数一个一个的安装。</p>
+
+<p>类属性的构造代码如下：</p>
+
+<pre><code class="c">/* 接上面的代码 */
+        GParamSpec *properties[N_PROPERTIES] = {NULL,};
+        properties[PROPERTY_TITLE] =
+                g_param_spec_string ("title",
+                                     "Title",
+                                     "Bibliography title",
+                                     NULL,
+                                     G_PARAM_READWRITE);
+        properties[PROPERTY_AUTHOR] =
+                g_param_spec_string ("author",
+                                     "Author",
+                                     "Bibliography author",
+                                     NULL,
+                                     G_PARAM_READWRITE);
+        properties[PROPERTY_PUBLISHER] =
+                g_param_spec_string ("publisher",
+                                     "Publisher",
+                                     "Bibliography Publisher",
+                                     NULL,
+                                     G_PARAM_READWRITE);
+        properties[PROPERTY_YEAR] =
+                g_param_spec_uint ("year",
+                                   "Year",
+                                   "Bibliography year",
+                                   0,
+                                   G_MAXUINT,
+                                   0,
+                                   G_PARAM_READWRITE);
+/* 未完 */
+</code></pre>
+
+<p>最后，安装类属性：</p>
+
+<pre><code class="c">/* 接上面代码 */
+        g_object_class_install_properties (base_class, N_PROPERTIES, properties);
+}
+</code></pre>
+
+<p><b>使用 KbBibtex 类</b></p>
+
+<p>建立 main.c 源文件，内容为：</p>
+
+<pre><code class="c">#include "kb-bibtex.h"
+
+int
+main (void)
+{
+        g_type_init ();
+
+        KbBibtex *entry = g_object_new (KB_TYPE_BIBTEX,
+                                        "title", "The {\\TeX}Book",
+                                        "author", "Knuth, D. E.",
+                                        "publisher", "Addison-Wesley Professional",
+                                        "year", 1984,
+                                        NULL);
+
+        gchar *title, *author, *publisher;
+        guint year;
+
+        g_object_get (G_OBJECT (entry),
+                      "title", &amp;title,
+                      "author", &amp;author,
+                      "publisher", &amp;publisher,
+                      "year", &amp;year,
+                      NULL);
+
+        g_printf ("    Title: %s\n"
+                  "   Author: %s\n"
+                  "Publisher: %s\n"
+                  "     Year: %d\n", title, author, publisher, year);
+
+        g_free (title);
+        g_free (author);
+        g_free (publisher);
+
+        g_object_unref (entry);
+        return 0;
+}
+</code></pre>
+
+<p>编译这个程序的命令为：
+$ gcc $(pkg-config &ndash;cflags &ndash;libs gobject-2.0) kb-bibtex.c main.c  -o test
+程序运行结果：
+$ ./test
+    Title: The {\TeX}Book
+   Author: Knuth, D. E.
+Publisher: Addison-Wesley Professional
+     Year: 1984</p>
+
+<p><b>为类和对象添加方法</b></p>
+
+<p>在面向对象程序设计方法中，类和对象皆由“属性”与“方法“构成。文档 [1-3] 所讲的均是基于 GObject 子类化的数据抽象与封装，而未有涉及到类和对象的方法。其实，这样说并不正确，因为我们已经接触到了 GObject 子类的类结构体与实例结构体的构造函数，它们分别是类的方法和对象的方法。</p>
+
+<p>类的方法，形式如下：</p>
+
+<p>返回值
+函数名 (参数, &hellip;)
+{</p>
+
+<p>}</p>
+
+<p>对象的方法，形式如下：</p>
+
+<p>返回值
+函数名 (参数, &hellip;)
+{</p>
+
+<p>}</p>
+
+<p>  #@￥%……开玩笑呢吧？这两种方法有什么区别？它们不就是普通的 C 函数么？</p>
+
+<p>嗯，你以为呢？就是普通的 C 函数。</p>
+
+<p>下面为 KbBibtex 类增加一个对象方法，这个函数的功能是可以在终端输出文献信息。</p>
+
+<p>首先，在 kb-bibtex.h 头文件的底部增加函数声明：</p>
+
+<pre><code class="c">/* 对象的方法 */
+void kb_bibtex_printf (KbBibtex *self);
+</code></pre>
+
+<p>然后在 kb-bibtex.c 源文件中实现该函数，如下：</p>
+
+<pre><code class="c">void
+kb_bibtex_printf (KbBibtex *self)
+{
+        gchar *title, *author, *publisher;
+        guint year;
+
+        g_object_get (G_OBJECT (self),
+                      "title",     &amp;title,
+                      "author",    &amp;author,
+                      "publisher", &amp;publisher,
+                      "year",      &amp;year,
+                      NULL);
+
+        g_printf ("    Title: %s\n"
+                  "   Author: %s\n"
+                  "Publisher: %s\n"
+                  "     Year: %d\n", title, author, publisher, year);
+
+        g_free (title);
+        g_free (author);
+        g_free (publisher);
+}
+</code></pre>
+
+<p>这样，main.c 源文件便可以被简化为：</p>
+
+<pre><code class="c">#include "kb-bibtex.h"
+
+int
+main (void)
+{
+        g_type_init ();
+
+        KbBibtex *entry = g_object_new (KB_TYPE_BIBTEX,
+                                        "title", "The {\\TeX}Book",
+                                        "author", "Knuth, D. E.",
+                                        "publisher", "Addison-Wesley Professional",
+                                        "year", 1984,
+                                        NULL);
+
+        kb_bibtex_printf (entry);
+
+        g_object_unref (entry);
+        return 0;
+}
+</code></pre>
+
+<p>~ End ~</p>
+
+<p>原文出处：<a href="http://garfileo.is-programmer.com">http://garfileo.is-programmer.com</a></p>
+]]></content>
+  </entry>
+  
+</feed>

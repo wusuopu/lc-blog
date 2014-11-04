@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: 嵌入式栏目 | 龍昌博客]]></title>
+  <link href="http://www.xefan.com/categories/嵌入式栏目/atom.xml" rel="self"/>
+  <link href="http://www.xefan.com/"/>
+  <updated>2014-11-04T14:10:28+08:00</updated>
+  <id>http://www.xefan.com/</id>
+  <author>
+    <name><![CDATA[龍昌]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[TQ2440 串口程序]]></title>
+    <link href="http://www.xefan.com/archives/83741.html"/>
+    <updated>2012-05-14T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/83741-TQ2440 串口程序</id>
+    <content type="html"><![CDATA[<p>S3C2440的UART只需要3根线就可以实现通信功能，除去GND外只有两根线：一根发送TXD，一根接收RXD。</p>
+
+<p>对于UART0,TXD0与GPH2是复用的，RXD0与GPH3是复用的。</p>
+
+<p>因此使用UART0先要设置GPH2、GPH3：</p>
+
+<pre><code>GPHCON &amp;= ~((3&lt;&lt;4)|(3&lt;&lt;6));
+GPHCON |= (2&lt;&lt;4)|(2&lt;&lt;6);
+</code></pre>
+
+<p>其次进行初始化。</p>
+
+<p>与UART相关的寄存器：<br/>
+ULCONn：主要用于设置数据长度、停止位和检验位。<br/>
+UCONn：主要用于设置数据发送和接收的模式，中断方式还是查询方式。<br/>
+UBRDIVn：主要用于设置波特率。<br/>
+UTRSTATn：包含发送和接收是否完成的状态位。<br/>
+URXHn：接收数据缓冲寄存器，8位数据长度。<br/>
+UTXHn：发送数据缓冲寄存器，8位数据长度。</p>
+
+<p>例子程序下载：
+<a href="http://download.csdn.net/detail/wosuopu/4300998">http://download.csdn.net/detail/wosuopu/4300998</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[TQ2440 定时器程序]]></title>
+    <link href="http://www.xefan.com/archives/83739.html"/>
+    <updated>2012-05-13T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/83739-TQ2440 定时器程序</id>
+    <content type="html"><![CDATA[<p>S3C2440有两个PLL：MPLL（用于CPU及其他外设）、UPLL（专用于USB设备）<br/>
+MPLL会产生三个部分的时钟频率：FCLK、HCLK、PCLK</p>
+
+<p>S3C2440有5个16位定时器。定时器0和1共享一个8位预分频器，定时器2、3、4共享另一个8位预分频器。</p>
+
+<p>定时器的时钟源为PCLK，首先经过预分频器降低频率后，进入第二分频。可生成5种不同的分频信号（1/2,&frac14;,1/8,1/16和TCLK）。</p>
+
+<p>定时器启动后，TCNTn开始减一计数，当TCNTn等于TCMPn时TOUTn反转，TCNTn继续减数。当TCNTn=0时，TOUTn再反转，并触发中断（中断已使能）。若TCON设为自动加载，TCNTn/TCMPn值被重载。</p>
+
+<p>与定时器相关的寄存器：<br/>
+TCFG0：配置两个8位预分频器［15:8］决定定时器2,3,4的预标定器值，[7:0]决定定时器0,1。<br/>
+输出频率=PCLK/(prescaler value+1)</p>
+
+<p>TCFG1：设置第二个分频，可设置5种不同分频信号（1/2,&frac14;,1/8,1/16,TCLK）<br/>
+定时器工作频率=PCLK/(Prescaler value+1)/(divider value)<br/>
+divider value=2,4,8,16<br/>
+Prescaler=0~255</p>
+
+<p>TCON：定时器控制寄存器<br/>
+TCNTBn：设置一个被装载到递减计数器中的初始值<br/>
+TCMPBn：设置一个被装载到比较寄存器中用来和递减计数器的值比较的初始值<br/>
+TCNTOn：通过读取其可以得到TCNTn的值<br/>
+TCNTB=(PCLK/(Prescaler+1)/divider)*中断间隔</p>
+
+<p>定时器初始化例子：<br/>
+TCFG0 = 99; //预分频器0=99<br/>
+TCFG1 = 0x03; //选择16分频<br/>
+TCNTB0 = 31250; //0.5秒触发一次中断<br/>
+TCON |= (1&lt; TCON = 0x09; //自动加载，清“手动更新”，启动定时器0</p>
+
+<p>一个简单的定时器程序下载：<a href="http://download.csdn.net/detail/wosuopu/4298320">http://download.csdn.net/detail/wosuopu/4298320</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[TQ2440 蜂鸣器程序]]></title>
+    <link href="http://www.xefan.com/archives/83736.html"/>
+    <updated>2012-05-12T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/83736-TQ2440 蜂鸣器程序</id>
+    <content type="html"><![CDATA[<p>根据原理图知道TOUT0与GPB0连接，因此当GPB0输出高电平时蜂鸣器鸣；当GPB0输出低电平时蜂鸣器停止鸣。<br/>
+程序如下：<br/>
+文件名 beep.S</p>
+
+<pre><code>.include "gpio.inc"
+.text
+.global _start
+_start:
+        ldr r0, =GPBCON
+        mov r1, #0b01
+        str r1, [r0]
+        ldr r0, =GPBUP
+        mov r1, #0
+        str r1, [r0]
+        ldr r0, =GPBDAT
+        mov r1, #1
+next:   
+        mvn r1, r1
+        str r1, [r0]
+        bl delay
+        b next
+
+delay:
+        ldr r4, =100000
+delay1: sub r4, r4, #1
+        cmp r4, #0
+        bgt delay1
+        mov pc, lr
+
+main_loop:
+        b main_loop
+</code></pre>
+
+<p>文件名 gpio.inc</p>
+
+<pre><code>.equ GPACON, 0x56000000
+.equ GPADAT, 0x56000004
+
+.equ GPBCON, 0x56000010
+.equ GPBDAT, 0x56000014
+.equ GPBUP,  0x56000018
+
+.equ GPCCON, 0x56000020
+.equ GPCDAT, 0x56000024
+.equ GPCUP,  0x56000028
+
+.equ GPDCON, 0x56000030
+.equ GPDDAT, 0x56000034
+.equ GPDUP,  0x56000038
+
+.equ GPECON, 0x56000040
+.equ GPEDAT, 0x56000044
+.equ GPEUP,  0x56000048
+
+.equ GPFCON, 0x56000050
+.equ GPFDAT, 0x56000054
+.equ GPFUP,  0x56000058
+
+.equ GPGCON, 0x56000060
+.equ GPGDAT, 0x56000064
+.equ GPGUP,  0x56000068
+
+.equ GPHCON, 0x56000070
+.equ GPHDAT, 0x56000074
+.equ GPHUP,  0x56000078
+
+.equ GPJCON, 0x560000d0
+.equ GPJDAT, 0x560000d4
+.equ GPJUP,  0x560000d8
+</code></pre>
+
+<p>文件名 Makefile</p>
+
+<pre><code>ARCH = arm-linux-
+CC = $(ARCH)gcc
+LD = $(ARCH)ld
+OBJCOPY = $(ARCH)objcopy
+
+all:beep.S
+    $(CC) -g -c -o beep.o beep.S
+    $(LD) -Ttext 0x00000000 -g -o beep-elf beep.o
+    $(OBJCOPY) -O binary -S beep-elf beep.bin
+
+clean:
+    rm -f beep.o beep-elf beep.bin
+</code></pre>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[TQ2440 按键裸机驱动]]></title>
+    <link href="http://www.xefan.com/archives/83731.html"/>
+    <updated>2012-05-10T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/83731-TQ2440 按键裸机驱动</id>
+    <content type="html"><![CDATA[<p>根据TQ2440的手册可知KEY1、2、3、4分别由GPF1、4、2、0控制。<br/>
+程序的步骤为：<br/>
+1、先将GPB1、4、2、0设为输入；<br/>
+2、若有按键按下则对应引脚为0，否则为1.</p>
+
+<p>程序如下：<br/>
+文件名 crt0.S</p>
+
+<pre><code>.text
+.global _start
+_start:
+        ldr r0, =0x56000010 @WATCHDOG
+        mov r1, #0
+        str r1, [r0]
+        ldr sp, =1024*4
+        bl main
+
+halt_loop:
+        b halt_loop
+</code></pre>
+
+<p>文件名 gpio.h</p>
+
+<pre><code class="c">#ifndef _GPIO_H
+#define _GPIO_H
+
+#define GPACON (*(volatile unsigned int*)0x56000000)
+#define GPADAT (*(volatile unsigned int*)0x56000004)
+
+#define GPBCON (*(volatile unsigned int*)0x56000010)
+#define GPBDAT (*(volatile unsigned int*)0x56000014)
+#define GPBUP  (*(volatile unsigned int*)0x56000018)
+
+#define GPCCON (*(volatile unsigned int*)0x56000020)
+#define GPCDAT (*(volatile unsigned int*)0x56000024)
+#define GPCUP  (*(volatile unsigned int*)0x56000028)
+
+
+#define GPDCON (*(volatile unsigned int*)0x56000030)
+#define GPDDAT (*(volatile unsigned int*)0x56000034)
+#define GPDUP  (*(volatile unsigned int*)0x56000038)
+
+#define GPECON (*(volatile unsigned int*)0x56000040)
+#define GPEDAT (*(volatile unsigned int*)0x56000044)
+#define GPEUP  (*(volatile unsigned int*)0x56000048)
+
+#define GPFCON (*(volatile unsigned int*)0x56000050)
+#define GPFDAT (*(volatile unsigned int*)0x56000054)
+#define GPFUP  (*(volatile unsigned int*)0x56000058)
+
+#define GPGCON (*(volatile unsigned int*)0x56000060)
+#define GPGDAT (*(volatile unsigned int*)0x56000064)
+#define GPGUP  (*(volatile unsigned int*)0x56000068)
+
+#define GPHCON (*(volatile unsigned int*)0x56000070)
+#define GPHDAT (*(volatile unsigned int*)0x56000074)
+#define GPHUP  (*(volatile unsigned int*)0x56000078)
+
+#define GPJCON (*(volatile unsigned int*)0x560000d0)
+#define GPJDAT (*(volatile unsigned int*)0x560000d4)
+#define GPJUP  (*(volatile unsigned int*)0x560000d8)
+
+#endif
+</code></pre>
+
+<p>文件名 key.c</p>
+
+<pre><code class="c">#include "gpio.h"
+
+void delay()
+{
+    int i;
+    for (i=0; i&lt;100000; i++);
+}
+
+void main()
+{
+    GPFCON = 0b0011000000;
+    GPFDAT = 0b10111;
+
+    GPBCON = (0b01010101&lt;&lt;10);
+    GPBDAT = 0b111100000;
+    while(1)
+    {
+        if((GPFDAT &amp; 0b10) == 0)                   //key1
+        {
+            GPBDAT = 0b111000000;
+        }
+        else if((GPFDAT &amp; 0b10000) == 0)        //key2
+        {
+            GPBDAT = 0b110100000;
+        }
+        else if((GPFDAT &amp; 0b100) == 0)          //key3
+        {
+            GPBDAT = 0b101100000;
+        }
+        else if((GPFDAT &amp; 0b1) == 0)            //key4
+        {
+            GPBDAT = 0b011100000;
+        }
+        else continue;
+        delay();
+        GPBDAT = 0b111100000;
+    }
+}
+</code></pre>
+
+<p>文件名 Makefile</p>
+
+<pre><code>ARCH = arm-linux-
+CC = $(ARCH)gcc
+LD = $(ARCH)ld
+OBJDUMP = $(ARCH)objdump
+OBJCOPY = $(ARCH)objcopy
+
+all: crt0.S key.c
+    $(CC) -nostdlib -g -c -o crt0.o crt0.S
+    $(CC) -nostdlib -g -c -o key.o key.c
+    $(LD) -Ttext 0x00000000 -g crt0.o key.o -o key-elf
+    $(OBJCOPY) -O binary -S key-elf key_c.bin
+    $(OBJDUMP) -D -m arm key-elf &amp;gt; key.dis
+
+clean:
+    rm -f *.o key-elf key_c.bin key.dis
+</code></pre>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[TQ2440 LED裸机驱动]]></title>
+    <link href="http://www.xefan.com/archives/83725.html"/>
+    <updated>2012-04-29T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/83725-TQ2440 LED裸机驱动</id>
+    <content type="html"><![CDATA[<p>根据TQ2440的手册可知LED1、2、3、4分别由GPB5、6、7、8控制。<br/>
+程序的步骤为：<br/>
+1、先将GPB5、6、7、8设为输出；<br/>
+2、将对应位置0表示LED灯亮，对应位置1表示灯灭。</p>
+
+<p>程序如下：</p>
+
+<pre><code>@  文件名：led_on.s
+.equ GPBCON, 0x56000010
+.equ GPBDAT, 0x56000014
+.equ GPBUP,  0x56000018
+
+.text
+.global _start
+_start:
+    LDR R0,=GPBCON
+    MOV R1,#0b010101010000000000    @将GPB5、6、7、8设为输出
+    STR R1,[R0]
+    LDR R0,=GPBDAT
+    MOV R1,#0x00000000
+n:  MVN R1,R1
+    STR R1,[R0]
+    LDR R2,=100000
+w:  SUB R2,R2,#1
+    CMP R2,#0
+    BGT w
+    B n
+
+MAIN_LOOP:
+    B MAIN_LOOP
+.end
+</code></pre>
+
+<p>Makefile内容如下：</p>
+
+<pre><code>ARCH=arm-linux-
+CC=$(ARCH)gcc
+LD=$(ARCH)ld
+Objcopy=$(ARCH)objcopy
+
+led_on:led_on.s
+    $(CC) -g -c -o led_on.o led_on.s
+    $(LD) -Ttext 0x00000000 -g led_on.o -o led_on_elf
+    $(Objcopy) -O binary -S led_on_elf led_on.bin
+clean:
+    rm -f led_on.bin
+    rm -f led_on.o
+    rm -f led_on_elf
+</code></pre>
+]]></content>
+  </entry>
+  
+</feed>

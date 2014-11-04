@@ -1,0 +1,769 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>[翻译]Ruby GTK教程2——布局管理 - 龍昌博客</title>
+  <meta name="author" content="龍昌">
+
+  
+  <meta name="description" content="布局管理 这一章我们将展示如何布置窗口或者对话框中的控件。 当我设计应用程序的用户界面时，我们决定了将要使用哪些控件以及如何在应用程序中组织这些控件。为了组织我们的控件，我们使用了一些称为布局容器的特殊不可见控件。这一章我们将提到Alignment、Fixed、VBox和Table。 Fixed &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.xefan.com/archives/83957.html">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="龍昌博客" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.useso.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.useso.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.useso.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">龍昌博客</a></h1>
+  
+    <h2>从Pythoner转向Rubist</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.xefan.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+ <li><a href="/about/">About</a></li>  <li><a href="/gbook/">留言板</a></li> 
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">[翻译]Ruby GTK教程2——布局管理</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-11-21T00:00:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h1>布局管理</h1>
+
+
+<p>这一章我们将展示如何布置窗口或者对话框中的控件。</p>
+
+
+<p>当我设计应用程序的用户界面时，我们决定了将要使用哪些控件以及如何在应用程序中组织这些控件。为了组织我们的控件，我们使用了一些称为布局容器的特殊不可见控件。这一章我们将提到<em>Alignment</em>、<em>Fixed</em>、<em>VBox</em>和<em>Table</em>。</p>
+
+
+<h2>Fixed</h2>
+
+
+<p>Fixed窗口是将子控件放置在固定位置固定大小。这个容器不会执行自动布局管理。在大部分的应用程序中我们不使用这个容器。它用于一些特殊的地方，例如游戏、使用图表的特殊应用、可移动可变大小的组件（如电子表格中的图表）。以下是一些小例子。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# In this program, we lay out widgets
+# using absolute positioning
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "Fixed"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 300, 280
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        modify_bg Gtk::STATE_NORMAL, Gdk::Color.new(6400, 6400, 6440)
+
+        begin       
+            bardejov = Gdk::Pixbuf.new "bardejov.jpg"
+            rotunda = Gdk::Pixbuf.new "rotunda.jpg"
+            mincol = Gdk::Pixbuf.new "mincol.jpg"
+        rescue IOError =&gt; e
+            puts e
+            puts "cannot load images"
+            exit
+        end
+
+        image1 = Gtk::Image.new bardejov
+        image2 = Gtk::Image.new rotunda
+        image3 = Gtk::Image.new mincol
+
+        fixed = Gtk::Fixed.new
+
+        fixed.put image1, 20, 20
+        fixed.put image2, 40, 160
+        fixed.put image3, 170, 50
+
+        add fixed
+
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+
+
+<p>在我们在例子中我们在窗口上显示了三张图片。我们明确的指定了这些图片的x、y坐标的位置。</p>
+
+
+<pre><code>modify_bg Gtk::STATE_NORMAL, Gdk::Color.new(6400, 6400, 6440)
+</code></pre>
+
+
+<p>为了更好的显示体验，我们修改背景颜色为灰色。</p>
+
+
+<pre><code>bardejov = Gdk::Pixbuf.new "bardejov.jpg"
+</code></pre>
+
+
+<p>从磁盘上加载图片为Pixbug对象。</p>
+
+
+<pre><code>image1 = Gtk::Image.new bardejov
+image2 = Gtk::Image.new rotunda
+image3 = Gtk::Image.new mincol
+</code></pre>
+
+
+<p><em>Image</em>是用于显示图片的控件。在它的构造函数接收一个<em>Pixbuf</em>对象。</p>
+
+
+<pre><code>fixed = Gtk::Fixed.new
+</code></pre>
+
+
+<p>创建一个Fixed容器。</p>
+
+
+<pre><code>fixed.put image1, 20, 20
+</code></pre>
+
+
+<p>将第一张图片放在x=20，y=20的坐标位置上。</p>
+
+
+<pre><code> add fixed
+</code></pre>
+
+
+<p>最后我们将Fixed窗口放入窗口中。</p>
+
+
+<p><img alt="image1" src="http://zetcode.com/img/gui/rubygtk/fixed.png"><br>
+<em>图片：Fixed</em></p>
+
+
+<h2>按钮</h2>
+
+
+<p>Alignment容器用于控件它的子控件的对齐和大小。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# In this program, we position two buttons
+# in the bottom right corner of the window.
+# We use horizontal and vertical boxes.
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "Buttons"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 260, 150
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        vbox = Gtk::VBox.new false, 5
+        hbox = Gtk::HBox.new true, 3
+
+        valign = Gtk::Alignment.new 0, 1, 0, 0
+        vbox.pack_start valign
+
+        ok = Gtk::Button.new "OK"
+        ok.set_size_request 70, 30
+        close = Gtk::Button.new "Close"
+
+        hbox.add ok
+        hbox.add close
+
+        halign = Gtk::Alignment.new 1, 0, 0, 0
+        halign.add hbox
+
+        vbox.pack_start halign, false, false, 3
+
+        add vbox
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+
+
+<p>这个例子的代码中，我们将两个按钮放置在窗口的右下角。为了实现这个功能我们使用了两个垂直盒子和一个水平盒子和两个对齐容器。</p>
+
+
+<pre><code>valign = Gtk::Alignment.new 0, 1, 0, 0
+</code></pre>
+
+
+<p>这会将子控件放置在底部。</p>
+
+
+<pre><code>vbox.pack_start valign
+</code></pre>
+
+
+<p>这里我们将Alignment控件放置在竖直例子中。</p>
+
+
+<pre><code>hbox = Gtk::HBox.new true, 3 
+...
+ok = Gtk::Button.new "OK"
+ok.set_size_request 70, 30
+close = Gtk::Button.new "Close"
+
+hbox.add ok
+hbox.add close
+</code></pre>
+
+
+<p>创建一个水平盒子并放入两个按钮。</p>
+
+
+<pre><code>halign = Gtk::Alignment.new 1, 0, 0, 0
+halign.add hbox
+
+vbox.pack_start halign, false, false, 3
+</code></pre>
+
+
+<p>这将会创建一个对齐容器用于将其子控件放置在右边。我们将水平盒子放入对齐容器里并将对齐容器放入竖直盒子中。我们必须记住对齐容器只有一个子控件，这就是为什么我们要使用盒子容器。 <br>
+<img alt="image2" src="http://zetcode.com/img/gui/rubygtk/buttons.png"><br>
+<em>图片：按钮</em></p>
+
+
+<h2>计算器框架</h2>
+
+
+<p>Table控件将控件按行和列进行排序。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# In this program we create a skeleton of
+# a calculator. We use the Table widget. 
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "Calculator"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 300, 250
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        vbox = Gtk::VBox.new false, 2
+
+        mb = Gtk::MenuBar.new
+        filemenu = Gtk::Menu.new
+        file = Gtk::MenuItem.new "File"
+        file.set_submenu filemenu
+        mb.append file
+
+        vbox.pack_start mb, false, false, 0
+
+        table = Gtk::Table.new 5, 4, true
+
+        table.attach Gtk::Button.new("Cls"), 0, 1, 0, 1
+        table.attach Gtk::Button.new("Bck"), 1, 2, 0, 1
+        table.attach Gtk::Label.new, 2, 3, 0, 1
+        table.attach Gtk::Button.new("Close"), 3, 4, 0, 1
+
+        table.attach Gtk::Button.new("7"), 0, 1, 1, 2
+        table.attach Gtk::Button.new("8"), 1, 2, 1, 2
+        table.attach Gtk::Button.new("9"), 2, 3, 1, 2
+        table.attach Gtk::Button.new("/"), 3, 4, 1, 2
+
+        table.attach Gtk::Button.new("4"), 0, 1, 2, 3
+        table.attach Gtk::Button.new("5"), 1, 2, 2, 3
+        table.attach Gtk::Button.new("6"), 2, 3, 2, 3
+        table.attach Gtk::Button.new("*"), 3, 4, 2, 3
+
+        table.attach Gtk::Button.new("1"), 0, 1, 3, 4
+        table.attach Gtk::Button.new("2"), 1, 2, 3, 4
+        table.attach Gtk::Button.new("3"), 2, 3, 3, 4
+        table.attach Gtk::Button.new("-"), 3, 4, 3, 4
+
+        table.attach Gtk::Button.new("0"), 0, 1, 4, 5
+        table.attach Gtk::Button.new("."), 1, 2, 4, 5
+        table.attach Gtk::Button.new("="), 2, 3, 4, 5
+        table.attach Gtk::Button.new("+"), 3, 4, 4, 5
+
+        vbox.pack_start Gtk::Entry.new, false, false, 0
+
+        vbox.pack_end table, true, true, 0
+
+        add vbox
+
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+
+
+<p>我们使用Table控件来创建计算器的框架。</p>
+
+
+<pre><code>table = Gtk::Table.new 5, 4, true
+</code></pre>
+
+
+<p>我们创建了一个有5行4列的表格控件。第三个参数是homogenous参数。如果设置为true那么表格中的所有控件都是一样大小的。控件的大小等于表格容器中最大的那个控件。</p>
+
+
+<pre><code>table.attach Gtk::Button.new("Cls"), 0, 1, 0, 1
+</code></pre>
+
+
+<p>我们将一个按钮附加到表格容器的左上角。前两个参数是单元格的左右边界，后两个参数是单元格的上下边界。</p>
+
+
+<pre><code>vbox.pack_end table, true, true, 0
+</code></pre>
+
+
+<p>将表格控件打包放入竖直盒子里。<br>
+<img alt="image3" src="http://zetcode.com/img/gui/rubygtk/calculator.png">  <br>
+<em>图片：计算器框架</em></p>
+
+
+<h2>窗口</h2>
+
+
+<p>接下来我们创建一个更高级的例子。我们展示一个JDeveloper IDE中的窗口。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# This is a more complicated layout example.
+# We use Alignment and Table widgets. 
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "Windows"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 300, 250
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        set_border_width 15
+
+        table = Gtk::Table.new 8, 4, false
+        table.set_column_spacings 3
+
+        title = Gtk::Label.new "Windows"
+
+        halign = Gtk::Alignment.new 0, 0, 0, 0
+        halign.add title
+
+        table.attach(halign, 0, 1, 0, 1, Gtk::FILL,
+            Gtk::FILL, 0, 0)
+
+        frame = Gtk::Frame.new
+        table.attach(frame, 0, 2, 1, 3, Gtk::FILL | Gtk::EXPAND,
+            Gtk::FILL | Gtk::EXPAND, 1, 1)
+
+        activate = Gtk::Button.new "Activate"
+        activate.set_size_request 50, 30
+        table.attach(activate, 3, 4, 1, 2, Gtk::FILL,
+            Gtk::SHRINK, 1, 1)
+
+        valign = Gtk::Alignment.new 0, 0, 0, 0
+        close = Gtk::Button.new "Close"
+        close.set_size_request 70, 30
+        valign.add close
+        table.set_row_spacing 1, 3
+        table.attach(valign, 3, 4, 2, 3, Gtk::FILL,
+            Gtk::FILL | Gtk::EXPAND, 1, 1)
+
+        halign2 = Gtk::Alignment.new 0, 1, 0, 0
+        help = Gtk::Button.new "Help"
+        help.set_size_request 70, 30
+        halign2.add help
+        table.set_row_spacing 3, 6
+        table.attach(halign2, 0, 1, 4, 5, Gtk::FILL,
+            Gtk::FILL, 0, 0)
+
+        ok = Gtk::Button.new "OK"
+        ok.set_size_request 70, 30
+        table.attach(ok, 3, 4, 4, 5, Gtk::FILL,
+            Gtk::FILL, 0, 0)
+
+        add table
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+
+
+<p>这个例子展示了我们如何可以使用Ruby GTK创建一个类似的窗口。</p>
+
+
+<pre><code>table = Gtk::Table.new 8, 4, false
+table.set_column_spacings 3
+</code></pre>
+
+
+<p>这个例子是基于Table容器的。每个列之间有3像素的空隙。</p>
+
+
+<pre><code>title = Gtk::Label.new "Windows"
+
+halign = Gtk::Alignment.new 0, 0, 0, 0
+halign.add title
+
+table.attach(halign, 0, 1, 0, 1, Gtk::FILL,
+    Gtk::FILL, 0, 0)
+</code></pre>
+
+
+<p>这个代码创建了一个左对齐的标签。这个标签放置在表格的第一行中。</p>
+
+
+<pre><code>frame = Gtk::Frame.new
+table.attach(frame, 0, 2, 1, 3, Gtk::FILL | Gtk::EXPAND,
+    Gtk::FILL | Gtk::EXPAND, 1, 1)
+</code></pre>
+
+
+<p><em>frame</em>控件跨度为2行2列。</p>
+
+
+<pre><code>valign = Gtk::Alignment.new 0, 0, 0, 0
+close = Gtk::Button.new "Close"
+close.set_size_request 70, 30
+valign.add close
+table.set_row_spacing 1, 3
+table.attach(valign, 3, 4, 2, 3, Gtk::FILL,
+    Gtk::FILL | Gtk::EXPAND, 1, 1)
+</code></pre>
+
+
+<p>我们将关闭按钮放置在<em>frame</em>控件的下一个位置，在表格的第4列（我们是从0算起）。我们将按钮放在对齐控件内，这样我们就可以顶对齐了。</p>
+
+
+<p><img alt="image4" src="http://zetcode.com/img/gui/rubygtk/windows.png"><br>
+<em>图片：窗口</em></p>
+
+
+<p>这部分的Ruby GTK教程，我们提到了布局控件。</p>
+
+
+<hr>
+
+
+<p>原文地址： <a href="http://zetcode.com/gui/rubygtk/layoutmanagement/">http://zetcode.com/gui/rubygtk/layoutmanagement/</a><br>
+翻译：龙昌  admin@longchangjin.cn  </p>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">龍昌</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2013-11-21T00:00:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+    </p>
+    <p class="meta">
+      Categories: 
+
+<span class="categories">
+  
+    <a class='category' href='/categories/ruby栏目/index.html'>ruby栏目</a>
+  
+</span>
+
+
+    </p>
+    <p class="meta">
+      Tags: 
+
+<span class="tags">
+  
+    <a class='tag' href='/tags/Ruby/index.html'>Ruby</a>, <a class='tag' href='/tags/gtk/index.html'>gtk</a>, <a class='tag' href='/tags/翻译/index.html'>翻译</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/archives/83954.html" title="Previous Post: [翻译]Ruby GTK教程1——介绍">&laquo; [翻译]Ruby GTK教程1——介绍</a>
+      
+      
+        <a class="basic-alignment right" href="/archives/83960.html" title="Next Post: [翻译]Ruby GTK教程3——控件">[翻译]Ruby GTK教程3——控件 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Subscription</h1>
+  <!--以下是QQ邮件列表订阅嵌入代码--><script >var nId = "e7ee5da6d322dc7157c25cfd8a7700bb23a056dd1fb18cb4",nWidth="auto",sColor="light",sText="请输入邮件地址：" ;</script><script src="http://list.qq.com/zh_CN/htmledition/js/qf/page/qfcode.js" charset="gb18030"></script>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84132.html">配置elixir的vim环境</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84130.html">配置coffeescript的vim环境</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84127.html">VIM编译参数</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84124.html">Docker使用笔记</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84121.html">Nginx + Php + FastCGI配置</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (47)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (32)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (26)</a></li><li><a href='/categories/web开发/index.html'>web开发 (16)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (7)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (10)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (21)</a></li></ul>
+</section>
+<section>
+  <h1>Tag Cloud</h1>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.45454545454545%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.9090909090909%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.81818181818181%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.9090909090909%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.36363636363636%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.27272727272727%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.36363636363636%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.81818181818181%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.81818181818181%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 100.9090909090909%'>Django(1)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.9090909090909%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.81818181818181%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.72727272727273%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.9090909090909%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.9090909090909%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.45454545454545%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.81818181818181%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.63636363636364%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.45454545454545%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.9090909090909%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.45454545454545%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.9090909090909%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.9090909090909%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.9090909090909%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(66)</a> <a href='/tags/mongodb/index.html' style='font-size: 109.0909090909091%'>mongodb(10)</a> <a href='/tags/mysql/index.html' style='font-size: 103.63636363636364%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.9090909090909%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.9090909090909%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.18181818181819%'>php(9)</a> <a href='/tags/ps/index.html' style='font-size: 105.45454545454545%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.9090909090909%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 144.54545454545456%'>python(49)</a> <a href='/tags/qt/index.html' style='font-size: 101.81818181818181%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.9090909090909%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 123.63636363636364%'>Ruby(26)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.72727272727273%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.9090909090909%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.54545454545455%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.36363636363636%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.72727272727273%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 121.81818181818181%'>vim(24)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.72727272727273%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.9090909090909%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.9090909090909%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 112.72727272727272%'>Web开发(14)</a> <a href='/tags/windows/index.html' style='font-size: 106.36363636363636%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.9090909090909%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.9090909090909%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.9090909090909%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.9090909090909%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.45454545454545%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.81818181818181%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.9090909090909%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.18181818181819%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.18181818181819%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.9090909090909%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.9090909090909%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.9090909090909%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.81818181818181%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 109.0909090909091%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.18181818181819%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.9090909090909%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.54545454545455%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.9090909090909%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.9090909090909%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 104.54545454545455%'>网络日志(5)</a> <a href='/tags/翻译/index.html' style='font-size: 120.9090909090909%'>翻译(23)</a> <a href='/tags/视频教程/index.html' style='font-size: 109.0909090909091%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.9090909090909%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.81818181818181%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.9090909090909%'>随笔(1)</a> </span>
+</section>
+<section>
+  <h1>Link</h1>
+    <ul id="category-list">
+      <li><a target="_blank" title="我的Github" href="https://github.com/wusuopu">@Github</a></li>
+      <li><a target="_blank" title="我的微博" href="http://www.weibo.com/u/1768691343">@Weibo</a></li>
+      <li><a target="_blank" title="我的Twitter" href="https://twitter.com/longchangjin">@Twitter</a></li>
+      <li><a target="_blank" title="我的豆瓣" href="http://www.douban.com/people/lchj/">@Douban</a></li>
+
+      <li><a target="_blank" title="" href="http://www.vimer.cn/">Vimer的程序世界</a></li>
+      <li><a target="_blank" title="" href="http://pythoner.net/">python开发者社区</a></li>
+      <li><a target="_blank" title="" href="http://simple-is-better.com/">python.cn(news, jobs)</a></li>
+      <li><a target="_blank" title="" href="http://gtk.awaysoft.com/">GTK+ 中文社区</a></li>
+    </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - 龍昌 -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+<div style="display:none;"><script src="http://s94.cnzz.com/stat.php?id=1259846&web_id=1259846&show=pic" language="JavaScript"></script></div>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'longchang';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://www.xefan.com/archives/83957.html';
+        var disqus_url = 'http://www.xefan.com/archives/83957.html';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

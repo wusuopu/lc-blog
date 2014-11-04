@@ -1,0 +1,9240 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>龍昌博客</title>
+  <meta name="author" content="龍昌">
+
+  
+  <meta name="description" content="布局管理 这一章我们将展示如何布置窗口或者对话框中的控件。 当我设计应用程序的用户界面时，我们决定了将要使用哪些控件以及如何在应用程序中组织这些控件。为了组织我们的控件，我们使用了一些称为布局容器的特殊不可见控件。这一章我们将提到Alignment、Fixed、VBox和Table。 Fixed &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.xefan.com/page/6/index.html">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="龍昌博客" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.useso.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.useso.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.useso.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">龍昌博客</a></h1>
+  
+    <h2>从Pythoner转向Rubist</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.xefan.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+ <li><a href="/about/">About</a></li>  <li><a href="/gbook/">留言板</a></li> 
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83957.html">[翻译]Ruby GTK教程2——布局管理</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-11-21T00:00:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83957.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83957.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h1>布局管理</h1>
+
+
+<p>这一章我们将展示如何布置窗口或者对话框中的控件。</p>
+
+
+<p>当我设计应用程序的用户界面时，我们决定了将要使用哪些控件以及如何在应用程序中组织这些控件。为了组织我们的控件，我们使用了一些称为布局容器的特殊不可见控件。这一章我们将提到<em>Alignment</em>、<em>Fixed</em>、<em>VBox</em>和<em>Table</em>。</p>
+
+
+<h2>Fixed</h2>
+
+
+<p>Fixed窗口是将子控件放置在固定位置固定大小。这个容器不会执行自动布局管理。在大部分的应用程序中我们不使用这个容器。它用于一些特殊的地方，例如游戏、使用图表的特殊应用、可移动可变大小的组件（如电子表格中的图表）。以下是一些小例子。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# In this program, we lay out widgets
+# using absolute positioning
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "Fixed"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 300, 280
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        modify_bg Gtk::STATE_NORMAL, Gdk::Color.new(6400, 6400, 6440)
+
+        begin       
+            bardejov = Gdk::Pixbuf.new "bardejov.jpg"
+            rotunda = Gdk::Pixbuf.new "rotunda.jpg"
+            mincol = Gdk::Pixbuf.new "mincol.jpg"
+        rescue IOError =&gt; e
+            puts e
+            puts "cannot load images"
+            exit
+        end
+
+        image1 = Gtk::Image.new bardejov
+        image2 = Gtk::Image.new rotunda
+        image3 = Gtk::Image.new mincol
+
+        fixed = Gtk::Fixed.new
+
+        fixed.put image1, 20, 20
+        fixed.put image2, 40, 160
+        fixed.put image3, 170, 50
+
+        add fixed
+
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+
+
+<p>在我们在例子中我们在窗口上显示了三张图片。我们明确的指定了这些图片的x、y坐标的位置。</p>
+
+
+<pre><code>modify_bg Gtk::STATE_NORMAL, Gdk::Color.new(6400, 6400, 6440)
+</code></pre>
+
+
+<p>为了更好的显示体验，我们修改背景颜色为灰色。</p>
+
+
+<pre><code>bardejov = Gdk::Pixbuf.new "bardejov.jpg"
+</code></pre>
+
+
+<p>从磁盘上加载图片为Pixbug对象。</p>
+
+
+<pre><code>image1 = Gtk::Image.new bardejov
+image2 = Gtk::Image.new rotunda
+image3 = Gtk::Image.new mincol
+</code></pre>
+
+
+<p><em>Image</em>是用于显示图片的控件。在它的构造函数接收一个<em>Pixbuf</em>对象。</p>
+
+
+<pre><code>fixed = Gtk::Fixed.new
+</code></pre>
+
+
+<p>创建一个Fixed容器。</p>
+
+
+<pre><code>fixed.put image1, 20, 20
+</code></pre>
+
+
+<p>将第一张图片放在x=20，y=20的坐标位置上。</p>
+
+
+<pre><code> add fixed
+</code></pre>
+
+
+<p>最后我们将Fixed窗口放入窗口中。</p>
+
+
+<p><img alt="image1" src="http://zetcode.com/img/gui/rubygtk/fixed.png"><br>
+<em>图片：Fixed</em></p>
+
+
+<h2>按钮</h2>
+
+
+<p>Alignment容器用于控件它的子控件的对齐和大小。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# In this program, we position two buttons
+# in the bottom right corner of the window.
+# We use horizontal and vertical boxes.
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "Buttons"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 260, 150
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        vbox = Gtk::VBox.new false, 5
+        hbox = Gtk::HBox.new true, 3
+
+        valign = Gtk::Alignment.new 0, 1, 0, 0
+        vbox.pack_start valign
+
+        ok = Gtk::Button.new "OK"
+        ok.set_size_request 70, 30
+        close = Gtk::Button.new "Close"
+
+        hbox.add ok
+        hbox.add close
+
+        halign = Gtk::Alignment.new 1, 0, 0, 0
+        halign.add hbox
+
+        vbox.pack_start halign, false, false, 3
+
+        add vbox
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+
+
+<p>这个例子的代码中，我们将两个按钮放置在窗口的右下角。为了实现这个功能我们使用了两个垂直盒子和一个水平盒子和两个对齐容器。</p>
+
+
+<pre><code>valign = Gtk::Alignment.new 0, 1, 0, 0
+</code></pre>
+
+
+<p>这会将子控件放置在底部。</p>
+
+
+<pre><code>vbox.pack_start valign
+</code></pre>
+
+
+<p>这里我们将Alignment控件放置在竖直例子中。</p>
+
+
+<pre><code>hbox = Gtk::HBox.new true, 3 
+...
+ok = Gtk::Button.new "OK"
+ok.set_size_request 70, 30
+close = Gtk::Button.new "Close"
+
+hbox.add ok
+hbox.add close
+</code></pre>
+
+
+<p>创建一个水平盒子并放入两个按钮。</p>
+
+
+<pre><code>halign = Gtk::Alignment.new 1, 0, 0, 0
+halign.add hbox
+
+vbox.pack_start halign, false, false, 3
+</code></pre>
+
+
+<p>这将会创建一个对齐容器用于将其子控件放置在右边。我们将水平盒子放入对齐容器里并将对齐容器放入竖直盒子中。我们必须记住对齐容器只有一个子控件，这就是为什么我们要使用盒子容器。 <br>
+<img alt="image2" src="http://zetcode.com/img/gui/rubygtk/buttons.png"><br>
+<em>图片：按钮</em></p>
+
+
+<h2>计算器框架</h2>
+
+
+<p>Table控件将控件按行和列进行排序。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# In this program we create a skeleton of
+# a calculator. We use the Table widget. 
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "Calculator"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 300, 250
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        vbox = Gtk::VBox.new false, 2
+
+        mb = Gtk::MenuBar.new
+        filemenu = Gtk::Menu.new
+        file = Gtk::MenuItem.new "File"
+        file.set_submenu filemenu
+        mb.append file
+
+        vbox.pack_start mb, false, false, 0
+
+        table = Gtk::Table.new 5, 4, true
+
+        table.attach Gtk::Button.new("Cls"), 0, 1, 0, 1
+        table.attach Gtk::Button.new("Bck"), 1, 2, 0, 1
+        table.attach Gtk::Label.new, 2, 3, 0, 1
+        table.attach Gtk::Button.new("Close"), 3, 4, 0, 1
+
+        table.attach Gtk::Button.new("7"), 0, 1, 1, 2
+        table.attach Gtk::Button.new("8"), 1, 2, 1, 2
+        table.attach Gtk::Button.new("9"), 2, 3, 1, 2
+        table.attach Gtk::Button.new("/"), 3, 4, 1, 2
+
+        table.attach Gtk::Button.new("4"), 0, 1, 2, 3
+        table.attach Gtk::Button.new("5"), 1, 2, 2, 3
+        table.attach Gtk::Button.new("6"), 2, 3, 2, 3
+        table.attach Gtk::Button.new("*"), 3, 4, 2, 3
+
+        table.attach Gtk::Button.new("1"), 0, 1, 3, 4
+        table.attach Gtk::Button.new("2"), 1, 2, 3, 4
+        table.attach Gtk::Button.new("3"), 2, 3, 3, 4
+        table.attach Gtk::Button.new("-"), 3, 4, 3, 4
+
+        table.attach Gtk::Button.new("0"), 0, 1, 4, 5
+        table.attach Gtk::Button.new("."), 1, 2, 4, 5
+        table.attach Gtk::Button.new("="), 2, 3, 4, 5
+        table.attach Gtk::Button.new("+"), 3, 4, 4, 5
+
+        vbox.pack_start Gtk::Entry.new, false, false, 0
+
+        vbox.pack_end table, true, true, 0
+
+        add vbox
+
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+
+
+<p>我们使用Table控件来创建计算器的框架。</p>
+
+
+<pre><code>table = Gtk::Table.new 5, 4, true
+</code></pre>
+
+
+<p>我们创建了一个有5行4列的表格控件。第三个参数是homogenous参数。如果设置为true那么表格中的所有控件都是一样大小的。控件的大小等于表格容器中最大的那个控件。</p>
+
+
+<pre><code>table.attach Gtk::Button.new("Cls"), 0, 1, 0, 1
+</code></pre>
+
+
+<p>我们将一个按钮附加到表格容器的左上角。前两个参数是单元格的左右边界，后两个参数是单元格的上下边界。</p>
+
+
+<pre><code>vbox.pack_end table, true, true, 0
+</code></pre>
+
+
+<p>将表格控件打包放入竖直盒子里。<br>
+<img alt="image3" src="http://zetcode.com/img/gui/rubygtk/calculator.png">  <br>
+<em>图片：计算器框架</em></p>
+
+
+<h2>窗口</h2>
+
+
+<p>接下来我们创建一个更高级的例子。我们展示一个JDeveloper IDE中的窗口。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# This is a more complicated layout example.
+# We use Alignment and Table widgets. 
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "Windows"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 300, 250
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        set_border_width 15
+
+        table = Gtk::Table.new 8, 4, false
+        table.set_column_spacings 3
+
+        title = Gtk::Label.new "Windows"
+
+        halign = Gtk::Alignment.new 0, 0, 0, 0
+        halign.add title
+
+        table.attach(halign, 0, 1, 0, 1, Gtk::FILL,
+            Gtk::FILL, 0, 0)
+
+        frame = Gtk::Frame.new
+        table.attach(frame, 0, 2, 1, 3, Gtk::FILL | Gtk::EXPAND,
+            Gtk::FILL | Gtk::EXPAND, 1, 1)
+
+        activate = Gtk::Button.new "Activate"
+        activate.set_size_request 50, 30
+        table.attach(activate, 3, 4, 1, 2, Gtk::FILL,
+            Gtk::SHRINK, 1, 1)
+
+        valign = Gtk::Alignment.new 0, 0, 0, 0
+        close = Gtk::Button.new "Close"
+        close.set_size_request 70, 30
+        valign.add close
+        table.set_row_spacing 1, 3
+        table.attach(valign, 3, 4, 2, 3, Gtk::FILL,
+            Gtk::FILL | Gtk::EXPAND, 1, 1)
+
+        halign2 = Gtk::Alignment.new 0, 1, 0, 0
+        help = Gtk::Button.new "Help"
+        help.set_size_request 70, 30
+        halign2.add help
+        table.set_row_spacing 3, 6
+        table.attach(halign2, 0, 1, 4, 5, Gtk::FILL,
+            Gtk::FILL, 0, 0)
+
+        ok = Gtk::Button.new "OK"
+        ok.set_size_request 70, 30
+        table.attach(ok, 3, 4, 4, 5, Gtk::FILL,
+            Gtk::FILL, 0, 0)
+
+        add table
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+
+
+<p>这个例子展示了我们如何可以使用Ruby GTK创建一个类似的窗口。</p>
+
+
+<pre><code>table = Gtk::Table.new 8, 4, false
+table.set_column_spacings 3
+</code></pre>
+
+
+<p>这个例子是基于Table容器的。每个列之间有3像素的空隙。</p>
+
+
+<pre><code>title = Gtk::Label.new "Windows"
+
+halign = Gtk::Alignment.new 0, 0, 0, 0
+halign.add title
+
+table.attach(halign, 0, 1, 0, 1, Gtk::FILL,
+    Gtk::FILL, 0, 0)
+</code></pre>
+
+
+<p>这个代码创建了一个左对齐的标签。这个标签放置在表格的第一行中。</p>
+
+
+<pre><code>frame = Gtk::Frame.new
+table.attach(frame, 0, 2, 1, 3, Gtk::FILL | Gtk::EXPAND,
+    Gtk::FILL | Gtk::EXPAND, 1, 1)
+</code></pre>
+
+
+<p><em>frame</em>控件跨度为2行2列。</p>
+
+
+<pre><code>valign = Gtk::Alignment.new 0, 0, 0, 0
+close = Gtk::Button.new "Close"
+close.set_size_request 70, 30
+valign.add close
+table.set_row_spacing 1, 3
+table.attach(valign, 3, 4, 2, 3, Gtk::FILL,
+    Gtk::FILL | Gtk::EXPAND, 1, 1)
+</code></pre>
+
+
+<p>我们将关闭按钮放置在<em>frame</em>控件的下一个位置，在表格的第4列（我们是从0算起）。我们将按钮放在对齐控件内，这样我们就可以顶对齐了。</p>
+
+
+<p><img alt="image4" src="http://zetcode.com/img/gui/rubygtk/windows.png"><br>
+<em>图片：窗口</em></p>
+
+
+<p>这部分的Ruby GTK教程，我们提到了布局控件。</p>
+
+
+<hr>
+
+
+<p>原文地址： <a href="http://zetcode.com/gui/rubygtk/layoutmanagement/">http://zetcode.com/gui/rubygtk/layoutmanagement/</a><br>
+翻译：龙昌  admin@longchangjin.cn  </p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83954.html">[翻译]Ruby GTK教程1——介绍</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-11-20T00:00:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83954.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83954.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h1>Ruby GTK介绍</h1>
+
+
+<p>在这部分的Ruby GTK编程教程中，我偿将介绍GTK库并且使用Ruby语言编写我们的第一个程序。</p>
+
+
+<p>这个教程的目标是让你入门GTK和Ruby。贪吃蛇游戏的图片可以从这里<a href="http://zetcode.com/img/gui/rubygtk/images.zip">下载</a>。</p>
+
+
+<h2>关于</h2>
+
+
+<p>GTK是一个领先的创建图形化用户界面的套件。Ruby是一个流行的脚本语言。</p>
+
+
+<h2>简单的例子</h2>
+
+
+<p>第一个例子我们创建一个简单的窗口。这个窗口位置屏幕中间。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# This program centers a window on 
+# the screen
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: April 2009
+
+require 'gtk2'
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "Center"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        set_default_size 250, 200
+        set_window_position Gtk::Window::POS_CENTER
+
+        show
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+
+
+<p>这个例子在屏幕中间显示了一个250x200像素的窗口。</p>
+
+
+<pre><code>require 'gtk2'
+</code></pre>
+
+
+<p><em>require</em>关键字导入了这个应用程序中将要使用的类。</p>
+
+
+<pre><code>class RubyApp &lt; Gtk::Window
+</code></pre>
+
+
+<p>这个例子继承自<em>Window</em>。<em>Window</em>是一个顶级容器。</p>
+
+
+<pre><code>set_title "Center"
+</code></pre>
+
+
+<p>设置窗口的标题。</p>
+
+
+<pre><code>signal_connect "destroy" do 
+    Gtk.main_quit 
+end
+</code></pre>
+
+
+<p>当我们点击标题栏的关闭按钮或者按下Alt+F4时<em>destroy</em>事件被触发。<em>main_quit</em>正常退出应用程序。</p>
+
+
+<pre><code>set_default_size 250, 200
+</code></pre>
+
+
+<p>设置应用程序窗口的默认大小。</p>
+
+
+<pre><code>set_window_position Gtk::Window::POS_CENTER
+</code></pre>
+
+
+<p>将窗口放置在屏幕中间。</p>
+
+
+<pre><code>show
+</code></pre>
+
+
+<p>一些就绪，我们在屏幕上显示该窗口。</p>
+
+
+<pre><code>Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+
+
+<p>这三行启动应用程序。</p>
+
+
+<h2>创建提示框</h2>
+
+
+<p>第二个例子我们将显示一个提示框。提示框(Tooltip)是一个小的矩形窗口用于显示一些简洁的提示信息。它是一个常用的GUI组件。它是应用程序帮助系统的一部分。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# This code shows a tooltip on 
+# a window and a button
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title  "Tooltips"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        fixed = Gtk::Fixed.new
+        add fixed
+
+        button = Gtk::Button.new "Button"
+        button.set_size_request 80, 35      
+        button.set_tooltip_text "Button widget"
+
+        fixed.put button, 50, 50
+
+        set_tooltip_text "Window widget"
+        set_default_size 250, 200
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+
+
+<p>这个例子创建了一个窗口。如果我们将鼠标光标放在窗口的区域中，将会出现一个提示框。</p>
+
+
+<pre><code>button.set_tooltip_text "Button widget"
+</code></pre>
+
+
+<p>我们使用<em>set_tooltip_text</em>方法设置一个提示框。</p>
+
+
+<p><img alt="image1" src="http://zetcode.com/img/gui/rubygtk/tooltip.png"><br>
+<em>图片：提示框</em></p>
+
+
+<h2>退出按钮</h2>
+
+
+<p>在这节的最后一个例子我们将创建一个退出按钮。当我们按下这个按钮时程序结束。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# This program creates a quit
+# button. When we press the button,
+# the application terminates. 
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title  "Quit button"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        show_all
+    end
+
+    def init_ui
+
+        fixed = Gtk::Fixed.new
+        add fixed
+
+        button = Gtk::Button.new "Quit"
+        button.set_size_request 80, 35      
+        button.signal_connect "clicked" do 
+            Gtk.main_quit 
+        end
+
+        fixed.put button, 50, 50
+
+        set_default_size 250, 200
+        set_window_position Gtk::Window::POS_CENTER
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+
+
+<p>我们使用一个按钮控件。这是一个非常平常的控件。它显示一个文本、图像或者两者都显示。</p>
+
+
+<pre><code>init_ui
+</code></pre>
+
+
+<p>我们将用户接口的创建委派给<em>init_ui</em>方法。</p>
+
+
+<pre><code>show_all
+</code></pre>
+
+
+<p>我们有两个选择。对每个控件都调用<em>show</em>，或者调用<em>show_all</em>显示容器的所有了子控件。</p>
+
+
+<pre><code>button = Gtk::Button.new "Quit"
+</code></pre>
+
+
+<p>这里创建一个按钮控件。</p>
+
+
+<pre><code>button.set_size_request 80, 35
+</code></pre>
+
+
+<p>设置按钮的大小。</p>
+
+
+<pre><code>button.signal_connect "clicked" do 
+    Gtk.main_quit 
+end
+</code></pre>
+
+
+<p>我们将<em>main_quit</em>方法插入到按钮的点击事件中。</p>
+
+
+<pre><code>fixed.put button, 50, 50
+</code></pre>
+
+
+<p>将退出按钮放在<em>fixed</em>容器的x=50，y=50的位置。
+<img alt="image2" src="http://zetcode.com/img/gui/rubygtk/quitbutton.png"><br>
+<em>图片：退出按钮</em></p>
+
+
+<p>这一节我们介绍Ruby语言的GTK库。</p>
+
+
+<hr>
+
+
+<p>原文地址： <a href="http://zetcode.com/gui/rubygtk/introduction/">http://zetcode.com/gui/rubygtk/introduction/</a><br>
+翻译：龙昌  admin@longchangjin.cn  </p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83949.html">[翻译]Ruby教程15——输入&输出</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-11-18T00:00:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>18</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83949.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83949.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h1>Ruby的输入&amp;输出</h1>
+
+
+<p>这部分的教程我们讨论Ruby的输入和输出操作。输入是程序从键盘、文件或者其他程序读取数据。输出是程序产生数据。可以输出到屏幕、文件或者其他程序。</p>
+
+
+<p>输入&amp;输出是一个大的话题。稍后我们通过一些例子来大概介绍一下这个主题。Ruby中的一些类有些方法会执行输入&amp;输出操作。例如Kernel、IO、Dir或者File。</p>
+
+
+<h2>输出到终端</h2>
+
+
+<p>Ruby有一些在终端上打印输出的方法。这些方法是Kernel模块的一部分。Kernel模块的方法对于所有的Ruby对象都是有效的。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+print "Apple "
+print "Apple\n"
+
+puts "Orange"
+puts "Orange"
+</code></pre>
+
+
+<p><em>print</em>和<em>puts</em>方法会将文本输出到终端。它们的不同是会在最后加上一个换行符。</p>
+
+
+<pre><code>print "Apple "
+print "Apple\n"
+</code></pre>
+
+
+<p><em>print</em>在终端上打印两个连续的&#8221;Apple&#8221;字符串。如果我们想换一行，我们就必须显示的包含一个换行符。换行符是&#8217;\n&#8217;。<em>print</em>方法实际上是调用了对象的<em>to_s</em>方法。</p>
+
+
+<pre><code>puts "Orange"
+puts "Orange"
+</code></pre>
+
+
+<p><em>puts</em>方法在终端上打印两个字符串。每一个都各在一行。这个方法会自己添加换行符。</p>
+
+
+<p>$ ./printing.rb 
+Apple Apple<br>
+Orange<br>
+Orange  </p>
+
+
+<p><em>printing.rb</em>脚本的输出结果。</p>
+
+
+<p>根据Ruby的文档，<em>print</em>方法与<em>$stdout.print</em>是等效的。<em>$stdout</em>是全局变量，保存的标准输出流。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+$stdout.print "Ruby language\n"
+$stdout.puts "Python language"
+</code></pre>
+
+
+<p>我们使用$stdout变量打印两行内容。</p>
+
+
+<p>Ruby有另外三种输出方法。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+p "Lemon"
+p "Lemon"
+
+printf "There are %d apples\n", 3
+
+putc 'K'
+putc 0xA
+</code></pre>
+
+
+<p>这个例子中，我们展示了p、printf和putc方法。</p>
+
+
+<pre><code>p "Lemon"
+</code></pre>
+
+
+<p><em>p</em>会调用对象的<em>inspect</em>方法。这个方法对于调试很有用。</p>
+
+
+<pre><code>printf "There are %d apples\n", 3
+</code></pre>
+
+
+<p><em>printf</em>方法因C语言而出名。它能够将字符串格式化。</p>
+
+
+<pre><code>putc 'K'
+putc 0xA
+</code></pre>
+
+
+<p><em>putc</em>方法在终端上打印一个字符。第二行是打印一个换行符。0xA是换行符的十六进制代码。</p>
+
+
+<p>$ ./printing3.rb <br>
+&#8220;Lemon&#8221;<br>
+&#8220;Lemon&#8221;<br>
+There are 3 apples<br>
+K  </p>
+
+
+<p>printing3.rb的输出。</p>
+
+
+<p>使用Kernel的方法在终端上打印数据是简短方便的方式。接下来的例子展示了更多在终端上打印数据的正式方法。</p>
+
+
+<pre><code>ios = IO.new STDOUT.fileno
+ios.write "ZetCode\n"
+ios.close
+</code></pre>
+
+
+<p>这个例子我们打开标准输出流并往其中写入字符串。</p>
+
+
+<pre><code>ios = IO.new STDOUT.fileno
+</code></pre>
+
+
+<p><em>new</em>方法返回一个可写的数据流。这个方法传入一个文件描述符数字。<em>STDOUT.fileno</em>返回了标准输出流的文件描述符。我们也可以直接写2。</p>
+
+
+<pre><code>ios.write "ZetCode\n"
+</code></pre>
+
+
+<p>我们往打开的数据流写入字符串。</p>
+
+
+<pre><code>ios.close
+</code></pre>
+
+
+<p>关闭输出流。</p>
+
+
+<p>在Unix系统中标准的终端输出是连接到一个特殊的文件/dev/tty。将其打开并写入数据，既是写到终端上。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+fd = IO.sysopen "/dev/tty", "w"
+ios = IO.new(fd, "w")
+ios.puts "ZetCode"
+ios.close
+</code></pre>
+
+
+<p>写入到/dev/tty文件的一个例子。这仅能够在Unix上运行。</p>
+
+
+<pre><code>fd = IO.sysopen "/dev/tty", "w"
+</code></pre>
+
+
+<p><em>sysopen</em>方法打开指定目录的文件，返回最后的文件描述符。</p>
+
+
+<pre><code>ios = IO.new(fd, "w")
+</code></pre>
+
+
+<p>文件描述符数字用于打开一个数据流。</p>
+
+
+<pre><code>ios.puts "ZetCode"
+ios.close
+</code></pre>
+
+
+<p>往数据流中写入字符串然后关闭它。</p>
+
+
+<h2>从终端输入</h2>
+
+
+<p>这一节我们将创建一些处理输入的代码例子。</p>
+
+
+<p>$stdin是一个全局变量保存了标准输入流。它可以用于从终端输入数据。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+inp = $stdin.read
+puts inp
+</code></pre>
+
+
+<p>上面的代码，我们使用<em>read</em>方法从终端读取输入。</p>
+
+
+<pre><code>inp = $stdin.read
+</code></pre>
+
+
+<p><em>read</em>方法从标准输入读取数据直到文件结尾。EOF在Unix中是使用Ctrl + D产生，在Windows中是Ctrl + Z。</p>
+
+
+<p>$ ./reading.rb<br>
+Ruby language<br>
+Ruby language  </p>
+
+
+<p>我们启动了程序，这个脚本会读取数据直到我们按下Ctrl + D 或者 Ctrl + Z。</p>
+
+
+<p>$ echo &#8220;ZetCode&#8221; | ./reading.rb<br>
+ZetCode  </p>
+
+
+<p>$ ./input.rb &lt; stones <br>
+Garnet<br>
+Topaz<br>
+Opal<br>
+Amethyst<br>
+Ruby<br>
+Jasper<br>
+Pyrite<br>
+Malachite<br>
+Quartz  </p>
+
+
+<p>如果我们使用重定向，脚本可以从其他程序或者文件中读取数据。</p>
+
+
+<p>通常从终端读取数据是使用<em>gets</em>方法。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+print "Enter your name: "
+name = gets
+puts "Hello #{name}"
+</code></pre>
+
+
+<p>使用<em>gets</em>方法读取用户输入的一行数据。</p>
+
+
+<pre><code>name = gets
+</code></pre>
+
+
+<p><em>gets</em>方法从标准输入读取数据并分配给<em>name</em>变量。</p>
+
+
+<pre><code>puts "Hello #{name}"
+</code></pre>
+
+
+<p>打印输入的数据。</p>
+
+
+<p>$ ./readline.rb<br>
+Enter your name: Jan<br>
+Hello Jan  </p>
+
+
+<p>输出结果。</p>
+
+
+<p>接下来的两个脚本我们讨论<em>chomp</em>方法。它是字符串方法，用于移除字符串结尾的空白。当我们执行输入操作时它很有用。这个方法名和用法来自Perl语言。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+print "Enter a string: "
+inp = gets
+
+puts "The string has #{inp.size} characters"
+</code></pre>
+
+
+<p>读取一个用户输入的字符串，并计算它的长度。</p>
+
+
+<p>$ ./nochomp.rb <br>
+Enter a string: Ruby<br>
+The string has 5 characters  </p>
+
+
+<p>这个提示表示了这个字符串有5个字符，因为它统计的换行符。</p>
+
+
+<p>为了得到正确的结果，我们需要移除换行符。这正是<em>chomp</em>方法的作用。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+print "Enter a string: "
+inp = gets.chomp
+
+puts "The string has #{inp.size} characters"
+</code></pre>
+
+
+<p>这次我们使用<em>chomp</em>方法截掉了换行符。</p>
+
+
+<p>$ ./chomp.rb <br>
+Enter a string: Ruby<br>
+The string has 4 characters  </p>
+
+
+<p><em>Ruby</em>字符串有4个字符。</p>
+
+
+<h2>文件</h2>
+
+
+<p>从Ruby官方文档我们知道<em>IO</em>类是所有输入输出的基类。<em>File</em>类只是<em>IO</em>类的一个子类。这两个类是紧密相关的。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+f = File.open('output.txt', 'w')
+f.puts "The Ruby tutorial"
+f.close
+</code></pre>
+
+
+<p>第一个例子我们打开一个文件并往里面写入一些数据。</p>
+
+
+<pre><code>f = File.open('output.txt', 'w')
+</code></pre>
+
+
+<p>以写模式打开&#8217;output.txt&#8217;文件。<em>open</em>方法返回数据流。</p>
+
+
+<pre><code>f.puts "The Ruby tutorial"
+</code></pre>
+
+
+<p>往上面打开的数据流写入数据。<em>puts</em>方法也可用于往文件写入数据。</p>
+
+
+<pre><code>f.close
+</code></pre>
+
+
+<p>最后关闭数据流。</p>
+
+
+<p>$ ./simplewrite.rb<br>
+$ cat output.txt <br>
+The Ruby tutorial  </p>
+
+
+<p>执行脚本并显示output.txt文件的内容。</p>
+
+
+<p>以下是一个类似的例子显示了额外的方法。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+File.open('langs', 'w') do |f|
+
+    f.puts "Ruby"
+    f.write "Java\n"
+    f &lt;&lt; "Python\n"
+
+end
+</code></pre>
+
+
+<p>如果<em>open</em>方法之后是一个代码块，Ruby会将打开的数据流传递给这个代码块。最后这个文件会自动关闭。</p>
+
+
+<pre><code>f.puts "Ruby"
+f.write "Java\n"
+f &lt;&lt; "Python\n"
+</code></pre>
+
+
+<p>我们使用了三个方法写文件。</p>
+
+
+<p>$ ./simplewrite2.rb<br>
+$ cat langs <br>
+Ruby<br>
+Java<br>
+Python  </p>
+
+
+<p>执行这个脚本并查看里面的内容。</p>
+
+
+<p>第二个例子我们显示一些<em>File</em>类的方法。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+puts File.exists? 'tempfile'
+
+f = File.new 'tempfile', 'w'
+puts File.mtime 'tempfile'
+puts f.size
+
+File.rename 'tempfile', 'tempfile2'
+
+f.close
+</code></pre>
+
+
+<p>这个例子创建了一个新文件&#8217;tempfile&#8217;并调用了一些方法。</p>
+
+
+<pre><code>puts File.exists? 'tempfile'
+</code></pre>
+
+
+<p><em>exists?</em>方法检查给定的文件是否存在。这行返回false，因为我们还没有创建这个文件。</p>
+
+
+<pre><code>f = File.new 'tempfile', 'w'
+</code></pre>
+
+
+<p>创建文件。</p>
+
+
+<pre><code>puts File.mtime 'tempfile'
+</code></pre>
+
+
+<p><em>mtime</em>方法返回这个文件的最后修改时间。</p>
+
+
+<pre><code>puts f.size
+</code></pre>
+
+
+<p>查看文件的大小。这里返回0,因为我们还没有往文件写入数据。</p>
+
+
+<pre><code>File.rename 'tempfile', 'tempfile2'
+</code></pre>
+
+
+<p>最后我们使用<em>rename</em>将文件重命名。</p>
+
+
+<p>$ ./testfile.rb<br>
+false<br>
+2011-11-05 16:19:36 +0100<br>
+0  </p>
+
+
+<p>输出结果。</p>
+
+
+<p>接下来我们从磁盘文件读取内容。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+f = File.open("stones")
+
+while line = f.gets do
+    puts line
+end
+
+f.close
+</code></pre>
+
+
+<p>这是一个简单的脚本，打开<em>stones</em>文件并在终端上打印它的内容。</p>
+
+
+<pre><code>f = File.open("stones")
+</code></pre>
+
+
+<p>打开&#8217;stones&#8217;文件，默认是只读模式。</p>
+
+
+<pre><code>while line = f.gets do
+    puts line
+end
+</code></pre>
+
+
+<p><em>gets</em>方法从I/O数据流读取一行数据。当读到文件结尾时while代码块退出。</p>
+
+
+<p>$ ./readlines2.rb<br>
+Garnet<br>
+Topaz<br>
+Opal<br>
+Amethyst<br>
+Ruby<br>
+Jasper<br>
+Pyrite<br>
+Malachite<br>
+Quartz  </p>
+
+
+<p>例子输出结果。</p>
+
+
+<p>下一个例子将从文件读取数据。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+fname = 'alllines.rb'
+
+File.readlines(fname).each do |line|
+    puts line
+end
+</code></pre>
+
+
+<p>这个脚本显示了另一个读取文件内容的方式。这个例子将它自己的代码打印在终端上。</p>
+
+
+<pre><code>File.readlines(fname).each do |line|
+    puts line
+end
+</code></pre>
+
+
+<p><em>readlines</em>读取指定文件的每一行内容，并作为数据返回。我们使用<em>each</em>方法遍历数组，并将其在终端上打印。</p>
+
+
+<pre><code>$ ./alllines.rb
+#!/usr/bin/ruby
+
+fname = 'alllines.rb'
+
+File.readlines(fname).each do |line|
+    puts line
+end
+</code></pre>
+
+
+<p>输出结果。</p>
+
+
+<h2>目录</h2>
+
+
+<p>在这一节我们使用目录。Ruby中有一个Dir类可以操作目录。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+Dir.mkdir "tmp"
+puts Dir.exists? "tmp"
+
+puts Dir.pwd
+Dir.chdir "tmp"
+puts Dir.pwd
+
+Dir.chdir '..'
+puts Dir.pwd
+Dir.rmdir "tmp"
+puts Dir.exists? "tmp"
+</code></pre>
+
+
+<p>这个脚本我们使用了Dir类的四个方法。</p>
+
+
+<pre><code>Dir.mkdir "tmp"
+</code></pre>
+
+
+<p><em>mkdir</em>方法创建一个新目录&#8217;tmp&#8217;。</p>
+
+
+<pre><code>puts Dir.exists? "tmp"
+</code></pre>
+
+
+<p>使用<em>exists?</em>方法检查一个目录是否存在。</p>
+
+
+<pre><code>puts Dir.pwd
+</code></pre>
+
+
+<p><em>pwd</em>方法打印当前的工作目录。这是我们启动脚本的目录。</p>
+
+
+<pre><code>Dir.chdir '..'
+</code></pre>
+
+
+<p><em>chdir</em>方法切换目录。&#8217;..&#8217;目录是当前工作目录的父目录。</p>
+
+
+<pre><code>Dir.rmdir "tmp"
+puts Dir.exists? "tmp"
+</code></pre>
+
+
+<p>最后我们使用<em>rmdir</em>方法移除目录。这时<em>exists?</em>方法返回false。</p>
+
+
+<p>$ ./dirs.rb<br>
+true<br>
+/home/vronskij/programming/ruby/io<br>
+/home/vronskij/programming/ruby/io/tmp<br>
+/home/vronskij/programming/ruby/io<br>
+false  </p>
+
+
+<p>例子的输出结果。
+第二个例子我们检索目录所有的条目，包括文件和子目录。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+fls = Dir.entries '.'
+puts fls.inspect
+</code></pre>
+
+
+<p><em>entries</em> 方法返回指定目录的所有条目。</p>
+
+
+<pre><code>fls = Dir.entries '.'
+puts fls.inspect
+</code></pre>
+
+
+<p>我们得到了当前目录下的文件和目录数组。&#8217;.&#8217;代表当前工作目录。<em>inspect</em>方法使得数组更加可读。</p>
+
+
+<p>$ ./allfiles.rb<br>
+[&#8220;putc.rb&#8221;, &#8220;simplewrite.rb&#8221;, &#8220;readlines2.rb&#8221;, &#8220;fileexists.rb~&#8221; &#8230;  </p>
+
+
+<p>输出结果。</p>
+
+
+<p>第三个例子使用了home目录。每个计算机用户都有一个分配给他的唯一的目录，称为home目录。它是用于存放用户自己的文件。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+puts Dir.home
+puts Dir.home 'root'
+</code></pre>
+
+
+<p>这个脚本打印两个home目录。</p>
+
+
+<pre><code>puts Dir.home
+</code></pre>
+
+
+<p>如果没有指定用户名则返回当前用户的home目录。当前用户是指定启动这个脚本文件的用户。</p>
+
+
+<pre><code>puts Dir.home 'root'
+</code></pre>
+
+
+<p>这里我们指定了一个用户。</p>
+
+
+<p>$ ./homedir.rb<br>
+/home/vronskij<br>
+/root  </p>
+
+
+<p>输出结果。</p>
+
+
+<h2>执行外部程序</h2>
+
+
+<p>Ruby有一些方式可以执行外部程序。我们的例子中我们使用了Linux中有名的命令。Windows或者Mac读取可以使用他们自己系统的命令。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+data = system 'ls'
+puts data
+</code></pre>
+
+
+<p>调用<em>ls</em>命令列出目录内容。</p>
+
+
+<pre><code>data = system 'ls'
+</code></pre>
+
+
+<p><em>system</em>命令在一个子shell中执行外部程序。这个方法是属于Kernel Ruby 模块的。</p>
+
+
+<p>$ ./system.rb<br>
+allfiles.rb   characters.rb  fileexists.rb   homedir.rb~ &#8230;  </p>
+
+
+<p>输出结果。</p>
+
+
+<p>我们展示另外两个执行外部程序的方式。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+out = `pwd`
+puts out
+
+out = %x[uptime]
+puts out
+
+out = %x[ls | grep 'readline']
+puts out
+</code></pre>
+
+
+<p>执行外部程序我们可以使用反引号&#8220;和%x[]字符。</p>
+
+
+<pre><code>out = `pwd`
+</code></pre>
+
+
+<p>这里我们使用反引号执行<em>pwd</em>命令。这个命令返回当前的工作目录。</p>
+
+
+<pre><code>out = %x[uptime]
+</code></pre>
+
+
+<p>这里我得到<em>uptime</em>命令的输出，它显示系统运行了多久。</p>
+
+
+<pre><code>out = %x[ls | grep 'readline']
+</code></pre>
+
+
+<p>我们也可以使用复合命令。</p>
+
+
+<p>$ ./system2.rb<br>
+/home/vronskij/programming/ruby/io<br>
+ 22:50:50 up  5:32,  1 user,  load average: 0.46, 0.44, 0.45<br>
+readline.rb<br>
+readline.rb~<br>
+readlines2.rb<br>
+readlines2.rb~  </p>
+
+
+<p>输出结果。</p>
+
+
+<p>我们可以使用<em>open</em>方法执行命令。这个方法是属于Kernel模块的。它创建一个IO对象连接到指定的数据流、文件或者子进程。如果我们想要连接到子进程，我们将打开路径以管道符(|)开头。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+f = open("|ls -l |head -3")
+out = f.read
+puts out
+f.close
+
+puts $?.success?
+</code></pre>
+
+
+<p>这个例子我们打印了<em>ls -l | head -3</em>命令的结果。我们也还检查了子进程的状态。</p>
+
+
+<pre><code>f = open("|ls -l |head -3")
+</code></pre>
+
+
+<p>连接到子进程。</p>
+
+
+<pre><code>out = f.read
+puts out
+</code></pre>
+
+
+<p>读取并打印子进程的数据。</p>
+
+
+<pre><code>f.close
+</code></pre>
+
+
+<p>关闭文件句柄。</p>
+
+
+<pre><code>puts $?.success?
+</code></pre>
+
+
+<p><em>$?</em>是一个特殊的变量，设置为上次执行过的子进程。如果子进程成功退出<em>success?</em>方法返回true。</p>
+
+
+<p>$ ./system3.rb<br>
+total 148<br>
+-rwxr-xr-x 1 vronskij vronskij   57 2011-10-30 23:33 allfiles.rb<br>
+-rwxr-xr-x 1 vronskij vronskij   58 2011-10-30 23:33 allfiles.rb~<br>
+true  </p>
+
+
+<p>输出结果。</p>
+
+
+<h2>重定向标准输出</h2>
+
+
+<p>Ruby对标准输入、标准输出和标准错误输出都有预定义的全局变量。<em>$stdout</em> 是标准输出的变量名。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+$stdout = File.open "output.log", "a"
+
+puts "Ruby"
+puts "Java"
+
+$stdout.close
+$stdout = STDOUT
+
+puts "Python"
+</code></pre>
+
+
+<p>上面的例子我们将输出重定向到output.log文件。</p>
+
+
+<pre><code>$stdout = File.open "output.log", "a"
+</code></pre>
+
+
+<p>这行创建一个新的标准输出。现在标准输出流向ouput.log文件。这个文件以追加方式打开，如果文件不存在则创建，否则打开并将数据追加到文件尾部。</p>
+
+
+<pre><code>puts "Ruby"
+puts "Java"
+</code></pre>
+
+
+<p>打印两个字符串。这些字符串不会像平常一样在终端上显示了。而是追加到output.log文件中。</p>
+
+
+<pre><code>$stdout.close
+</code></pre>
+
+
+<p>关闭文件句柄。</p>
+
+
+<pre><code>$stdout = STDOUT
+
+puts "Python"
+</code></pre>
+
+
+<p>使用预定义的常量<em>STDOUT</em>重新创建正常的标准输出。&#8221;Python&#8221;字符串在终端上打印。</p>
+
+
+<p>这部分的教程我们使用了输入和输出操作。</p>
+
+
+<hr>
+
+
+<p>原文地址： <a href="http://zetcode.com/lang/rubytutorial/io/">http://zetcode.com/lang/rubytutorial/io/</a><br>
+翻译：龙昌  admin@longchangjin.cn<br>
+完整教程：<a href="https://github.com/wusuopu/Ruby-tutorial">https://github.com/wusuopu/Ruby-tutorial</a> </p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83945.html">[翻译]Ruby教程14——正则表达式</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-11-17T00:00:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83945.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83945.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h1>Ruby的正则表达式</h1>
+
+
+<p>在这部分和教程中我们将讨论正则表达式。</p>
+
+
+<p>正则表达式用于文本搜索和更高级的文本操作。内建正则表达式的工具如grep、sed；文本编辑器如vi、emacs；编程语言如Tcl、Perl、Python。Ruby也内建支持正则表达式。</p>
+
+
+<p>从另一方面来看正则表达式语法构成了一个文本匹配的领域专用语言。</p>
+
+
+<p><em>pattern</em>（模式）是一个正则表达式，它定义了我们要搜索或者操作的文本。它由文本字面和元字符构成。模式位于两个分隔符内。在Ruby中是<em>//</em>字符。它们通知正则表达式函数的开始和结束。</p>
+
+
+<p>这里是元字符的部分列表。</p>
+
+
+<table>
+    <tr>
+        <td>.</td>
+        <td>匹配任意一个字符</td>
+    </tr>
+    <tr>
+        <td>*</td>
+        <td>匹配前一个元素0次或多次</td>
+    </tr>
+    <tr>
+        <td>[]</td>
+        <td>括号表达式。匹配括号内的一个字符</td>
+    </tr>
+    <tr>
+        <td>[^]</td>
+        <td>匹配不在括号内的一个字符</td>
+    </tr>
+    <tr>
+        <td>^</td>
+        <td>匹配字符串的开始位置</td>
+    </tr>
+    <tr>
+        <td>$</td>
+        <td>匹配字符串的结束位置</td>
+    </tr>
+    <tr>
+        <td>|</td>
+        <td>交替操作</td>
+    </tr>
+</table>
+
+
+
+
+<p>=~操作符对字符串匹配正则表达式，如果匹配则返回匹配字符串的偏移量否则为nil。 <em>RegExp</em>类是用来开发正则表达式。还有两个速记的方式来创建正则表达式。下面的例子将显示它们。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+re = Regexp.new 'Jane'
+p "Jane is hot".match re
+
+p "Jane is hot" =~ /Jane/
+p "Jane is hot".match %r{Jane}
+</code></pre>
+
+
+<p>第一个例子我们显示了对字符串应用正则表达式的三种方式。</p>
+
+
+<pre><code>re = Regexp.new 'Jane'
+p "Jane is hot".match re
+</code></pre>
+
+
+<p>上面两行我们创建了一个简单的包含正则表达式文本的<em>Regexp</em>对象。使用<em>match</em>方法我们对<em>&#8220;Jane is hot&#8221;</em>句子应用这个正则表达式。检查&#8217;Jance&#8217;是否在这个句子中。</p>
+
+
+<pre><code>p "Jane is hot" =~ /Jane/
+p "Jane is hot".match %r{Jane}
+</code></pre>
+
+
+<p>这两行完成相同的工作。两个斜杠//和%R{}字符是第一种方式的简写。在这个教程中，我们将使用斜杠。这是在许多语言中是事实上的标准。</p>
+
+
+<pre><code>$ ./regex.rb
+#&lt;MatchData "Jane"&gt;
+0
+#&lt;MatchData "Jane"&gt;
+</code></pre>
+
+
+<p>这三种情况都匹配的。<em>match</em>方法返回匹配的数据，如果没有则返回nil。=~操作符返回第一个匹配的字符的位置，或者nil。</p>
+
+
+<h2>点字符</h2>
+
+
+<p>点字符是一个可以匹配任意单字符的正则表达式字符。注意必须要有些字符，它不能被忽略。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+p "Seven".match /.even/
+p "even".match /.even/
+p "eleven".match /.even/
+p "proven".match /.even/
+</code></pre>
+
+
+<p>第一个例子，我们对字符串使用<em>match</em>方法应用正则表达式。<em>match</em>方法成功则返回匹配到的数据，否则返回nil。</p>
+
+
+<pre><code>p "Seven".match /.even/
+</code></pre>
+
+
+<p>&#8220;Seven&#8221;是一个字符串，可以调用<em>match</em>方法。这个方法的参数是一个模式。/.even/正则表达式模式是查找以任意字符开头接着是<em>&#8216;even&#8217;</em>的字符串。</p>
+
+
+<pre><code>$ ./dot.rb
+#&lt;MatchData "Seven"&gt;
+nil
+#&lt;MatchData "leven"&gt;
+nil
+</code></pre>
+
+
+<p>从输出结果中我们看到哪些是匹配的哪些是没有匹配的。</p>
+
+
+<hr>
+
+
+<p>正如前面所说的，如果有点字符，那么就必须要有一个任意的字符。它不能被忽略。如果我们想到查找一个文本，其中有字符能被忽略的。换言之，我们想要一个模式可以同时匹配&#8217;seven&#8217;和&#8217;even&#8217;。对于这个我们可以使用一个<em>?</em>重复字符。<em>?</em>重复字符表示前一个字符可能出现0或者1次。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+p "seven".match /.even/
+p "even".match /.even/
+p "even".match /.?even/
+</code></pre>
+
+
+<p>这个脚本使用<em>?</em>重复字符。</p>
+
+
+<pre><code>p "even".match /.even/
+</code></pre>
+
+
+<p>这行打印nil，因为正则表达式在&#8217;even&#8217;之前要接受一个字符。</p>
+
+
+<pre><code>p "even".match /.?even/
+</code></pre>
+
+
+<p>我们稍微修改一下正则表达式。<em>&#8217;.?&#8217;</em>代表没有字符或者有一个字符。这次匹配成功。</p>
+
+
+<pre><code>$ ./dot2.rb
+#&lt;MatchData "seven"&gt;
+nil
+#&lt;MatchData "even"&gt;
+</code></pre>
+
+
+<p>输出结果。</p>
+
+
+<h2>正则表达式方法</h2>
+
+
+<p>前面的两个例子我们对正则表达式使用了<em>match</em>方法。除了<em>match</em>之外还有其他的方法也接受正则表达式参数。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+puts "motherboard" =~ /board/
+puts "12, 911, 12, 111"[/\d{3}/]
+
+puts "motherboard".gsub /board/, "land"
+
+p "meet big deep nil need".scan /.[e][e]./
+p "This is Sparta!".split(/\s/)
+</code></pre>
+
+
+<p>这个例子显示了正则表达式的一些方法。</p>
+
+
+<pre><code>puts "motherboard" =~ /board/
+</code></pre>
+
+
+<p>=~操作符将正则表达式放在右边，字符串放在左边。</p>
+
+
+<pre><code>puts "12, 911, 12, 111"[/\d{3}/]
+</code></pre>
+
+
+<p>正则表达式可以位于字符串后面的中括号内。这行打印第一个3个数字。</p>
+
+
+<pre><code>puts "motherboard".gsub /board/, "land"
+</code></pre>
+
+
+<p>使用<em>gsub</em>方法我们将&#8217;board&#8217;字符串替换成&#8217;land&#8217;。</p>
+
+
+<pre><code>p "meet big deep nil need".scan /.[e][e]./
+</code></pre>
+
+
+<p><em>scan</em>方法查找字符串匹配。它会查找所有出现的匹配，而不仅是第一个。这行打印所有与模式匹配的字符串。</p>
+
+
+<pre><code>p "This is Sparta!".split(/\s/)
+</code></pre>
+
+
+<p><em>split</em>方法使用给定的正则式来分隔字符串。<em>\s</em>字符代表了任何空白字符。</p>
+
+
+<pre><code>$ ./apply.rb
+6
+911
+motherland
+["meet", "deep", "need"]
+["This", "is", "Sparta!"]
+</code></pre>
+
+
+<p>apply.rb脚本的输出结果。</p>
+
+
+<h2>特殊变量</h2>
+
+
+<p>一些使用正则式的方法会激活一些特殊的变量。包括上次匹配的字符串、上次匹配结果的前面部分和上次匹配结果的后面部分。这些变量方便了程序员。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+puts "Her name is Jane" =~ /name/
+
+p $`
+p $&amp;
+p $'
+</code></pre>
+
+
+<p>这个例子显示了三个特殊的变量。</p>
+
+
+<pre><code>puts "Her name is Jane" =~ /name/
+</code></pre>
+
+
+<p>这行代码是一个简单的正则式匹配。我们在&#8217;Her name is Jane&#8217;句子中查找&#8217;name&#8217;。我们使用=~操作符。这个操作符也会设置三个特殊的变量。这行返回数字4。</p>
+
+
+<pre><code>p $`
+</code></pre>
+
+
+<p><em>$`</em>特殊变量包含了上次匹配结果之前的文本。</p>
+
+
+<pre><code>p $&amp;
+</code></pre>
+
+
+<p><em>$&amp;</em>为匹配的文本。</p>
+
+
+<pre><code>p $'
+</code></pre>
+
+
+<p><em>$&#8217;</em>变量包含上次匹配结果之后的文本。</p>
+
+
+<p>$ ./svars.rb<br>
+4<br>
+&#8220;Her &#8221;<br>
+&#8220;name&#8221;<br>
+&#8221; is Jane&#8221;  </p>
+
+
+<p>例子的输出结果。</p>
+
+
+<h2>锚点</h2>
+
+
+<p>锚点是在文本中匹配位置的字符。我们展示三个锚点字符。^字符匹配了行的开头；$字符匹配了行的结尾；\b字符匹配词的边界。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+sen1 = "Everywhere I look I see Jane"
+sen2 = "Jane is the best thing that happened to me"
+
+p sen1.match /^Jane/ 
+p sen2.match /^Jane/
+
+p sen1.match /Jane$/ 
+p sen2.match /Jane$/
+</code></pre>
+
+
+<p>第一个例子我们使用了^和$。</p>
+
+
+<pre><code>sen1 = "Everywhere I look I see Jane"
+sen2 = "Jane is the best thing that happened to me"
+</code></pre>
+
+
+<p>有两个句子。&#8217;Jane&#8217;位于第一个的结尾第二个的开头。</p>
+
+
+<pre><code>p sen1.match /^Jane/ 
+p sen2.match /^Jane/
+</code></pre>
+
+
+<p>这里我们查找这两个句子是否以&#8217;Jane&#8217;开头。</p>
+
+
+<pre><code>p sen1.match /Jane$/ 
+p sen2.match /Jane$/
+</code></pre>
+
+
+<p>这里我们在句子结尾查找匹配。</p>
+
+
+<pre><code>$ ./anchors.rb
+nil
+#&lt;MatchData "Jane"&gt;
+#&lt;MatchData "Jane"&gt;
+nil
+</code></pre>
+
+
+<p>运行结果。</p>
+
+
+<hr>
+
+
+<p>通常一个请求仅包含一个匹配全部的词。我们会默认计算所有匹配，包括更大的或者复合词。让我们通过一个例子来阐述。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+text = "The cat also known as the domestic cat is a small, 
+usually furry, domesticated, carnivorous mammal."
+
+p text.scan /cat/
+
+p $`
+p $&amp;
+p $'
+</code></pre>
+
+
+<p>有一个句子。我们使用<em>scan</em>在这个句子中查找所有的&#8217;cat&#8217;字符串。</p>
+
+
+<pre><code>text = "The cat also known as the domestic cat is a small, 
+usually furry, domesticated, carnivorous mammal."
+</code></pre>
+
+
+<p>问题是这个文本中有三个&#8217;cat&#8217;字符串。要匹配的&#8217;cat&#8217;表示一个哺乳动物,/cat/却匹配了&#8217;domesticated&#8217;词的8-10的字母。这不是我们想要的。</p>
+
+
+<pre><code>$ ./boudaries.rb
+["cat", "cat", "cat"]
+"The cat also known as the domestic cat is a small, \nusually furry, domesti"
+"cat"
+"ed, carnivorous mammal."
+</code></pre>
+
+
+<p>最后一次匹配的&#8217;domesticated&#8217;在下一个例子中将被使用\b锚点字符排除。</p>
+
+
+<hr>
+
+
+<p>\b字符用于设置要查找的词的边界。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+text = "The cat also known as the domestic cat is a small, 
+usually furry, domesticated, carnivorous mammal."
+
+p text.scan /\bcat\b/
+
+p $`
+p $&amp;
+p $'
+</code></pre>
+
+
+<p>这个例子使用\b元字符进行了改善。</p>
+
+
+<pre><code>p text.scan /\bcat\b/
+</code></pre>
+
+
+<p>使用上面的正则式我们将查找&#8217;cat&#8217;整个词，不计算子词。</p>
+
+
+<h2>字符类</h2>
+
+
+<p>我们可以结合方括号将字符转换成字符类。字符类可以匹配在方括号内的任意字符。/[ab]/模式意味a或者b，相反的/ab/意味着a接着b。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+words = %w/ sit MIT fit fat lot pad /
+
+pattern = /[fs]it/
+
+words.each do |word|
+   if word.match pattern
+       puts "#{word} matches the pattern" 
+   else
+       puts "#{word} does not match the pattern" 
+   end
+end
+</code></pre>
+
+
+<p>有一系列的6个3字母的单词。我们对数组的每个字符串采用特定字符集的正则式。</p>
+
+
+<pre><code>pattern = /[fs]it/
+</code></pre>
+
+
+<p>这个式模式在这个数组中查找到了&#8217;fit&#8217;、&#8217;sit&#8217;。我们从字符集使用&#8217;f&#8217;或者&#8217;s&#8217;。</p>
+
+
+<p>$ ./classes.rb<br>
+sit matches the pattern<br>
+MIT does not match the pattern<br>
+fit matches the pattern<br>
+fat does not match the pattern<br>
+lot does not match the pattern<br>
+pad does not match the pattern  </p>
+
+
+<p>有两个匹配的。</p>
+
+
+<hr>
+
+
+<p>一个例子我们将进一步探讨字符类。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+p "car".match %r{[abc][a][rs]}
+p "car".match /[a-r]+/
+p "23af 433a 4ga".scan /\b[a-f0-9]+\b/
+</code></pre>
+
+
+<p>例子中有三个字符类正则式。</p>
+
+
+<pre><code>p "car".match %r{[abc][a][rs]}
+</code></pre>
+
+
+<p>这行的正则式由三个字符类构成。每个都对应一个字符。[abc]是a、b或者c。[a]就是a。第三个[rs]是r或者s。这里匹配&#8217;car&#8217;字符串。</p>
+
+
+<pre><code>p "car".match /[a-r]+/
+</code></pre>
+
+
+<p>我们在字符类中使用了一个连接符<em>-</em>。连接符是一个元字符表示一个范围：这里是a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, 或r。由于字符类仅对应一个字符。我们也可以使用+重复字符。这表示前一个字符集的字符可以重复一次或者多次。&#8217;car&#8217;字符串被匹配了。</p>
+
+
+<pre><code>p "23af 433a 4ga".scan /\b[a-f0-9]+\b/
+</code></pre>
+
+
+<p>这行有一个由三个子字符串构成的字符串。使用<em>scan</em>方法检查十六进制整数。我们有两个范围。第一个[a-f]代表a到f的字符。第二个[0-9]代表字数0到9。+表示这些字符可以重复多次。最后\b创建一个边界，表示仅接受由这些字符构成的字符串。</p>
+
+
+<pre><code>$ ./classes2.rb
+#&lt;MatchData "car"&gt;
+#&lt;MatchData "car"&gt;
+["23af", "433a"]
+</code></pre>
+
+
+<p>输出结果。 </p>
+
+
+<hr>
+
+
+<p>如果字符类的第一个字符是脱字符（^），则对该类反转。它会匹配除了这些之外的任何字符。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+p "ABC".match /[^a-z]{3}/
+p "abc".match /[^a-z]{3}/
+</code></pre>
+
+
+<p>这个例子我们在字符类中使用脱字符。</p>
+
+
+<pre><code>p "ABC".match /[^a-z]{3}/
+</code></pre>
+
+
+<p>我们查找一个有3个字母的字符串。这些字母不能在a到z之间。&#8221;ABC&#8221;字符串匹配这个正则式，因为所有的三个字符都是大写字母。</p>
+
+
+<pre><code>p "abc".match /[^a-z]{3}/
+</code></pre>
+
+
+<p>&#8220;abc&#8221;字符串没有匹配。</p>
+
+
+<pre><code>$ ./caret.rb
+#&lt;MatchData "ABC"&gt;
+nil
+</code></pre>
+
+
+<p>输出结果。</p>
+
+
+<h2>量词</h2>
+
+
+<p>标记或者组后面的量词表示前面的元素允许出现多少次。</p>
+
+
+<pre><code> ?     - 0 or 1 match
+ *     - 0 or more
+ +     - 1 or more
+ {n}   - exactly n
+ {n,}  - n or more
+ {,n}  - n or less (??)
+ {n,m} - range n to m
+</code></pre>
+
+
+<p>上面是通常的量词列表。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+p "seven dig moon car lot fire".scan /\w{3}/
+p "seven dig moon car lot fire".scan /\b\w{3}\b/
+</code></pre>
+
+
+<p>例子中我们想要选择这些有3个字符的单词。\w字符是一个词字符。\w{3}意味着前面的词字符出现3次。</p>
+
+
+<pre><code>p "seven dig moon car lot fire".scan /\w{3}/
+</code></pre>
+
+
+<p>第一只是对每个字符串截取前三个字符。这不是我们想要的。</p>
+
+
+<pre><code>p "seven dig moon car lot fire".scan /\b\w{3}\b/
+</code></pre>
+
+
+<p>这是改进的搜索。我们将之前的模式放在边界符\b之间。现在仅查找有三个字符的单词。</p>
+
+
+<pre><code>$ ./nchars.rb
+["sev", "dig", "moo", "car", "lot", "fir"]
+["dig", "car", "lot"]
+</code></pre>
+
+
+<p>输出结果。</p>
+
+
+<hr>
+
+
+<p>{n,m}是一个重复结构对于有n到m个字符的字符串。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+p "I dig moon lottery it fire".scan /\b\w{2,4}\b/
+</code></pre>
+
+
+<p>上面的例子我们选择有2、3、4个字符的单词。我们再次使用了边界符\b。</p>
+
+
+<pre><code>$ ./rchars.rb
+["dig", "moon", "it", "fire"]
+</code></pre>
+
+
+<p>这个例子打印了一个有2-4个字符的单词数组。</p>
+
+
+<hr>
+
+
+<p>下一个例子我们展示<em>?</em>元字符。接着<em>?</em>的字符是可选的。<em>?</em>之前的字符可以出现一次或者0次。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+p "color colour colors colours".scan /colou?rs/
+p "color colour colors colours".scan /colou?rs?/
+
+p "color colour colors colours".scan /\bcolor\b|\bcolors\b|\bcolour\b|\bcolours\b/
+</code></pre>
+
+
+<p>我们想要在一个文本中查找<em>colour</em>单词。这个单词有两种拼写方式，美式的&#8217;colour&#8217;和英式的&#8217;color&#8217;。我们想要两种都查找，此外我们还想查找复数形式。</p>
+
+
+<pre><code>p "color colour colors colours".scan /colou?rs/
+</code></pre>
+
+
+<p>colou?rs模式查找&#8217;colours&#8217;和&#8217;colors&#8217;。u字符在?字符之前表示是可选的。</p>
+
+
+<pre><code>p "color colour colors colours".scan /colou?rs?/
+</code></pre>
+
+
+<p>colou?rs?模式使u和s字符是可选的。因此我们会查找到这四个组合。</p>
+
+
+<pre><code>p "color colour colors colours".scan /\bcolor\b|\bcolors\b|\bcolour\b|\bcolours\b/
+</code></pre>
+
+
+<p>相同的请求可以间隔的写。</p>
+
+
+<pre><code>$ ./qmark.rb
+["colors", "colours"]
+["color", "colour", "colors", "colours"]
+["color", "colour", "colors", "colours"]
+</code></pre>
+
+
+<p>输出结果。</p>
+
+
+<hr>
+
+
+<p>这节的最后一个例子我们展示+字符。它允许前面的字符重复1次或多次。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+nums = %w/ 234 1 23 53434 234532453464 23455636
+    324f 34532452343452 343 2324 24221 34$34232/
+
+nums.each do |num|
+    m = num.match /[0-9]+/
+
+    if m.to_s.eql? num
+        puts num
+    end              
+end
+</code></pre>
+
+
+<p>这个例子我们有一个数字数组。数字可以有一个或者多个数字字符。</p>
+
+
+<pre><code>nums = %w/ 234 1 23 53434 234532453464 23455636
+    324f 34532452343452 343 2324 24221 34$34232/
+</code></pre>
+
+
+<p>这是一个字符串数组。其中有两个不是数字，因为它们包含了非数字字符。</p>
+
+
+<pre><code>nums.each do |num|
+    m = num.match /[0-9]+/
+
+    if m.to_s.eql? num
+        puts num
+    end              
+end
+</code></pre>
+
+
+<p>我们遍历数组并对每个字符串应用正则式。表达式[0-9]+代表了0到9的任意字符重复0次或者多次。默认的这个表达式也会查找子字符串。
+在34$34232中引擎认为34是一个数字。\b边界符在这里是无效的，因为我们没有具体的字符，引擎不知道该在哪里停止查找。这就是为什么我们在代码块中包含一个if条件式。仅当匹配结果等于原字符串才认为它是一个数字。</p>
+
+
+<p>$ ./numbers.rb<br>
+234<br>
+1<br>
+23<br>
+53434<br>
+234532453464<br>
+23455636<br>
+34532452343452<br>
+343<br>
+2324<br>
+24221  </p>
+
+
+<p>这些的值是数字。</p>
+
+
+<h2>忽略大小写搜索</h2>
+
+
+<p>我们可以执行忽略大小写的搜索。正则表达式可以接一个选项。它是一个单一的字符，以某种方式修改模式。这里不区分大小写的搜索我们使用i选项。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+p "Jane".match /Jane/
+p "Jane".match /jane/
+p "Jane".match /JANE/
+
+p "Jane".match /jane/i
+p "Jane".match /Jane/i
+p "Jane".match /JANE/i
+</code></pre>
+
+
+<p>这个例子显示了区分大小写和不区分大小写的搜索。</p>
+
+
+<pre><code>p "Jane".match /Jane/
+p "Jane".match /jane/
+p "Jane".match /JANE/
+</code></pre>
+
+
+<p>这三行的字符必须完全匹配模式。仅有第一行是匹配的。</p>
+
+
+<pre><code>p "Jane".match /jane/i
+p "Jane".match /Jane/i
+p "Jane".match /JANE/i
+</code></pre>
+
+
+<p>这里我们使用i选项，接在第二个/字符后面。我们进行不区分大小写的搜索。这三行者匹配了。</p>
+
+
+<pre><code>$ ./icase.rb
+#&lt;MatchData "Jane"&gt;
+nil
+nil
+#&lt;MatchData "Jane"&gt;
+#&lt;MatchData "Jane"&gt;
+#&lt;MatchData "Jane"&gt;
+</code></pre>
+
+
+<p>例子的输出结果。</p>
+
+
+<h2>交替</h2>
+
+
+<p>一个例子解释交替操作符（|）。这个操作符可以创建一个有多个选择的正则式。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+names = %w/Jane Thomas Robert Lucy Beky
+    John Peter Andy/
+
+pattern = /Jane|Beky|Robert/
+
+names.each do |name|
+
+    if name =~ pattern
+        puts "#{name} is my friend"
+    else
+        puts "#{name} is not my friend"
+    end
+end
+</code></pre>
+
+
+<p><em>names</em>数组中有8个名字。我们将在数组中查找多虑字符串的组合。</p>
+
+
+<pre><code>pattern = /Jane|Beky|Robert/
+</code></pre>
+
+
+<p>这是搜索模式。它表示Jane, Beky和Robert是我的朋友。如果你查找他们就会找到我的朋友。</p>
+
+
+<p>$ ./alternation.rb<br>
+Jane is my friend<br>
+Thomas is not my friend<br>
+Robert is my friend<br>
+Lucy is not my friend<br>
+Beky is my friend<br>
+John is not my friend<br>
+Peter is not my friend<br>
+Andy is not my friend  </p>
+
+
+<p>这是脚本的输出结果。</p>
+
+
+<h2>子模式</h2>
+
+
+<p>我们可以使用括号()创建子模式。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+p "bookworm" =~ /book(worm)?$/
+p "book" =~ /book(worm)?$/
+p "worm" =~ /book(worm)?$/
+p "bookstore" =~ /book(worm)?$/
+</code></pre>
+
+
+<p>我们有如下正则式模式：book(worm)?$。(worm)是一个子模式。仅有两个字符串可以匹配：&#8217;book&#8217;或者&#8217;bookworm&#8217;。接在子模式后面的?字符意味着这个子模式出现0或者1次。这里$字符确切的匹配字符串的结尾。没有它单词bookstore和bookmania也会被匹配。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+p "book" =~ /book(shelf|worm)?$/
+p "bookshelf" =~ /book(shelf|worm)?$/
+p "bookworm" =~ /book(shelf|worm)?$/
+p "bookstore" =~ /book(shelf|worm)?$/
+</code></pre>
+
+
+<p>子模式经常是多个单词组合交替结合的。例如，book(shelf|worm)匹配&#8217;bookshelf&#8217;和&#8217;bookworm&#8217;，book(shelf|worm)?匹配&#8217;bookshelf&#8217;，&#8217;bookworm&#8217;和&#8217;book&#8217;。</p>
+
+
+<p>$ ./subpatterns2.rb<br>
+0<br>
+0<br>
+0<br>
+nil  </p>
+
+
+<p>最后一个子模式没有匹配。记住0不意味着没有匹配。对于=~操作符，它是第一个匹配到的字符的索引。</p>
+
+
+<h2>邮箱例子</h2>
+
+
+<p>最后一个例子，我们创建一个正则式模式检查邮箱地址。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+emails = %w/ luke@gmail.com andy@yahoo.com 23214sdj^as
+    f3444@gmail.com /
+
+pattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9-]+\.[a-zA-Z.]{2,5}$/
+
+emails.each do |email|
+
+    if email.match pattern
+        puts "#{email} matches"
+    else
+        puts "#{email} does not match"
+    end
+
+end
+</code></pre>
+
+
+<p>注意这个例子提供了仅一种解决方案。它不需要是最好的。</p>
+
+
+<pre><code>emails = %w/ luke@gmail.com andy@yahoocom 23214sdj^as
+    f3444@gmail.com /
+</code></pre>
+
+
+<p>这是一个邮箱数组，仅有两个是有效的。</p>
+
+
+<pre><code>pattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9-]+\.[a-zA-Z.]{2,5}$/
+</code></pre>
+
+
+<p>这是一个模式，第一个^和最后一个$是获取完整匹配。在模式之前和之后都不允许有字符。邮箱分为5部分。第一部分是本地部分，它通常是公司、个体或者昵称的名字。[a-zA-Z0-9._-]+列出了所有可能用于本地部分的字符，它们可以使用一次或者多次。第二部分是字面符@，第三部分是域名部分。它通常是邮箱的提供商，如 yahoo或者gmail。字符集[a-zA-Z0-9-]+指明了所有的可以用于域名的字符。+量词将这些字符使用一次或者多次。第四部分是点字符。它的前面接一个转义符。(&#46;)因为点字符是一个元字符具有特殊意义。转义之后得到一个字面上的点。最后一部分是顶级域名。这个模式是[a-zA-Z.]{2,5}。顶级域名有2到5个字符，如sk, net, info, travel。这同样也有点字符，这是因此一些顶级域名有两部分如co.uk。</p>
+
+
+<p>$ ./email.rb<br>
+luke@gmail.com matches<br>
+andy@yahoocom does not match<br>
+23214sdj^as does not match<br>
+f3444@gmail.com matches  </p>
+
+
+<p>这个正则式标记了两个有效的邮箱地址。</p>
+
+
+<p>在这章，我们学习了Ruby的正则表达式。</p>
+
+
+<hr>
+
+
+<p>原文地址： <a href="http://zetcode.com/lang/rubytutorial/regex/">http://zetcode.com/lang/rubytutorial/regex/</a><br>
+翻译：龙昌  admin@longchangjin.cn<br>
+完整教程：<a href="https://github.com/wusuopu/Ruby-tutorial">https://github.com/wusuopu/Ruby-tutorial</a> </p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83942.html">[翻译]Ruby教程13——面向对象2</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-11-17T00:00:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83942.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83942.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h1>Ruby的面向对象编程2</h1>
+
+
+<p>在这章的教程我们继续讨论Ruby的面向对象编程。</p>
+
+
+<p>我们以属性修饰符开始。将会包涵类常量、类方法和操作符重载。我们将定义多态，并展示在Ruby中如何使用它。我们也会提及模块和异常。</p>
+
+
+<h2>属性修饰符</h2>
+
+
+<p>Ruby的所有变量都是私有的。它只能通过方法来访问。这些方法通常称为设值函数(setters)和获得者(getters)。创建一个setter和getter方法是很平常的事情。加些Ruby有便利的方法来创建这两种方法。它们是<em>attr_reader</em>、<em>attr_writer</em>和<em>attr_accessor</em>。</p>
+
+
+<p><em>attr_reader</em>用于创建getter方法。<em>attr_writer</em>用于setter方法。<em>attr_accessor</em>用于创建两种方法。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Car
+
+    attr_reader :name, :price
+    attr_writer :name, :price
+
+    def to_s
+        "#{@name}: #{@price}"
+    end
+
+end
+
+
+c1 = Car.new
+c2 = Car.new
+
+c1.name = "Porsche"
+c1.price = 23500
+
+c2.name = "Volkswagen"
+c2.price = 9500
+
+puts "The #{c1.name} costs #{c1.price}"
+
+p c1
+p c2
+</code></pre>
+
+
+<p>定义了一个<em>Car</em>类，在类内部我们使用了<em>attr_reader</em>和<em>attr_writer</em>创建了两个<em>getter</em>和<em>setter</em>方法。</p>
+
+
+<pre><code>attr_reader :name, :price
+</code></pre>
+
+
+<p>这里我们创建了两个实例方法名为：<em>name</em>和<em>price</em>。注意<em>attr_reader</em>将方法名符号作为参数。</p>
+
+
+<pre><code>attr_writer :name, :price
+</code></pre>
+
+
+<p><em>attr_writer</em>创建了两个<em>setter</em>方法<em>name</em>、<em>price</em>和两个实例变量<em>@name</em>、 <em>@price</em>。</p>
+
+
+<pre><code>c1.name = "Porsche"
+c1.price = 23500
+</code></pre>
+
+
+<p>这里的上下文中调用了两个<em>setter</em>方法，为实例变量填充数据。</p>
+
+
+<pre><code>puts "The #{c1.name} costs #{c1.price}"
+</code></pre>
+
+
+<p>这里调用了两个<em>getter</em>方法获取数据。</p>
+
+
+<p>$ ./arw.rb <br>
+The Porsche costs 23500<br>
+Porsche: 23500<br>
+Volkswagen: 9500  </p>
+
+
+<p>例子的输出结果。</p>
+
+
+<hr>
+
+
+<p>正如上面阐述的，<em>attr_accessor</em>方法会创建<em>getter</em>、<em>setter</em>方法和它们的实例变量。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Book
+   attr_accessor :title, :pages    
+end
+
+b1 = Book.new
+b1.title = "Hidden motives"
+b1.pages = 255
+
+p "The book #{b1.title} has #{b1.pages} pages"
+</code></pre>
+
+
+<p>定义了一个<em>Book</em>类，它使用<em>attr_accessor</em>创建了两对方法和两个实例变量。</p>
+
+
+<pre><code>class Book
+   attr_accessor :title, :pages    
+end
+</code></pre>
+
+
+<p><em>attr_accessor</em>方法设置了<em>title</em>、<em>pages</em> 方法以及<em>@title</em>、<em>@pages</em>实例变量。</p>
+
+
+<pre><code>b1 = Book.new
+b1.title = "Hidden motives"
+b1.pages = 255
+</code></pre>
+
+
+<p>创建了一个<em>Book</em>对象。调用两个setter方法为对象的实例变量填充数据。</p>
+
+
+<pre><code>p "The book #{b1.title} has #{b1.pages} pages"
+</code></pre>
+
+
+<p>这行的代码我们调用getter方法读取实例变量的值。</p>
+
+
+<p>$ ./accessor.rb<br>
+&#8220;The book Hidden motives has 255 pages&#8221;  </p>
+
+
+<p>例子的输出结果。</p>
+
+
+<h2>类的常量</h2>
+
+
+<p>Ruby允许创建类常量。这些常量不属于特定的对象，它们是属于类的。作为约定，常量以大写字母开头。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class MMath
+
+    PI = 3.141592
+end
+
+
+puts MMath::PI
+</code></pre>
+
+
+<p>创建一个<em>MMath</em>类，包含了一个<em>PI</em>常量。</p>
+
+
+<pre><code>PI = 3.141592
+</code></pre>
+
+
+<p>我们创建了一个<em>PI</em>常量。记住在Ruby中常量不是强制的。</p>
+
+
+<pre><code>puts MMath::PI
+</code></pre>
+
+
+<p>使用<em>::</em>操作符访问<em>PI</em>常量。</p>
+
+
+<p>$ ./classconstant.rb <br>
+3.141592  </p>
+
+
+<p>例子输出结果。</p>
+
+
+<h2>to_s方法</h2>
+
+
+<p>每个对象都有一个<em>to_s</em>方法，它返回该对象的一个字符串描述。注意<em>puts</em>方法将一个对象作为参数时，该对象的<em>to_s</em>方法将被调用。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Being
+
+    def to_s
+        "This is Being class"
+    end
+end
+
+b = Being.new
+puts b.to_s
+puts b
+</code></pre>
+
+
+<p>定义一个<em>Being</em>类并重载了<em>to_s</em>方法。</p>
+
+
+<pre><code>def to_s
+    "This is Being class"
+end
+</code></pre>
+
+
+<p>每个创建的类都继承自基类<em>Object</em>。<em>to_s</em>方法属于这个类。我们重载了<em>to_s</em>方法，使得描述信息更加可读。</p>
+
+
+<pre><code>b = Being.new
+puts b.to_s
+puts b
+</code></pre>
+
+
+<p>创建一个<em>Being</em>的对象，调用两次<em>to_s</em>方法。第一次是显式调用，第二次是隐式调用。</p>
+
+
+<p>$ ./tostring.rb <br>
+This is Being class<br>
+This is Being class  </p>
+
+
+<p>例子的运行结果。</p>
+
+
+<h2>操作符重载</h2>
+
+
+<p>操作符重载是基本参数的不同进行的操作也不同。</p>
+
+
+<p>Ruby中操作符和方法仅有一点区别。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Circle
+
+    attr_accessor :radius
+
+    def initialize r
+        @radius = r
+    end
+
+    def +(other)
+        Circle.new @radius + other.radius
+    end
+
+    def to_s
+        "Circle with radius: #{@radius}"
+    end
+end
+
+
+c1 = Circle.new 5
+c2 = Circle.new 6
+c3 = c1 + c2
+
+p c3
+</code></pre>
+
+
+<p>这个例子中，我们创建了一个<em>Circle</em>类，并重载了+操作符，用于将两个<em>circle</em>对象相加。</p>
+
+
+<pre><code>def +(other)
+    Circle.new @radius + other.radius
+end
+</code></pre>
+
+
+<p>我们定义了一个名为<em>+</em>的方法，这个方法将两个<em>circle</em>对象的半径相加。</p>
+
+
+<pre><code>c1 = Circle.new 5
+c2 = Circle.new 6
+c3 = c1 + c2
+</code></pre>
+
+
+<p>创建两个<em>circle</em>对象。在第三行我们将这两个对象相加生成一个新的对象。</p>
+
+
+<p>$ ./operatoroverloading.rb<br>
+Circle with radius: 11  </p>
+
+
+<p>这两个对象相加生成的第三个对象半径为11。</p>
+
+
+<h2>类方法</h2>
+
+
+<p>Ruby方法分为类方法和实例方法。类方法只能被类调用，不能被实例调用。</p>
+
+
+<p>类方法不能访问实例变量。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Circle
+
+    def initialize x
+        @r = x
+    end
+
+    def self.info
+       "This is a Circle class" 
+    end
+
+    def area
+        @r * @r * 3.141592
+    end
+
+end
+
+
+p Circle.info
+c = Circle.new 3
+p c.area
+</code></pre>
+
+
+<p>上面的例子展示了一个<em>Circle</em>类。除了构造函数之外，还有一个类方法和一个实例方法。</p>
+
+
+<pre><code>def self.info
+    "This is a Circle class" 
+end
+</code></pre>
+
+
+<p>以<em>self</em>关键字开头的是类方法。</p>
+
+
+<pre><code>def area
+    "Circle, radius: #{@r}"
+end
+</code></pre>
+
+
+<p>实例方法不以<em>self</em>关键字开头。</p>
+
+
+<pre><code>p Circle.info
+</code></pre>
+
+
+<p>调用类方法。注意我们是通过类来调用这个方法。</p>
+
+
+<pre><code>c = Circle.new 3
+p c.area
+</code></pre>
+
+
+<p>为了调用实例方法我们必须得先创建一个对象。实例方法总是被对象调用。这里<em>c</em>变量保存了该对象，我们利用点操作符调用<em>area</em>方法。</p>
+
+
+<p>$ ./classmethods.rb<br>
+&#8220;This is a Circle class&#8221;<br>
+28.274328  </p>
+
+
+<p>例子的输出描述了Ruby的类方法。</p>
+
+
+<hr>
+
+
+<p>在Ruby中有三种方式创建类方法。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Wood
+
+    def self.info
+       "This is a Wood class" 
+    end
+end
+
+class Brick
+
+    class &lt;&lt; self
+        def info
+           "This is a Brick class" 
+        end
+    end
+end
+
+class Rock
+
+end
+
+def Rock.info
+   "This is a Rock class" 
+end
+
+
+p Wood.info
+p Brick.info
+p Rock.info
+</code></pre>
+
+
+<p>这个例子创建了三个类，每个都有一个类方法。</p>
+
+
+<pre><code>def self.info
+    "This is a Wood class" 
+end
+</code></pre>
+
+
+<p>类方法可以以<em>self</em>关键字开头。</p>
+
+
+<pre><code>class &lt;&lt; self
+    def info
+        "This is a Brick class" 
+    end
+end
+</code></pre>
+
+
+<p>另一个方式是将方法定义放在<em>class &lt;&lt; self</em>结构之后。</p>
+
+
+<pre><code>def Rock.info
+   "This is a Rock class" 
+end
+</code></pre>
+
+
+<p>这是第三种定义类方法的方式。</p>
+
+
+<p>$ ./classmethods2.rb<br>
+&#8220;This is a Wood class&#8221;<br>
+&#8220;This is a Brick class&#8221;<br>
+&#8220;This is a Rock class&#8221;  </p>
+
+
+<p>调用<em>Wood</em>、<em>Brick</em>和<em>Rock</em>这三个类的类方法的输出结果。</p>
+
+
+<h2>创建实例方法的三种方式</h2>
+
+
+<p>Ruby有三种基本的方式创建实例方法。实例方法是属于实例对象的。它们是通过对象使用点操作符调用。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Wood
+
+    def info
+       "This is a wood object"        
+    end
+end
+
+wood = Wood.new
+p wood.info
+
+class Brick
+
+    attr_accessor :info
+end
+
+brick = Brick.new
+brick.info = "This is a brick object"
+p brick.info
+
+class Rock
+
+end
+
+rock = Rock.new
+
+def rock.info
+    "This is a rock object"
+end
+
+p rock.info
+</code></pre>
+
+
+<p>这个例子我们创建了三个实例对象<em>Wood</em>、<em>Brick</em>和<em>Rock</em>。每个对象都有一介上实例方法。</p>
+
+
+<pre><code>class Wood
+
+    def info
+       "This is a wood object"        
+    end
+end
+
+wood = Wood.new
+p wood.info
+</code></pre>
+
+
+<p>这可能是最常用的一种方式。<em>info</em>方法定义在<em>Wood</em>类的内部。稍后创建一个对象并调用它的<em>info</em>方法。</p>
+
+
+<pre><code>class Brick
+
+    attr_accessor :info
+end
+
+brick = Brick.new
+brick.info = "This is a brick object"
+p brick.info
+</code></pre>
+
+
+<p>另一种创建实例方法的方式是使用属性修饰符。这是一种方便的方式可以减少程序员的按键输入。<em>attr_accessor</em>创建两个方法getter和setter，同样也创建一个实例变量用于存储数据。创建一个<em>brick</em>对象，数据使用setter方法保存在<em>@info</em>变量中。最后使用getter方法读取消息。</p>
+
+
+<pre><code>class Rock
+
+end
+
+rock = Rock.new
+
+def rock.info
+    "This is a rock object"
+end
+
+p rock.info
+</code></pre>
+
+
+<p>第三种方法我们创建了一个空的<em>Rock</em>类。稍后实例化一个对象，动态的为这个对外创建一个方法。</p>
+
+
+<p>$ ./threeways.rb<br>
+&#8220;This is a wood object&#8221;<br>
+&#8220;This is a brick object&#8221;<br>
+&#8220;This is a rock object&#8221;  </p>
+
+
+<p>例子的输出结果。</p>
+
+
+<h2>多态性</h2>
+
+
+<p>多态是使用一个操作符或者函数对不同的数据进行不同的处理。实践中多态意味着如果类B继承自类A，它没有必要将类A的所有都继承；它可以做一些与类A不同的事情。</p>
+
+
+<p>注意静态语言如C++、Java、或者C#和动态语言如Python、Ruby的多态有些不同。在静态语言中编译器决定了方法的定义。在动态语言中我们专注了同名方法的不同操作。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Animal
+
+    def make_noise 
+        "Some noise"
+    end
+
+    def sleep 
+        puts "#{self.class.name} is sleeping." 
+    end
+
+end
+
+class Dog &lt; Animal
+
+    def make_noise 
+        'Woof!'         
+    end
+
+end
+
+class Cat &lt; Animal
+
+    def make_noise 
+        'Meow!' 
+    end 
+end
+
+[Animal.new, Dog.new, Cat.new].each do |animal|
+  puts animal.make_noise
+  animal.sleep
+end
+</code></pre>
+
+
+<p>我们创建了一个简单的继承结构。有一个<em>Animal</em>基类和两个后代<em>Cat</em>和<em>Dog</em>。这三个类都有它自己的<em>make_noise</em>方法实现。后代的实现方法会替换掉<em>Animal</em>类的。</p>
+
+
+<pre><code>class Dog &lt; Animal
+
+    def make_noise 
+        'Woof!'         
+    end
+
+end
+</code></pre>
+
+
+<p><em>Dog</em>类的<em>make_noise</em>实现替换掉了<em>Animal</em>类的实现。</p>
+
+
+<pre><code>[Animal.new, Dog.new, Cat.new].each do |animal|
+  puts animal.make_noise
+  animal.sleep
+end
+</code></pre>
+
+
+<p>为每个类的创建了一个实例对象，并对该对象调用了<em>make_noise</em>方法和<em>sleep</em>方法。</p>
+
+
+<p>$ ./polymorhism.rb<br>
+Some noise<br>
+Animal is sleeping.<br>
+Woof!<br>
+Dog is sleeping.<br>
+Meow!<br>
+Cat is sleeping.  </p>
+
+
+<p>polymorhism.rb脚本的输出结果。</p>
+
+
+<h2>模块</h2>
+
+
+<p>一个Ruby模块是方法、类和常量的集合。模块与类相似也有些不同。模块不能创建实例，没有子类。</p>
+
+
+<p>模块用于将相关的类、方法和常量聚集单独放在一个模块中。这样也避免了命名的冲突，因为模块将它包含的对象进行了封装。从这方面来看Ruby的模块与C#的命名空间和Java的包相似。</p>
+
+
+<p>在Ruby中模块也支持混合类（mixins）。混入类（mixin）是一个创建多继承的工厂。如果一个类继承自多个类，则称为多继承。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+puts Math::PI
+puts Math.sin 2
+</code></pre>
+
+
+<p>Ruby有一个内建的<em>Math</em>模块。它有许多方法和常量。我们使用<em>::</em>操作符访问PI常量。与类相同使用点操作符访问方法。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+include Math
+
+puts PI
+puts sin 2
+</code></pre>
+
+
+<p>如果我包含了一个模块，我们就可以直接引用Math的对象了。模块导入使用<em>include</em>关键字。</p>
+
+
+<p>$ ./modules.rb<br>
+3.141592653589793<br>
+0.9092974268256817  </p>
+
+
+<p>程序的输出结果。</p>
+
+
+<hr>
+
+
+<p>下面的例子我们展示了如何使用模块来组织代码。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+module Forest
+
+    class Rock ; end
+    class Tree ; end
+    class Animal ; end
+
+end
+
+module Town
+
+   class Pool ; end
+   class Cinema ; end
+   class Square ; end
+   class Animal ; end
+
+end
+
+
+p Forest::Tree.new
+p Forest::Rock.new
+p Town::Cinema.new
+
+p Forest::Animal.new
+p Town::Animal.new
+</code></pre>
+
+
+<p>Ruby代码可以主义分组。<em>Rocks</em>和<em>Tree</em>属于<em>Forest</em>。<em>Pools</em>、<em>Cinema</em>、<em>Squares</em>属于<em>Town</em>。使用模块让我们的代码更加有条理。<em>Animals</em>可以在<em>Forest</em>里也可以有<em>Town</em>里。对于一个脚本我们不能定义两个<em>Animal</em>类，它们会冲突。将它们放在不同的模块即可解决这个问题。</p>
+
+
+<pre><code>p Forest::Tree.new
+p Forest::Rock.new
+p Town::Cinema.new
+</code></pre>
+
+
+<p>创建属于<em>Forest</em>和<em>Town</em>的对象。我们使用<em>::</em>操作符访问模块里的对象。</p>
+
+
+<pre><code>p Forest::Animal.new
+p Town::Animal.new
+</code></pre>
+
+
+<p>创建两个Animal对象。Ruby解释器会将它们标识为它们的模块名。</p>
+
+
+<pre><code>$ ./modules3.rb
+#&lt;Forest::Tree:0x97f35ec&gt;
+#&lt;Forest::Rock:0x97f35b0&gt;
+#&lt;Town::Cinema:0x97f3588&gt;
+#&lt;Forest::Animal:0x97f3560&gt;
+#&lt;Town::Animal:0x97f3538&gt;
+</code></pre>
+
+
+<p>modules3.rb程序的输出。</p>
+
+
+<hr>
+
+
+<p>这节的最后一个例子我们将展示使用模块进行多继承。在这里的上下文中模块称为混合类（mixins）。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+module Device
+    def switch_on ; puts "on" end    
+    def switch_off ; puts "off" end
+end
+
+module Volume
+    def volume_up ; puts "volume up" end    
+    def vodule_down ; puts "volume down" end
+end
+
+module Pluggable
+    def plug_in ; puts "plug in" end    
+    def plug_out ; puts "plug out" end
+end
+
+class CellPhone
+    include Device, Volume, Pluggable
+
+    def ring
+        puts "ringing"
+    end    
+end
+
+cph = CellPhone.new
+cph.switch_on
+cph.volume_up
+cph.ring
+</code></pre>
+
+
+<p>我们定义了三个模块和一个类。模块代表了一些功能。一个设备可以调节开头。许多对象都可以分享这个功能，包含电视、手机、电脑和冰箱。相对于为每个对象创建这个功能，我们是将它分隔在一个模块里，它可以被每个对象包含。这样代码将更加有条理更紧凑。</p>
+
+
+<pre><code>module Volume
+    def volume_up ; puts "volume up" end    
+    def vodule_down ; puts "volume down" end
+end
+</code></pre>
+
+
+<p><em>Volume</em>模块组织了负责控制音量等级的方法。如果一个设备需要这些方法，它只需要简单的在自己的类中包含这个模块即可。</p>
+
+
+<pre><code>class CellPhone
+    include Device, Volume, Pluggable
+
+    def ring
+        puts "ringing"
+    end    
+end
+</code></pre>
+
+
+<p><em>CellPhone</em>添加了这三个模块。这些模块的方法混合在<em>CellPhone</em>类中。对于这个类的实例对象同样有效。<em>CellPhone</em>类也有一个自己的<em>ring</em>方法。</p>
+
+
+<pre><code>cph = CellPhone.new
+cph.switch_on
+cph.volume_up
+cph.ring
+</code></pre>
+
+
+<p>创建了一个<em>CellPhone</em>对象并调用了三个方法。</p>
+
+
+<p>$ ./mixins.rb<br>
+on<br>
+volume up<br>
+ringing  </p>
+
+
+<p>例子的运行结果。</p>
+
+
+<h2>异常</h2>
+
+
+<p>异常是对象偏离了正常的程序执行流的信号。<br>
+异常出现、抛出或者开始。</p>
+
+
+<p>在应用程序执行期间，许多事情可能引起错误。磁盘满了我们不能保存文件。网络断了但应用程序试图连接某个网站。所有的这些可能引起应用程序崩溃。为了避免这个的发生，我们应当在程序异常时预先处理错误。对于这个我们可以使用异常处理。</p>
+
+
+<p>异常是对象，它们是内建<em>Exception</em>类的后代。<em>Exception</em>对象携带了关于异常的信息。它的类型（异常的类名），可选的描述字符串，和一个可选的跟踪信息。为了获取关于程序运行异常的额外信息，程序可以子类化<em>Exception</em>或者更多是<em>StandardError</em>。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+x = 35
+y = 0
+
+begin
+    z = x / y
+    puts z
+rescue =&gt; e
+    puts e
+    p e
+end
+</code></pre>
+
+
+<p>上面的程序我们故意的除以0,这个导致一个错误。</p>
+
+
+<pre><code>begin
+    z = x / y
+    puts z
+</code></pre>
+
+
+<p>出错的语句位置<em>begin</em>关键字之后。</p>
+
+
+<pre><code>rescue =&gt; e
+    puts e
+    p e
+end
+</code></pre>
+
+
+<p><em>rescue</em>关键字之后的代码我们处理一个异常。这里我们在终端上打印错误信息。<em>e</em>是一个异常对象，在错误发生时创建的。</p>
+
+
+<pre><code>$ ./zerodivision.rb
+divided by 0
+#&lt;ZeroDivisionError: divided by 0&gt;
+</code></pre>
+
+
+<p>输出结果我们看到了异常信息。最后一行显示了异常对象名为<em>ZeroDivisionError</em>。</p>
+
+
+<hr>
+
+
+<p>程序员可以使用<em>raise</em>关键字发起自己的异常。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+age = 17
+
+begin
+    if age &lt; 18
+        raise "Person is a minor"
+    end
+
+    puts "Entry allowed"
+rescue =&gt; e
+    puts e
+    p e
+    exit 1
+end
+</code></pre>
+
+
+<p>俱乐部不允许不满18岁的青年进入。我们使用Ruby脚本模拟这个情况。</p>
+
+
+<pre><code>begin
+    if age &lt; 18
+        raise "Person is a minor"
+    end
+
+    puts "Entry allowed"
+</code></pre>
+
+
+<p>如果是未成年人，将出现一个异常。如果<em>raise</em>关键字没有指明异常参数，则<em>RuntimeError</em>异常将引发。这个代码不会到达<em>puts &#8220;Entry allowed&#8221;</em>这行。代码执行中断并继续<em>rescue</em>的代码块。</p>
+
+
+<pre><code>rescue =&gt; e
+    puts e
+    p e
+    exit 1
+end
+</code></pre>
+
+
+<p>在<em>rescue</em>代码块中我们打印错误信息，<em>RuntimeError</em>对象的一个字符串描述。我们也调用了<em>exit</em>方法通知环境该脚本错误退出。</p>
+
+
+<pre><code>$ ./raise_exception.rb 
+Person is a minor
+#&lt;RuntimeError: Person is a minor&gt;
+$ echo $?
+1
+</code></pre>
+
+
+<p>未成年人不允许进行俱乐部。bash的$?变量设置了这个脚本错误退出。</p>
+
+
+<hr>
+
+
+<p>Ruby的<em>ensure</em>从名创建的代码块总是会被执行，不管是否有异常。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+begin
+    f = File.open("stones", "r")
+
+    while line = f.gets do
+        puts line
+    end
+
+rescue =&gt; e
+    puts e
+    p e
+ensure
+    f.close if f
+end
+</code></pre>
+
+
+<p>这个例子我们尝试打开并读取stones文件。I/O操作容易出现错误。</p>
+
+
+<pre><code>ensure
+    f.close if f
+end
+</code></pre>
+
+
+<p>在<em>ensure</em>的代码块中我们关闭文件处理对象。我们查检处理对象是否存在，因为它可能没有被创建。分配的资源通常位于<em>ensure</em>代码块里。</p>
+
+
+<hr>
+
+
+<p>如果想到，我们可以创建自定义的异常。Ruby中自定义异常继承自<em>StandardError</em>类。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class BigValueError &lt; StandardError ; end
+
+LIMIT = 333
+x = 3_432_453
+
+begin
+
+    if x &gt; LIMIT
+        raise BigValueError, "Exceeded the maximum value"
+    end
+
+    puts "Script continues"
+
+rescue =&gt; e
+    puts e
+    p e
+    exit 1
+end
+</code></pre>
+
+
+<p>我们有一个情况不能处理大的数字。</p>
+
+
+<pre><code>class BigValueError &lt; StandardError ; end
+</code></pre>
+
+
+<p>我们定义一个<em>BigValueError</em>类。这个类继承自<em>StandardError</em>类。</p>
+
+
+<pre><code>LIMIT = 333
+</code></pre>
+
+
+<p>数字超过这个常量就被认为是大的。</p>
+
+
+<pre><code>if x &gt; LIMIT
+    raise BigValueError, "Exceeded the maximum value"
+end
+</code></pre>
+
+
+<p>如果值比<em>LIMIT</em>在，则抛出一个自定义异常。异常信息为<em>&#8220;Exceeded the maximum value&#8221;</em>。</p>
+
+
+<pre><code>$ ./custom_exception.rb
+Exceeded the maximum value
+#&lt;BigValueError: Exceeded the maximum value&gt;
+</code></pre>
+
+
+<p>执行程序。</p>
+
+
+<p>在这一章我们完成了Ruby语言的面向对象编程。</p>
+
+
+<hr>
+
+
+<p>原文地址： <a href="http://zetcode.com/lang/rubytutorial/oop2/">http://zetcode.com/lang/rubytutorial/oop2/</a><br>
+翻译：龙昌  admin@longchangjin.cn<br>
+完整教程：<a href="https://github.com/wusuopu/Ruby-tutorial">https://github.com/wusuopu/Ruby-tutorial</a> </p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83939.html">[翻译]Ruby教程12——面向对象</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-11-16T00:00:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>16</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83939.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83939.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h1>Ruby的面向对象编程</h1>
+
+
+<p>在这部分的Ruby教程我们将讨论面向对象编程。</p>
+
+
+<p>编程语言有过程式编程、函数式编程和面向对象编程范式。Ruby中面向对象语言并包含了一些函数式和过程式。</p>
+
+
+<p>面向对象(OOP)是一种使用对象及其接口来设计应用程序和计算机程序的编程范式。</p>
+
+
+<p>面向对象的基本概念如下：</p>
+
+
+<ul>
+<li>抽象（Abstraction）  </li>
+<li>多态（Polymorphism）  </li>
+<li>封装（Encapsulation）  </li>
+<li>继承（Inheritance）  </li>
+</ul>
+
+
+<p>抽象是对于现实中复杂的问题通过适当的建模将其简化。多态是使用相同的操作符或者函数对不同的输入数据进行不同处理。封装是将一个类的具体实现对其他对象进行隐藏。继承是一种使用已经定义的类来创建新的类的方式。</p>
+
+
+<h2>对象</h2>
+
+
+<p>对象是Ruby面向对象程序的基本组成。一个对象包含了数据和方法。对象之间通过方法进行交流。每个对象可以接收消息、发送消息和处理数据。</p>
+
+
+<p>创建一个对象需要两步。首先定义一个类。类是对象的模板。它是一张蓝图，用来描述这个类的所有对象的状态和行为。一个类可以创建多个对象。运行时创建的对象称为这个类的实例。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Being
+
+end
+
+b = Being.new
+puts b
+</code></pre>
+
+
+<p>第一个例子我们创建了一个简单的对象。</p>
+
+
+<pre><code>class Being
+
+end
+</code></pre>
+
+
+<p>定义一个简单的类，内容为空。表示它没有任何数据和方法。</p>
+
+
+<pre><code>b = Being.new
+</code></pre>
+
+
+<p>创建一个<em>Being</em>类的新实例。这里我们使用<em>new</em>方法，新创建的对象保存在变量b中。</p>
+
+
+<pre><code>puts b
+</code></pre>
+
+
+<p>在终端上打印对象的基本描述。当我们打印一个对象时，实际上是调用的<em>to_s</em>方法。但是我们没有任何的定义，因为每个创建的对象都是继承自<em>Object</em>。它有一些基本的函数，<em>to_s</em>是其中一个。</p>
+
+
+<pre><code>$ ./simple.rb
+#&lt;Being:0x9f3c290&gt;
+</code></pre>
+
+
+<p>我们得到这个对象的类名。</p>
+
+
+<h2>构造函数</h2>
+
+
+<p>构造函数是一个特殊的方法。它在对象创建时自动执行。它没有返回值。构造函数的目的是初始化对象的状态。在Ruby中构造函数名为<em>intialize</em>。</p>
+
+
+<p>构造函数不能被继承。父对象的构造函数是通过<em>super</em>方法来调用。它们的调用顺序与继承顺序一致。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Being
+
+    def initialize
+        puts "Being is created"
+    end
+
+end
+
+Being.new
+</code></pre>
+
+
+<p>定义一个<em>Being</em>类。</p>
+
+
+<pre><code>class Being
+
+    def initialize
+        puts "Being is created"
+    end
+
+end
+</code></pre>
+
+
+<p>类<em>Being</em>定义了一个构造函数名为<em>initialize</em>。它在终端上打印一条信息。Ruby中方法定义位置<em>def</em>和<em>end</em>关键字之间。</p>
+
+
+<pre><code>Being.new
+</code></pre>
+
+
+<p>创建一个<em>Being</em>类的实例对象。在对象初创时构造函数将被调用。</p>
+
+
+<p>$ ./constructor.rb<br>
+Being is created  </p>
+
+
+<p>程序的输出。</p>
+
+
+<hr>
+
+
+<p>对象的属性是绑定在对象里的数据项。这些数据项也称为实例变量（instance variables）或者成员字段（member fields）。实例变量在类中定义但是各个对象都有单独的复本。</p>
+
+
+<p>下面的例子我们初始化类的成员数据。变量初始化是构造函数的典型工作。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Person
+
+    def initialize name
+        @name = name
+    end
+
+    def get_name
+        @name
+    end
+
+end
+
+p1 = Person.new "Jane"
+p2 = Person.new "Beky"
+
+puts p1.get_name
+puts p2.get_name
+</code></pre>
+
+
+<p>上面的例子定义了一个<em>Person</em>类，并且有一个实例变量。</p>
+
+
+<pre><code>class Person
+
+    def initialize name
+        @name = name
+    end
+</code></pre>
+
+
+<p><em>Person</em>的构造函数设置了一个实例变量<em>name</em>。构造函数的<em>name</em>参数是在创建时传递的。构造函数是在实例对象创建时调用。<em>@name</em>是一个实例变量。在Ruby中实例变量以@字符开头。</p>
+
+
+<pre><code>def get_name
+    @name
+end
+</code></pre>
+
+
+<p><em>get_name</em>方法返回成员字段。在Ruby蝇成员字段只能通过方法来访问。</p>
+
+
+<pre><code>p1 = Person.new "Jane"
+p2 = Person.new "Beky"
+</code></pre>
+
+
+<p>我们创建了<em>Person</em>类的两个对象。每个对象的构造函数都传递了一个字符串参数。</p>
+
+
+<pre><code>puts p1.get_name
+puts p2.get_name
+</code></pre>
+
+
+<p>通过调用每个对象的<em>get_name</em>方法来打印成员字段。</p>
+
+
+<p>$ ./person.rb<br>
+Jane<br>
+Beky  </p>
+
+
+<p>从程序的输出看到每个实例都有自己的<em>name</em>成员字段。</p>
+
+
+<hr>
+
+
+<p>我们可以创建一个对象而不调用构造函数。Ruby有一个特殊的<em>allocate</em>方法。<em>allocate</em>方法为新的对象分配空间而不调用<em>initialize</em>。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Being
+
+   def initialize
+       puts "Being created"
+   end   
+end
+
+
+b1 = Being.new
+b2 = Being.allocate
+puts b2
+</code></pre>
+
+
+<p>这个例子我们创建了两个对象。第一介对象使用<em>new</em>方法，第二个对象使用<em>allocate</em>方法。</p>
+
+
+<pre><code>b1 = Being.new
+</code></pre>
+
+
+<p>这里我们通过<em>new</em>关键字创建一个实例对象。构造函数<em>initialize</em>将会调用，并且在终端上打印消息。</p>
+
+
+<pre><code>b2 = Being.allocate
+puts b2
+</code></pre>
+
+
+<p>这里使用<em>allocate</em>方法，没有调用构造函数。使用<em>puts</em>关键字调用对象的<em>to_s</em>方法将其显示。</p>
+
+
+<pre><code>$ ./allocate.rb
+Being created
+#&lt;Being:0x8ea0044&gt;
+</code></pre>
+
+
+<p>程序的输出。</p>
+
+
+<h2>构造函数重载</h2>
+
+
+<p>重载构造函数可以使用类有多种类型的构造函数。这样我们可以使用不同数量或者不同类型的参数来创建对象。</p>
+
+
+<p>Ruby没有我们所知的其他语言那样的构造函数重载。在Ruby中这种行为可以通过一些有默认值的扩展参数来模拟。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+
+class Person
+
+    def initialize name="unknown", age=0
+        @name = name
+        @age = age        
+    end
+
+    def to_s
+        "Name: #{@name}, Age: #{@age}"
+    end
+
+end
+
+p1 = Person.new
+p2 = Person.new "unknown", 17
+p3 = Person.new "Becky", 19
+p4 = Person.new "Robert"
+
+p p1, p2, p3, p4
+</code></pre>
+
+
+<p>这个例子展示了模拟构造函数的重载。当<em>name</em>参数没有指定时使用<em>&#8220;unknow&#8221;</em>代替，对于<em>age</em>使用0。</p>
+
+
+<pre><code>def initialize name="unknown", age=0
+    @name = name
+    @age = age        
+end
+</code></pre>
+
+
+<p>这个构造传入两个参数。它们都有默认值。当我们创建对象没有指定值时就使用默认值。注意参数顺序必须一致。第一个是<em>name</em>，第二介是<em>age</em>。</p>
+
+
+<pre><code>p1 = Person.new
+p2 = Person.new "unknown", 17
+p3 = Person.new "Becky", 19
+p4 = Person.new "Robert"
+
+p p1, p2, p3, p4
+</code></pre>
+
+
+<p>我们创建了四个对象。构造函数传入了不同个数的参数。</p>
+
+
+<p>$ ./consover.rb<br>
+Name: unknown, Age: 0<br>
+Name: unknown, Age: 17<br>
+Name: Becky, Age: 19<br>
+Name: Robert, Age: 0  </p>
+
+
+<p>例子的输出结果。</p>
+
+
+<h2>方法</h2>
+
+
+<p>方法是定义在类里面的函数。它们用于对对象的属性执行一些操作。方法在面向对象范式的封装性中必不可少。例如我们<em>AccessDatabase</em>类中有一个<em>connect</em>方法，我们不需要关心这个方法到底是如何连接数据库的。我们仅需要知道使用这个方法连接数据库。这对程序功能的划分必不可少，尤其是大的应用程序。</p>
+
+
+<p>在Ruby中数据仅能够通过方法访问。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Person
+
+    def initialize name
+        @name = name
+    end
+
+    def get_name
+        @name
+    end
+
+end
+
+per = Person.new "Jane"
+
+puts per.get_name
+puts per.send :get_name
+</code></pre>
+
+
+<p>这个例子展示了调用方法的两个基本方式。</p>
+
+
+<pre><code>puts per.get_name
+</code></pre>
+
+
+<p>通常的方式是在对象后面使用点操作符。</p>
+
+
+<pre><code>puts per.send :get_name
+</code></pre>
+
+
+<p>另种方式是使用内建的<em>send</em>方法。它将方法名符号作为参数传入。</p>
+
+
+<hr>
+
+
+<p>方法通常对对象的数据进行一些操作。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Circle
+
+    @@PI = 3.141592
+
+    def initialize
+        @radius = 0
+    end
+
+    def set_radius radius
+        @radius = radius
+    end
+
+    def area
+        @radius * @radius * @@PI
+    end
+
+end
+
+
+c = Circle.new
+c.set_radius 5
+puts c.area
+</code></pre>
+
+
+<p>这个例子的代码我们定义了一个<em>Circle</em>类两个方法。</p>
+
+
+<pre><code>@@PI = 3.141592
+</code></pre>
+
+
+<p>我们在<em>Circle</em>类中定义了一个<em>@@PI</em>变量。类变量以<em>@@</em>开头。类变量是属于类的，每个对象都可以访问它们的类变量。我们<em>@@PI</em>来计算圆的面积。</p>
+
+
+<p>def initialize
+    @radius = 0
+end</p>
+
+
+<p>定义了一个成员字段。它是圆的半径。如果我们想在外部修改这个变量，我们必须使用公开的<em>set_radius</em>方法。这个数据是受保护的。</p>
+
+
+<pre><code>def set_radius radius
+    @radius = radius
+end
+</code></pre>
+
+
+<p>这是<em>set_radius</em>方法。它为<em>@radius</em>实例变量设置一个新的值。</p>
+
+
+<pre><code>def area
+    @radius * @radius * @@PI
+end
+</code></pre>
+
+
+<p><em>area</em>方法返回圆的面积。</p>
+
+
+<pre><code>c = Circle.new
+c.set_radius 5
+puts c.area
+</code></pre>
+
+
+<p>我们创建一个<em>Circle</em>类的实例对象，并且通过<em>set_radius</em>方法设置它的半径。</p>
+
+
+<p>$ ./circle.rb<br>
+78.5398  </p>
+
+
+<p>例子的输出结果。</p>
+
+
+<h2>访问修饰符</h2>
+
+
+<p>访问修饰符设置成员和方法的可见性。Ruby有三种访问修饰符：<em>public</em>、<em>protected</em>和<em>private</em>。在Ruby中所有的数据都是私有的。访问修饰符可以仅对方法使用。Ruby中的方法是公开的，除非使用了其他修饰符。</p>
+
+
+<p>公开的方法在类的内部和外部都可以访问。保护和私有的方法略微不同。都不能在类外部访问，仅能在这个类和它的子类或者父类内部访问。</p>
+
+
+<p>注意与其他面向对象编程语言不同，继承不会充当访问修饰符。仅有两件事很重要。第一，我们是否可以在类的内部或者外部访问方法。第二，是否我们要使用或者不使用<em>self</em>关键字。</p>
+
+
+<p>访问修饰符保护数据避免受到意外的修改。使用程序更健壮。实现一些主要用于修改数据的方法。这些方法最好是私有的。只有真正需要修改才将接口公开给用户。多年来用户习惯使用特殊方法并对打破向后兼容普遍不满。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Some
+
+     def method1
+         puts "public method1 called"
+     end
+
+    public
+
+     def method2
+         puts "public method2 called"  
+     end
+
+     def method3
+         puts "public method3 called"
+         method1
+         self.method1
+     end          
+end
+
+s = Some.new
+s.method1
+s.method2
+s.method3
+</code></pre>
+
+
+<p>这个例子解释了Ruby公有方法的用法。</p>
+
+
+<pre><code>def method1
+    puts "public method1 called"
+end
+</code></pre>
+
+
+<p><em>method1</em>是公有的，尽管我们没有使用<em>public</em>修饰符。因为方法默认都是公有的，除非指明为其他。</p>
+
+
+<pre><code>public
+
+  def method2
+      puts "public method2 called"  
+  end
+
+  ...
+</code></pre>
+
+
+<p><em>public</em>关键字之后的方法是公有的。</p>
+
+
+<pre><code>def method3
+    puts "public method3 called"
+    method1
+    self.method1
+end
+</code></pre>
+
+
+<p>在公有方法<em>method3</em>中我们通过使用和没有使用<em>self</em>关键字调用了另一个公有方法。</p>
+
+
+<pre><code>s = Some.new
+s.method1
+s.method2
+s.method3
+</code></pre>
+
+
+<p>公有方法是仅能够在类外部调用的方法。</p>
+
+
+<p>$ ./public_methods.rb  
+public method1 called  
+public method2 called  
+public method3 called  
+public method1 called  
+public method1 called</p>
+
+
+<p>例子运行结果。</p>
+
+
+<hr>
+
+
+<p>下一个例子看私有方法。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+
+class Some
+
+    def initialize
+        method1
+        # self.method1
+    end
+
+    private
+
+     def method1
+         puts "private method1 called"  
+     end
+
+end
+
+
+s = Some.new
+# s.method1
+</code></pre>
+
+
+<p>私有方法是Ruby中严厉的方法。它们只能够在类内部调用并且不能使用<em>self</em>关键字。</p>
+
+
+<pre><code>def initialize
+    method1
+    # self.method1
+end
+</code></pre>
+
+
+<p>在构造函数方法中我们调用了私有方法<em>method1</em>。使用<em>self</em>调用的被注释了。私有方法不能指定接收者。</p>
+
+
+<pre><code>private
+
+  def method1
+      puts "private method1 called"  
+  end
+</code></pre>
+
+
+<p><em>private</em>关键字之后的是私有方法。</p>
+
+
+<pre><code>s = Some.new
+# s.method1
+</code></pre>
+
+
+<p>创建了一个<em>Some</em>类的实例对象。在外部调用这个方法是禁止的，如果将这行取消注释Ruby解释器会报错。</p>
+
+
+<p>$ ./private_methods.rb<br>
+private method called  </p>
+
+
+<p>输出结果。</p>
+
+
+<hr>
+
+
+<p>最后我们使用保护方法。保护方法和私有方法的区别很小。保护方法与私有方法相似，不过它们可以通过<em>self</em>关键字调用。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Some
+
+    def initialize
+        method1
+        self.method1
+    end
+
+    protected
+
+     def method1
+         puts "protected method1 called"  
+     end
+
+end
+
+
+s = Some.new
+# s.method1
+</code></pre>
+
+
+<p>上面的例子展示了保护方法的用法。</p>
+
+
+<pre><code>def initialize
+    method1
+    self.method1
+end
+</code></pre>
+
+
+<p>保护方法可以使用和不使用<em>self</em>关键字。</p>
+
+
+<pre><code>protected
+
+  def method1
+      puts "protected method1 called"  
+  end
+</code></pre>
+
+
+<p>保护方法以<em>protected</em>关键字开头。</p>
+
+
+<pre><code>s = Some.new
+# s.method1
+</code></pre>
+
+
+<p>保护方法不能在类外部调用。取消注释会报错。</p>
+
+
+<h2>继承</h2>
+
+
+<p>继承是使用已经定义的类来构造新的类的方式。新构建的类称为派生类。派生自的类称为基类。继承的好处是代码利用，减少程序的复杂性。派生类（后代）覆盖或者扩展基类（祖先）的函数。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Being
+
+    def initialize
+        puts "Being class created"
+    end
+end
+
+class Human &lt; Being
+
+   def initialize
+       super
+       puts "Human class created"
+   end
+end
+
+Being.new
+Human.new
+</code></pre>
+
+
+<p>这个程序我们定义了两个类：一个基类<em>Being</em>和一个派生类<em>Human</em>。</p>
+
+
+<pre><code>class Human &lt; Being
+</code></pre>
+
+
+<p>Ruby中使用<em>&lt;</em>操作符创建继承关系。<em>Human</em>类继承自<em>Being</em>类。</p>
+
+
+<pre><code>def initialize
+    super
+    puts "Human class created"
+end
+</code></pre>
+
+
+<p><em>super</em>方法调用父类的构造函数。</p>
+
+
+<pre><code>Being.new
+Human.new
+</code></pre>
+
+
+<p>实例化了<em>Being</em>类和<em>Human</em>类。</p>
+
+
+<p>$ ./inheritance.rb <br>
+Being class created<br>
+Being class created<br>
+Human class created  </p>
+
+
+<p>首先创建<em>Being</em>类。基类<em>Human</em>同样也调用了父类的构造函数。</p>
+
+
+<hr>
+
+
+<p>一个对象的关系可能很复杂。一个对象可以有多个祖先。Ruby有<em>ancestors</em>方法获取一个类的祖先列表。</p>
+
+
+<p>每个Ruby对象都是<em>Object</em>、<em>BaseObject</em>和<em>Kernel</em>的后代。它们内建于Ruby语言的内核中。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+
+class Being 
+end
+
+class Living &lt; Being 
+end
+
+class Mammal &lt; Living 
+end
+
+class Human &lt; Mammal 
+end
+
+
+p Human.ancestors
+</code></pre>
+
+
+<p>这个例子中定义了四个类。<em>Human</em>、<em>Mammal</em>、<em>Living</em>和<em>Being</em>。</p>
+
+
+<pre><code>p Human.ancestors
+</code></pre>
+
+
+<p>打印Human类的祖先。</p>
+
+
+<p>$ ./ancestors.rb <br>
+[Human, Mammal, Living, Being, Object, Kernel, BasicObject]  </p>
+
+
+<p><em>Human</em>类有三个自定义的和三个内建的祖先。</p>
+
+
+<hr>
+
+
+<p>一个更复杂的例子。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Being
+
+    @@count = 0
+
+    def initialize
+        @@count += 1
+        puts "Being class created"
+    end
+
+    def show_count
+        "There are #{@@count} beings"
+    end
+
+end
+
+class Human &lt; Being
+
+   def initialize
+       super
+       puts "Human is created"
+   end
+end
+
+class Animal &lt; Being
+
+   def initialize
+       super
+       puts "Animal is created"
+   end
+end
+
+class Dog &lt; Animal
+
+   def initialize
+       super
+       puts "Dog is created"
+   end
+end
+
+Human.new
+d = Dog.new
+puts d.show_count
+</code></pre>
+
+
+<p>我们定义了四个类。继承的层级有点复杂。<em>Human</em>和<em>Animal</em>继承自<em>Being</em>。<em>Dog</em>继承自<em>Animal</em>。我们还使用了类变量来统计beings的创建个数。</p>
+
+
+<pre><code>@@count = 0
+</code></pre>
+
+
+<p>我们定义一个类变量。它用于统计beings的创建个数。</p>
+
+
+<pre><code>def initialize
+    @@count += 1
+    puts "Being class created"
+end
+</code></pre>
+
+
+<p>每次<em>Being</em>类实例化时我们将<em>@@count</em>变量加1。这使用我们可以跟踪实例创建的个数。</p>
+
+
+<pre><code>class Animal &lt; Being
+...
+
+class Dog &lt; Animal
+...
+</code></pre>
+
+
+<p><em>Animal</em>继承自<em>Being</em>，<em>Dog</em>继承自<em>Animal</em>。进一步的<em>Dog</em>也继承自<em>Being</em>。</p>
+
+
+<pre><code>Human.new
+d = Dog.new
+puts d.show_count
+</code></pre>
+
+
+<p>我们通过<em>Human</em>和<em>Dog</em>创建实例。然后调用<em>Dog</em>对象的<em>show_count</em>方法。<em>Dog</em>类没有该方法，将调用<em>Being</em>类的。</p>
+
+
+<p>$ ./inheritance2.rb 
+Being class created<br>
+Human is created<br>
+Being class created<br>
+Animal is created<br>
+Dog is created<br>
+There are 2 beings  </p>
+
+
+<p><em>Human</em>对象调用了两个构造函数。<em>Dog</em>对象调用了三个构造函数。创建了两个<em>Being</em>实例。</p>
+
+
+<hr>
+
+
+<p>方法和数据成员可见性在继承中不起作用。这与其他通常的面向对象编程语言是显著的不同。</p>
+
+
+<p>在C#或者Java中公有的和保护的数据成员和方法可以被继承，私有的不能。与这相比，在Ruby中私有的数据成员和方法也可以被继承。数据成员和方法的可见性不会受继承的影响。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Base
+
+    def initialize
+        @name = "Base"
+    end
+
+    private
+
+     def private_method
+         puts "private method called"
+     end
+
+    protected
+
+     def protected_method
+         puts "protected_method called"
+     end
+
+    public
+
+     def get_name
+         return @name
+     end
+end
+
+
+class Derived &lt; Base
+
+    def public_method
+        private_method
+        protected_method
+    end
+end
+
+d = Derived.new
+d.public_method
+puts d.get_name
+</code></pre>
+
+
+<p>这个例子中有两个类。<em>Derived</em>继承乍<em>Base</em>。它继承了三个方法和一个数据字段。</p>
+
+
+<pre><code>def public_method
+    private_method
+    protected_method
+end
+</code></pre>
+
+
+<p><em>Derived</em>类的<em>public_method</em>调用了一个私有方法和一个保护方法。它们定义在父类中。</p>
+
+
+<pre><code>d = Derived.new
+d.public_method
+puts d.get_name
+</code></pre>
+
+
+<p>创建一个<em>Derived</em>类的实例。调用<em>public_method</em>方法和<em>get_name</em>方法，它返回私有的实例变量<em>@name</em>。记住Ruby中所有的实例变量都是私有的。<em>get_name</em>方法返回这个变量不管<em>@name</em>是私有的还是在父类中定义的。</p>
+
+
+<p>$ ./inheritance3.rb<br>
+private method called<br>
+protected_method called<br>
+Base  </p>
+
+
+<p>输出结果证实了在Ruby中公有的、保护的、私有的方法和私有的成员字段都能被继承。</p>
+
+
+<h2>super方法</h2>
+
+
+<p><em>super</em>方法调用父类的同名方法。如果没有传递参数它将自动的把当前的所有参数传入。如果写为<em>super()</em>则没有参数传入。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Base
+
+    def show x=0, y=0
+        p "Base class, x: #{x}, y: #{y}"
+    end
+end
+
+class Derived &lt; Base
+
+    def show x, y
+        super
+        super x
+        super x, y
+        super()
+    end
+end
+
+
+d = Derived.new
+d.show 3, 3
+</code></pre>
+
+
+<p>这个例子有两个类一个继承。它们都定义了<em>show</em>方法。这个方法在<em>Derived</em>类中使用super调用了父类的方法。</p>
+
+
+<pre><code>def show x, y
+    super
+    super x
+    super x, y
+    super()
+end
+</code></pre>
+
+
+<p><em>super</em>不带参数则会传递将当前传入的参数，这里是x=3、y=3。<em>super()</em>方法不传递参数。</p>
+
+
+<p>$ ./super.rb<br>
+&#8220;Base class, x: 3, y: 3&#8221;<br>
+&#8220;Base class, x: 3, y: 0&#8221;<br>
+&#8220;Base class, x: 3, y: 3&#8221;<br>
+&#8220;Base class, x: 0, y: 0&#8221;  </p>
+
+
+<p>输出结果。</p>
+
+
+<p>这是Ruby的面向对象的第一部分。</p>
+
+
+<hr>
+
+
+<p>原文地址： <a href="http://zetcode.com/lang/rubytutorial/oop/">http://zetcode.com/lang/rubytutorial/oop/</a><br>
+翻译：龙昌  admin@longchangjin.cn<br>
+完整教程：<a href="https://github.com/wusuopu/Ruby-tutorial">https://github.com/wusuopu/Ruby-tutorial</a> </p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83935.html">[翻译]Ruby教程11——哈希表</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-11-15T00:00:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>15</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83935.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83935.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h1>哈希表</h1>
+
+
+<p>这部分的教程我们将提到哈希表。哈希表是一个键-值对的集合。与数组相似，不同与数组的是哈希表的索引是确定的，数组的只能是整数。哈希表有时称为相关联的数组。</p>
+
+
+<p>哈希表是非常有用的集合。它有许多方法供程序员使用。</p>
+
+
+<h2>创建哈希表</h2>
+
+
+<p>有两种创建哈希表的方式：使用<em>new</em>关键字或者哈希表的字面量。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+names = Hash.new
+names[1] = "Jane"
+names[2] = "Thomas"
+
+puts names
+</code></pre>
+
+
+<p>第一个脚本创建了一个哈希表并添加了两个键-值对。</p>
+
+
+<pre><code>names = Hash.new
+</code></pre>
+
+
+<p>创建一个哈希对象。</p>
+
+
+<pre><code>names[1] = "Jane"
+names[2] = "Thomas"
+</code></pre>
+
+
+<p>添加两对值。数字1、2是哈希表的键。键放在中括号里。<em>names</em>是属于键的值。</p>
+
+
+<pre><code>puts names
+</code></pre>
+
+
+<p>打印哈希表。</p>
+
+
+<pre><code>$ ./create.rb  
+{1=&gt;"Jane", 2=&gt;"Thomas"}
+</code></pre>
+
+
+<p>从输出结果我们看到一个哈希表是用花括号括起来的。键和值是使用<em>=&gt;</em>符号成对搭配。</p>
+
+
+<hr>
+
+
+<p><em>store</em>方法可以用于给哈希表设置一些初始值。它可以代替花括号。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+names = Hash.new
+names.store(1, "Jane")
+names.store(2, "Thomas")
+names.store(3, "Rebecca")
+
+puts names
+</code></pre>
+
+
+<p>创建了一个相似的脚本，这次我们使用<em>store</em>方法。</p>
+
+
+<pre><code>names.store(1, "Jane")
+</code></pre>
+
+
+<p><em>store</em>方法的第一个参数是键，第二个参数是值。</p>
+
+
+<hr>
+
+
+<p>第三个脚本我们使用字面符来创建哈希表。它的值是用花括号括起来的。并且键和值是用<em>=&gt;</em>符号成对分配。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+domains = { "de" =&gt; "Germany",
+            "sk" =&gt; "Slovakia",
+            "hu" =&gt; "Hungary",
+            "us" =&gt; "United States",
+            "no" =&gt; "Norway"                       
+          }
+
+puts domains["de"]
+puts domains["sk"]
+</code></pre>
+
+
+<p>创建哈希表<em>domains</em>包含5对内容。这里键和值都是字符串。</p>
+
+
+<p>$ ./create3.rb <br>
+Germany<br>
+Slovakia  </p>
+
+
+<p>例子的输出结果。</p>
+
+
+<h2>基本用法</h2>
+
+
+<p>这一节我们展示Ruby哈希表的一些很基础的方法。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+names = Hash.new
+
+names[1] = "Jane"
+names[2] = "Thomas"
+names[3] = "Robert"
+names[4] = "Julia"
+names[5] = "Rebecca"
+
+puts "The size of the hash is #{names.size}"
+
+puts names.keys.inspect
+puts names.values.inspect
+</code></pre>
+
+
+<p>上面的脚本中创建了一个有5个值的哈希表，介绍了哈希表的三个方法。</p>
+
+
+<pre><code>puts "The size of the hash is #{names.size}"
+</code></pre>
+
+
+<p><em>size</em>方法返回哈希表的大小。与<em>length</em>方法相同。</p>
+
+
+<pre><code>puts names.keys.inspect
+puts names.values.inspect
+</code></pre>
+
+
+<p><em>keys</em>方法返回哈希表的所有键。以此类推，<em>values</em>方法返回哈希表的所有值。返回的数据是一个数组形式的。为了使输出更加可读我们使用了<em>inspect</em>方法。</p>
+
+
+<p>$ ./basic.rb<br>
+The size of the hash is 5<br>
+[1, 2, 3, 4, 5]<br>
+[&#8220;Jane&#8221;, &#8220;Thomas&#8221;, &#8220;Robert&#8221;, &#8220;Julia&#8221;, &#8220;Rebecca&#8221;]  </p>
+
+
+<p>例子的输出结果。注意最后两个方法是两个数组。</p>
+
+
+<hr>
+
+
+<p>这节的第二个例子展示了哈希表实例的三个方法。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+names1 = Hash.new
+
+names1[1] = "Jane"
+names1[2] = "Thomas"
+names1[3] = "Robert"
+names1[4] = "Julia"
+names1[5] = "Rebecca"
+
+names2 = names1.dup
+
+puts names1.eql? names2
+
+puts names1.empty?
+names1.clear
+puts names1.empty?
+</code></pre>
+
+
+<p>创建了一个<em>names</em>哈希表，对该对象调用了三个方法。</p>
+
+
+<pre><code>names2 = names1.dup
+</code></pre>
+
+
+<p>通过<em>dup</em>方法创建了一个副本。</p>
+
+
+<pre><code>puts names1.eql? names2
+</code></pre>
+
+
+<p><em>eql?</em>方法比较两个哈希表对象是否相等。这里是相同的，打印true。</p>
+
+
+<pre><code>puts names1.empty?
+</code></pre>
+
+
+<p><em>empty?</em>方法检查哈希表是否为空。这行打印false，因为<em>names1</em>有5项数据。</p>
+
+
+<pre><code>names1.clear
+puts names1.empty?
+</code></pre>
+
+
+<p><em>clear</em>方法删除哈希表的所有内容。接着调用<em>empty?</em>方法返回true。</p>
+
+
+<p>$ ./basic2.rb<br>
+true<br>
+false<br>
+true  </p>
+
+
+<p>输出结果。</p>
+
+
+<hr>
+
+
+<p>有一个方法可以判断一个键或者值是否在这个哈希表中。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+domains = { :de =&gt; "Germany", :sk =&gt; "Slovakia",
+            :no =&gt; "Norway", :us =&gt; "United States"
+          }
+
+puts domains.has_key? :de
+puts domains.include? :no
+puts domains.key? :me
+puts domains.member? :sk
+
+puts domains.has_value? "Slovakia"
+puts domains.value? "Germany"
+</code></pre>
+
+
+<p>创建了一个有4对数据的哈希表<em>domains</em>。键是用的符号，因为它更有效。</p>
+
+
+<pre><code>puts domains.has_key? :de
+puts domains.include? :no
+puts domains.key? :me
+puts domains.member? :sk
+</code></pre>
+
+
+<p>这里我们用了四个方法来判断哈希表是否包含该键。它们的功能都是相同的。</p>
+
+
+<pre><code>puts domains.has_value? "Slovakia"
+puts domains.value? "Germany"
+</code></pre>
+
+
+<p>这里用了两个方法检查这两个字符串是否在哈希表中。</p>
+
+
+<p>$ ./has.rb<br>
+true<br>
+true<br>
+false<br>
+true<br>
+true<br>
+true  </p>
+
+
+<p>输出结果。</p>
+
+
+<hr>
+
+
+<p>这节的最后一个例子，我们将从哈希表中读取内容。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+stones = { 1 =&gt; "garnet", 2 =&gt; "topaz", 
+           3 =&gt; "opal", 4 =&gt; "amethyst"
+         }
+
+puts stones.fetch 1
+puts stones[2]
+puts stones.values_at 1, 2, 3
+</code></pre>
+
+
+<p>这个脚本展示了三个读取值的方法。</p>
+
+
+<pre><code>puts stones.fetch 1
+</code></pre>
+
+
+<p><em>fetch</em>方法通过给定的键读取值。</p>
+
+
+<pre><code>puts stones[2]
+</code></pre>
+
+
+<p>也可以使用中括号来获取一个值，这行会打印<em>&#8220;topaz&#8221;</em>。</p>
+
+
+<pre><code>puts stones.values_at 1, 2, 3
+</code></pre>
+
+
+<p><em>values_at</em>方法可以一次获取多个值。这个方法通过给定的键返回一个数组包含了对应的值。</p>
+
+
+<p>$ ./read.rb<br>
+garnet<br>
+topaz<br>
+garnet<br>
+topaz<br>
+opal  </p>
+
+
+<p>例子的输出结果。</p>
+
+
+<h2>循环遍历哈希表</h2>
+
+
+<p>有一些方法可以用于循环遍历哈希表。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+stones = { 1 =&gt; "garnet", 2 =&gt; "topaz", 
+           3 =&gt; "opal", 4 =&gt; "amethyst"
+         }
+
+stones.each { |k, v| puts "Key: #{k}, Value: #{v}" }
+stones.each_key { |key| puts "#{key}" }
+stones.each_value { |val| puts "#{val}" }
+stones.each_pair { |k, v| puts "Key: #{k}, Value: #{v}" }
+</code></pre>
+
+
+<p>上面的例子我们展示的四个方法。用这些方法显示了所有的键、值。</p>
+
+
+<pre><code>stones.each { |k, v| puts "Key: #{k}, Value: #{v}" }
+</code></pre>
+
+
+<p><em>each</em>方法对每个键都调用了给定的代码块，键-值对作为参数传递。</p>
+
+
+<pre><code>stones.each_key { |key| puts "#{key}" }
+</code></pre>
+
+
+<p>我们使用<em>each_key</em>方法循环遍历了哈希表所有的键。将它们打印在终端上。</p>
+
+
+<pre><code>stones.each_value { |val| puts "#{val}" }
+</code></pre>
+
+
+<p><em>each_value</em>用于循环遍历哈希表所有的值。</p>
+
+
+<pre><code>stones.each_pair { |k, v| puts "Key: #{k}, Value: #{v}" }
+</code></pre>
+
+
+<p><em>each_pair</em>方法与<em>each</em>方法相同。</p>
+
+
+<p>$ ./loop.rb<br>
+Key: 1, Value: garnet<br>
+Key: 2, Value: topaz<br>
+Key: 3, Value: opal<br>
+Key: 4, Value: amethyst<br>
+1<br>
+2<br>
+3<br>
+4<br>
+garnet<br>
+topaz<br>
+opal<br>
+amethyst<br>
+Key: 1, Value: garnet<br>
+Key: 2, Value: topaz<br>
+Key: 3, Value: opal<br>
+Key: 4, Value: amethyst  </p>
+
+
+<p>输出结果。</p>
+
+
+<h2>删除键值对</h2>
+
+
+<p>接下来的例子关注哈希表的删除。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+names = Hash.new
+
+names[1] = "Jane"
+names[2] = "Thomas"
+names[3] = "Robert"
+names[4] = "Julia"
+names[5] = "Rebecca"
+
+names.delete 4
+names.shift
+
+puts names
+</code></pre>
+
+
+<p>这个脚本我们使用了两个方法：<em>delete</em>和<em>shift</em>。<em>delete</em>方法是删除指定的键的值，并将其返回。<em>shift</em>方法删除哈希表的第一对键值，并将其作为数组返回。</p>
+
+
+<pre><code>names.delete 4
+</code></pre>
+
+
+<p>删除<em>4 =&gt; &#8220;Julia&#8221;</em>这对值。</p>
+
+
+<pre><code>names.shift
+</code></pre>
+
+
+<p>这行代码删除<em>1 =&gt; &#8220;Jane&#8221;</em>这对值。</p>
+
+
+<pre><code>$ ./deleteitem.rb  
+{2=&gt;"Thomas", 3=&gt;"Robert", 5=&gt;"Rebecca"}
+</code></pre>
+
+
+<p>输出结果显示还剩的内容。</p>
+
+
+<hr>
+
+
+<p><em>reject</em>和<em>delete_if</em>方法可以从哈希表中移除多项内容。如果这些方法所给定的代码块中的条件式返回true，则删除对应的键值对。这两个方法有个重要区别。<em>reject</em>方法作用于复本，<em>delete_if</em>作用于原对象。</p>
+
+
+<pre><code>#!/usr/local/bin/ruby
+
+names1 = Hash.new
+
+names1[1] = "Jane"
+names1[2] = "Thomas"
+names1[3] = "Robert"
+names1[4] = "Julia"
+names1[5] = "Rebecca"
+
+puts names1.reject { |k, v| v =~ /R.*/ }
+puts names1
+puts names1.delete_if { |k, v| k&lt;=3 }
+puts names1
+</code></pre>
+
+
+<p>这个例子使用上面的方法删除多项键值对。</p>
+
+
+<pre><code>puts names1.reject { |k, v| v =~ /R.*/ }
+</code></pre>
+
+
+<p><em>reject</em>方法移除所有满足代码块中正则式的值，并返回修改后的哈希表，原哈希表不变。</p>
+
+
+<pre><code>puts names1
+</code></pre>
+
+
+<p>这行的输出证实了原哈希表没有改变。</p>
+
+
+<pre><code>puts names1.delete_if { |k, v| k&lt;=3 }
+</code></pre>
+
+
+<p>这里我们删除键小于等于3的键值对。这个方法修改了原对象。</p>
+
+
+<pre><code>$ ./massdelete.rb   
+{1=&gt;"Jane", 2=&gt;"Thomas", 4=&gt;"Julia"}  
+{1=&gt;"Jane", 2=&gt;"Thomas", 3=&gt;"Robert", 4=&gt;"Julia", 5=&gt;"Rebecca"}  
+{4=&gt;"Julia", 5=&gt;"Rebecca"}  
+{4=&gt;"Julia", 5=&gt;"Rebecca"}
+</code></pre>
+
+
+<p>输出结果。</p>
+
+
+<h2>添加内容</h2>
+
+
+<p><em>merge</em>和<em>update</em>方法可以给哈希表添加键值对。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+names1 = Hash.new
+
+names1[1] = "Jane"
+names1[2] = "Thomas"
+
+names2 = Hash.new
+
+names2[3] = "Robert"
+names2[4] = "Julia"
+
+names = names1.merge names2
+puts names
+
+names = names1.update names2
+puts names
+</code></pre>
+
+
+<p>这个脚本中我们创建了两个哈希表，然后对它们调用了<em>merge</em>和<em>update</em>方法。</p>
+
+
+<pre><code>names = names1.merge names2
+puts names
+</code></pre>
+
+
+<p>合并<em>names1</em>和<em>names2</em>，结果分配给<em>names</em>。</p>
+
+
+<pre><code>$ ./merge.rb  
+{1=&gt;"Jane", 2=&gt;"Thomas", 3=&gt;"Robert", 4=&gt;"Julia"}  
+{1=&gt;"Jane", 2=&gt;"Thomas", 3=&gt;"Robert", 4=&gt;"Julia"}
+</code></pre>
+
+
+<p>最后的哈希表包含了<em>names1</em>和<em>names2</em>的内容。</p>
+
+
+<h2>merge与merge!</h2>
+
+
+<p>最后一节，我们重述一下Ruby的习俗。一些Ruby的方法以感叹号结尾。这个标志在语法上没有意义，它只是表明调用这个方法会修改对象的内容。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+names1 = Hash.new
+
+names1[1] = "Jane"
+names1[2] = "Thomas"
+
+names2 = Hash.new
+
+names2[3] = "Robert"
+names2[4] = "Julia"
+
+names = names1.merge names2
+puts names
+puts names1
+
+names = names1.merge! names2
+puts names
+puts names1
+</code></pre>
+
+
+<p>我们展示了<em>merge</em>和<em>merge!</em>方法的不同。</p>
+
+
+<pre><code>names = names1.merge names2
+</code></pre>
+
+
+<p><em>merge</em>不会修改<em>names1</em>，它作用于一个新的复本。</p>
+
+
+<pre><code>names = names1.merge! names2
+</code></pre>
+
+
+<p><em>merge!</em>方法作用于原对象。<em>names1</em>被修改了。</p>
+
+
+<pre><code>$ ./merge2.rb
+{1=&gt;"Jane", 2=&gt;"Thomas", 3=&gt;"Robert", 4=&gt;"Julia"}
+{1=&gt;"Jane", 2=&gt;"Thomas"}
+{1=&gt;"Jane", 2=&gt;"Thomas", 3=&gt;"Robert", 4=&gt;"Julia"}
+{1=&gt;"Jane", 2=&gt;"Thomas", 3=&gt;"Robert", 4=&gt;"Julia"}
+</code></pre>
+
+
+<p><em>merge2.rb</em>程序的输出。</p>
+
+
+<p>在这章我们学习了Ruby的哈希表。</p>
+
+
+<hr>
+
+
+<p>原文地址： <a href="http://zetcode.com/lang/rubytutorial/hashes/">http://zetcode.com/lang/rubytutorial/hashes/</a><br>
+翻译：龙昌  admin@longchangjin.cn<br>
+完整教程：<a href="https://github.com/wusuopu/Ruby-tutorial">https://github.com/wusuopu/Ruby-tutorial</a> </p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83932.html">[翻译]Ruby教程10——数组</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-11-14T00:00:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>14</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83932.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83932.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h1>数组</h1>
+
+
+<p>这一部分的教程将介绍数组。数组是有序对象的集合。</p>
+
+
+<p>一个这是在某个时刻只能保存一项数值。不过数组可以保存多项。这些数据项被称为数组的元素。数组可以保存任何类型的数据。每个元素可以使用索引来引用。第一个元素的索引值为0。</p>
+
+
+<p>注意Ruby的数组与C、C++或者Java中的数组有很大的不同。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+nums = [1, 2, 3, 4, 5]
+
+nums.each do |num|
+    puts num
+end
+</code></pre>
+
+
+<p>我们的第一个例子创建了一个包含5个整数的数组，然后在终端上打印这些元素。</p>
+
+
+<pre><code>nums = [1, 2, 3, 4, 5]
+</code></pre>
+
+
+<p>这行创建了一个包含5个整数的数组，每个元素使用逗号分隔开来。</p>
+
+
+<pre><code>nums.each do |num|
+    puts num
+end
+</code></pre>
+
+
+<p>我们使用<em>each</em>方法遍历数组并在终端上打印每个元素。</p>
+
+
+<p>$ ./array.rb<br>
+1<br>
+2<br>
+3<br>
+4<br>
+5  </p>
+
+
+<p>程序的输出结果。</p>
+
+
+<h2>创建数组</h2>
+
+
+<p>Ruby中数组是一个对象，可以使用<em>new</em>方法进行实例化。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+nums = Array.new
+
+nums.push 1
+nums.push 2
+nums.push 3
+nums.push 4
+nums.push 5
+
+puts nums
+</code></pre>
+
+
+<p>这个脚本中我们创建了一个数组<em>nums</em>，然后往里面添加了5个整数。</p>
+
+
+<pre><code>nums = Array.new
+</code></pre>
+
+
+<p>创建数组对象。</p>
+
+
+<pre><code>nums.push 1
+</code></pre>
+
+
+<p><em>push</em>方法是往数组尾部添加一项数据。</p>
+
+
+<hr>
+
+
+<p>我们继续使用<em>new</em>方法创建数组。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+a1 = Array.new 
+a2 = Array.new 3
+a3 = Array.new 6, "coin"
+a4 = Array.new [11]
+a5 = Array.new (15) {|e| e*e}
+
+puts [a1, a2, a3, a4, a5].inspect
+</code></pre>
+
+
+<p><em>Array</em>类的<em>new</em>方法有一些选项。</p>
+
+
+<pre><code>a1 = Array.new
+</code></pre>
+
+
+<p>创建一个空的数组，支持稍后再往其中填充数据。</p>
+
+
+<pre><code>a2 = Array.new 3
+</code></pre>
+
+
+<p>创建一个数组包含3个<em>nil</em>对象。</p>
+
+
+<pre><code>a3 = Array.new 6, "coin"
+</code></pre>
+
+
+<p>创建一个数组包含6个<em>&#8220;coin&#8221;</em>字符串。第一个选项是数组的大小；第二个选项是填充的对象。</p>
+
+
+<pre><code>a4 = Array.new [11]
+</code></pre>
+
+
+<p>第四个数组只有一项数据。</p>
+
+
+<pre><code>a5 = Array.new (15) {|e| e*e}
+</code></pre>
+
+
+<p>创建一个有15个元素的数组，第个元素都是在代码块中创建。这里计算了序号数的平方。</p>
+
+
+<pre><code>puts [a1, a2, a3, a4, a5].inspect
+</code></pre>
+
+
+<p>将所有的数组放在一个数组中。数组是可以放入另一个数组里的。然后调用数组的<em>inspect</em>方法，它将对其所有的元素都调用该方法。<em>inspect</em>方法将返回代表这个数组的字符串。当我们需要快速检查数组内容时它非常有用。</p>
+
+
+<p>$ ./arraynew.rb<br>
+[[], [nil, nil, nil], [&#8220;coin&#8221;, &#8220;coin&#8221;, &#8220;coin&#8221;, &#8220;coin&#8221;, &#8220;coin&#8221;, &#8220;coin&#8221;], <br>
+[11], [0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 121, 144, 169, 196]]  </p>
+
+
+<p>我们可以所有创建的数组。</p>
+
+
+<hr>
+
+
+<p>接下来的脚本展示了多种创建数组的方法。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+integers = [1, 2, 3, 4, 5]
+animals = %w( donkey dog cat dolphin eagle )
+weights = Array.new
+weights &lt;&lt; 4.55 &lt;&lt; 3.22 &lt;&lt; 3.55 &lt;&lt; 8.55 &lt;&lt; 3.23
+
+puts integers.inspect
+puts animals.inspect
+puts weights.inspect
+</code></pre>
+
+
+<p>我们创建了三个数组分别包含了整数、字符串和小数。</p>
+
+
+<pre><code>integers = [1, 2, 3, 4, 5]
+</code></pre>
+
+
+<p>这行创建了一个包含5个整数的数组。这是最经典的方法。数组的每个元素放在中括号中用逗号隔开。</p>
+
+
+<pre><code>animals = %w( donkey dog cat dolphin eagle )
+</code></pre>
+
+
+<p>这行代码创建了一个有5个元素的字符串数组。这种方式我们不需要逗号和双引号，减少了按键次数。</p>
+
+
+<pre><code>weights = Array.new
+weights &lt;&lt; 4.55 &lt;&lt; 3.22 &lt;&lt; 3.55 &lt;&lt; 8.55 &lt;&lt; 3.23
+</code></pre>
+
+
+<p>第三种方法有两步。首先创建一个数组对象，然后用数据将其初始化。这是正式的数组创建方法。上面方法实际上是这个的简写。</p>
+
+
+<pre><code>puts integers.inspect
+</code></pre>
+
+
+<p>The inspect method prints the string representation of the array to the terminal.</p>
+
+
+<p>$ ./creation.rb<br>
+[1, 2, 3, 4, 5]<br>
+[&#8220;donkey&#8221;, &#8220;dog&#8221;, &#8220;cat&#8221;, &#8220;dolphin&#8221;, &#8220;eagle&#8221;]<br>
+[4.55, 3.22, 3.55, 8.55, 3.23]  </p>
+
+
+<p>例子的输出结果。</p>
+
+
+<hr>
+
+
+<p>数组的数据项没限制必须是数字和字符串。数组可以包含Ruby中的所有类型的数据。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Empty
+
+end
+
+nums = [1, 2, 3, 4, 5]
+
+various = [1, -1, "big", 3.4, Empty.new, nums, :two]
+
+puts various.inspect
+</code></pre>
+
+
+<p>我们在数组中放了多种Ruby对象。</p>
+
+
+<pre><code>various = [1, -1, "big", 3.4, Empty.new, nums, :two]
+</code></pre>
+
+
+<p>这个数组包含了数字、字符串、自定义对象、另一个数组和一个符号。</p>
+
+
+<pre><code>$ ./arrayobjects.rb                                                                                   
+[1, -1, "big", 3.4, #&lt;Empty:0x987f704&gt;, [1, 2, 3, 4, 5], :two]
+</code></pre>
+
+
+<p><em>arrayobjects.rb</em>脚本的运行结果。</p>
+
+
+<hr>
+
+
+<p>下一个例子展示嵌套数组；即一个数组包含另一个数组。Ruby中可以在数组中嵌套数组。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+numbers = [1, 2, 3, [2, 4, 6, [11, 12]]]
+
+puts numbers.length
+puts numbers[0], numbers[1]
+
+puts numbers[3][0]
+puts numbers[3][1]
+
+puts numbers[3][3][0]
+puts numbers[3][3][1]
+
+puts numbers.flatten!.inspect
+</code></pre>
+
+
+<p>数组<em>[11, 12]</em>被嵌套在<em>[2, 4, 6, &#8230;]</em>里，这个数组又被嵌套在<em>[1, 2, 3, &#8230;]</em>数组里。</p>
+
+
+<pre><code>puts numbers.length
+</code></pre>
+
+
+<p><em>length</em>方法返回4。内嵌数组只算一个元素。</p>
+
+
+<pre><code>puts numbers[0], numbers[1]
+</code></pre>
+
+
+<p>这里<em>[]</em>字符用于访问数组的元素。上面这行代码返回第一个和第二个元素。</p>
+
+
+<pre><code>puts numbers[3][0]
+puts numbers[3][1]
+</code></pre>
+
+
+<p>这里我们访问内嵌数组的元素。<em>[3][0]</em>返回内嵌数组的第一个元素，在这里是2。同样的<em>[3][1]</em>返回内嵌数组的第二个元素，这里是4。</p>
+
+
+<pre><code>puts numbers[3][3][0]
+puts numbers[3][3][1]
+</code></pre>
+
+
+<p>现在我们进入更深一层。我们访问更深一层数组的元素。<em>[3][3]</em>返回<em>[11, 12]</em>数组。然后从这个数组获取第一个和第二个元素。</p>
+
+
+<pre><code>puts numbers.flatten!.inspect
+</code></pre>
+
+
+<p><em>flatten!</em>方法将数组变为平坦。它将所有的内嵌数组元素创建成一个新的数组。</p>
+
+
+<p>$ ./arrayofarrays.rb<br>
+4<br>
+1<br>
+2<br>
+2<br>
+4<br>
+11<br>
+12<br>
+[1, 2, 3, 2, 4, 6, 11, 12]  </p>
+
+
+<p>输出结果。 </p>
+
+
+<h2>打印数组内容</h2>
+
+
+<p>要在终端上打印数组的元素有多种方法可以完成。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+integers = [1, 2, 3, 4, 5]
+
+puts integers
+puts integers.inspect
+
+integers.each do |e|
+    puts e
+end
+</code></pre>
+
+
+<p>这个脚本我们将数组的元素打印了三次。</p>
+
+
+<pre><code>puts integers
+</code></pre>
+
+
+<p>数组作为puts/print方法的参数是最简单的方式。每行将打印一个元素。</p>
+
+
+<pre><code>puts integers.inspect
+</code></pre>
+
+
+<p>使用<em>inspect</em>方法输出结果的可读性更好。</p>
+
+
+<pre><code>integers.each do |e|
+    puts e
+end
+</code></pre>
+
+
+<p><em>each</em>方法为每个元素都调用一次一个代码块，元素作为参数传递。我们简单的参元素使用<em>puts</em>方法。</p>
+
+
+<p>$ ./printarray1.rb<br>
+1<br>
+2<br>
+3<br>
+4<br>
+5<br>
+[1, 2, 3, 4, 5]<br>
+1<br>
+2<br>
+3<br>
+4<br>
+5  </p>
+
+
+<p>数组在终端上打印了三次。</p>
+
+
+<hr>
+
+
+<p>第二个例子我们提供了两个额外的方法打印数组。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+integers = [1, 2, 3, 4, 5]
+
+integers.length.times do |idx|
+    puts integers[idx]
+end
+
+integers.each_with_index do |num, idx|
+    puts "value #{num} has index #{idx}"
+end
+</code></pre>
+
+
+<p>第一种情况我们组合使用了<em>length</em>和<em>times</em>方法。第二种情况我们使用了<em>each_with_index</em>方法。</p>
+
+
+<pre><code>integers.length.times do |idx|
+    puts integers[idx]
+end
+</code></pre>
+
+
+<p><em>length</em>方法返回数组的长度。<em>times</em>方法将接下来的代码块迭代<em>length</em>次，传递的值从0到length-1。这些数字作为数组的索引使用。</p>
+
+
+<pre><code>integers.each_with_index do |num, idx|
+    puts "value #{num} has index #{idx}"
+end
+</code></pre>
+
+
+<p><em>each_with_index</em>方法迭代数组并将元素及其索引传递给代码块。用这种方法我们可以简单的打印元素和它的索引。</p>
+
+
+<p>$ ./printarray2.rb<br>
+1<br>
+2<br>
+3<br>
+4<br>
+5<br>
+value 1 has index 0<br>
+value 2 has index 1<br>
+value 3 has index 2<br>
+value 4 has index 3<br>
+value 5 has index 4  </p>
+
+
+<p>输出结果。</p>
+
+
+<h2>读取数组元素</h2>
+
+
+<p>这节我们将从数组读取数据。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+lts = %w{ a b c d e f g h}
+
+puts lts.first
+puts lts.last
+puts lts.at(3)
+</code></pre>
+
+
+<p>第一个例子我们展示了三个简单的方法进行数据检索。</p>
+
+
+<pre><code>puts lts.first
+puts lts.last
+</code></pre>
+
+
+<p><em>first</em>方法读取数组的第一个元素；<em>last</em>方法读取数组的最后一个元素。</p>
+
+
+<pre><code>puts lts.at(3)
+</code></pre>
+
+
+<p><em>at</em>方法返回指定索引的元素。</p>
+
+
+<p>$ ./retrieval.rb<br>
+a<br>
+h<br>
+d  </p>
+
+
+<p><em>retrieval.rb</em>程序的输出结果。</p>
+
+
+<hr>
+
+
+<p><em>[]</em>符号可以用于访问数据。这是传统访问数据的方法，许多语言都使用这种方法。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+lts = %w{ a b c d e f g h }
+
+puts lts[0]
+puts lts[-1]
+puts lts[0, 3].inspect
+puts lts[2..6].inspect
+puts lts[2...6].inspect
+</code></pre>
+
+
+<p>我们展示了5个使用[]符号的例子。</p>
+
+
+<pre><code>puts lts[0]
+puts lts[-1]
+</code></pre>
+
+
+<p>我们获取数组的第一个和最后一个元素。第一项的索引为0,最后一项的索引为-1。</p>
+
+
+<pre><code>puts lts[0, 3].inspect
+</code></pre>
+
+
+<p>当中括号里有两个数时，第一个是开始的索引，第二个是长度。这行代码返回从0开始的3个元素。注意<em>inspect</em>方法仅是为了让输出可读而已。</p>
+
+
+<pre><code>puts lts[2..6].inspect
+puts lts[2...6].inspect
+</code></pre>
+
+
+<p>我们可以在中括号使用范围操作符。第一行读取第2个到第6个元素，第二行读取第2个到第5个元素。</p>
+
+
+<hr>
+
+
+<p>接下来展示<em>values_at</em>方法。这个方法的优势是可以选择多个位置的元素。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+lts = %w{ a b c d e f g h}
+
+puts lts.values_at(1..5).inspect
+puts lts.values_at(1, 3, 5).inspect
+puts lts.values_at(1, 3, 5, 6, 8).inspect
+puts lts.values_at(-1, -3).inspect
+</code></pre>
+
+
+<p><em>values_at method</em>方法返回一个数组包含选中的元素。<em>inspect</em>方法仅是为了让输出可读而已。</p>
+
+
+<pre><code>puts lts.values_at(1..5).inspect
+</code></pre>
+
+
+<p>这行代码返回索引为1到5的元素。</p>
+
+
+<pre><code>puts lts.values_at(1, 3, 5).inspect
+</code></pre>
+
+
+<p>这里我们读取索引为1、3、5的元素。</p>
+
+
+<pre><code>puts lts.values_at(1, 3, 5, 6, 8).inspect
+</code></pre>
+
+
+<p>我们可以指定多个索引，如果指定的索引没有元素则返回<em>nil</em>。</p>
+
+
+<pre><code>puts lts.values_at(-1, -3).inspect
+</code></pre>
+
+
+<p>负数的索引表示从数组尾部开始。</p>
+
+
+<p>$ ./retrieval3.rb<br>
+[&#8220;b&#8221;, &#8220;c&#8221;, &#8220;d&#8221;, &#8220;e&#8221;, &#8220;f&#8221;]<br>
+[&#8220;b&#8221;, &#8220;d&#8221;, &#8220;f&#8221;]<br>
+[&#8220;b&#8221;, &#8220;d&#8221;, &#8220;f&#8221;, &#8220;g&#8221;, nil]<br>
+[&#8220;h&#8221;, &#8220;f&#8221;]  </p>
+
+
+<p>脚本的输出结果。</p>
+
+
+<hr>
+
+
+<p>我们使用<em>fetch</em>方法从数组读取数据。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+lts = [0, 1, 2, 3, 4, 5, 6]
+
+puts lts.fetch(0)
+puts lts.fetch(-2)
+puts lts.fetch(8, 'undefined')
+puts lts.fetch(8) { |e| -2*e }
+</code></pre>
+
+
+<p>我们展示了<em>fetch</em>方法的一些形式的用法。</p>
+
+
+<pre><code>puts lts.fetch(0)
+puts lts.fetch(-2)
+</code></pre>
+
+
+<p>第一行打印了数组的第一个元素。第二行打印了倒数第二个元素。</p>
+
+
+<pre><code>puts lts.fetch(8, 'undefined')
+</code></pre>
+
+
+<p>第三种形式是返回指定索引的元素，如果索引超出范围则返回默认值，这里是<em>&#8216;undefined&#8217;</em>。没有第二个参数则会抛出IndexError错误。</p>
+
+
+<pre><code>puts lts.fetch(8) { |e| -2*e}
+</code></pre>
+
+
+<p>最后一种形式我们定义了一个代码块，传递了索引对应的值，这个方法返回了代码块调用的结果。</p>
+
+
+<p>$ ./retrieval4.rb<br>
+0<br>
+5<br>
+undefined<br>
+-16  </p>
+
+
+<p>脚本的输出结果。</p>
+
+
+<hr>
+
+
+<p>我们将展示<em>take</em>和<em>take_while</em>方法的用法。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+lts = %w{ a b c d e f g h}
+
+
+puts lts.take(4).inspect
+
+lts2 = lts.take_while { |e| e &lt; 'f' }
+puts lts2.inspect
+</code></pre>
+
+
+<p><em>take</em> n方法返回开头的n个元素。<em>take_while</em>方法将元素传递给一个代码块，直到代码块返回<em>nil</em>或者<em>false</em>才停止迭代，并返回之前的元素。</p>
+
+
+<pre><code>puts lts.take(4).inspect
+</code></pre>
+
+
+<p>这里我们返回开头的4个元素。</p>
+
+
+<pre><code>lts2 = lts.take_while { |e| e &lt; 'f' }
+puts lts2.inspect
+</code></pre>
+
+
+<p>这里我们从源数组创建了一个新的数组，这个新数组包含了所有小于&#8217;f&#8217;的字符。</p>
+
+
+<p>$ ./retrieval5.rb<br>
+[&#8220;a&#8221;, &#8220;b&#8221;, &#8220;c&#8221;, &#8220;d&#8221;]<br>
+[&#8220;a&#8221;, &#8220;b&#8221;, &#8220;c&#8221;, &#8220;d&#8221;, &#8220;e&#8221;]  </p>
+
+
+<p><em>retrieval5.rb</em>程序的输出结果。</p>
+
+
+<hr>
+
+
+<p><em>slice</em>方法与[]符号相同。返回一个或者多个元素。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+lts = %w{ a b c d e f g h}
+
+puts lts.slice(0)
+puts lts.slice(-1)
+puts lts.slice(0, 3).inspect
+puts lts.slice(2..6).inspect
+puts lts.slice(2...6).inspect
+</code></pre>
+
+
+<p>展示了5个<em>slice</em> 方法的例子。</p>
+
+
+<pre><code>puts lts.slice(0)
+puts lts.slice(-1)
+</code></pre>
+
+
+<p>这些形式的<em>slice</em>方法返回一个数组元素。第行代码返回第一个元素，第二行代码返回最后一个元素。</p>
+
+
+<pre><code>puts lts.slice(0, 3).inspect
+</code></pre>
+
+
+<p>第一个参数是起始索引，第二个参数是长度。这一行代码返回从0开始的3个元素。</p>
+
+
+<pre><code>puts lts.slice(2..6).inspect
+puts lts.slice(2...6).inspect
+</code></pre>
+
+
+<p>我们可以在<em>slice</em>方法中使用范围操作符。第一行读取第2到6的元素，第二行读取第2到5的元素。</p>
+
+
+<p>$ ./retrieval6.rb<br>
+a<br>
+h<br>
+[&#8220;a&#8221;, &#8220;b&#8221;, &#8220;c&#8221;]<br>
+[&#8220;c&#8221;, &#8220;d&#8221;, &#8220;e&#8221;, &#8220;f&#8221;, &#8220;g&#8221;]<br>
+[&#8220;c&#8221;, &#8220;d&#8221;, &#8220;e&#8221;, &#8220;f&#8221;]  </p>
+
+
+<p><em>slice</em>方法返回数组的一部分，一个或者多个元素。</p>
+
+
+<hr>
+
+
+<p>可以随机选择数组的一个元素。Ruby中的<em>sample</em>方法可以实现。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+lts = %w{ a b c d e f g h}
+
+puts lts.sample
+puts lts.sample(3).inspect
+</code></pre>
+
+
+<p><em>sample</em>方法有两种形式。第一种我们选择一个随机元素。第二种我们选择n个随机元素。</p>
+
+
+<p>$ ./random.rb<br>
+b<br>
+[&#8220;c&#8221;, &#8220;f&#8221;, &#8220;d&#8221;]<br>
+$ ./random.rb<br>
+d<br>
+[&#8220;c&#8221;, &#8220;d&#8221;, &#8220;e&#8221;]  </p>
+
+
+<p>执行两次结果不同。</p>
+
+
+<h2>使用数组</h2>
+
+
+<p>接下来的例子介绍一些Ruby数组的方法。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+num1 = [1, 2, 3, 4, 5]
+num2 = [6, 7, 8, 9, 10]
+
+puts num1 + num2 
+puts num1.concat num2
+</code></pre>
+
+
+<p>我们定义了两个数组，将它们相加。</p>
+
+
+<pre><code>puts num1 + num2 
+puts num1.concat num2
+</code></pre>
+
+
+<p>有两个数组相加的方法。使用+操作符或者<em>concat</em>方法。</p>
+
+
+<hr>
+
+
+<p>Ruby中数组有丰富的方法。例如<em>length</em>方法返回数组的元素个数。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+lts = %w{ a b c d e f}
+
+puts lts.inspect
+puts "Array has #{lts.length} elements"
+puts "The first element is #{lts.first}"
+puts "The last element is #{lts.last}"
+
+puts lts.eql? lts.dup
+puts lts.eql? lts.dup.delete_at(0)
+
+lts.clear
+puts lts.inspect
+puts lts.empty?
+</code></pre>
+
+
+<p>上面的脚本我们介绍了7个新方法。</p>
+
+
+<pre><code>puts "Array has #{lts.length} elements"
+</code></pre>
+
+
+<p><em>length</em>方法决定数组的大小。</p>
+
+
+<pre><code>puts "The first element is #{lts.first}"
+puts "The last element is #{lts.last}"
+</code></pre>
+
+
+<p>这里我们获取第一个和最后一个元素。</p>
+
+
+<pre><code>puts lts.eql? lts.dup
+</code></pre>
+
+
+<p><em>eql?</em>方法指出两个数组是否相等。这里是返回<em>true</em>。<em>dup</em>方法创建一个浅复制对象。</p>
+
+
+<pre><code>puts lts.eql? lts.dup.delete_at(0)
+</code></pre>
+
+
+<p><em>delete_at</em>方法从数组的开头删除元素。现在两个数组不相同了。</p>
+
+
+<pre><code>lts.clear
+</code></pre>
+
+
+<p><em>clear</em>方法删除数组的所有元素。</p>
+
+
+<pre><code>puts lts.empty?
+</code></pre>
+
+
+<p><em>empty?</em>方法检查数组是否为空。这里返回<em>true</em>，因为我们已经将所有元素都删除了。</p>
+
+
+<p>$ ./basics.rb<br>
+[&#8220;a&#8221;, &#8220;b&#8221;, &#8220;c&#8221;, &#8220;d&#8221;, &#8220;e&#8221;, &#8220;f&#8221;]<br>
+Array has 6 elements<br>
+The first element is a<br>
+The last element is f<br>
+true<br>
+false<br>
+[]<br>
+true  </p>
+
+
+<p>输出结果。</p>
+
+
+<hr>
+
+
+<p>一些Ruby的数组方法以感叹号结尾。这是Ruby的习惯。感叹号告诉程序员这个方法会修改数据。感叹号本身没有什么作用，它只是名字的约定。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+chars = %w{a b c d e}
+
+reversed_chars = chars.reverse
+puts reversed_chars.inspect
+puts chars.inspect
+
+reversed_chars = chars.reverse!
+puts reversed_chars.inspect
+puts chars.inspect
+</code></pre>
+
+
+<p>Ruby中有一些比较相似的方法。<em>reverse</em>和<em>reverse!</em>方法都是改为数组元素的顺序，将它们反转。不同在于<em>reverse</em>方法返回反转后的数组，原数组不变。<em>reverse!</em>方法会同时修改原数组。</p>
+
+
+<p>$ ./twotypes.rb<br>
+[&#8220;e&#8221;, &#8220;d&#8221;, &#8220;c&#8221;, &#8220;b&#8221;, &#8220;a&#8221;]<br>
+[&#8220;a&#8221;, &#8220;b&#8221;, &#8220;c&#8221;, &#8220;d&#8221;, &#8220;e&#8221;]<br>
+[&#8220;e&#8221;, &#8220;d&#8221;, &#8220;c&#8221;, &#8220;b&#8221;, &#8220;a&#8221;]<br>
+[&#8220;e&#8221;, &#8220;d&#8221;, &#8220;c&#8221;, &#8220;b&#8221;, &#8220;a&#8221;]  </p>
+
+
+<p>我们清晰的看到前两个数组不同，第三和第四个数组是相同的。</p>
+
+
+<hr>
+
+
+<p>一些其他的方法展示。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+numbers = [1, 2, 2, 2, 3, 4, 5, 8, 11]
+
+puts numbers.index 2
+puts numbers.index 11
+puts numbers.rindex 2
+
+puts numbers.include? 3
+puts numbers.include? 10
+
+puts numbers.join '-'
+puts numbers.uniq!.inspect
+</code></pre>
+
+
+<p>介绍5个额外的方法。</p>
+
+
+<pre><code>puts numbers.index 2
+puts numbers.index 11
+</code></pre>
+
+
+<p><em>index</em>方法返回数组中元素对应的索引。索引是从左算起。第一行返回1,它是第一个2的索引。数组中仅有一个11,它的索引是8。</p>
+
+
+<pre><code>puts numbers.rindex 2
+</code></pre>
+
+
+<p><em>rindex</em>方法返回从右边开始的索引。这里2的最右索引为3。</p>
+
+
+<pre><code>puts numbers.include? 3
+puts numbers.include? 10
+</code></pre>
+
+
+<p><em>include?</em>方法检查一个元素是否在数组中。第一行返回<em>true</em>，3在数组中。第二行返回<em>false</em>，数组中没有10。作为约定Ruby中以问号结尾的方法返回一个布尔值，并且对数组没有影响。</p>
+
+
+<pre><code>puts numbers.join '-'
+</code></pre>
+
+
+<p><em>join</em>方法返回一个字符串，它是将数组的元素用指定的符号分隔开来。</p>
+
+
+<pre><code>puts numbers.uniq!.inspect
+</code></pre>
+
+
+<p><em>uniq!</em>方法移除重复的元素。在数组中有3个2,调用方法之后就只剩一个2了。</p>
+
+
+<p>$ ./methods2.rb <br>
+1<br>
+8<br>
+3<br>
+true<br>
+false<br>
+1-2-2-2-3-4-5-8-11<br>
+[1, 2, 3, 4, 5, 8, 11]  </p>
+
+
+<p>注意<em>join</em>方法产生的是一个字符串，它是数组的数字用<em>-</em>符号分隔。</p>
+
+
+<h2>修改数组</h2>
+
+
+<p>这一节我们介绍与数组修改相关的方法。基本的我们做一些插入和删除操作。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+lts = []
+
+lts.insert 0, 'E', 'F', 'G'
+lts.push 'H'
+lts.push 'I', 'J', 'K'
+lts &lt;&lt; 'L' &lt;&lt; 'M' 
+lts.unshift 'A', 'B', 'C'
+lts.insert(3, 'D')
+
+puts lts.inspect
+</code></pre>
+
+
+<p>从一个空数组开始，我们使用不同的插入方法。</p>
+
+
+<pre><code>lts.insert 0, 'E', 'F', 'G'
+</code></pre>
+
+
+<p><em>insert</em>方法往<em>lts</em>数组插入了3个元素。</p>
+
+
+<pre><code>lts.push 'H'
+lts.push 'I', 'J', 'K'
+</code></pre>
+
+
+<p><em>push</em>方法往数组添加元素，我们可以添加一个或多个元素。</p>
+
+
+<pre><code>lts &lt;&lt; 'L' &lt;&lt; 'M'
+</code></pre>
+
+
+<p><em>&lt;&lt;</em>与<em>push</em>方法相同。这个操作可以链式调用。</p>
+
+
+<pre><code>lts.unshift 'A', 'B', 'C'
+</code></pre>
+
+
+<p><em>unshift</em>方法将元素插入在数组前端。</p>
+
+
+<pre><code>lts.insert(3, 'D')
+</code></pre>
+
+
+<p>这里<em>insert</em>方法在指定的位置插入&#8217;D&#8217;字符。</p>
+
+
+<p>$ ./insertion.rb<br>
+[&#8220;A&#8221;, &#8220;B&#8221;, &#8220;C&#8221;, &#8220;D&#8221;, &#8220;E&#8221;, &#8220;F&#8221;, &#8220;G&#8221;, &#8220;H&#8221;, &#8220;I&#8221;, &#8220;J&#8221;, &#8220;K&#8221;, &#8220;L&#8221;, &#8220;M&#8221;]  </p>
+
+
+<p>使用上面的方法，我们创建了一个包含大写字母的数组。</p>
+
+
+<hr>
+
+
+<p>一些删除数组元素的方法。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+lts = %w{ a b c d e f g h}
+
+lts.pop
+lts.pop
+
+puts lts.inspect
+
+lts.shift
+lts.shift
+
+puts lts.inspect
+
+lts.delete_at(0)
+lts.delete('d')
+
+puts lts.inspect
+
+puts lts.clear
+puts lts.inspect
+</code></pre>
+
+
+<p>这个脚本展示了5个用于删除数组元素的方法。</p>
+
+
+<pre><code>lts = %w{ a b c d e f g h}
+</code></pre>
+
+
+<p>创建一个有8个元素的数组。</p>
+
+
+<pre><code>lts.pop
+</code></pre>
+
+
+<p><em>pop</em>方法移除最后一个元素。</p>
+
+
+<pre><code>lts.shift
+</code></pre>
+
+
+<p><em>shift</em>方法移除数组的第一个元素。</p>
+
+
+<pre><code>lts.delete_at(0)
+</code></pre>
+
+
+<p><em>delete_at</em>方法删除指定位置的元素。我们删除剩余元素的第一个元素。</p>
+
+
+<pre><code>puts lts.clear
+</code></pre>
+
+
+<p><em>clear</em>方法清除所有元素。</p>
+
+
+<pre><code>lts.delete('d')
+</code></pre>
+
+
+<p><em>delete</em>方法删除指定的一项数据。</p>
+
+
+<p>$ ./deletion.rb<br>
+[&#8220;a&#8221;, &#8220;b&#8221;, &#8220;c&#8221;, &#8220;d&#8221;, &#8220;e&#8221;, &#8220;f&#8221;]<br>
+[&#8220;c&#8221;, &#8220;d&#8221;, &#8220;e&#8221;, &#8220;f&#8221;]<br>
+[&#8220;e&#8221;, &#8220;f&#8221;]<br>
+[]  </p>
+
+
+<p>输出结果。</p>
+
+
+<hr>
+
+
+<p>目前为止我们使用的方法同时只修改一个数组项。Ruby中有一些方法可以一次修改多个数组项的。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+nms = [2, -1, -4, 0, 4, 3, -2, 3, 5]
+
+nms.delete_if { |x| x &lt; 0 }
+
+puts nms.inspect
+</code></pre>
+
+
+<p>例子介绍了<em>delete_if</em>方法用于删除所有符合条件式的数据项。</p>
+
+
+<pre><code>nms.delete_if { |x| x &lt; 0 }
+</code></pre>
+
+
+<p>这行删除所有的负数。</p>
+
+
+<p>$ ./delete_if.rb<br>
+[2, 0, 4, 3, 3, 5]  </p>
+
+
+<p>我们从<em>nms</em>数组中删除了所有的负数。</p>
+
+
+<hr>
+
+
+<p>我们展示两个其他的方法处理多数据项。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+lts = %w{ a b c d e f g}
+
+puts lts.inspect
+
+lts.reject! do |e|
+    e =~ /[c language="-y"][/c]/
+end
+
+puts lts.inspect
+
+lts.replace(["x", "y", "z"])
+puts lts.inspect
+</code></pre>
+
+
+<p>我们使用了两个方法，<em>reject!</em>和<em>replace</em>。</p>
+
+
+<pre><code>lts.reject! do |e|
+    e =~ /[c language="-y"][/c]/
+end
+</code></pre>
+
+
+<p><em>reject!</em>方法移除了所有项满足条件式的数据。这里我们删除所有符合正则式的字母。</p>
+
+
+<pre><code>lts.replace(["x", "y", "z"])
+</code></pre>
+
+
+<p><em>replace</em>方法将使用给定的数据替换数组项。如果可能它会截断或者扩展数组。</p>
+
+
+<p>$ ./modify.rb <br>
+[&#8220;a&#8221;, &#8220;b&#8221;, &#8220;c&#8221;, &#8220;d&#8221;, &#8220;e&#8221;, &#8220;f&#8221;, &#8220;g&#8221;]<br>
+[&#8220;a&#8221;, &#8220;b&#8221;]<br>
+[&#8220;x&#8221;, &#8220;y&#8221;, &#8220;z&#8221;]  </p>
+
+
+<p><em>modify.rb</em>例子的输出结果。</p>
+
+
+<h2>集合操作</h2>
+
+
+<p>这一节中我们展示Ruby数组的集合操作。数学中集合是独立对象的收集。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+A = [1, 2, 3, 4, 5]
+B = [4, 5, 6, 7, 8]
+
+union = A | B
+isect = A &amp; B
+diff1  = A - B
+diff2  = B - A
+sdiff = (A - B) | (B - A)
+
+puts "Union of arrays: #{union}"
+puts "Intersection of arrays: #{isect}"
+puts "Difference of arrays A - B: #{diff1}"
+puts "Difference of arrays B - A: #{diff2}"    
+puts "Symmetric difference of arrays: #{sdiff}"
+</code></pre>
+
+
+<p>上面的脚本我们展示了一些集合操作，并集、交集、差集和对称差集。</p>
+
+
+<pre><code>nums1 = [1, 2, 3, 4, 5]
+nums2 = [4, 5, 6, 7, 8]
+</code></pre>
+
+
+<p>字义了两个整数数组。都是集合，因此每个元素都只出现了一次。两个数组有两个相同的数，4和5。</p>
+
+
+<pre><code>union = nums1 | nums2
+</code></pre>
+
+
+<p>数组的并集。两个数组相加，每个元素最终也只出现一次。</p>
+
+
+<pre><code>isect = A &amp; B
+</code></pre>
+
+
+<p>数组交集。输出两个数组都存在的元素。这里是4和5。</p>
+
+
+<pre><code>diff1  = A - B
+diff2  = B - A
+</code></pre>
+
+
+<p>两个差集，也称补集。第一行我们得到了所有在A中出现B中没有出现的元素。第二行我们得到B中出现A中没有出现的元素。</p>
+
+
+<pre><code>sdiff = (A - B) | (B - A)
+</code></pre>
+
+
+<p>对称差集。A或B中存在，但不同时存在于A和B。</p>
+
+
+<p>$ ./setoperations.rb<br>
+Union of arrays: [1, 2, 3, 4, 5, 6, 7, 8]<br>
+Intersection of arrays: [4, 5]<br>
+Difference of arrays A - B: [1, 2, 3]<br>
+Difference of arrays B - A: [6, 7, 8]<br>
+Symmetric difference of arrays: [1, 2, 3, 6, 7, 8]  </p>
+
+
+<p>输出结果。</p>
+
+
+<h2>select、collect、map方法</h2>
+
+
+<p>下面的例子我们展示三个方法：<em>select</em>、<em>collect</em>和<em>map</em>。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+nums = [1, 3, 2, 6, 7, 12, 8, 15]
+
+selected = nums.select do |e|
+    e &gt; 10
+end
+
+puts selected.inspect
+
+collected = nums.collect do |e|
+    e &lt; 10
+end
+
+puts collected.inspect
+
+mapped = nums.map do |e|
+    e*2
+end
+
+puts mapped.inspect
+</code></pre>
+
+
+<p>所有这些方法都对数组的元素执行许多操作。</p>
+
+
+<pre><code>selected = nums.select do |e|
+    e &gt; 10
+end
+</code></pre>
+
+
+<p>上面的代码使用<em>collect</em>方法创建了一个新数组。我们只选择了满足条件式的元素。这里我们选择了所有大于10的元素。</p>
+
+
+<pre><code>collected = nums.collect do |e|
+    e &lt; 10
+end
+</code></pre>
+
+
+<p><em>collect</em>方法稍微不同。它只收集代码块的返回值。新的数组只包含true和false。</p>
+
+
+<pre><code>mapped = nums.map do |e|
+    e*2
+end
+</code></pre>
+
+
+<p><em>map</em>方法与<em>collect</em>方法相同。上面的代码根据已存在的数组创建了一个新的数组。每个元素都乘以2.</p>
+
+
+<p>$ ./mass.rb<br>
+[12, 15]<br>
+[true, true, true, true, true, false, true, false]<br>
+[2, 6, 4, 12, 14, 24, 16, 30]  </p>
+
+
+<p>创建了新数组。</p>
+
+
+<h2>元素排序</h2>
+
+
+<p>最后我们对数组元素进行排序。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+planets = %w{ Mercury Venus Earth Mars Jupiter
+                Saturn Uranus Neptune Pluto }
+
+puts "#{planets.sort}"                
+puts "#{planets.reverse}"
+puts "#{planets.shuffle}"
+</code></pre>
+
+
+<p>例子中使用了三个Ruby数组的方法对数组元素进行重组。</p>
+
+
+<pre><code>puts "#{planets.sort}"
+</code></pre>
+
+
+<p><em>sort</em>方法按字母顺序进行排序。</p>
+
+
+<pre><code>puts "#{planets.reverse}"
+</code></pre>
+
+
+<p><em>reverse</em>方法反转元素并返回新的数组。</p>
+
+
+<pre><code>puts "#{planets.shuffle}"
+</code></pre>
+
+
+<p><em>shuffle</em>方法将数组元素随机重组。</p>
+
+
+<p>$ ./ordering.rb<br>
+[&#8220;Earth&#8221;, &#8220;Jupiter&#8221;, &#8220;Mars&#8221;, &#8220;Mercury&#8221;, &#8220;Neptune&#8221;, &#8220;Pluto&#8221;, &#8220;Saturn&#8221;, &#8230;]<br>
+[&#8220;Pluto&#8221;, &#8220;Neptune&#8221;, &#8220;Uranus&#8221;, &#8220;Saturn&#8221;, &#8220;Jupiter&#8221;, &#8220;Mars&#8221;, &#8220;Earth&#8221;, &#8230;]<br>
+[&#8220;Earth&#8221;, &#8220;Jupiter&#8221;, &#8220;Mercury&#8221;, &#8220;Saturn&#8221;, &#8220;Mars&#8221;, &#8220;Venus&#8221;, &#8220;Uranus&#8221;, &#8230;]  </p>
+
+
+<p>例子的输出结果。</p>
+
+
+<p>在这章我们学习了Ruby的数组。</p>
+
+
+<hr>
+
+
+<p>原文地址： <a href="http://zetcode.com/lang/rubytutorial/arrays/">http://zetcode.com/lang/rubytutorial/arrays/</a><br>
+翻译：龙昌  admin@longchangjin.cn<br>
+完整教程：<a href="https://github.com/wusuopu/Ruby-tutorial">https://github.com/wusuopu/Ruby-tutorial</a> </p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83929.html">[翻译]Ruby教程9——控制流</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-11-12T00:00:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>12</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83929.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83929.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h1>控制流</h1>
+
+
+<p>这章的教程我们将讨论控制流。</p>
+
+
+<p>条件和循环改变了Ruby程序的流程。条件式是执行条件语句下面的特定语句。循环是执行多次的代码块。程序开始后，语句从源文件顶部到底部一行一行的执行。</p>
+
+
+<h2>if语句</h2>
+
+
+<p>if关键字用于检查一个表达式是否为真。如果为真则执行语句。这个语句可以是单一的语句，也可以是复合语句。复合语句是由多条语句构成的闭合代码块。代码块用<em>end</em>关键字闭合，<em>then</em>关键字是可选的。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+num = gets.to_i
+
+if num &gt; 0 then
+
+    puts "num variable is positive"
+    puts "num variable equals to #{num}"
+end
+</code></pre>
+
+
+<p>输入一个数字，如果这个数字大于0则打印两条消息，否则什么也不做。</p>
+
+
+<p>$ ./simpleif.rb <br>
+4<br>
+num variable is positive<br>
+num variable equals to 4  </p>
+
+
+<p>条件为真并且消息在终端上打印了。</p>
+
+
+<hr>
+
+
+<p>我们可以使用<em>else</em>关键字不创建一个简单的分支。如果<em>if</em>关键字后的表达式求值为假，那么<em>else</em>后面的语句将自动执行。这些代码使用<em>end</em>关键字闭合起来。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+age = 17
+
+if age &gt; 18
+
+    puts "Driving licence issued"
+else
+
+    puts "Driving licence not permitted"
+end
+</code></pre>
+
+
+<p>这里创建了一个<em>age</em>变量，布尔表达式求值为假，因此在终端上打印&#8221;Driving licence not permitted&#8221;。</p>
+
+
+<p>$ ./licence.rb <br>
+Driving licence not permitted  </p>
+
+
+<p>我们可以使用<em>elsif</em>关键字创建多个分支。仅当前一个条件不为真时<em>elsif</em>关键字才会测试另一个条件。注意我们可以使用多个<em>elsif</em>关键字。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+print "Enter a number: "
+
+num = gets.to_i
+
+if num &lt; 0
+
+    puts "#{num} is negative"
+elsif num == 0
+
+   puts "#{num} is zero"
+elsif num &gt; 0
+
+   puts "#{num} is positive"
+end
+</code></pre>
+
+
+<p>创建一个数字变量判断它是正数、负数还是0。根据输入值的不同将打印不同的消息。</p>
+
+
+<h2>case语句</h2>
+
+
+<p><em>case</em>语句是一个程序控制流语句。它允许一个变量或者表达式的值控制程序的执行流程。相比<em>if</em>、<em>elsif</em>它创建多分支更简单。</p>
+
+
+<p>我们创建一个变量或者表达式。<em>case</em>关键字用于针对一个列表的值测试这个变量或者表达式的值。这个列表的值是使用<em>when</em>关键字呈现出来。如果值匹配，那么<em>when</em>关键字后面的语句将执行。有一个可选的<em>else</em>语句，如果没有匹配的它将执行。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+print "Enter top level domain: "
+
+domain = gets.chomp
+
+case domain
+    when "us"
+        puts "United States"
+    when "de" 
+        puts "Germany"
+    when "sk" 
+        puts "Slovakia"
+    when "hu" 
+        puts "Hungary"
+    else
+        puts "Unknown"
+end
+</code></pre>
+
+
+<p>这个程序中我们创建了一个<em>domain</em>变量，它的值从命令行读取。使用<em>when</em>语句测试这个变量的值。这有些选项。如果值等于&#8221;us&#8221;则打印&#8221;United States&#8221;字符串。</p>
+
+
+<pre><code>domain = gets.chomp
+</code></pre>
+
+
+<p>我们使用<em>gets</em>方法获取一个输入值。使用<em>chomp</em>方法去掉换行符。</p>
+
+
+<p>$ ./domains.rb <br>
+Enter top level domain: hu<br>
+Hungary  </p>
+
+
+<p>我们输入&#8221;hu&#8221;，程序返回&#8221;Hungary&#8221;。</p>
+
+
+<h2>while、until语句</h2>
+
+
+<p><em>while</em>语句是一个控制流语句允许代码多次执行。当的条件为真时代码将执行。</p>
+
+
+<p><em>while</em>关键字执行使用<em>end</em>闭合的代码块语句。每次表达式为真时这些语句将执行。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+i = 0
+sum = 0
+
+while i &lt; 10  do
+   i = i + 1
+   sum = sum + i
+end
+
+puts "The sum of 0..9 values is #{sum}"
+</code></pre>
+
+
+<p>这个例子计算了一个范围数的和。</p>
+
+
+<p>while循环有三部分：初始化、测试和更新。每次执行语句称为周期。</p>
+
+
+<pre><code>i = 0
+sum = 0
+</code></pre>
+
+
+<p>初始化变量<em>i</em>和<em>sum</em>。<em>i</em>用于计数。</p>
+
+
+<pre><code>while i &lt; 10  do
+   ...
+end
+</code></pre>
+
+
+<p><em>while</em>和<em>do</em>之间的表达式是第二阶段，测试。注意<em>do</em>关键字是可选的。，内部的语句将会执行直到表达式的值为假。</p>
+
+
+<pre><code>i = i + 1
+</code></pre>
+
+
+<p>这是循环的第三阶段——更新。我们增加计数值。注意不当的处理会导致死循环。</p>
+
+
+<p>$ ./while.rb <br>
+The sum of 0..9 values is 55  </p>
+
+
+<p>This is the output of the example. </p>
+
+
+<hr>
+
+
+<p>当条件为假时<em>until</em>控制流语句将执行。当条件为真时循环停止。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+hours_left = 12
+
+until hours_left == 0
+
+    if hours_left == 1
+        puts "There is #{hours_left} hour left"
+    else
+        puts "There are #{hours_left} hours left"
+    end
+
+    hours_left -= 1
+end
+</code></pre>
+
+
+<p>这个例子中创建了一个变量<em>hours_left</em>。我们开始计数，每次循环打印还有几个小时。当变量值等于0时循环停止。</p>
+
+
+<p>$ ./until.rb <br>
+There are 12 hours left<br>
+There are 11 hours left<br>
+There are 10 hours left<br>
+There are 9 hours left<br>
+There are 8 hours left<br>
+There are 7 hours left<br>
+There are 6 hours left<br>
+There are 5 hours left<br>
+There are 4 hours left<br>
+There are 3 hours left<br>
+There are 2 hours left<br>
+There is 1 hour left  </p>
+
+
+<p>程序运行的结果。</p>
+
+
+<h2>for语句</h2>
+
+
+<p>当循环次数是已知时，我们可以使用<em>for</em>语句。<em>for</em>循环使用<em>in</em>接着一个范围。对这个范围的每个元素都执行代码块的语句。这些语句使用<em>end</em>关键字闭合。<em>do</em>关键字是可选的。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+for i in 0..9 do
+
+    puts "#{i}"
+end
+</code></pre>
+
+
+<p>这个例子中我们打印了0到9的数。每次循环<em>i</em>变量保存了这个范围的一个数，这个数将在终端上打印。</p>
+
+
+<p>$ ./forloop.rb <br>
+0<br>
+1<br>
+2<br>
+3<br>
+4<br>
+5<br>
+6<br>
+7<br>
+8<br>
+9  </p>
+
+
+<p>例子运行结果。</p>
+
+
+<hr>
+
+
+<p>要遍历一个数组的元素可以使用数组的<em>length</em>方法。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+planets = ["Mercury", "Venus", "Earth", "Mars", "Jupiter",
+    "Saturn", "Uranus", "Neptune"]
+
+for i in 0...planets.length
+
+    puts planets[i]
+end
+</code></pre>
+
+
+<p>这个例子中我们创建了一个数组<em>planets</em>，我们遍历这个数组打印这个数组的每个元素。</p>
+
+
+<pre><code>planets = ["Mercury", "Venus", "Earth", "Mars", "Jupiter",
+    "Saturn", "Uranus", "Neptune"]
+</code></pre>
+
+
+<p><em>planets</em>数组。</p>
+
+
+<pre><code>for i in 0...planets.length
+</code></pre>
+
+
+<p><em>length</em>方法返回数组的长度。数组从0开始，最后一个索引是n-1。</p>
+
+
+<pre><code>puts planets[i]
+</code></pre>
+
+
+<p>打印数组指定的一个元素。</p>
+
+
+<p>$ ./planets2.rb <br>
+Mercury<br>
+Venus<br>
+Earth<br>
+Mars<br>
+Jupiter<br>
+Saturn<br>
+Uranus<br>
+Neptune  </p>
+
+
+<p>程序的运行结果。</p>
+
+
+<h2>each方法</h2>
+
+
+<p>在Ruby中我们可以使用<em>each</em>方法遍历数组的每个元素。它接受两个参数。一个元素和一个代码块。元素放在管道之间，它保存了当前循环的数据项。代码块是每次要执行的内容。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+planets = ["Mercury", "Venus", "Earth", "Mars", "Jupiter",
+    "Saturn", "Uranus", "Neptune"]
+
+planets.each do |planet|
+
+    puts planet
+end
+</code></pre>
+
+
+<p>这个例子我们使用<em>each</em>迭代器遍历<em>planets</em>数组。</p>
+
+
+<pre><code>planets.each do |planet|
+
+    puts planet
+end
+</code></pre>
+
+
+<p><em>each</em>迭代器是<em>planets</em>数组的一个方法。<em>planet</em>保存了此次迭代的数据项。我们可以使用任何我们想使用的字符。我们可以使用{}代替<em>do</em>和<em>end</em>关键字。</p>
+
+
+<h2>break、next语句</h2>
+
+
+<p><em>break</em>语句用于终止<em>while</em>、<em>for</em>或者<em>case</em>的代码块语句。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+while true
+
+    r = 1 + rand(30)
+    print "#{r} "
+
+    if r == 22
+        break
+    end
+end
+
+puts
+</code></pre>
+
+
+<p>我们定义了一个无限循环，使用<em>break</em>语句退出这个循环。我们选择1到30的数，打印它。如果等于22则结束<em>while</em>循环。</p>
+
+
+<pre><code>while true
+   ...
+end
+</code></pre>
+
+
+<p>这是一个无限循环，<em>while</em>的条件总是为真。退出无限循环的唯一方法是使用<em>break</em>。</p>
+
+
+<pre><code>r = 1 + rand(30)
+print "#{r} "
+</code></pre>
+
+
+<p>计算从1到30的随机数，并将其打印。</p>
+
+
+<pre><code>if r == 22
+    break
+end
+</code></pre>
+
+
+<p>如果数等于22,结束循环。</p>
+
+
+<p>$ ./break.rb <br>
+20 14 6 26 30 12 2 10 18 29 28 11 30 26 20 22   </p>
+
+
+<p>可能的输出结果。</p>
+
+
+<hr>
+
+
+<p><em>next</em>语句用于跳过此次循环，继续下次循环。它可与<em>for</em>和<em>while</em>联合使用。</p>
+
+
+<p>接下来的例子我们打印不能被2整除的数一列表。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+num = 0
+
+while num &lt; 100
+
+    num += 1
+
+    if (num % 2 == 0)
+        next
+    end
+
+    print "#{num} " 
+end
+
+puts
+</code></pre>
+
+
+<p>我们使用<em>while</em>循环迭代1到99的数。</p>
+
+
+<pre><code>if (num % 2 == 0)
+    next
+end
+</code></pre>
+
+
+<p>如果这个数可以被2整除，<em>next</em>语句将执行，循环的其余将跳过。</p>
+
+
+<p>$ ./next.rb <br>
+1 3 5 7 9 11 13 15 17 19 21 23 25 27 29 31 33 35 37 39 <br>
+41 43 45 47 49 51 53 55 57 59 61 63 65 67 69 71 73 75 77 <br>
+79 81 83 85 87 89 91 93 95 97 99   </p>
+
+
+<p>程序的输出结果。</p>
+
+
+<h2>redo语句</h2>
+
+
+<p><em>redo</em>语句重新开始循环而不检查循环的条件式。下面的例子有点复杂，它展示了<em>redo</em>语句和其它的一些特性。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+options = ["rock", "scissors", "paper"]
+
+while true
+
+    print &lt;&lt;TEXT
+1 - rock
+2 - scissors
+3 - paper
+9 - end game
+TEXT
+
+    val = gets.to_i
+
+    r = rand(3) + 1
+
+    if val == 9 
+        puts "End"
+        exit
+    end
+
+    if ![1, 2, 3, 9].include?(val)
+        puts "Invalid option"
+        redo
+    end
+
+    computer = options[r-1]
+    human = options[val-1]
+
+    puts "I have #{computer}, you have #{human}"
+
+    if val == r
+        puts "Tie, next throw"
+        redo
+    end
+
+
+    if val == 1 and r == 2
+        puts "Rock blunts scissors, you win"
+
+    elsif val == 2 and r == 1
+        puts "Rock blunts scissors, you loose"
+
+    elsif val == 2 and r == 3
+        puts "Scissors cut paper, you win"
+
+    elsif val == 3 and r == 2
+        puts "Scissors cut paper, you loose"
+
+    elsif val == 3 and r == 1
+        puts "Paper covers rock, you win"
+
+    elsif val == 1 and r == 3
+        puts "Paper covers rock, you loose"
+
+    end    
+end
+</code></pre>
+
+
+<p>这是一个简单的Rock-paper-scissors游戏。这个例子中我们用到了<em>redo</em>语句、条件式、随机数、数组和输入。</p>
+
+
+<pre><code>options = ["rock", "scissors", "paper"]
+</code></pre>
+
+
+<p>定义了游戏可能用到的选项数组。这三个词在打印消息时会用到。</p>
+
+
+<pre><code>    print &lt;&lt;TEXT
+1 - rock
+2 - scissors
+3 - paper
+9 - end game
+TEXT
+</code></pre>
+
+
+<p>使用定界符在终端上打印一个菜单。菜单在每次游戏循环时都打印。</p>
+
+
+<pre><code>val = gets.to_i
+
+r = rand(3) + 1
+</code></pre>
+
+
+<p>这几行代码从终端输入一个值，然后选择一个1、2、3的随机数。</p>
+
+
+<pre><code>if val == 9 
+    puts "End"
+    exit
+end
+</code></pre>
+
+
+<p>如果输入为9，打印&#8217;End&#8217;并退出程序。</p>
+
+
+<pre><code>if ![1, 2, 3, 9].include?(val)
+    puts "Invalid option"
+    redo
+end
+</code></pre>
+
+
+<p>如果用户选择了一个不是菜单的值，我们提示无效选项并重新循环。</p>
+
+
+<pre><code>computer = options[r-1]
+human = options[val-1]
+
+puts "I have #{computer}, you have #{human}"
+</code></pre>
+
+
+<p>将数字转化为字符串，并同时打印用户的选择和计算机的选择。</p>
+
+
+<pre><code>if val == r
+    puts "Tie, next throw"
+    redo
+end
+</code></pre>
+
+
+<p>如果选择相同则是平局，开始新的游戏循环。</p>
+
+
+<pre><code>if val == 1 and r == 2
+    puts "Rock blunts scissors, you win"
+
+elsif val == 2 and r == 1
+    puts "Rock blunts scissors, you loose"
+...
+</code></pre>
+
+
+<p>使用多个<em>if</em>、<em>elsif</em>分支，比较用户和计算机的选择以决定谁是赢家。</p>
+
+
+<p>$ ./redo.rb <br>
+1 - rock<br>
+2 - scissors<br>
+3 - paper<br>
+9 - end game<br>
+3<br>
+I have paper, you have paper<br>
+Tie, next throw<br>
+1 - rock<br>
+2 - scissors<br>
+3 - paper<br>
+9 - end game<br>
+2<br>
+I have rock, you have scissors<br>
+Rock blunts scissors, you loose<br>
+1 - rock<br>
+2 - scissors<br>
+3 - paper<br>
+9 - end game<br>
+1<br>
+I have scissors, you have rock<br>
+Rock blunts scissors, you win<br>
+1 - rock<br>
+2 - scissors<br>
+3 - paper<br>
+9 - end game<br>
+9<br>
+End  </p>
+
+
+<p>程序输出结果。</p>
+
+
+<p>这部分的Ruby教程我们谈论了结构控制流。</p>
+
+
+<hr>
+
+
+<p>原文地址： <a href="http://zetcode.com/lang/rubytutorial/flowcontrol/">http://zetcode.com/lang/rubytutorial/flowcontrol/</a><br>
+翻译：龙昌  admin@longchangjin.cn<br>
+完整教程：<a href="https://github.com/wusuopu/Ruby-tutorial">https://github.com/wusuopu/Ruby-tutorial</a> </p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83926.html">[翻译]Ruby教程8——表达式</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-11-10T00:00:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83926.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83926.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h1>表达式</h1>
+
+
+<p>在这章的教程将介绍Ruby的表达式。</p>
+
+
+<p>表达式是由操作数和操作符构成的。表达式的操作符表明了对操作数应用什么操作。表达式中操作符的求值顺序由操作符的优先级和结合律决定的。</p>
+
+
+<p>操作符是一个特殊的符号表明了要执行的确切操作。编程语言中的操作符取自数学运算。程序员使用数据，操作符用于处理数据。操作数是操作符的参数。</p>
+
+
+<p>以下表格中按优先级展示Ruby的操作符（高优先级在前）：</p>
+
+
+<table>
+    <thead>
+        <tr>
+            <td>分类</td>
+            <td>符号</td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>解析，访问操作符</td>
+            <td>:: .</td>
+        </tr>
+        <tr>
+            <td>数组操作符</td>
+            <td>[] []=</td>
+        </tr>
+        <tr>
+            <td>求幂</td>
+            <td>**</td>
+        </tr>
+        <tr>
+            <td>非，反，一元加、减</td>
+            <td>! ~ + -</td>
+        </tr>
+        <tr>
+            <td>乘、除、模</td>
+            <td>* / %</td>
+        </tr>
+        <tr>
+            <td>加、减</td>
+            <td>+ -</td>
+        </tr>
+        <tr>
+            <td>移位</td>
+            <td><< >></td>
+        </tr>
+        <tr>
+            <td>位与</td>
+            <td>&</td>
+        </tr>
+        <tr>
+            <td>位或、逻辑或</td>
+            <td>^ |</td>
+        </tr>
+        <tr>
+            <td>关系运算</td>
+            <td>> >= < <=</td>
+        </tr>
+        <tr>
+            <td>相等、模式匹配</td>
+            <td><=> == === != =~ !~</td>
+        </tr>
+        <tr>
+            <td>逻辑与</td>
+            <td>&&</td>
+        </tr>
+        <tr>
+            <td>逻辑或</td>
+            <td>||</td>
+        </tr>
+        <tr>
+            <td>范围操作符</td>
+            <td>.. &#8230;</td>
+        </tr>
+        <tr>
+            <td>三目运算</td>
+            <td>?:</td>
+        </tr>
+        <tr>
+            <td>分配操作</td>
+            <td>= += -= *= **= /= %= &= |= ^= <<= >>= ||= &&=</td>
+        </tr>
+        <tr>
+            <td>否定</td>
+            <td>not</td>
+        </tr>
+        <tr>
+            <td>逻辑或、与</td>
+            <td>or and</td>
+        </tr>
+    </tbody>
+</table>
+
+
+
+
+<p>同一行的操作符具有相同的优先级。</p>
+
+
+<p>一个操作符通常有两个操作数。那些只有一个操作数的操作符称为一元操作符。有两个操作数的称为二元操作符。有一个三元操作符(?:)有三个操作数。</p>
+
+
+<p>操作符可能用于不同的上下文。例如+操作符，从上面的表格可知它能用于不同情况。数字求和、连接字符串、作为数字的符号。我们称这个操作符被重载了。</p>
+
+
+<h2>正负号操作符</h2>
+
+
+<p>有两个正负号操作符，+和-，用于指定或者修改值的符号。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+puts +2
+puts -2
+</code></pre>
+
+
+<p>+和-指明了值的符号。加号表明是正数，通常可省略。</p>
+
+
+<hr>
+
+
+<p>接下来的例子我们使用减号。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+a = 1
+
+puts a
+puts -(a)
+puts -(-(a))
+</code></pre>
+
+
+<p>减号改变了值的符号。</p>
+
+
+<p>$ ./sign.rb<br>
+1<br>
+-1<br>
+1  </p>
+
+
+<p>输出结果。</p>
+
+
+<h2>分配操作符</h2>
+
+
+<p>分配操作符<em>=</em>将一个值分配给一个变量。变量是这个值的点位符。数学运算中<em>=</em>操作符有不同的意义。在方程式中<em>=</em>是相等操作，左边的值等于右边的值。</p>
+
+
+<pre><code>x = 1
+puts x # prints 1
+</code></pre>
+
+
+<p>这里分配的一个数字给<em>x</em>变量。</p>
+
+
+<pre><code>x = x + 1
+puts x # prints 2
+</code></pre>
+
+
+<p>前一个表达式中数学运算中是行不通的。但是在程序中是合法的。这个表达式是将<em>x</em>变量加1，右边等于2,并把2赋值给x。</p>
+
+
+<pre><code>3 = x;
+</code></pre>
+
+
+<p>这个语法是错误的，我们不能组值分配字面符。</p>
+
+
+<h2>解析，成员访问操作符</h2>
+
+
+<p>有两个操作符具有最高的优先级，这意味着它们总是先求解。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class MyMath
+    Pi = 3.1415926535    
+end
+
+module People
+    Name = "People"
+end
+
+puts MyMath::Pi
+puts People::Name
+</code></pre>
+
+
+<p>第一个例子展示了<em>::</em>命名空间解析操作符。它可以访问一个定义在其它类或模块里的常量、模块或者类。它用于提供命名空间，这样方法和类的名字就不会与其他作者的类冲突了。</p>
+
+
+<pre><code>class MyMath
+    Pi = 3.1415926535    
+end
+
+module People
+    Name = "People"
+end
+</code></pre>
+
+
+<p>这里创建了一个模块的一个类，分别定义了一个常量。</p>
+
+
+<pre><code>puts MyMath::Pi
+puts People::Name
+</code></pre>
+
+
+<p>我们使用<em>::</em>操作符访问它们的常量。</p>
+
+
+<p>$ ./resolution.rb<br>
+3.1415926535<br>
+People  </p>
+
+
+<p><em>resolution.rb</em>脚本的输出结果。</p>
+
+
+<hr>
+
+
+<p>点(.)操作符是成员访问，用于调用对象的方法。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Person
+
+   def initialize name, age
+       @name = name
+       @age = age       
+   end
+
+   def info
+       "#{@name} is #{@age} years old"
+   end
+
+end
+
+p = Person.new "Jane", 17
+puts p.info
+
+puts "ZetCode".reverse
+</code></pre>
+
+
+<p>这个例子中我们创建了两个对象，一个是用户定义的，一个是预定义的。我们对这些对象使用点操作符。</p>
+
+
+<pre><code>p = Person.new "Jane", 17
+puts p.info
+</code></pre>
+
+
+<p>在这行使用点操作符调用了两个方法：new和info。</p>
+
+
+<pre><code>puts "ZetCode".reverse
+</code></pre>
+
+
+<p>字符串是内建对象，具有一个<em>reverse</em>方法。</p>
+
+
+<p>$ ./memberaccess.rb<br>
+Jane is 17 years old<br>
+edoCteZ  </p>
+
+
+<p>输出结果。</p>
+
+
+<h2>字符串连接</h2>
+
+
+<p>Ruby中<em>+</em>操作符同样可以用于字符串连接。在不同上下文中操作符作用不同，我们称这个为重载。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+puts "Return " + "of " + "the " + "King"
+puts "Return ".+"of ".+ "the ".+"King"
+</code></pre>
+
+
+<p>我们将三个字符串连接在一起。</p>
+
+
+<pre><code>puts "Return " + "of " + "the " + "King"
+</code></pre>
+
+
+<p>我们使用<em>+</em>操作符连接字符串。</p>
+
+
+<pre><code>puts "Return ".+"of ".+ "the ".+"King"
+</code></pre>
+
+
+<p><em>+</em>操作符也是Ruby的一个方法。我们可以使用访问操作符(.)来调用它。</p>
+
+
+<p>$ ./catstrings.rb <br>
+Return of the King<br>
+Return of the King  </p>
+
+
+<p><em>catstrings.rb</em>程序的运行结果。</p>
+
+
+<h2>增、减操作符</h2>
+
+
+<p>Ruby中没有如下操作。<br>
+x++;<br>
+&#8230;<br>
+y&#8211;;  </p>
+
+
+<p>这些是C语言的增、减操作。</p>
+
+
+<p>如果你熟悉Java、C、C++，你可能了解这些操作符。但是这些在Ruby中无效的。同样在Python中也没有。</p>
+
+
+<h2>算术操作符</h2>
+
+
+<p>下面的表格是Ruby中的算术操作符。  </p>
+
+
+<table>
+<thead>
+<tr>
+<th align="left">符号</th>
+<th align="left">名字</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">+</td>
+<td align="left">加</td>
+</tr>
+<tr>
+<td align="left">-</td>
+<td align="left">减</td>
+</tr>
+<tr>
+<td align="left">*</td>
+<td align="left">乘</td>
+</tr>
+<tr>
+<td align="left">/</td>
+<td align="left">除</td>
+</tr>
+<tr>
+<td align="left">%</td>
+<td align="left">模</td>
+</tr>
+<tr>
+<td align="left">**</td>
+<td align="left">幂</td>
+</tr>
+</tbody>
+</table>
+
+
+<p>下面的例子中我们使用了算术操作符。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+a = 10
+b = 11
+c = 12
+
+puts a + b + c
+puts c - a
+puts a * b
+puts c / 3
+puts c % a
+puts c ** a
+</code></pre>
+
+
+<p>在前面的例子我们使用了加、减、乘、除和取余操作。这些与数学上的是相同的。</p>
+
+
+<pre><code>puts c % a
+</code></pre>
+
+
+<p><em>%</em>操作符是取余或者求模。</p>
+
+
+<p>$ ./arithmetic.rb<br>
+33<br>
+2<br>
+110<br>
+4<br>
+2<br>
+61917364224  </p>
+
+
+<p>输出结果。</p>
+
+
+<hr>
+
+
+<p>接下来展示整数和浮点数除法的区别。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+puts 5 / 2
+
+puts 5 / 2.0
+puts 5.0 / 2
+puts 5.to_f / 2
+</code></pre>
+
+
+<p>上面的例子我们将两个数相除。</p>
+
+
+<pre><code>puts 5 / 2
+</code></pre>
+
+
+<p>这个表达式中的操作数都是整数，我们进行的是整数相除。结果返回的也是整数。</p>
+
+
+<pre><code>puts 5 / 2.0
+puts 5.0 / 2
+puts 5.to_f / 2
+</code></pre>
+
+
+<p>如果其中一个或两个是浮点数，我们进行的是浮点数相除。</p>
+
+
+<p>$ ./division.rb<br>
+2<br>
+2.5<br>
+2.5<br>
+2.5  </p>
+
+
+<p><em>division.rb</em>程序的运行结果。</p>
+
+
+<hr>
+
+
+<p>Ruby有其他方式进行除运算。这些都是有效的方法调用。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+puts 5.div 2.0
+puts 5.fdiv 2
+puts 5.quo 2
+puts 5.0.quo 2.0
+</code></pre>
+
+
+<p>上面例子中我们使用了<em>div</em>、<em>fdiv</em>和<em>quo</em>方法。</p>
+
+
+<pre><code>puts 5.div 2.0
+</code></pre>
+
+
+<p><em>div</em>总是进行整数除，即使操作数是浮点数。</p>
+
+
+<pre><code>puts 5.fdiv 2
+</code></pre>
+
+
+<p><em>fdiv</em>总是进行浮点数除法。</p>
+
+
+<pre><code>puts 5.quo 2
+puts 5.0.quo 2.0
+</code></pre>
+
+
+<p><em>quo</em>方法进行精确的除法。如果操作数是浮点数则返回浮点数，否则是有理数。</p>
+
+
+<p>$ ./otherdivision.rb<br>
+2<br>
+2.5<br>
+5/2<br>
+2.5  </p>
+
+
+<h2>布尔操作符</h2>
+
+
+<p>Ruby中有以下布尔操作符。</p>
+
+
+<table>
+    <thead>
+        <tr>
+            <td>符号</td>
+            <td>名字</td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>&&</td>
+            <td>逻辑与</td>
+        </tr>
+        <tr>
+            <td>||</td>
+            <td>逻辑或</td>
+        </tr>
+        <tr>
+            <td>!</td>
+            <td>否</td>
+        </tr>
+    </tbody>
+</table>
+
+
+
+
+<p>布尔操作符处理真假值。Ruby中有额外的布尔操作符，<em>and</em>、<em>or</em>、<em>&amp;</em>、<em>not</em>。它们操作是相同的，只是优先级低一些。与Perl语言不同，这需要一个低优先级的布尔操作符。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+x = 3
+y = 8
+
+puts x == y
+puts y &gt; x
+
+if y &gt; x then
+    puts "y is greater than x"
+end
+</code></pre>
+
+
+<p>许多表达式的结果都是一个布尔值。布尔值用于条件语句。</p>
+
+
+<pre><code>puts x == y
+puts y &gt; x
+</code></pre>
+
+
+<p>返回布尔值的相关操作符。这两行打印为false和true。</p>
+
+
+<pre><code>if y &gt; x then
+    puts "y is greater than x"
+end
+</code></pre>
+
+
+<p>仅当月<em>if</em>条件为真时<em>if</em>里的语句才会执行。x &gt; y返回true，因此&#8221;y is greater than x&#8221;会在终端上打印。</p>
+
+
+<hr>
+
+
+<p>下面的例子展示逻辑与操作符。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+puts true &amp;&amp; true
+puts true &amp;&amp; false
+puts false &amp;&amp; true
+puts false &amp;&amp; false
+</code></pre>
+
+
+<p>与操作只有在操作数都为true才返回true。</p>
+
+
+<p>$ ./andoperator.rb<br>
+true<br>
+false<br>
+false<br>
+false  </p>
+
+
+<p>只有一个表达式的结果为true。</p>
+
+
+<hr>
+
+
+<p>逻辑或操作符当有一个操作数为true则返回true。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+puts true || true
+puts true || false
+puts false || true
+puts false || false
+</code></pre>
+
+
+<p>如果有一边是true，操作的结果就是true。</p>
+
+
+<p>$ ./oroperator.rb<br>
+true<br>
+true<br>
+true<br>
+false  </p>
+
+
+<p>三个表达式结果为true。</p>
+
+
+<hr>
+
+
+<p>非操作进行真假反转。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+puts !0
+puts !1
+puts !true
+puts !false
+
+puts ! (4&lt;3)
+puts ! "Ruby".include?("a")
+</code></pre>
+
+
+<p>这个例子展示了非操作符的用法。</p>
+
+
+<p>$ ./not.rb<br>
+false<br>
+false<br>
+false<br>
+true<br>
+true<br>
+true  </p>
+
+
+<p>输出结果。</p>
+
+
+<hr>
+
+
+<p><em>||</em>和<em>&amp;&amp;</em>操作符是短路求值（short circuit evaluated）。短路求值意味着只有在第一个参数不足以确定表达式的值时第二个参数才会进行求值。短求值主要用于提高执行效率。</p>
+
+
+<p>用一个例子解释。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+def one
+    puts "Inside one"
+    false
+end
+
+def two
+    puts "Inside two"
+    true
+end
+
+puts "Short circuit"
+
+if one &amp;&amp; two
+    puts "Pass"
+end
+
+puts "##############################"
+
+if two || one
+    puts "Pass"
+end
+</code></pre>
+
+
+<p>在例子中定义了两个方法，用于在布尔操作中作为操作数。我们将看到它们是否被调用了。</p>
+
+
+<pre><code>if one &amp;&amp; two
+    puts "Pass"
+end
+</code></pre>
+
+
+<p>第一个方法返回false，短路求值不会计算第二个方法。一旦一个操作数是false，那么这个逻辑的结果总是false。</p>
+
+
+<pre><code>puts "##############################"
+
+if two || one
+    puts "Pass"
+end
+</code></pre>
+
+
+<p>第二种情况我们使用<em>||</em>操作符，并且第一个操作数为<em>tow</em>方法。这里同样没有必要对第二个操作数求值，只要第一个操作数为true，那么逻辑或总是为true。</p>
+
+
+<pre><code>$ ./shortcircuit.rb
+Short circuit
+Inside one
+##############################
+Inside two
+Pass
+</code></pre>
+
+
+<p><em>shortcircuit.rb</em>程序的运行结果。</p>
+
+
+<h2>关系操作符</h2>
+
+
+<p>关系操作符用于值的比较，其总是返回布尔值。</p>
+
+
+<table>
+<thead>
+<tr>
+<th align="left">符号</th>
+<th align="left">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">&lt;</td>
+<td align="left">小于</td>
+</tr>
+<tr>
+<td align="left">&lt;=</td>
+<td align="left">小于等于</td>
+</tr>
+<tr>
+<td align="left">&gt;</td>
+<td align="left">大于</td>
+</tr>
+<tr>
+<td align="left">&gt;=</td>
+<td align="left">大于等于</td>
+</tr>
+</tbody>
+</table>
+
+
+<p>关系操作符又称为比较操作符。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+p 3 &lt; 4
+p 3 &gt; 5
+p 3 &gt;= 3
+</code></pre>
+
+
+<p>表达式<em>3 &lt; 4</em>返回true，因为3小于4。表达式<em>3 &gt; 5</em>返回false，因为3不大于5。</p>
+
+
+<h2>位操作符</h2>
+
+
+<p>人类用的是十进制数字，计算机原生的是二进制数。二进制、八进制、十进制和十六进制只是数字的符号。位操作符针对的是二进制数。</p>
+
+
+<table>
+    <thead>
+        <tr>
+            <td>符号</td>
+            <td>含义</td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>~</td>
+            <td>按位取反</td>
+        </tr>
+        <tr>
+            <td>^</td>
+            <td>按位异或</td>
+        </tr>
+        <tr>
+            <td>&</td>
+            <td>按位与</td>
+        </tr>
+        <tr>
+            <td>|</td>
+            <td>按位与或</td>
+        </tr>
+        <tr>
+            <td>&lt;&lt;</td>
+            <td>左移位</td>
+        </tr>
+        <tr>
+            <td>&gt;&gt;</td>
+            <td>右移位</td>
+        </tr>
+    </tbody>
+</table>
+
+
+
+
+<p>位操作在高级语言中很少使用。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+puts ~ 7   # prints -8 
+puts ~ -8  # prints 7
+
+puts 6 &amp; 3  # prints 2
+puts 3 &amp; 6  # prints 2
+
+puts 6 ^ 3  # prints 5
+puts 3 ^ 6  # prints 5
+
+puts 6 | 3  # prints 7
+puts 3 | 6  # prints 7
+
+puts 6 &lt;&lt; 1  # prints 12
+puts 1 &lt;&lt; 6  # prints 64
+
+puts 6 &gt;&gt; 1  # prints 3
+puts 1 &gt;&gt; 6  # prints 0
+</code></pre>
+
+
+<p>上面的例子中展示了这6个位操作符。</p>
+
+
+<pre><code>puts ~ 7   # prints -8 
+puts ~ -8  # prints 7
+</code></pre>
+
+
+<p>按位取反是将1变为0，0变为1。将操作会将数字7所有的位都反转，同样包括符号位。如果再次反转所有的位即会得到数字7。</p>
+
+
+<pre><code>puts 6 &amp; 3  # prints 2
+puts 3 &amp; 6  # prints 2
+</code></pre>
+
+
+<p>按位与是将两个数进行逐位与操作，只有两个数对应位的都为1结果才为1。</p>
+
+
+<pre><code>puts 6 ^ 3  # prints 5
+puts 3 ^ 6  # prints 5
+</code></pre>
+
+
+<p>按位异或是将两个数进行逐位异或操作，只要其中一个数（但不是全部）对应位的为1结果就为1。</p>
+
+
+<pre><code>puts 6 | 3  # prints 7
+puts 3 | 6  # prints 7
+</code></pre>
+
+
+<p>按位或是将两个数进行逐位或操作，只要其中一个数对应位的为1结果就为1。</p>
+
+
+<pre><code>puts 6 &lt;&lt; 1  # prints 12
+puts 1 &lt;&lt; 6  # prints 64
+
+puts 6 &gt;&gt; 1  # prints 3
+puts 1 &gt;&gt; 6  # prints 0
+</code></pre>
+
+
+<p>移位操作符是按位进行右移或左移，也称为算术移位。</p>
+
+
+<h2>复合分配操作符</h2>
+
+
+<p>复合分配操作符是由两个操作符构成。它们是简写操作符。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+a = 0
+
+a = a + 1
+a += 1
+puts a
+
+
+b = 0
+
+b = b - 8
+b -= 8
+puts b
+</code></pre>
+
+
+<p><em>+=</em>和<em>-=</em>操作符是一个简写的操作符。它们的可读性没有全写的好，但是有经验的程序员经常使用它们。</p>
+
+
+<pre><code>a = a + 1
+a += 1
+</code></pre>
+
+
+<p>这两行的操作是一样的，都是将变量<em>a</em>加1。</p>
+
+
+<p>其他的一些复合操作符。</p>
+
+
+<pre><code>-=   *=  **=  /=   %=   &amp;=   |=   &lt;&lt;=   &gt;&gt;=
+</code></pre>
+
+
+<h2>操作符优先级</h2>
+
+
+<p>操作符的优先级表明了先对哪个操作符进行求值。优先级避免了表达式的二义性。</p>
+
+
+<p>这个表达式的结果是多少？28还是40？</p>
+
+
+<p>3 + 5 * 5  </p>
+
+
+<p>跟数学相同，乘法优先级高于加法，加些结果为28。</p>
+
+
+<p>(3 + 5) * 5  </p>
+
+
+<p>我们可以使用括号来改变优先级。括号里的表达式总是最先求值。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+puts 3 + 5 * 5
+puts (3 + 5) * 5
+
+puts ! true | true
+puts ! (true | true)
+</code></pre>
+
+
+<p>这个例子展示了一些表达式，其结果依赖于操作符优先级。</p>
+
+
+<pre><code>puts 3 + 5 * 5
+</code></pre>
+
+
+<p>这行打印28，因为乘法操作优先级高于加法。</p>
+
+
+<pre><code>puts ! true | true
+</code></pre>
+
+
+<p>这里非操作优先级更高。最后返回为true。</p>
+
+
+<p>$ ./precedence.rb<br>
+28<br>
+40<br>
+true<br>
+false  </p>
+
+
+<h2>结合律</h2>
+
+
+<p>有时优先级不能决定表达式的结果。还有另一条规则称为结合律。它决定相同优先级的求值顺序。</p>
+
+
+<p>9 / 3 * 3  </p>
+
+
+<p>这个的结果是多少？9还是1？乘、除和取模操作是从左到右结合的。因此结果为9。</p>
+
+
+<p>数学运算、布尔、关系和位操作都是从左向右结合的。</p>
+
+
+<p>另外赋值操作是右结合。</p>
+
+
+<pre><code>a = b = c = d = 0
+print a, b, c, d # prints 0000
+</code></pre>
+
+
+<p>复合分配操作是从右向左结合的。</p>
+
+
+<pre><code>j = 0
+j *= 3 + 1
+puts j
+</code></pre>
+
+
+<p>你可能期望结果为1,但是实际上结果为0。由于结合律，右边表达式先求值再应用复合分配操作。</p>
+
+
+<h2>范围操作符</h2>
+
+
+<p>Ruby有两个范围操作符，用于创建一个范围对象。通常是数字或者字母的范围。</p>
+
+
+<p><em>..</em>范围操作符（两个点）创建一个包含的范围。<em>&#8230;</em>操作符（三个点）创建一个非包含的范围，较大的值不包含在其中。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+p (1..3).to_a
+p (1...3).to_a
+
+p ('a' .. 'l').to_a
+</code></pre>
+
+
+<p>这个例子中我们使用范围操作符创建了数字范围和字母范围。</p>
+
+
+<pre><code>p (1..3).to_a
+p (1...3).to_a
+</code></pre>
+
+
+<p>这两行都是使用范围操作符创建了两个范围，然后转换为数据。第一个范围的值为1,2,3；第二个为1和2.</p>
+
+
+<pre><code>p ('a' .. 'l').to_a
+</code></pre>
+
+
+<p>这里使用<em>..</em>操作符创建一个&#8217;a&#8217;到&#8217;l&#8217;的数组。</p>
+
+
+<p>$ ./range.rb<br>
+[1, 2, 3]<br>
+[1, 2]<br>
+[&#8220;a&#8221;, &#8220;b&#8221;, &#8220;c&#8221;, &#8220;d&#8221;, &#8220;e&#8221;, &#8220;f&#8221;, &#8220;g&#8221;, &#8220;h&#8221;, &#8220;i&#8221;, &#8220;j&#8221;, &#8220;k&#8221;, &#8220;l&#8221;]  </p>
+
+
+<p>输出结果。</p>
+
+
+<h2>三元运算术</h2>
+
+
+<p>三元运算术是一个条件操作。如果我们需要根据条件表达式从两个值选择一个时这是一个方便的操作。</p>
+
+
+<p>cond-exp ? exp1 : exp2  </p>
+
+
+<p>如果<em>cond-exp</em>为真则返回<em>exp1</em>，否则返回<em>exp2</em>。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+age = 32
+
+adult = age &gt;= 18 ? true : false
+
+if adult then
+    puts "Adult"
+else
+    puts "Not adult"
+end
+</code></pre>
+
+
+<p>许多国家成年是基于你的年龄。是否成年即为是否超过了一定年龄。这种情况适合于三元操作。</p>
+
+
+<pre><code>adult = age &gt;= 18 ? true : false
+</code></pre>
+
+
+<p>首先对赋值符右转进行求值，它的值将赋给<em>adult</em>变量。</p>
+
+
+<p>$ ./ternary.rb<br>
+Adult  </p>
+
+
+<p>32年已经成年了。</p>
+
+
+<h2>计算素数</h2>
+
+
+<p>我们将计算素数。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+nums = (4..50).to_a
+
+puts "Prime numbers:"
+
+print "2 3 "
+
+nums.each do |i|
+
+    not_prime = false
+
+    (2..Math.sqrt(i).ceil).each do |j|
+        not_prime = true if i % j == 0    
+    end
+
+    print i, " " unless not_prime
+
+end
+
+puts
+</code></pre>
+
+
+<p>上面的例子中我们用到了一些操作符。</p>
+
+
+<pre><code>nums = (4..50).to_a
+</code></pre>
+
+
+<p>我们将从这些数中计算哪些是素数。</p>
+
+
+<pre><code>print "2 3 "
+</code></pre>
+
+
+<p>我们路过2和3,因为它们都是素数。</p>
+
+
+<pre><code>not_prime = false
+</code></pre>
+
+
+<p><em>not_prime</em>标志表明选择的数不是素数。我们假设选择的数是素数，直到被证明不是为止。</p>
+
+
+<pre><code>(2..Math.sqrt(i).ceil).each do |j|
+    not_prime = true if i % j == 0    
+end
+</code></pre>
+
+
+<p>当取模的结果为0表示这个数不是素数。</p>
+
+
+<pre><code>print i, " " unless not_prime
+</code></pre>
+
+
+<p>如果<em>not_prime</em>标志没有设置则打印这个数。</p>
+
+
+<hr>
+
+
+<p>上面例子展示了一些操作符。实际上有更简单方法计算素数。Ruby中有一个计算素数的模块。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+require 'prime'
+
+Prime.each(50) do |i|
+    print i, " "
+end
+
+puts
+</code></pre>
+
+
+<p>使用Ruby的<em>prime</em>模块计算素数。</p>
+
+
+<pre><code>require 'prime'
+</code></pre>
+
+
+<p>导入<em>prime</em>模块。</p>
+
+
+<pre><code>Prime.each(50) do |i|
+    print i, " "
+end
+</code></pre>
+
+
+<p>计算到50的素数。</p>
+
+
+<p>$ ./primes.rb<br>
+2 3 5 7 11 13 17 19 23 29 31 37 41 43 47   </p>
+
+
+<p>结果输出了2到50之间的素数。</p>
+
+
+<p>这章的教程介绍了表达式。</p>
+
+
+<hr>
+
+
+<p>原文地址： <a href="http://zetcode.com/lang/rubytutorial/expressions/">http://zetcode.com/lang/rubytutorial/expressions/</a><br>
+翻译：龙昌  admin@longchangjin.cn<br>
+完整教程：<a href="https://github.com/wusuopu/Ruby-tutorial">https://github.com/wusuopu/Ruby-tutorial</a>  </p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/page/7">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/page/5">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Subscription</h1>
+  <!--以下是QQ邮件列表订阅嵌入代码--><script >var nId = "e7ee5da6d322dc7157c25cfd8a7700bb23a056dd1fb18cb4",nWidth="auto",sColor="light",sText="请输入邮件地址：" ;</script><script src="http://list.qq.com/zh_CN/htmledition/js/qf/page/qfcode.js" charset="gb18030"></script>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84132.html">配置elixir的vim环境</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84130.html">配置coffeescript的vim环境</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84127.html">VIM编译参数</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84124.html">Docker使用笔记</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84121.html">Nginx + Php + FastCGI配置</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (47)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (32)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (26)</a></li><li><a href='/categories/web开发/index.html'>web开发 (16)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (7)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (10)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (21)</a></li></ul>
+</section>
+<section>
+  <h1>Tag Cloud</h1>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.45454545454545%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.9090909090909%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.81818181818181%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.9090909090909%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.36363636363636%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.27272727272727%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.36363636363636%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.81818181818181%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.81818181818181%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 100.9090909090909%'>Django(1)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.9090909090909%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.81818181818181%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.72727272727273%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.9090909090909%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.9090909090909%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.45454545454545%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.81818181818181%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.63636363636364%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.45454545454545%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.9090909090909%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.45454545454545%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.9090909090909%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.9090909090909%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.9090909090909%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(66)</a> <a href='/tags/mongodb/index.html' style='font-size: 109.0909090909091%'>mongodb(10)</a> <a href='/tags/mysql/index.html' style='font-size: 103.63636363636364%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.9090909090909%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.9090909090909%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.18181818181819%'>php(9)</a> <a href='/tags/ps/index.html' style='font-size: 105.45454545454545%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.9090909090909%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 144.54545454545456%'>python(49)</a> <a href='/tags/qt/index.html' style='font-size: 101.81818181818181%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.9090909090909%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 123.63636363636364%'>Ruby(26)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.72727272727273%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.9090909090909%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.54545454545455%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.36363636363636%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.72727272727273%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 121.81818181818181%'>vim(24)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.72727272727273%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.9090909090909%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.9090909090909%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 112.72727272727272%'>Web开发(14)</a> <a href='/tags/windows/index.html' style='font-size: 106.36363636363636%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.9090909090909%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.9090909090909%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.9090909090909%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.9090909090909%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.45454545454545%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.81818181818181%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.9090909090909%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.18181818181819%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.18181818181819%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.9090909090909%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.9090909090909%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.9090909090909%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.81818181818181%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 109.0909090909091%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.18181818181819%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.9090909090909%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.54545454545455%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.9090909090909%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.9090909090909%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 104.54545454545455%'>网络日志(5)</a> <a href='/tags/翻译/index.html' style='font-size: 120.9090909090909%'>翻译(23)</a> <a href='/tags/视频教程/index.html' style='font-size: 109.0909090909091%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.9090909090909%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.81818181818181%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.9090909090909%'>随笔(1)</a> </span>
+</section>
+<section>
+  <h1>Link</h1>
+    <ul id="category-list">
+      <li><a target="_blank" title="我的Github" href="https://github.com/wusuopu">@Github</a></li>
+      <li><a target="_blank" title="我的微博" href="http://www.weibo.com/u/1768691343">@Weibo</a></li>
+      <li><a target="_blank" title="我的Twitter" href="https://twitter.com/longchangjin">@Twitter</a></li>
+      <li><a target="_blank" title="我的豆瓣" href="http://www.douban.com/people/lchj/">@Douban</a></li>
+
+      <li><a target="_blank" title="" href="http://www.vimer.cn/">Vimer的程序世界</a></li>
+      <li><a target="_blank" title="" href="http://pythoner.net/">python开发者社区</a></li>
+      <li><a target="_blank" title="" href="http://simple-is-better.com/">python.cn(news, jobs)</a></li>
+      <li><a target="_blank" title="" href="http://gtk.awaysoft.com/">GTK+ 中文社区</a></li>
+    </ul>
+</section>
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - 龍昌 -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+<div style="display:none;"><script src="http://s94.cnzz.com/stat.php?id=1259846&web_id=1259846&show=pic" language="JavaScript"></script></div>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'longchang';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

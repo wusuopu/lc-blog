@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Tag: Vmware | 龍昌博客]]></title>
+  <link href="http://www.xefan.com/tags/vmware/atom.xml" rel="self"/>
+  <link href="http://www.xefan.com/"/>
+  <updated>2014-11-04T14:10:28+08:00</updated>
+  <id>http://www.xefan.com/</id>
+  <author>
+    <name><![CDATA[龍昌]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[VirtualBox和VMware镜像文件互转方法详解]]></title>
+    <link href="http://www.xefan.com/archives/83415.html"/>
+    <updated>2010-09-29T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/83415-VirtualBox和VMware镜像文件互转方法详解</id>
+    <content type="html"><![CDATA[<p>VirtualBox和VMware都是功能强大的虚拟机软件，各有其优点，也各有缺点。有时实在是让人难以取舍，不知道该用那个好。下面说说这两个软件分别生成的不同格式的硬盘文件相互转换的方法。</p>
+
+<p><span style="color: #ff0000"><strong>VMWare转VirtualBox </strong></span></p>
+
+<p>方法一：<br/>
+使用VBoxManage命令</p>
+
+<p>Usage:<br/>
+<em>VBoxManage clonehd          &lt;uuid&gt;|&lt;filename&gt;   &lt;outputfile&gt;<br/>
+[&ndash;format VDI|VMDK|VHD|RAW|&lt;other&gt;]<br/>
+[&ndash;variant Standard,Fixed,Split2G,Stream,ESX]<br/>
+[&ndash;type normal|writethrough|immutable|shareable]<br/>
+[&ndash;remember] [&ndash;existing]</em></p>
+
+<p>例如：<br/>
+<em>VBoxManage clonehd &lsquo;vmdk文件名&rsquo; &lsquo;vdi文件名&rsquo; &ndash;format VDI</em></p>
+
+<p>命令执行过程中如出现如下错误：<br/>
+ERROR: Cannot register the hard disk &lsquo;/stor/virtualbox/sv1/sv1-disk1.vdi&rsquo; with UUID {4e7a0d53-2775-438d-b383-79e69c5cf7f4} because a hard disk &lsquo;/stor/virtualbox/sv1/sv1-disk1.vdi&rsquo; with UUID {4e7a0d53-2775-438d-b383-79e69c5cf7f4} already exists in the media registry (&lsquo;/home/chao/.VirtualBox/VirtualBox.xml&rsquo;)<br/>
+Details: code NS_ERROR_INVALID_ARG (0x80070057), component VirtualBox, interface IVirtualBox, callee nsISupports<br/>
+Context: &ldquo;OpenHardDisk(Bstr(szFilenameAbs), AccessMode_ReadWrite, false, Bstr(&rdquo;&ldquo;), false, Bstr(&rdquo;&ldquo;), srcDisk.asOutParam())&rdquo; at line 628 of file VBoxManageDisk.cpp</p>
+
+<p>则需要先将硬盘镜像从虚拟介质管理器中将镜像释放 并删除，然后再执行命令。</p>
+
+<p>最新版本的VirtualBox是可以直接使用VMDK的。</p>
+
+<p>方法二：<br/>
+使用Qemu软件，下载地址：<a href="http://www.davereyn.co.uk/download.htm%EF%BC%88%E5%8F%AA%E8%83%BD%E5%9C%A8Windows%E4%B8%8B%E7%94%A8%EF%BC%89  ">http://www.davereyn.co.uk/download.htm%EF%BC%88%E5%8F%AA%E8%83%BD%E5%9C%A8Windows%E4%B8%8B%E7%94%A8%EF%BC%89  </a>
+先用Qemu转VMDK为RAW格式，再转RAW为VDI格式。详情请自己看软件说明。</p>
+
+<p><span style="color: #ff0000"><strong>VirtualBox转VMWare</strong></span></p>
+
+<p>因為VirtualBox的转换方式有问题的关系，所以我們得通过两次转化的方法来进行…</p>
+
+<p>第一次就是先把vdi轉成vmdk</p>
+
+<p><em>VBoxManage clonehd &lsquo;vdi文件名&rsquo; &lsquo;vmdk文件名&rsquo; &ndash;format VMDK</em></p>
+
+<p>經過漫長的等候<br/>
+這裡轉換好之後….<br/>
+再來就是第二次的轉換啦…</p>
+
+<p><em>vmware-vdiskmanager -r &lsquo;原vmdk文件&rsquo; -t X &lsquo;转换后的vmdk文件&rsquo;</em></p>
+
+<p>其中的X可以用<br/>
+0 : 做成單一檔案(不預先配置)<br/>
+1 : 切成2GB為一個檔案<br/>
+2 : 預先配置檔案大小<br/>
+3 : 預先配置以2GB為單位的檔案群<br/>
+4 : 預先配置成ESX的格式<br/>
+來代替</p>
+
+<p>這裡我用的是”1″</p>
+]]></content>
+  </entry>
+  
+</feed>

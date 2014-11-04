@@ -1,0 +1,293 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Linux下u盘的使用 - 龍昌博客</title>
+  <meta name="author" content="龍昌">
+
+  
+  <meta name="description" content="一、 Linux不像Windows一样，Windows接上新硬件后可以自动识别，有时在Linux下无法自动识别新硬件的，需要手动去识别。USB移动存储设备通常被识别为sda1，具体可以通过fdisk -l命令查询。
+在使用U盘前，我们先要为外挂点新建一个子目录，一般外挂点的子目录都是建立在/ &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.xefan.com/archives/83324.html">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="龍昌博客" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.useso.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.useso.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.useso.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">龍昌博客</a></h1>
+  
+    <h2>从Pythoner转向Rubist</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.xefan.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+ <li><a href="/about/">About</a></li>  <li><a href="/gbook/">留言板</a></li> 
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Linux下u盘的使用</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2010-03-16T00:00:00+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>16</span><span class='date-suffix'>th</span>, <span class='date-year'>2010</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><div class="Section0">
+<p class="p0" style="margin-top: 0pt;margin-bottom: 0pt"><span style="font-weight: bold;font-size: 14pt;color: #ff0000;font-family: 'Times New Roman'">一</span><span style="font-weight: bold;font-size: 14pt;color: #ff0000;font-family: '宋体'">、</span><span style="font-size: 10.5pt;font-family: '宋体'"></span></p>
+
+<p class="p0" style="margin-top: 0pt;margin-bottom: 0pt"><span style="font-size: 10.5pt;font-family: 'Times New Roman'">Linux<span style="font-family: 宋体">不像</span><span style="font-family: Times New Roman">Windows</span><span style="font-family: 宋体">一样，</span><span style="font-family: Times New Roman">Windows</span><span style="font-family: 宋体">接上新硬件后可以自动识别，</span></span><span style="font-size: 10.5pt;font-family: '宋体'">有时</span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">在<span style="font-family: Times New Roman">Linux</span><span style="font-family: 宋体">下无法自动识别新硬件的，需要手动去识别。</span><span style="font-family: Times New Roman">USB</span><span style="font-family: 宋体">移动存储设备通常被识别为</span><span style="font-family: Times New Roman">sda1</span><span style="font-family: 宋体">，具体可以通过</span><span style="font-family: Times New Roman">fdisk -l</span><span style="font-family: 宋体">命令查询。</span></span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">
+</span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">在使用<span style="font-family: Times New Roman">U</span><span style="font-family: 宋体">盘前，我们先要为外挂点新建一个子目录，一般外挂点的子目录都是建立在</span><span style="font-family: Times New Roman">/mnt</span><span style="font-family: 宋体">里面的，我们也建在那里，当然也可以建在</span><span style="font-family: Times New Roman">/</span><span style="font-family: 宋体">目录下，名字可以自己定，我们就取名为</span><span style="font-family: Times New Roman">usb</span><span style="font-family: 宋体">，终端下的命令如下：</span></span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">
+</span><span style="font-size: 10.5pt;font-style: italic;font-family: 'Times New Roman'">mkdir /mnt/usb</span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">
+</span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">然后我们就可以接上我的<span style="font-family: Times New Roman">U</span><span style="font-family: 宋体">盘了，然后在终端下输入命令并击</span><span style="font-family: Times New Roman">Enter</span><span style="font-family: 宋体">键即可：</span></span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">
+</span><span style="font-size: 10.5pt;font-style: italic;font-family: 'Times New Roman'">mount /dev/sda1 /mnt/usb</span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">
+</span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">在<span style="font-family: Times New Roman">Windows</span><span style="font-family: 宋体">下当我们用完</span><span style="font-family: Times New Roman">U</span><span style="font-family: 宋体">盘后，在我们取下</span><span style="font-family: Times New Roman">U</span><span style="font-family: 宋体">盘前我们先要删除，同样在</span><span style="font-family: Times New Roman">Linux</span><span style="font-family: 宋体">下我们也要删除挂起点，方法是：</span></span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">
+</span><span style="font-size: 10.5pt;font-style: italic;font-family: 'Times New Roman'">umount /dev/sda1 /mnt/usb <span style="font-family: 宋体">或 </span><span style="font-family: Times New Roman">umount /dev/sda1</span></span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">
+</span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">如果不把<span style="font-family: Times New Roman">U</span><span style="font-family: 宋体">盘给</span><span style="font-family: Times New Roman">umount</span><span style="font-family: 宋体">掉，那样很容易造成数据的丢失</span></span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">
+</span><span style="font-weight: bold;font-size: 14pt;color: #ff0000;font-family: 'Times New Roman'">二</span><span style="font-weight: bold;font-size: 14pt;color: #ff0000;font-family: '宋体'">、</span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">
+</span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">USB<span style="font-family: 宋体">的支持关键在于驱动，没有驱动设备时</span><span style="font-family: Times New Roman">mount</span><span style="font-family: 宋体">执行是肯定不成的。我在</span><span style="font-family: Times New Roman">Red Hat</span><span style="font-family: 宋体">里使用</span><span style="font-family: Times New Roman">U</span><span style="font-family: 宋体">盘的通用方法如下，屡试不爽</span></span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">
+</span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">1. <span style="font-family: 宋体">先别插</span><span style="font-family: Times New Roman">U</span><span style="font-family: 宋体">盘，</span></span><span style="font-size: 10.5pt;font-style: italic;font-family: 'Times New Roman'">/sbin/lsmod</span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">看是否有<span style="font-family: Times New Roman">usb-storage</span><span style="font-family: 宋体">。如果没有的话：</span></span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">
+</span><span style="font-size: 10.5pt;font-style: italic;font-family: 'Times New Roman'">cd /lib/modules/2.4.20-8/kernel/drivers/usb</span><span style="font-size: 10.5pt;font-style: italic;font-family: 'Times New Roman'">
+</span><span style="font-size: 10.5pt;font-style: italic;font-family: 'Times New Roman'">for v in *.o storage/*.o ; do /sbin/insmod $v ; done</span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">
+</span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">2. <span style="font-family: 宋体">这里再</span><span style="font-family: Times New Roman">/sbin/lsmod</span><span style="font-family: 宋体">，应该有</span><span style="font-family: Times New Roman">usbcore</span><span style="font-family: 宋体">、</span><span style="font-family: Times New Roman">usb-ohci</span><span style="font-family: 宋体">（或</span><span style="font-family: Times New Roman">usb-uhci</span><span style="font-family: 宋体">，根据主板芯片组而不同）、</span><span style="font-family: Times New Roman">usb-storage</span><span style="font-family: 宋体">、</span><span style="font-family: Times New Roman">scsi_mod</span><span style="font-family: 宋体">等。其中</span><span style="font-family: Times New Roman">usb-storage</span><span style="font-family: 宋体">的状态应该为</span></span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">
+</span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">（<span style="font-family: Times New Roman">unused</span><span style="font-family: 宋体">）。</span></span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">
+</span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">3. <span style="font-family: 宋体">插入</span><span style="font-family: Times New Roman">U</span><span style="font-family: 宋体">盘，不停的</span><span style="font-family: Times New Roman">/sbin/lsmod</span><span style="font-family: 宋体">，这期间</span><span style="font-family: Times New Roman">usb-storage</span><span style="font-family: 宋体">的状态应为</span><span style="font-family: Times New Roman">Initializing</span><span style="font-family: 宋体">，持续时间大约半分钟，其实就相当于</span><span style="font-family: Times New Roman">Windows</span><span style="font-family: 宋体">在右下角不停的弹汽球</span><span style="font-family: Times New Roman">:)</span></span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">
+</span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">4. <span style="font-family: 宋体">初始化结束后</span><span style="font-family: Times New Roman">, /sbin/fdisk -l</span><span style="font-family: 宋体">，应该能看到</span><span style="font-family: Times New Roman">/dev/sda1</span><span style="font-family: 宋体">设备。这时，执行</span></span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">
+</span><span style="font-size: 10.5pt;font-style: italic;font-family: 'Times New Roman'">mount /dev/sda1 /mnt/udisk</span><span style="font-size: 10.5pt;font-family: 'Times New Roman'"> 才能成功。如果</span><span style="font-size: 10.5pt;font-family: '宋体'">∪盘分区</span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">是<span style="font-family: Times New Roman">MSDOS</span><span style="font-family: 宋体">格式，又想看到中文，可以</span></span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">
+</span><span style="font-size: 10.5pt;font-style: italic;font-family: 'Times New Roman'">mount -t vfat /dev/sda1 /mnt/udisk -o iocharset=gb2312</span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">。</span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">
+</span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">(<span style="font-family: 宋体">为方便可以</span><span style="font-family: Times New Roman">/etc/fstab</span><span style="font-family: 宋体">加一行，以后就可以 </span><span style="font-family: Times New Roman">mount /mnt/udisk</span><span style="font-family: 宋体">就行了）。</span></span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">
+</span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">5. <span style="font-family: 宋体">奇怪的是有时候</span><span style="font-family: Times New Roman">fdisk</span><span style="font-family: 宋体">是看不到</span><span style="font-family: Times New Roman">sda1</span><span style="font-family: 宋体">，但是也能</span><span style="font-family: Times New Roman">mount</span><span style="font-family: 宋体">上</span></span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">
+</span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">使用以上步骤挂<span style="font-family: Times New Roman">U</span><span style="font-family: 宋体">盘基本上可说是</span><span style="font-family: Times New Roman">“</span><span style="font-family: 宋体">万全</span><span style="font-family: Times New Roman">”</span><span style="font-family: 宋体">了。台式机、笔记本、</span><span style="font-family: Times New Roman">VMware</span><span style="font-family: 宋体">都一样。</span></span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">
+</span><span style="font-size: 10.5pt;font-style: italic;font-family: 'Times New Roman'">mkdir /mnt/usb</span><span style="font-size: 10.5pt;font-style: italic;font-family: 'Times New Roman'">
+</span><span style="font-size: 10.5pt;font-style: italic;font-family: 'Times New Roman'">mount /dev/sda1 /mnt/usb</span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">
+</span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">笔记本上安装<span style="font-family: Times New Roman">linux</span><span style="font-family: 宋体">用法和台式机一样</span></span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">
+</span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">ps:</span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">
+</span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">首先要检查</span><span style="font-size: 10.5pt;font-style: italic;font-family: 'Times New Roman'">lsmod|grep usb-storage</span><span style="font-size: 10.5pt;font-family: 'Times New Roman'"> 这是支持<span style="font-family: Times New Roman">USB</span><span style="font-family: 宋体">的模块。如果没有的话</span><span style="font-family: Times New Roman">,</span><span style="font-family: 宋体">是无法操作</span><span style="font-family: Times New Roman">USB</span><span style="font-family: 宋体">接口的设备的。</span></span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">
+</span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">如没有的话<span style="font-family: Times New Roman">,</span><span style="font-family: 宋体">可以手功</span><span style="font-family: Times New Roman">modprobe usb-storage,</span><span style="font-family: 宋体">一般查看</span><span style="font-family: Times New Roman">U</span><span style="font-family: 宋体">盘可以用</span><span style="font-family: Times New Roman">fdisk -l</span><span style="font-family: 宋体">可以很清楚的看到这个硬件的设备名</span><span style="font-family: Times New Roman">,</span><span style="font-family: 宋体">比猜测硬件名要准确多了</span></span><span style="font-size: 10.5pt;font-family: '宋体'">。</span><span style="font-size: 10.5pt;font-family: 'Times New Roman'">
+</span><span style="font-size: 10.5pt;font-family: 'Times New Roman'"></span>
+
+</div>
+
+
+<!--EndFragment-->
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">龍昌</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2010-03-16T00:00:00+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>16</span><span class='date-suffix'>th</span>, <span class='date-year'>2010</span></span> <span class='time'>12:00 am</span></time>
+    </p>
+    <p class="meta">
+      Categories: 
+
+<span class="categories">
+  
+    <a class='category' href='/categories/linux栏目/index.html'>linux栏目</a>
+  
+</span>
+
+
+    </p>
+    <p class="meta">
+      Tags: 
+
+<span class="tags">
+  
+    <a class='tag' href='/tags/Linux/index.html'>Linux</a>, <a class='tag' href='/tags/USB/index.html'>USB</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/archives/83314.html" title="Previous Post: VirtualBox 中共享文件夹的设置">&laquo; VirtualBox 中共享文件夹的设置</a>
+      
+      
+        <a class="basic-alignment right" href="/archives/83329.html" title="Next Post: 新手应了解的Linux十个知识点">新手应了解的Linux十个知识点 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Subscription</h1>
+  <!--以下是QQ邮件列表订阅嵌入代码--><script >var nId = "e7ee5da6d322dc7157c25cfd8a7700bb23a056dd1fb18cb4",nWidth="auto",sColor="light",sText="请输入邮件地址：" ;</script><script src="http://list.qq.com/zh_CN/htmledition/js/qf/page/qfcode.js" charset="gb18030"></script>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84132.html">配置elixir的vim环境</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84130.html">配置coffeescript的vim环境</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84127.html">VIM编译参数</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84124.html">Docker使用笔记</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84121.html">Nginx + Php + FastCGI配置</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (47)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (32)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (26)</a></li><li><a href='/categories/web开发/index.html'>web开发 (16)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (7)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (10)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (21)</a></li></ul>
+</section>
+<section>
+  <h1>Tag Cloud</h1>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.45454545454545%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.9090909090909%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.81818181818181%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.9090909090909%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.36363636363636%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.27272727272727%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.36363636363636%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.81818181818181%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.81818181818181%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 100.9090909090909%'>Django(1)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.9090909090909%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.81818181818181%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.72727272727273%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.9090909090909%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.9090909090909%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.45454545454545%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.81818181818181%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.63636363636364%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.45454545454545%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.9090909090909%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.45454545454545%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.9090909090909%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.9090909090909%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.9090909090909%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(66)</a> <a href='/tags/mongodb/index.html' style='font-size: 109.0909090909091%'>mongodb(10)</a> <a href='/tags/mysql/index.html' style='font-size: 103.63636363636364%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.9090909090909%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.9090909090909%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.18181818181819%'>php(9)</a> <a href='/tags/ps/index.html' style='font-size: 105.45454545454545%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.9090909090909%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 144.54545454545456%'>python(49)</a> <a href='/tags/qt/index.html' style='font-size: 101.81818181818181%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.9090909090909%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 123.63636363636364%'>Ruby(26)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.72727272727273%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.9090909090909%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.54545454545455%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.36363636363636%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.72727272727273%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 121.81818181818181%'>vim(24)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.72727272727273%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.9090909090909%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.9090909090909%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 112.72727272727272%'>Web开发(14)</a> <a href='/tags/windows/index.html' style='font-size: 106.36363636363636%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.9090909090909%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.9090909090909%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.9090909090909%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.9090909090909%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.45454545454545%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.81818181818181%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.9090909090909%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.18181818181819%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.18181818181819%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.9090909090909%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.9090909090909%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.9090909090909%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.81818181818181%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 109.0909090909091%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.18181818181819%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.9090909090909%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.54545454545455%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.9090909090909%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.9090909090909%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 104.54545454545455%'>网络日志(5)</a> <a href='/tags/翻译/index.html' style='font-size: 120.9090909090909%'>翻译(23)</a> <a href='/tags/视频教程/index.html' style='font-size: 109.0909090909091%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.9090909090909%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.81818181818181%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.9090909090909%'>随笔(1)</a> </span>
+</section>
+<section>
+  <h1>Link</h1>
+    <ul id="category-list">
+      <li><a target="_blank" title="我的Github" href="https://github.com/wusuopu">@Github</a></li>
+      <li><a target="_blank" title="我的微博" href="http://www.weibo.com/u/1768691343">@Weibo</a></li>
+      <li><a target="_blank" title="我的Twitter" href="https://twitter.com/longchangjin">@Twitter</a></li>
+      <li><a target="_blank" title="我的豆瓣" href="http://www.douban.com/people/lchj/">@Douban</a></li>
+
+      <li><a target="_blank" title="" href="http://www.vimer.cn/">Vimer的程序世界</a></li>
+      <li><a target="_blank" title="" href="http://pythoner.net/">python开发者社区</a></li>
+      <li><a target="_blank" title="" href="http://simple-is-better.com/">python.cn(news, jobs)</a></li>
+      <li><a target="_blank" title="" href="http://gtk.awaysoft.com/">GTK+ 中文社区</a></li>
+    </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - 龍昌 -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+<div style="display:none;"><script src="http://s94.cnzz.com/stat.php?id=1259846&web_id=1259846&show=pic" language="JavaScript"></script></div>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'longchang';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://www.xefan.com/archives/83324.html';
+        var disqus_url = 'http://www.xefan.com/archives/83324.html';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

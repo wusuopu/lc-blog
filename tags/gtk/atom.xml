@@ -1,0 +1,2446 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Tag: Gtk | 龍昌博客]]></title>
+  <link href="http://www.xefan.com/tags/gtk/atom.xml" rel="self"/>
+  <link href="http://www.xefan.com/"/>
+  <updated>2014-11-04T14:10:28+08:00</updated>
+  <id>http://www.xefan.com/</id>
+  <author>
+    <name><![CDATA[龍昌]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[[翻译]Ruby GTK教程8——贪吃蛇]]></title>
+    <link href="http://www.xefan.com/archives/83975.html"/>
+    <updated>2013-11-25T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/83975-[翻译]Ruby GTK教程8——贪吃蛇</id>
+    <content type="html"><![CDATA[<h1>贪吃蛇</h1>
+
+
+<p>在这部分的Ruby GTK编程教程中我们将创建一个贪吃蛇游戏。</p>
+
+
+<p>贪吃蛇是一个比较老的经典电子游戏。它第一次创建是在70年代后期。之后被移植到PC上。在这个游戏中玩家控制蛇，目标是尽可能多的吃掉苹果。蛇每吃掉一个苹果，身体就会变长。必须避免蛇撞到墙或者自己的身体。</p>
+
+
+<h2>开发</h2>
+
+
+<p>蛇的每块关节的大小为10像素。使用方向键控制蛇。初始，蛇有三块关节。游戏立即开始。当游戏结束后在窗口中央显示&#8221;Game Over&#8221;。</p>
+
+
+<p><em>board.rb</em></p>
+
+
+<pre><code>WIDTH = 300
+HEIGHT = 270
+DOT_SIZE = 10
+ALL_DOTS = WIDTH * HEIGHT / (DOT_SIZE * DOT_SIZE)
+RAND_POS = 26
+
+$x = [0] * ALL_DOTS
+$y = [0] * ALL_DOTS
+
+class Board &lt; Gtk::DrawingArea
+
+    def initialize
+        super
+
+        modify_bg Gtk::STATE_NORMAL, Gdk::Color.new(0, 0, 0)
+
+        signal_connect "expose-event" do  
+            on_expose
+        end
+
+        init_game
+    end
+
+    def on_timer
+
+        if @inGame
+            check_apple
+            check_collision
+            move
+            queue_draw
+            return true
+        else
+            return false
+        end
+    end
+
+    def init_game
+
+        @left = false
+        @right = true
+        @up = false
+        @down = false
+        @inGame = true
+        @dots = 3
+
+        for i in (0..@dots)
+            $x[i] = 50 - i * 10
+            $y[i] = 50
+        end
+
+        begin
+            @dot = Cairo::ImageSurface.from_png "dot.png"
+            @head = Cairo::ImageSurface.from_png "head.png"
+            @apple = Cairo::ImageSurface.from_png "apple.png"
+        rescue Exception =&gt; e
+            puts "cannot load images"
+            exit
+        end
+
+        locate_apple
+        GLib::Timeout.add(100) { on_timer }
+
+     end
+
+
+    def on_expose
+
+        cr = window.create_cairo_context
+
+        if @inGame
+            draw_objects cr
+        else
+            game_over cr
+        end      
+    end
+
+    def draw_objects cr
+
+        cr.set_source_rgb 0, 0, 0
+        cr.paint
+
+        cr.set_source @apple, @apple_x, @apple_y
+        cr.paint
+
+        for z in (0..@dots)
+            if z == 0 
+                cr.set_source @head, $x[z], $y[z]
+                cr.paint
+            else
+                cr.set_source @dot, $x[z], $y[z]
+                cr.paint
+            end    
+        end
+    end
+
+    def game_over cr
+
+        w = allocation.width / 2
+        h = allocation.height / 2
+
+        cr.set_font_size 15
+        te = cr.text_extents "Game Over"
+
+        cr.set_source_rgb 65535, 65535, 65535
+
+        cr.move_to w - te.width/2, h
+        cr.show_text "Game Over"
+
+    end
+
+
+    def check_apple
+
+        if $x[0] == @apple_x and $y[0] == @apple_y 
+            @dots = @dots + 1
+            locate_apple
+        end
+    end
+
+    def move
+
+        z = @dots
+
+        while z &gt; 0
+            $x[z] = $x[(z - 1)]
+            $y[z] = $y[(z - 1)]
+            z = z - 1
+        end
+
+        if @left
+            $x[0] -= DOT_SIZE
+        end
+
+        if @right 
+            $x[0] += DOT_SIZE
+        end
+
+        if @up
+            $y[0] -= DOT_SIZE
+        end
+
+        if @down
+            $y[0] += DOT_SIZE
+        end
+
+     end
+
+    def check_collision
+
+        z = @dots
+
+        while z &gt; 0
+            if z &gt; 4 and $x[0] == $x[z] and $y[0] == $y[z]
+                @inGame = false
+            end
+            z = z - 1
+        end
+
+        if $y[0] &gt; HEIGHT - DOT_SIZE
+            @inGame = false
+        end
+
+        if $y[0] &lt; 0
+            @inGame = false
+        end
+
+        if $x[0] &gt; WIDTH - DOT_SIZE
+            @inGame = false
+        end
+
+        if $x[0] &lt; 0
+            @inGame = false
+        end
+
+    end
+
+    def locate_apple
+
+        r = rand(RAND_POS)
+        @apple_x = r * DOT_SIZE
+        r = rand(RAND_POS)
+        @apple_y = r * DOT_SIZE
+    end
+
+    def on_key_down event
+
+        key = event.keyval
+
+        if key == Gdk::Keyval::GDK_Left and not @right
+            @left = true
+            @up = false
+            @down = false
+        end
+
+        if key == Gdk::Keyval::GDK_Right and not @left
+            @right = true
+            @up = false
+            @down = false
+        end
+
+        if key == Gdk::Keyval::GDK_Up and not @down
+            @up = true
+            @right = false
+            @left = false
+        end
+
+        if key == Gdk::Keyval::GDK_Down and not @up
+            @down = true
+            @right = false
+            @left = false
+        end
+    end   
+end
+</code></pre>
+
+
+<p>首先我们定义一些全局变量。</p>
+
+
+<p>WIDTH和HEIGHT常量决定了甲板的大小。DOT_SIZE是苹果和蛇的每个点的大小。ALL_DOTS常量定义了甲板可能包含的最大的点数量。RAND_POS常量用于计算苹果的随机位置。DELAY常量决定游戏速度。</p>
+
+
+<pre><code>$x = [0] * ALL_DOTS
+$y = [0] * ALL_DOTS
+</code></pre>
+
+
+<p>这两个数组存储了蛇所有关节的x、y坐标。</p>
+
+
+<p><em>init_game</em>方法初始化变量、加载图片和启动timeout函数。</p>
+
+
+<pre><code>if @inGame
+    draw_objects cr
+else
+    game_over cr
+end
+</code></pre>
+
+
+<p>在<em>on_expose_method</em>方法里我们检查<em>@inGame</em>变量。如果为true，绘制苹果和蛇。否则显示&#8221;Game over&#8221;文字。</p>
+
+
+<pre><code>def draw_objects cr
+
+    cr.set_source_rgb 0, 0, 0
+    cr.paint
+
+    cr.set_source @apple, @apple_x, @apple_y
+    cr.paint
+
+    for z in (0..@dots)
+        if z == 0 
+            cr.set_source @head, $x[z], $y[z]
+            cr.paint
+        else
+            cr.set_source @dot, $x[z], $y[z]
+            cr.paint
+        end    
+    end
+end
+</code></pre>
+
+
+<p><em>draw_objects</em>方法绘制苹果和蛇。蛇的头部用红色的圆表示。</p>
+
+
+<pre><code>def check_apple
+
+    if $x[0] == @apple_x and $y[0] == @apple_y 
+        @dots = @dots + 1
+        locate_apple
+    end
+end
+</code></pre>
+
+
+<p><em>check_apple</em>方法查检蛇是否碰到苹果，如果是则增加蛇的关节并调用<em>locate_apple</em>方法随机放置一个新的苹果。</p>
+
+
+<p><em>move</em>方法是游戏的关键算法。为了理解它，先看一下蛇是如何移动的。控制蛇头，可以使用方向键改变它的方向。其余的关节朝该方向前进。第二个关节移到到第一关节的位置，第三个关节到第二个等等。</p>
+
+
+<pre><code>while z &gt; 0
+    $x[z] = $x[(z - 1)]
+    $y[z] = $y[(z - 1)]
+    z = z - 1
+end
+</code></pre>
+
+
+<p>这些代码将关节按照链状前进。</p>
+
+
+<pre><code>if @left
+    $x[0] -= DOT_SIZE
+end
+</code></pre>
+
+
+<p>头部向左移动。</p>
+
+
+<p><em>check_collision</em>方法中，我们检查蛇是否撞到了自己或者墙。</p>
+
+
+<pre><code>while z &gt; 0
+    if z &gt; 4 and $x[0] == $x[z] and $y[0] == $y[z]
+        @inGame = false
+    end
+    z = z - 1
+end
+</code></pre>
+
+
+<p>如果蛇撞到了自己，游戏结束。</p>
+
+
+<pre><code>if $y[0] &gt; HEIGHT - DOT_SIZE
+    @inGame = false
+end
+</code></pre>
+
+
+<p>如果蛇撞到底部，游戏结束。</p>
+
+
+<p><em>localte_apple</em>方法在甲板上随机定位一个苹果。</p>
+
+
+<pre><code>r = rand(RAND_POS)
+</code></pre>
+
+
+<p>获取0到RAND_POS-1的一个随机数。</p>
+
+
+<pre><code>@apple_x = r * DOT_SIZE
+...
+@apple_y = r * DOT_SIZE
+</code></pre>
+
+
+<p>这几行设置了苹果的x、y坐标。</p>
+
+
+<pre><code>if @inGame
+    check_apple
+    check_collision
+    move
+    queue_draw
+    return true
+else
+    return false
+end
+</code></pre>
+
+
+<p>第140ms调用一次<em>on_timer</em>方法。如果游戏运行则调用三个组成游戏逻辑的方法。否则返回false，停止定时事件。</p>
+
+
+<p>在Board类的<em>on_key_down</em>方法中我们判断按下的键。</p>
+
+
+<pre><code>if key == Gdk::Keyval::GDK_Left and not @right
+    @left = true
+    @up = false
+    @down = false
+end
+</code></pre>
+
+
+<p>如果我们按的是左方向键，我们设置<em>left</em>变量为true。这个变量用于<em>move</em>方法改变蛇的坐标。同样注意，当蛇是朝右时，我们不能立即朝左。</p>
+
+
+<p><em>nibbles.rb</em></p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# This is a simple nibbles game
+# clone
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+require 'board'
+
+class RubyApp &gt; Gtk::Window
+    def initialize
+        super
+
+        set_title "Nibbles"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        @board = Board.new
+        signal_connect "key-press-event" do |w, e|
+            on_key_down(w, e)
+        end
+
+        add @board
+
+        set_default_size 300, 270
+        set_window_position Gtk::Window::POS_CENTER
+        show_all
+    end
+
+    def on_key_down widget, event
+
+        key = event.keyval
+        @board.on_key_down event
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+
+
+<p>在这个类我们启动了贪吃游戏。</p>
+
+
+<pre><code>def on_key_down widget, event
+
+    key = event.keyval
+    @board.on_key_down event
+end
+</code></pre>
+
+
+<p>在这个类的捕获按键事件然后委托Board类的<em>on_key_down method</em>方法进行处理。</p>
+
+
+<p><img alt="image" src="http://zetcode.com/img/gui/rubygtk/nibbles.png"><br>
+<em>图片：贪吃蛇</em></p>
+
+
+<p>这是使用Ruby语言和GTK库编写的贪吃蛇计算机游戏。</p>
+
+
+<hr>
+
+
+<p>原文地址： <a href="http://zetcode.com/gui/rubygtk/nibbles/">http://zetcode.com/gui/rubygtk/nibbles/</a><br>
+翻译：龙昌  admin@longchangjin.cn </p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[[翻译]Ruby GTK教程7——自定义控件]]></title>
+    <link href="http://www.xefan.com/archives/83972.html"/>
+    <updated>2013-11-24T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/83972-[翻译]Ruby GTK教程7——自定义控件</id>
+    <content type="html"><![CDATA[<h1>自定义控件</h1>
+
+
+<p>大多数套件通常只提供了最常用的控件，如按钮、文本控件、滑动条等。没有套件可以提供所有可能的控件。程序员必须自己创建这些。这是通过套件提供的绘制工具完成。这有两种可能。程序员可以修改或增强已存在的控件，或者从头开始创建一个自定义控件。</p>
+
+
+<h2>Burning控件</h2>
+
+
+<p>这个例子我们从头开始创建一个控件。这个控件可以在各种媒体烧定应用中看到，如Nero Burning ROM。</p>
+
+
+<p><em>custom.rb</em></p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial 
+#
+# This example creates a burning
+# custom widget
+#
+# author: jan bodnar
+# website: zetcode.com 
+# last edited: June 2009
+
+
+require 'gtk2'
+
+class Burning &lt; Gtk::DrawingArea
+
+    def initialize(parent)
+        @parent = parent
+
+        super()
+
+        @num = [ "75", "150", "225", "300", 
+            "375", "450", "525", "600", "675" ]
+
+        set_size_request 1, 30
+        signal_connect "expose-event" do
+            expose
+        end
+    end
+
+
+    def expose
+
+        cr = window.create_cairo_context
+        draw_widget cr
+
+    end
+
+    def draw_widget cr
+
+         cr.set_line_width 0.8
+
+        cr.select_font_face("Courier", 
+            Cairo::FONT_SLANT_NORMAL, Cairo::FONT_WEIGHT_NORMAL)
+        cr.set_font_size 11
+
+        width = allocation.width
+
+        @cur_width = @parent.get_cur_value
+
+        step = (width / 10.0).round
+
+        till = (width / 750.0) * @cur_width
+        full = (width / 750.0) * 700
+
+        if @cur_width &gt;= 700
+
+            cr.set_source_rgb(1.0, 1.0, 0.72)
+            cr.rectangle(0, 0, full, 30)
+            cr.clip
+            cr.paint
+            cr.reset_clip
+
+            cr.set_source_rgb(1.0, 0.68, 0.68)
+            cr.rectangle(full, 0, till-full, 30)
+            cr.clip
+            cr.paint
+            cr.reset_clip
+
+        else
+            cr.set_source_rgb 1.0, 1.0, 0.72
+            cr.rectangle 0, 0, till, 30
+            cr.clip
+            cr.paint
+            cr.reset_clip
+        end
+
+
+        cr.set_source_rgb(0.35, 0.31, 0.24)
+
+        for i in (1..@num.length)
+            cr.move_to i*step, 0
+            cr.line_to i*step, 5
+            cr.stroke
+
+            te = cr.text_extents @num[i-1]
+            cr.move_to i*step-te.width/2, 15
+            cr.text_path @num[i-1]
+            cr.stroke
+        end         
+    end
+end
+
+
+class RubyApp &lt; Gtk::Window
+    def initialize
+        super
+
+        set_title "Burning"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        set_size_request 350, 200        
+        set_window_position Gtk::Window::POS_CENTER
+
+        @cur_value = 0
+
+        vbox = Gtk::VBox.new false, 2
+
+        scale = Gtk::HScale.new
+        scale.set_range 0, 750
+        scale.set_digits 0
+        scale.set_size_request 160, 35
+        scale.set_value @cur_value
+
+        scale.signal_connect "value-changed" do |w|
+            on_changed(w)
+        end
+
+        fix = Gtk::Fixed.new
+        fix.put scale, 50, 50
+
+        vbox.pack_start fix
+
+        @burning = Burning.new(self)
+        vbox.pack_start @burning, false, false, 0
+
+        add vbox
+        show_all
+    end
+
+    def on_changed widget
+
+        @cur_value = widget.value
+        @burning.queue_draw
+    end
+
+    def get_cur_value
+        return @cur_value
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+
+
+<p>我们将DrawingArea放在窗口的底部，并且手动绘制控件的条目。所有的重要代码放在draw_widget里，通过Burning类的expose方法调用。这个控件生动的显示了媒介的容量和剩余空间。这个控件通过刻度控件来控制。我们自定义控件的最小值为0,最大值为750。如果达到700，我们开始绘制红色。这通常表明超标了。</p>
+
+
+<pre><code>@num = [ "75", "150", "225", "300", 
+    "375", "450", "525", "600", "675" ]
+</code></pre>
+
+
+<p>这些数字显示在控件上。他们显示了媒介的容量。</p>
+
+
+<pre><code>@cur_width = @parent.get_cur_value
+</code></pre>
+
+
+<p>通过父控件我们获得刻度控件的值。</p>
+
+
+<pre><code>till = (width / 750.0) * @cur_width
+full = (width / 750.0) * 700
+</code></pre>
+
+
+<p>我们使用width变量进行刻度值和自定义控件尺寸的转换。注意我们使用了浮点数，得到较大精度的绘制。<em>till</em>参数决定了绘制的总大小，它的值来自刻度控件。它是整个区域的比例。<em>full</em>参数决定了从什么位置开始绘制红色。</p>
+
+
+<pre><code>cr.set_source_rgb(1.0, 1.0, 0.72)
+cr.rectangle(0, 0, full, 30)
+cr.clip
+cr.paint
+cr.reset_clip
+</code></pre>
+
+
+<p>绘制黄色矩形直到<em>full</em>点。</p>
+
+
+<pre><code>te = cr.text_extents @num[i-1]
+cr.move_to i*step-te.width/2, 15
+cr.text_path @num[i-1]
+cr.stroke
+</code></pre>
+
+
+<p>这些代码绘制了burning控件的数字。我们计算了文本恰当的位置。</p>
+
+
+<pre><code>def on_changed widget
+
+    @cur_value = widget.value
+    @burning.queue_draw
+end
+</code></pre>
+
+
+<p>我们获取刻度控件的值保存在<em>cur_value</em>变量中，稍后使用。重绘burning控件。</p>
+
+
+<p><img alt="image" src="http://zetcode.com/img/gui/rubygtk/burning.png"><br>
+<em>图片：Burning widget</em></p>
+
+
+<p>在这一章中，我们创建了一个自定义控件。</p>
+
+
+<hr>
+
+
+<p>原文地址： <a href="http://zetcode.com/gui/rubygtk/customwidget/">http://zetcode.com/gui/rubygtk/customwidget/</a><br>
+翻译：龙昌  admin@longchangjin.cn </p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[[翻译]Ruby GTK教程6——Cairo]]></title>
+    <link href="http://www.xefan.com/archives/83969.html"/>
+    <updated>2013-11-24T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/83969-[翻译]Ruby GTK教程6——Cairo</id>
+    <content type="html"><![CDATA[<h1>使用Cairo绘制</h1>
+
+
+<p>这部分的Ruby GTK教程，我们将使用Cairo库进行一些绘制。</p>
+
+
+<p>Cairo是一个用于创建2D矢量图像的库。我们可以用它来绘制自己的控件、图表或者各种效果或动画。</p>
+
+
+<h2>颜色</h2>
+
+
+<p>在第一个会例子，我们将介绍颜色。颜色是一个代表了红、绿和蓝（RGB）强度值的对象。Cairo的RGB有效值范围为0到1。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# This program shows how to work
+# with colors in Cairo
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "Colors"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 360, 100
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        @darea = Gtk::DrawingArea.new
+
+        @darea.signal_connect "expose-event" do  
+            on_expose
+        end
+
+        add(@darea)
+
+    end
+
+    def on_expose
+
+        cr = @darea.window.create_cairo_context  
+        draw_colors cr
+
+    end
+
+    def draw_colors cr
+
+        cr.set_source_rgb 0.2, 0.23, 0.9
+        cr.rectangle 10, 15, 90, 60
+        cr.fill
+
+        cr.set_source_rgb 0.9, 0.1, 0.1
+        cr.rectangle 130, 15, 90, 60
+        cr.fill
+
+        cr.set_source_rgb 0.4, 0.9, 0.4
+        cr.rectangle 250, 15, 90, 60
+        cr.fill
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+
+
+<p>这个例子中我们绘制了三个矩形并且用三种不同的颜色填充。</p>
+
+
+<pre><code>@darea = Gtk::DrawingArea.new
+</code></pre>
+
+
+<p>我们将在DrawingArea控件是进行绘制操作。</p>
+
+
+<pre><code>@darea.signal_connect "expose-event" do  
+    on_expose
+end
+</code></pre>
+
+
+<p>当窗口需要重绘时<em>expose-event</em>事件将触发。对这个事件的响应中我们调用了<em>on_expose</em>方法。</p>
+
+
+<pre><code>cr = @darea.window.create_cairo_context
+</code></pre>
+
+
+<p>从GdkWindow创建cairo上下文对象。这个上下文是我们将要进行所有绘制的对象。</p>
+
+
+<pre><code>draw_colors cr
+</code></pre>
+
+
+<p>实际的绘制委托给<em>draw_colors</em>方法。</p>
+
+
+<pre><code>cr.set_source_rgb 0.2, 0.23, 0.9
+</code></pre>
+
+
+<p><em>set_source_rgb</em>方法是设置cairo上下文的颜色。这个方法的三个参数是颜色的强度值。</p>
+
+
+<pre><code>cr.rectangle 10, 15, 90, 60
+</code></pre>
+
+
+<p>绘制一个矩形。前两个参数是矩形左上角的x、y坐标。后两个参数是矩形的宽和高。</p>
+
+
+<pre><code>cr.fill
+</code></pre>
+
+
+<p>使用当前的颜色填充矩形。</p>
+
+
+<p><img alt="image1" src="http://zetcode.com/img/gui/rubygtk/colors.png"><br>
+<em>图片：颜色</em></p>
+
+
+<h2>基本形状</h2>
+
+
+<p>下一个例子在窗口上绘制一些基本形状。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# This code example draws basic shapes
+# with the Cairo library
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "Basic shapes"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 390, 240
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        @darea = Gtk::DrawingArea.new
+
+        @darea.signal_connect "expose-event" do  
+            on_expose
+        end
+
+        add(@darea)
+    end
+
+    def on_expose
+
+        cr = @darea.window.create_cairo_context  
+        draw_shapes cr
+    end
+
+    def draw_shapes cr
+
+        cr.set_source_rgb 0.6, 0.6, 0.6
+
+        cr.rectangle 20, 20, 120, 80
+        cr.rectangle 180, 20, 80, 80
+        cr.fill
+
+        cr.arc 330, 60, 40, 0, 2*Math::PI
+        cr.fill
+
+        cr.arc 90, 160, 40, Math::PI/4, Math::PI
+        cr.fill
+
+        cr.translate 220, 180
+        cr.scale 1, 0.7
+        cr.arc 0, 0, 50, 0, 2*Math::PI
+        cr.fill
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+
+
+<p>这个例子我们将创建一个矩形、方形、圆形、弧形和椭圆形。我们将轮廓绘为蓝色，内部为白色。</p>
+
+
+<pre><code>cr.rectangle 20, 20, 120, 80
+cr.rectangle 180, 20, 80, 80
+cr.fill
+</code></pre>
+
+
+<p>这几行绘制了一个矩形和一个方形。</p>
+
+
+<pre><code>cr.arc 330, 60, 40, 0, 2*Math::PI
+cr.fill
+</code></pre>
+
+
+<p><em>arc</em>方法绘制一个全圆。</p>
+
+
+<pre><code>cr.translate 220, 180
+cr.scale 1, 0.7
+cr.arc 0, 0, 50, 0, 2*Math::PI
+cr.fill
+</code></pre>
+
+
+<p><em>translate</em>方法将对象移动到指定的点。如果我们想要绘制椭圆，我们需要进行一些缩放。这里<em>scale</em>方法将y轴收缩。</p>
+
+
+<p><img alt="image2" src="http://zetcode.com/img/gui/rubygtk/shapes.png"><br>
+<em>图片：基本形状</em></p>
+
+
+<h2>透明矩形</h2>
+
+
+<p>透明度是透过实体的可见度。最简单的理解可以把它想象成玻璃或者水。光线可以透过玻璃，这样我们就可以看到玻璃后的物体。</p>
+
+
+<p>在计算机图像中，我们可以使用透明混合实现透明度。透明混合处理图片和背景的组合，显示部透明。作品处理使用了阿尔法通道。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# This program shows transparent
+# rectangles using Cairo
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "Transparent rectangles"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 590, 90
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        @darea = Gtk::DrawingArea.new
+
+        @darea.signal_connect "expose-event" do  
+            on_expose
+        end
+
+        add(@darea)
+
+    end
+
+    def on_expose
+
+        cr = @darea.window.create_cairo_context
+
+        for i in (1..10)
+            cr.set_source_rgba 0, 0, 1, i*0.1
+            cr.rectangle 50*i, 20, 40, 40
+            cr.fill
+        end
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+
+
+<p>这个例子我们使用不同等级透明度绘制了10个矩形。</p>
+
+
+<pre><code>cr.set_source_rgba 0, 0, 1, i*0.1
+</code></pre>
+
+
+<p><em>set_source_rgba</em>方法是最后一个参数是alpha透明度。</p>
+
+
+<p><img alt="image3" src="http://zetcode.com/img/gui/rubygtk/transparency.png"> <br>
+<em>图片：透明矩形</em></p>
+
+
+<h2>甜甜圈</h2>
+
+
+<p>接下来的例子我们通过旋转一堆椭圆来创建一个复杂的形状。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# This program creates a donut
+# with Cairo library
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "Donut"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 350, 250
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        @darea = Gtk::DrawingArea.new
+
+        @darea.signal_connect "expose-event" do  
+            on_expose
+        end
+
+        add(@darea)
+
+    end
+
+    def on_expose
+
+        cr = @darea.window.create_cairo_context  
+        cr.set_line_width 0.5
+
+        w = allocation.width
+        h = allocation.height
+
+        cr.translate w/2, h/2
+        cr.arc 0, 0, 120, 0, 2*Math::PI
+        cr.stroke
+
+        for i in (1..36)
+            cr.save
+            cr.rotate i*Math::PI/36
+            cr.scale 0.3, 1
+            cr.arc 0, 0, 120, 0, 2*Math::PI
+            cr.restore
+            cr.stroke
+        end
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+
+
+<p>这个例子我们创建了一个甜甜圈。它的形状与饼干相似，因此取名为甜甜圈（donut）。</p>
+
+
+<pre><code>cr.translate w/2, h/2
+cr.arc 0, 0, 120, 0, 2*Math::PI
+cr.stroke
+</code></pre>
+
+
+<p>在开始只是一个椭圆。</p>
+
+
+<pre><code>for i in (1..36)
+    cr.save
+    cr.rotate i*Math::PI/36
+    cr.scale 0.3, 1
+    cr.arc 0, 0, 120, 0, 2*Math::PI
+    cr.restore
+    cr.stroke
+end
+</code></pre>
+
+
+<p>经过一些旋转后变成了甜甜圈。</p>
+
+
+<p><img alt="image4" src="http://zetcode.com/img/gui/rubygtk/donut.jpg"><br>
+<em>图片：Donut</em></p>
+
+
+<h2>绘制文本</h2>
+
+
+<p>下一个例子我们在窗口上绘制一些文本。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# This program draws text
+# using Cairo
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "Soulmate"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 370, 240
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        @darea = Gtk::DrawingArea.new
+
+        @darea.signal_connect "expose-event" do  
+            on_expose
+        end
+
+        add(@darea)
+
+    end
+
+    def on_expose
+
+        cr = @darea.window.create_cairo_context
+
+        cr.set_source_rgb 0.1, 0.1, 0.1
+
+        cr.select_font_face "Purisa", Cairo::FONT_SLANT_NORMAL, 
+            Cairo::FONT_WEIGHT_NORMAL
+        cr.set_font_size 13
+
+        cr.move_to 20, 30
+        cr.show_text "Most relationships seem so transitory"
+        cr.move_to 20, 60
+        cr.show_text "They're all good but not the permanent one"
+        cr.move_to 20, 120
+        cr.show_text "Who doesn't long for someone to hold"
+        cr.move_to 20, 150
+        cr.show_text "Who knows how to love without being told"
+        cr.move_to 20, 180
+        cr.show_text "Somebody tell me why I'm on my own"
+        cr.move_to 20, 210
+        cr.show_text "If there's a soulmate for everyone"
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+
+
+<p>我们显示了Natasha Bedingfields Soulmate歌的部分歌词。</p>
+
+
+<pre><code>cr.select_font_face "Purisa", Cairo::FONT_SLANT_NORMAL, 
+    Cairo::FONT_WEIGHT_NORMAL
+</code></pre>
+
+
+<p>这里我们指定我们使用的字体。</p>
+
+
+<pre><code>cr.set_font_size 13
+</code></pre>
+
+
+<p>我们指定字体的大小。</p>
+
+
+<pre><code>cr.move_to 20, 30
+</code></pre>
+
+
+<p>移动到开始绘制文本的坐标。</p>
+
+
+<pre><code>cr.show_text "Most relationships seem so transitory"
+</code></pre>
+
+
+<p><em>show_text</em>方法在窗口上绘制文本。</p>
+
+
+<p><img alt="image5" src="http://zetcode.com/img/gui/rubygtk/soulmate.png"><br>
+<em>图片: Soulmate</em></p>
+
+
+<p>这章的Ruby GTK教程我们使用Cairo库进行绘制。</p>
+
+
+<hr>
+
+
+<p>原文地址： <a href="http://zetcode.com/gui/rubygtk/cairo/">http://zetcode.com/gui/rubygtk/cairo/</a><br>
+翻译：龙昌  admin@longchangjin.cn </p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[[翻译]Ruby GTK教程5——对话框]]></title>
+    <link href="http://www.xefan.com/archives/83966.html"/>
+    <updated>2013-11-23T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/83966-[翻译]Ruby GTK教程5——对话框</id>
+    <content type="html"><![CDATA[<h1>对话框</h1>
+
+
+<p>在这部分的Ruby GTK教程我们将介绍对话框。</p>
+
+
+<p>对话框是现代GUI应用程序不可缺的一部分。对话是两个或者更多人之间交谈。在计算机程序中对话是一个用于与应用程序交互的窗口。对话框用于输入数据、修改数据、修改设置等。对话框在用户与计算机程序之间的交流具有重要意义。</p>
+
+
+<h2>消息盒子</h2>
+
+
+<p>消息对话框是应用程序便于给用户提供消息的对话框。消息由文本和图片数据组成。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# This example shows message
+# dialogs
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "Messages"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 250, 100
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        table = Gtk::Table.new 2, 2, true
+
+        info = Gtk::Button.new "Information"
+        warn = Gtk::Button.new "Warning"
+        ques = Gtk::Button.new "Question"
+        erro = Gtk::Button.new "Error"
+
+        info.signal_connect "clicked" do
+            on_info
+        end
+
+        warn.signal_connect "clicked" do
+            on_warn
+        end
+
+        ques.signal_connect "clicked" do
+            on_ques
+        end
+
+        erro.signal_connect "clicked" do
+            on_erro
+        end
+
+        table.attach info, 0, 1, 0, 1
+        table.attach warn, 1, 2, 0, 1
+        table.attach ques, 0, 1, 1, 2
+        table.attach erro, 1, 2, 1, 2
+
+        add table
+
+    end
+
+    def on_info
+        md = Gtk::MessageDialog.new(self,
+            Gtk::Dialog::DESTROY_WITH_PARENT, Gtk::MessageDialog::INFO, 
+            Gtk::MessageDialog::BUTTONS_CLOSE, "Download completed")
+        md.run
+        md.destroy
+    end
+
+
+    def on_erro
+        md = Gtk::MessageDialog.new(self, Gtk::Dialog::MODAL |
+            Gtk::Dialog::DESTROY_WITH_PARENT, Gtk::MessageDialog::ERROR, 
+            Gtk::MessageDialog::BUTTONS_CLOSE, "Error loading file")
+        md.run
+        md.destroy
+    end
+
+
+    def on_ques
+        md = Gtk::MessageDialog.new(self,
+            Gtk::Dialog::DESTROY_WITH_PARENT, Gtk::MessageDialog::QUESTION, 
+            Gtk::MessageDialog::BUTTONS_CLOSE, "Are you sure to quit?")
+        md.run
+        md.destroy
+    end
+
+    def on_warn
+        md = Gtk::MessageDialog.new(self,
+            Gtk::Dialog::DESTROY_WITH_PARENT, Gtk::MessageDialog::WARNING, 
+            Gtk::MessageDialog::BUTTONS_CLOSE, "Unallowed operation")
+        md.run
+        md.destroy
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+
+
+<p>我们的例子中显示了四种消息对话框。信息、警告、询问和错误消息对话框。</p>
+
+
+<pre><code>info = Gtk::Button.new "Information"
+warn = Gtk::Button.new "Warning"
+ques = Gtk::Button.new "Question"
+erro = Gtk::Button.new "Error"
+</code></pre>
+
+
+<p>创建四个按钮。每个按钮将显示不同种类的消息对话框。</p>
+
+
+<pre><code>def on_info
+    md = Gtk::MessageDialog.new(self,
+        Gtk::Dialog::DESTROY_WITH_PARENT, Gtk::MessageDialog::INFO, 
+        Gtk::MessageDialog::BUTTONS_CLOSE, "Download completed")
+    md.run
+    md.destroy
+end
+</code></pre>
+
+
+<p>如果我们点击了<em>info</em>按钮，信息对话框将显示。<em>Gtk::MessageDialog::INFO</em>指定了对话框的类型。<em>Gtk::MessageDialog::BUTTONS_CLOSE</em>指定在对话框中显示的按钮。最后一个参数是要显示的消息。对话框使用<em>run</em>方法显示。程序员必须也要调用<em>destroy</em>或者<em>hide</em>方法。<br>
+<img alt="image1" src="http://zetcode.com/img/gui/rubygtk/information.png">  <img alt="image2" src="http://zetcode.com/img/gui/rubygtk/warning.png">  <br>
+<img alt="image3" src="http://zetcode.com/img/gui/rubygtk/question.png">  <img alt="image4" src="http://zetcode.com/img/gui/rubygtk/error.png">   </p>
+
+
+<h2>关于对话框(AboutDialog)</h2>
+
+
+<p><em>关于对话框</em>显示了应用程序的信息。<em>关于对话框</em>可以显示logo、应用程序名、版本号、版权、网站或者授权信息。它也可能给出作者、文档编写才、翻译者和设计师的信息。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# This example demonstrates the
+# AboutDialog dialog
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "About dialog"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 300, 150
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        button = Gtk::Button.new "About"
+        button.set_size_request 80, 30
+
+        button.signal_connect "clicked" do
+            on_clicked
+        end
+
+        fix = Gtk::Fixed.new
+        fix.put button, 20, 20
+
+        add fix
+
+    end
+
+    def on_clicked
+        about = Gtk::AboutDialog.new
+        about.set_program_name "Battery"
+        about.set_version "0.1"
+        about.set_copyright "(c) Jan Bodnar"
+        about.set_comments "Battery is a simple tool for battery checking"
+        about.set_website "http://www.zetcode.com"
+        about.set_logo Gdk::Pixbuf.new "battery.png"
+        about.run
+        about.destroy
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+
+
+<p>代码伅使用了<em>AboutDialog</em>的一些特性。</p>
+
+
+<pre><code>about = Gtk::AboutDialog.new
+</code></pre>
+
+
+<p>创建一个AboutDialog。</p>
+
+
+<pre><code>about.set_program_name "Battery"
+about.set_version "0.1"
+about.set_copyright "(c) Jan Bodnar"
+</code></pre>
+
+
+<p>这里我们指定名称、版本号和版权信息。</p>
+
+
+<pre><code>about.set_logo Gdk::Pixbuf.new "battery.png"
+</code></pre>
+
+
+<p>这行创建一个logo。 <br>
+<img alt="image5" src="http://zetcode.com/img/gui/rubygtk/about.png"> <br>
+<em>图片：AboutDialog</em></p>
+
+
+<h2>字体选择对话框</h2>
+
+
+<p>FontSelectionDialog是一个用于选择字体的对话框。它典型的应用于文本编辑或者格式化的应用程序中。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# This example works with the
+# FontSelectionDialog
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "FontSelectionDialog"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 300, 150
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        set_border_width 10
+        @label = Gtk::Label.new "The only victory over love is flight."
+        button = Gtk::Button.new "Select font"
+
+        button.signal_connect "clicked" do
+            on_clicked
+        end
+
+        fix = Gtk::Fixed.new
+        fix.put button, 100, 30
+        fix.put @label, 30, 90
+        add fix
+
+    end
+
+    def on_clicked
+        fdia = Gtk::FontSelectionDialog.new "Select font name"
+        response = fdia.run
+
+        if response == Gtk::Dialog::RESPONSE_OK
+            font_desc = Pango::FontDescription.new fdia.font_name
+            if font_desc
+                @label.modify_font font_desc
+            end
+        end
+        fdia.destroy
+    end     
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+
+
+<p>这个代码例子我们创建了一个按钮和一个标签。点击按钮之后显示字体选择对话框。</p>
+
+
+<pre><code>fdia = Gtk::FontSelectionDialog.new "Select font name"
+</code></pre>
+
+
+<p>创建<em>FontSelectionDialog</em>。</p>
+
+
+<pre><code>if response == Gtk::Dialog::RESPONSE_OK
+    font_desc = Pango::FontDescription.new fdia.font_name
+    if font_desc
+        @label.modify_font font_desc
+    end
+end
+</code></pre>
+
+
+<p>如果点击确定按钮，标签的字体会变为我们在对话框中选中的。<br>
+<img alt="image6" src="http://zetcode.com/img/gui/rubygtk/fontdialog.png"><br>
+<em>图片：FontSelectionDialog</em></p>
+
+
+<h2>颜色选择对话框</h2>
+
+
+<p>ColorSelectionDialog是用于选择颜色的对话框。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# This example works with the
+# ColorSelectionDialog
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "ColorSelectionDialog"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 350, 150
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        set_border_width 10
+        @label = Gtk::Label.new "The only victory over love is flight."
+        button = Gtk::Button.new "Select color"
+
+        button.signal_connect "clicked" do
+            on_clicked
+        end
+
+        fix = Gtk::Fixed.new
+        fix.put button, 100, 30
+        fix.put @label, 30, 90
+        add fix
+    end
+
+    def on_clicked
+        cdia = Gtk::ColorSelectionDialog.new "Select color"
+        response = cdia.run
+
+        if response == Gtk::Dialog::RESPONSE_OK
+            colorsel = cdia.colorsel
+            color = colorsel.current_color
+            @label.modify_fg Gtk::STATE_NORMAL, color
+        end
+
+        cdia.destroy
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+
+
+<p>这个例子与前一个例子很相似。这次我们是改变标签的颜色。</p>
+
+
+<pre><code>cdia = Gtk::ColorSelectionDialog.new "Select color"
+</code></pre>
+
+
+<p>创建ColorSelectionDialog。</p>
+
+
+<pre><code>if response == Gtk::Dialog::RESPONSE_OK
+    colorsel = cdia.colorsel
+    color = colorsel.current_color
+    @label.modify_fg Gtk::STATE_NORMAL, color
+end
+</code></pre>
+
+
+<p>如果按下OK按钮，我们得到颜色值并修改标签的颜色。</p>
+
+
+<p><img alt="image7" src="http://zetcode.com/img/gui/rubygtk/colordialog.png"><br>
+<em>图片：ColorSelectionDialog</em></p>
+
+
+<p>这部分的Ruby GTK教程我们展示了对话框。</p>
+
+
+<hr>
+
+
+<p>原文地址： <a href="http://zetcode.com/gui/rubygtk/dialogs/">http://zetcode.com/gui/rubygtk/dialogs/</a><br>
+翻译：龙昌  admin@longchangjin.cn </p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[[翻译]Ruby GTK教程4——菜单&工具条]]></title>
+    <link href="http://www.xefan.com/archives/83963.html"/>
+    <updated>2013-11-23T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/83963-[翻译]Ruby GTK教程4——菜单&工具条</id>
+    <content type="html"><![CDATA[<h1>菜单&amp;工具条</h1>
+
+
+<p>这部分的Ruby GTK教程我们将使用菜单和工具条。</p>
+
+
+<p>菜单栏是GUI应用中最常用的部分之一。它是位于各个菜单的一组命令。在命令行应用程序中我们需要记住这些所有神秘的命令，而现在我们将这些大部分的命令按照逻辑归合在一起。接受这些标准将进一步减少在学习新应用上花费的时间。</p>
+
+
+<h2>简单的菜单</h2>
+
+
+<p>我们的第一个例子将创建一个有文件菜单的菜单栏。这个菜单只有一个菜单项，选择这一项将退出应用。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# This example shows a simple menu
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "Simple menu"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 250, 200
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        modify_bg Gtk::STATE_NORMAL, Gdk::Color.new(6400, 6400, 6440)
+
+        mb = Gtk::MenuBar.new
+
+        filemenu = Gtk::Menu.new
+        filem = Gtk::MenuItem.new "File"
+        filem.set_submenu filemenu
+
+        exit = Gtk::MenuItem.new "Exit"
+        exit.signal_connect "activate" do
+            Gtk.main_quit
+        end
+
+        filemenu.append exit
+
+        mb.append filem
+
+        vbox = Gtk::VBox.new false, 2
+        vbox.pack_start mb, false, false, 0
+
+        add vbox
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+
+
+<p>这是一个最小功能的菜单栏的例子。</p>
+
+
+<pre><code>mb = Gtk::MenuBar.new
+</code></pre>
+
+
+<p>创建<em>MenuBar</em>控件，这是菜单的容器。</p>
+
+
+<pre><code>filemenu = Gtk::Menu.new
+filem = Gtk::MenuItem.new "File"
+filem.set_submenu filemenu
+</code></pre>
+
+
+<p>创建顶级菜单项。</p>
+
+
+<pre><code>exit = Gtk::MenuItem.new "Exit"
+exit.signal_connect "activate" do
+    Gtk.main_quit
+end
+
+filemenu.append exit
+</code></pre>
+
+
+<p>创建退出菜单项并添加到文件菜单项中。</p>
+
+
+<pre><code>mb.append filem
+</code></pre>
+
+
+<p>将顶级菜单项添加到菜单栏控件中。</p>
+
+
+<pre><code>vbox = Gtk::VBox.new false, 2
+vbox.pack_start mb, false, false, 0
+</code></pre>
+
+
+<p>与其他套件不同，我们必须要自己处理菜单栏的布局。我们将菜单栏放入竖直盒子中。</p>
+
+
+<p><img alt="image1" src="http://zetcode.com/img/gui/rubygtk/simplemenu.png"> <br>
+<em>图片：简单的菜单</em></p>
+
+
+<h2>子菜单</h2>
+
+
+<p>最后展示如何创建一个子菜单。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# This example shows a submenu
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "Submenu"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 250, 200
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        modify_bg Gtk::STATE_NORMAL, Gdk::Color.new(6400, 6400, 6440)
+
+        mb = Gtk::MenuBar.new
+
+        filemenu = Gtk::Menu.new
+        filem = Gtk::MenuItem.new "File"
+        filem.set_submenu filemenu
+
+        mb.append filem
+
+        imenu = Gtk::Menu.new
+
+        importm = Gtk::MenuItem.new "Import"
+        importm.set_submenu imenu
+
+        inews = Gtk::MenuItem.new "Import news feed..."
+        ibookmarks = Gtk::MenuItem.new "Import bookmarks..."
+        imail = Gtk::MenuItem.new "Import mail..."
+
+        imenu.append inews
+        imenu.append ibookmarks
+        imenu.append imail
+
+        filemenu.append importm
+
+        exit = Gtk::MenuItem.new "Exit"
+        exit.signal_connect "activate" do
+            Gtk.main_quit
+        end
+
+        filemenu.append exit
+
+        vbox = Gtk::VBox.new false, 2
+        vbox.pack_start mb, false, false, 0
+
+        add vbox
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+
+
+<p>创建子菜单。</p>
+
+
+<pre><code>imenu = Gtk::Menu.new
+</code></pre>
+
+
+<p>子菜单也是Menu控件。</p>
+
+
+<pre><code>importm = Gtk::MenuItem.new "Import"
+importm.set_submenu imenu
+</code></pre>
+
+
+<p>这是属于文件顶级菜单的菜单项的子菜单。</p>
+
+
+<pre><code>inews = Gtk::MenuItem.new "Import news feed..."
+ibookmarks = Gtk::MenuItem.new "Import bookmarks..."
+imail = Gtk::MenuItem.new "Import mail..."
+
+imenu.append inews
+imenu.append ibookmarks
+imenu.append imail
+</code></pre>
+
+
+<p>子菜单有自己的菜单项。</p>
+
+
+<p><img alt="image2" src="http://zetcode.com/img/gui/rubygtk/submenu.png"><br>
+<em>图片：子菜单</em></p>
+
+
+<h2>图片菜单</h2>
+
+
+<p>接下来的例子我们将进一步探索菜单。我们将在菜单项上添加图片和快捷键（accelerators）。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# This example shows a menu with
+# images, accelerators and a separator
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "Image menu"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 250, 200
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        modify_bg Gtk::STATE_NORMAL, Gdk::Color.new(6400, 6400, 6440)
+
+        mb = Gtk::MenuBar.new
+
+        filemenu = Gtk::Menu.new
+        filem = Gtk::MenuItem.new "File"
+        filem.set_submenu filemenu
+
+        agr = Gtk::AccelGroup.new
+        add_accel_group agr
+
+        newi = Gtk::ImageMenuItem.new Gtk::Stock::NEW, agr
+        key, mod = Gtk::Accelerator.parse "N"
+        newi.add_accelerator("activate", agr, key, 
+            mod, Gtk::ACCEL_VISIBLE)
+        filemenu.append newi
+
+        openm = Gtk::ImageMenuItem.new Gtk::Stock::OPEN, agr
+        key, mod = Gtk::Accelerator.parse "O"
+        openm.add_accelerator("activate", agr, key, 
+            mod, Gtk::ACCEL_VISIBLE)
+        filemenu.append openm
+
+        sep = Gtk::SeparatorMenuItem.new
+        filemenu.append sep
+
+        exit = Gtk::ImageMenuItem.new Gtk::Stock::QUIT, agr
+        key, mod = Gtk::Accelerator.parse "Q"
+        exit.add_accelerator("activate", agr, key, 
+            mod, Gtk::ACCEL_VISIBLE)
+
+        exit.signal_connect "activate" do
+            Gtk.main_quit
+        end
+        filemenu.append exit
+
+        mb.append filem
+
+        vbox = Gtk::VBox.new false, 2
+        vbox.pack_start mb, false, false, 0
+
+        add vbox
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+
+
+<p>这个例子显示了一个有子菜单的顶级菜单，每个菜单项都有一个图像和一个快捷键。退出菜单的快捷键是激活的。</p>
+
+
+<pre><code>agr = Gtk::AccelGroup.new
+add_accel_group agr
+</code></pre>
+
+
+<p>为了使用快捷键，我们创建了一个全局的<em>AccelGroup</em>对象。它稍后被用到。</p>
+
+
+<pre><code>newi = Gtk::ImageMenuItem.new Gtk::Stock::NEW, agr
+key, mod = Gtk::Accelerator.parse "N"
+newi.add_accelerator("activate", agr, key, 
+    mod, Gtk::ACCEL_VISIBLE)
+filemenu.append newi
+</code></pre>
+
+
+<p>创建图片菜单项。图片来自图片库中。我们也创建了<em>Ctrl+N</em>快捷键。</p>
+
+
+<pre><code>sep = Gtk::SeparatorMenuItem.new
+filemenu.append sep
+</code></pre>
+
+
+<p>这行创建一条分隔线。它用于将菜单项按照逻辑分组。</p>
+
+
+<p><img alt="image3" src="http://zetcode.com/img/gui/rubygtk/imagemenu.png"><br>
+<em>图片：图片菜单</em></p>
+
+
+<p>菜单将我们使用的命令进行分组。工具条提供了一个快速访问最常用命令的方式。</p>
+
+
+<h2>简单的工具条</h2>
+
+
+<p>接下来我们创建一个简单的工具条。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# This example shows a toolbar
+# widget
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "Toolbar"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 250, 200
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        toolbar = Gtk::Toolbar.new
+        toolbar.set_toolbar_style Gtk::Toolbar::Style::ICONS
+
+        newtb = Gtk::ToolButton.new Gtk::Stock::NEW
+        opentb = Gtk::ToolButton.new Gtk::Stock::OPEN
+        savetb = Gtk::ToolButton.new Gtk::Stock::SAVE
+        sep = Gtk::SeparatorToolItem.new
+        quittb = Gtk::ToolButton.new Gtk::Stock::QUIT
+
+        toolbar.insert 0, newtb
+        toolbar.insert 1, opentb
+        toolbar.insert 2, savetb
+        toolbar.insert 3, sep
+        toolbar.insert 4, quittb
+
+        quittb.signal_connect "clicked" do
+            Gtk.main_quit
+        end
+
+        vbox = Gtk::VBox.new false, 2
+        vbox.pack_start toolbar, false, false, 0
+
+        add(vbox)
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+
+
+<p>这个例子显示了有四个工具按钮的工具栏。</p>
+
+
+<pre><code>toolbar = Gtk::Toolbar.new
+</code></pre>
+
+
+<p>创建<em>Toolbar</em>控件。</p>
+
+
+<pre><code>toolbar.set_toolbar_style Gtk::Toolbar::Style::ICONS
+</code></pre>
+
+
+<p>工具栏上我们只显示图标，没有文字。</p>
+
+
+<pre><code>newtb = Gtk::ToolButton.new Gtk::Stock::NEW
+</code></pre>
+
+
+<p>创建了一个包含图片的ToolButton控件。图片来自内建的图片库。</p>
+
+
+<pre><code>sep = Gtk::SeparatorToolItem.new
+</code></pre>
+
+
+<p>这是一个分隔符，用于将按钮按照逻辑分组。</p>
+
+
+<pre><code>toolbar.insert 0, newtb
+toolbar.insert 1, opentb
+...
+</code></pre>
+
+
+<p>将按钮添加到工具栏。</p>
+
+
+<p><img alt="image4" src="http://zetcode.com/img/gui/rubygtk/toolbar.png"><br>
+<em>图片：工具栏</em></p>
+
+
+<h2>撤消重做</h2>
+
+
+<p>接下来的例子展示了如何停用工具栏上的按钮。这是GUI编程中的常见练习。例如对于保存按钮，在大多数编辑器中如果我们将文档的修改保存到磁盘中了，那么保存按钮会被停用。这是应用程序给用户的提示，所有修改都已保存。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# This example shows how to 
+# activate/deactivate a ToolButton
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+
+    def initialize
+        super
+
+        set_title "Undo redo"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        @count = 2
+
+        init_ui
+
+        set_default_size 250, 200
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        toolbar = Gtk::Toolbar.new
+        toolbar.set_toolbar_style Gtk::Toolbar::Style::ICONS
+
+        @undo = Gtk::ToolButton.new Gtk::Stock::UNDO
+        @redo = Gtk::ToolButton.new Gtk::Stock::REDO
+        sep = Gtk::SeparatorToolItem.new
+        quit = Gtk::ToolButton.new Gtk::Stock::QUIT
+
+        toolbar.insert 0, @undo
+        toolbar.insert 1, @redo
+        toolbar.insert 2, sep
+        toolbar.insert 3, quit
+
+        @undo.signal_connect "clicked" do
+            on_undo
+        end
+
+        @redo.signal_connect "clicked" do
+            on_redo
+        end
+
+        quit.signal_connect "clicked" do
+            Gtk.main_quit
+        end
+
+        vbox = Gtk::VBox.new false, 2
+        vbox.pack_start toolbar, false, false, 0
+
+        self.add vbox
+
+    end
+
+    def on_undo
+
+        @count = @count - 1
+
+        if @count &lt;= 0
+            @undo.set_sensitive false
+            @redo.set_sensitive true
+        end
+    end
+
+
+    def on_redo
+        @count = @count + 1
+
+        if @count &gt;= 5
+            @redo.set_sensitive false
+            @undo.set_sensitive true
+        end
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+
+
+<p>我们例子从GTK资源中创建了撤消和重做按钮。每个按钮点击多次后会被禁用，变为灰色。</p>
+
+
+<pre><code>@count = 2
+</code></pre>
+
+
+<p><em>@count</em>变量用于描述按钮是禁用还是激活。</p>
+
+
+<pre><code>@undo = Gtk::ToolButton.new Gtk::Stock::UNDO
+@redo = Gtk::ToolButton.new Gtk::Stock::REDO
+</code></pre>
+
+
+<p>创建两个工具按钮，图片来自资源库。</p>
+
+
+<pre><code>@undo.signal_connect "clicked" do
+    on_undo
+end
+</code></pre>
+
+
+<p>点击undo按钮触发<em>on_undo</em>方法。</p>
+
+
+<pre><code>if @count &lt;= 0
+    @undo.set_sensitive false
+    @redo.set_sensitive true
+end
+</code></pre>
+
+
+<p>我们使用<em>set_sensitive</em>方法激活或者禁用控件。</p>
+
+
+<p><img alt="image5" src="http://zetcode.com/img/gui/rubygtk/undoredo.png"><br>
+<em>图片：撤消重做</em></p>
+
+
+<p>这章的Ruby GTK教程我们展示了如何使用菜单和工具栏。</p>
+
+
+<hr>
+
+
+<p>原文地址： <a href="http://zetcode.com/gui/rubygtk/menustoolbars/">http://zetcode.com/gui/rubygtk/menustoolbars/</a><br>
+翻译：龙昌  admin@longchangjin.cn  </p>
+
+]]></content>
+  </entry>
+  
+</feed>

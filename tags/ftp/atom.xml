@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Tag: Ftp | 龍昌博客]]></title>
+  <link href="http://www.xefan.com/tags/ftp/atom.xml" rel="self"/>
+  <link href="http://www.xefan.com/"/>
+  <updated>2014-11-04T14:10:28+08:00</updated>
+  <id>http://www.xefan.com/</id>
+  <author>
+    <name><![CDATA[龍昌]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Linux下搭建简单ftp服务器]]></title>
+    <link href="http://www.xefan.com/archives/83429.html"/>
+    <updated>2010-10-11T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/83429-Linux下搭建简单ftp服务器</id>
+    <content type="html"><![CDATA[<p>在Windows下可以使用Serv-U快速、简单的搭建一个ftp服务器，同样在Linux下也可以。Linux下优秀的ftp服务器软件有vsftpd、wu-ftpd等。这里我们用的vsftpd。</p>
+
+<p>1、<strong>下载安装</strong></p>
+
+<p>下载地址：<a href="http://vsftpd.beasts.org/">http://vsftpd.beasts.org/</a></p>
+
+<p>也可以直接使用如下命令进行安装：<br/>
+<em>sudo apt-get install vsftpd</em> 或 <em>sudo yum install vsftpd</em></p>
+
+<p>2、<strong>配置</strong></p>
+
+<p>vsftpd 主要文件清单
+/etc/sbin/vsftpd：服务文件。<br/>
+配置文件：ubuntu为 /etc/vsftpd.conf。fedora为 /etc/vsftpd/vsftpd.conf<br/>
+不能用于ftp登录的用户：ubuntu为 /etc/ftpusers。fedora为 /etc/vsftpd/ftpusers<br/>
+/var/ftp：默认的匿名用户（anonymous或ftp，无密码）登录的目录。</p>
+
+<p><strong>vsftpd.conf文件配置：</strong><br/>
+anonymous_enable=YES #允许匿名用户访问<br/>
+local_enable=YES #允许本地用户访问<br/>
+write_enable=YES #具有写权限</p>
+
+<p>允许匿名用户具有写权限（上传／创建目录），在默认配置下添加以下内容，另外还需对ftp目录具有权限：<br/>
+anon_upload_enable=YES<br/>
+anon_mkdir_write_enable=YES<br/>
+anon_world_readable_only=NO</p>
+
+<p>更改用户主目录，诺不设置，则匿名用户及ftp用户的主目录为/var/ftp，其余用户的主目录为其Linux的系统主目录。</p>
+
+<p>anon_root=/media/home/ftpserv #匿名用户主目录
+local_root=/media/home/ftpserv  #本地用户主目录</p>
+
+<p>设置欢迎信息</p>
+
+<p>dirmessage_enable=YES<br/>
+message_file=.welcome #欢迎信息的文件，不设置缺省为.welcome。<br/>
+设置好后在每个ftp用户的主目录下新建一个文件，取名为.welcome，然后在里面输入你想显示的欢迎信息。</p>
+
+<p>3、<strong>启动、停止、重启</strong></p>
+
+<p>启动：<em>sudo /etc/init.d/vsftpd start</em> 或 <em>sudo service vsftpd start</em><br/>
+停止：<em>sudo /etc/init.d/vsftpd stop</em> 或 <em>sudo service vsftpd stop</em><br/>
+重启：<em>sudo /etc/init.d/vsftpd restart</em> 或<em> sudo service vsftpd restart </em></p>
+
+<p>至此一个简单的ftp平台搭建好了，如果你需要更多的功能请查看vsftpd的帮助文档。</p>
+]]></content>
+  </entry>
+  
+</feed>

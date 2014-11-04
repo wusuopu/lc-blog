@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Tag: 单片机 | 龍昌博客]]></title>
+  <link href="http://www.xefan.com/tags/单片机/atom.xml" rel="self"/>
+  <link href="http://www.xefan.com/"/>
+  <updated>2014-11-04T14:10:28+08:00</updated>
+  <id>http://www.xefan.com/</id>
+  <author>
+    <name><![CDATA[龍昌]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[I2C串口总线驱动程序(汇编语言)]]></title>
+    <link href="http://www.xefan.com/archives/83610.html"/>
+    <updated>2011-09-17T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/83610-I2C串口总线驱动程序(汇编语言)</id>
+    <content type="html"><![CDATA[<pre><code>;I2C串口总线驱动程序
+;作者：龙昌
+;博客：http://www.xefan.com
+;请根据自己的实际情况定义SCL和SDA
+
+;延时4.7us以上，我的是12MHz的晶振，请根据自己的晶振频率相应增删NOP条数
+_NOP:   NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        RET
+
+;发送开始信号
+I2CB:   SETB SDA
+        NOP
+        SETB SCL
+        ACALL _NOP
+        CLR SDA
+        ACALL _NOP
+        CLR SCL
+        RET
+
+;发送结束信号
+I2CE:   CLR SDA
+        NOP
+        SETB SCL
+        ACALL _NOP
+        SETB SDA
+        ACALL _NOP
+        CLR SCL
+        RET
+
+;发送应答(ACK)
+MACK:   CLR SDA
+        NOP
+        SETB SCL
+        ACALL _NOP
+        CLR SCL
+        RET
+
+;发送非应答(/ACK)
+MNACK:  SETB SDA
+        NOP
+        SETB SCL
+        ACALL _NOP
+        CLR SCL
+        RET
+
+;发送一个字节数据，要发送的数据存放在A寄存器中
+SendB:  MOV R5,#8
+SendB1: RLC A
+        MOV SDA,C
+        NOP
+        SETB SCL
+        ACALL _NOP
+        CLR SCL
+        DJNZ R5,SendB1
+        ;接收ACK
+        SETB SDA
+        NOP
+        SETB SCL
+        NOP
+        NOP
+        MOV C,SDA
+        MOV ACK,C
+        CLR SCL
+        RET
+
+;接收一个字节的数据，接收完后存放在A寄存器中
+RecvB:  MOV R5,#8
+RecvB1: SETB SDA
+        NOP
+        SETB SCL
+        NOP
+        NOP
+        MOV C,SDA
+        RLC A
+        CLR SCL
+        DJNZ R5,RecvB1
+        RET
+</code></pre>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[STC89C5XX单片机看门狗说明]]></title>
+    <link href="http://www.xefan.com/archives/83599.html"/>
+    <updated>2011-09-17T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/83599-STC89C5XX单片机看门狗说明</id>
+    <content type="html"><![CDATA[<p>下面是关于STC89C5XX-51 单片机看门狗的描述</p>
+
+<p>WDT_CONTR 位置0xE1; [-] [-] [EN_WDT] [CLR_WDT] [IDLE_WDT] [PS2] [PS1] [PS0]</p>
+
+<p>EN_WDT: 看门狗允许位，置 1 启动看门狗，看门狗不能自动启动，需要设置该位后启动，一旦启动不能关闭(只能系统重新上电和看门狗复位可以关闭)</p>
+
+<p>CLR_WDT: 看门狗计数器清零位，置1 清零看门狗计数器，当计数器开始重新计数，硬件清零该位。</p>
+
+<p>IDLE_WDT: 单片机IDLE 模式看门狗允许位，当IDLE_WDT=1时，单片机在 IDLE 模式(空闲模式)依然启用看门狗</p>
+
+<p>PS2~PS0: 看门狗定时器预分频器，下表中 Prescale 表示预分频数</p>
+
+<p>PS2    PS1    PS0    Prescale
+0       0       0       2
+0       0       1       4
+0       1       0       8
+0       1       1       16
+1       0       0       32
+1       0       1       64
+1       1       0       128
+1      1      1      256</p>
+
+<p>看门狗溢出时间：(N<em>Prescale</em>32768)/晶振频率，其中 N 表示指令周期数 N=12 表示 12 时钟周期模式；N=6 表示6时钟周期模式。如N=12，晶振频率为12MHz，PS2~PS0为100时，溢出时间=(12<em>32</em>32768)/12=1048576us，差不多是1s。</p>
+
+<p>例如：给WDT_CONTR写入0×34，即是激活看门狗，同时预分频数设为32。喂狗过程也是一样的。</p>
+
+<p>顺便说一下ATMEL-51单片机的看门狗</p>
+
+<p>下面是关于ATMEL-51单片机看门狗的描述</p>
+
+<p>【看门狗计数器】(watchdog timer)是一个14位的计数器，它以机器周期（晶振频率/12）增加，当计数值计满(16383/0×3FFF)了就使单片机软复位；当启动了【看门狗计数器】之后，我们需要在它计数没有满之前复位计数器强制它不能够溢出，这个过程称作喂狗。</p>
+
+<p>一般设置是给 WDTRST 先写入0×1E 再写入0xE1激活看门狗；喂狗过程也是一样的，给 WDTRST 先写入0×1E 再写入0xE1。</p>
+]]></content>
+  </entry>
+  
+</feed>

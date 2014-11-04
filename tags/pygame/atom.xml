@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Tag: Pygame | 龍昌博客]]></title>
+  <link href="http://www.xefan.com/tags/pygame/atom.xml" rel="self"/>
+  <link href="http://www.xefan.com/"/>
+  <updated>2014-11-04T14:10:28+08:00</updated>
+  <id>http://www.xefan.com/</id>
+  <author>
+    <name><![CDATA[龍昌]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Pygame学习笔记11：手柄]]></title>
+    <link href="http://www.xefan.com/archives/83605.html"/>
+    <updated>2011-09-17T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/83605-Pygame学习笔记11：手柄</id>
+    <content type="html"><![CDATA[<p><strong>手柄</strong></p>
+
+<p>joystick模块管理计算机上的手柄设备（可能多于一个）。手柄设备包括轨迹球、类似电视游戏机的游戏手柄，允许使用多个按钮和’hats’。</p>
+
+<p>pygame.joystick.get_count函数可以获得系统中手柄的个数。比如：</p>
+
+<p><em>count = pygame.joystick.get_count()</em></p>
+
+<p>如果系统没有手柄，数量是0。</p>
+
+<p>如果系统有手柄，可以通过pygame.joystick.Joystick来创建手柄对象：</p>
+
+<p><em>j = pygame.joystick.Joystick(0)</em></p>
+
+<p>其中的整数是手柄的id，取值范围从0到count-1。</p>
+
+<p>创建对象后，需要先初始化</p>
+
+<p><em>j.init()</em></p>
+
+<p>初始化后，事件队列中就可以收到来自手柄的事件了。事件类型分为：</p>
+
+<pre><code>JOYAXISMOTION joy, axis, value
+JOYBALLMOTION joy, ball, rel
+JOYHATMOTION joy, hat, value
+JOYBUTTONUP joy, button
+JOYBUTTONDOWN joy, button
+</code></pre>
+
+<p>要注意pygame.JOYAXISMOTION事件的value值在-1.0和1.0之间。值0.0表示轴在正中间。游戏手柄设备一般只有-1、0、1三个值，而没有中间的值。而老的模拟手柄并不一定能完全达到-1到1的区间，中间的值也可能是0附近的一个值。模拟手柄通常会有一点噪声，从而会产生很多很小很快的运动事件。当轨迹球滚动时，pygame.JOYBALLMOTION事件会发生。它会报告轨迹球总共滚动了多少距离。当按钮被按下和释放时，会产生pygame.JOYBUTTONDOWN和pygame.JOYBUTTONUP事件。当hat的位置改变时，pygame.JOYHATMOTION事件会产生。事件的位置属性包括一对值，它们是-1或者0或者1。位置(0,0)表示hat在正中间。</p>
+
+<p>要获得手柄的轴数可以使用</p>
+
+<p><em>j.get_numaxes()</em></p>
+
+<p>要获得手柄上轨迹球的个数，可以使用</p>
+
+<p><em>j.get_numballs()</em></p>
+
+<p>要获得手柄上的按键数，可以使用</p>
+
+<p><em>j.get_numbuttons()</em></p>
+
+<p>要获得手柄上hat控制器的个数，可以使用</p>
+
+<p><em>j.get_numhats()</em></p>
+
+<p>除了通过事件获得手柄的输入外，也可以直接查询手柄的状态。通过</p>
+
+<p><em>j.get_axis(axis_number)</em></p>
+
+<p>可以获得某个轴的位置。通过</p>
+
+<p><em>j.get_ball(ball_number)</em></p>
+
+<p>可以获得某个轨迹球的相对位置。通过</p>
+
+<p><em>j.get_button(button)</em></p>
+
+<p>可以获得某个按键的状态。通过</p>
+
+<p><em>j.get_hat(hat_number)</em></p>
+
+<p>可以获得hat控制器的当前位置。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Pygame学习笔记10：鼠标]]></title>
+    <link href="http://www.xefan.com/archives/83603.html"/>
+    <updated>2011-09-17T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/83603-Pygame学习笔记10：鼠标</id>
+    <content type="html"><![CDATA[<p><strong>鼠标</strong></p>
+
+<p>当显示模式设置后，事件队列就会开始收到鼠标事件。当按下和释放鼠标的按键时，会产生 pygame.MOUSEBUTTONDOWN和pygame.MOUSEBUTTONUP事件。这些事件包含一个button属性表示哪些键被按下。滚动鼠标滚轮会产生pygame.MOUSEBUTTONDOWN事件。当向上滚动滚轮时button的值是4，向下滚动时button的值是5。除此外还有一个pos属性，表示按键按下或释放时鼠标指针的位置。当移动鼠标时，会产生pygame.MOUSEMOTION事件。鼠标移动事件会被分解成一组较小的精确的移动事件。当鼠标移动时，会有很多事件被放在队列中。鼠标移动事件没有被正确的清除，常常是事件队列被填满的主要原因。鼠标移动事件包括一个buttons属性，表示鼠标移动时，鼠标键的状态。还有一个pos属性，表示鼠标指针的位置。还有一个rel属性表示当前位置相对于上一次事件发生时指针位置的偏移量。</p>
+
+<p>除了可以通过事件来接受鼠标输入外，还可以直接调用函数检查鼠标的状态。pygame.mouse.get_pressed可以获得当前所有鼠标按键的状态。pygame.mouse.get_pos获得当前鼠标的位置。pygame.mouse.get_rel获得当前鼠标位置相对于前一个位置的位移。</p>
+
+<p>用pygame.mouse.set_visible可以隐藏鼠标的指针。如果鼠标指针被隐藏，输入被当前的display捕获，鼠标会进入虚拟输入模式，这种模式下鼠标的相对位移不会收到屏幕边界的影响。</p>
+
+<p>通过pygame.mouse.set_cursor可以设置鼠标指针的形状。</p>
+
+<p><em>pygame.mouse.set_cursor(size, hotspot, xormasks, andmasks): return None</em></p>
+
+<p>当鼠标指针可见时，它会显示为给定的位域数组指定的黑白色的位图。size是包含指针高度和宽度的列表。hotspot是表示指针的热点位置的列表。xormasks是序列包含指针异或数据位域的序列，andmask是一组包含指针位域数据的序列。宽度必须是8的倍数，位域数组必须是size给定的正确的大小。</p>
+
+<p>pygame.cursors模块包括了几个内置的指针形状。可以这样使用</p>
+
+<p><em>pygame.mouse.set_cursor(*pygame.cursors.arrow)</em></p>
+
+<p>可以使用的指针形状有：</p>
+
+<p>pygame.cursors.arrow<br/>
+pygame.cursors.diamond<br/>
+pygame.cursors.broken_x<br/>
+pygame.cursors.tri_left<br/>
+pygame.cursors.tri_right</p>
+
+<p>偶自己写的一个扫雷小游戏，全鼠标操作的。下载地址：<a href="http://app.xefan.com/小游戏/扫雷/" target="_blank"><a href="http://app.xefan.com/%E5%B0%8F%E6%B8%B8%E6%88%8F/%E6%89%AB%E9%9B%B7/">http://app.xefan.com/%E5%B0%8F%E6%B8%B8%E6%88%8F/%E6%89%AB%E9%9B%B7/</a></a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Pygame学习笔记9：键盘]]></title>
+    <link href="http://www.xefan.com/archives/83601.html"/>
+    <updated>2011-09-17T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/83601-Pygame学习笔记9：键盘</id>
+    <content type="html"><![CDATA[<p><strong>键盘</strong></p>
+
+<p>当键盘的按键被按下时，事件队列会得到pygame.KEYDOWN和pygame.KEYUP事件。这两个事件都有一个叫做key的整型属性表示键盘上的键。pygame.KEYDOWN事件还有一个额外的属性unicode，表示键盘输入的转后对应的字符。这个字符会考虑shift键和其它组合键的状态。</p>
+
+<p>有很多键盘相关的常量，他们表示键盘上的键。下面是所有键盘常量的列表：</p>
+
+<pre><code>KeyASCII      ASCII   Common Name
+K_BACKSPACE   \b      backspace
+K_TAB         \t      tab
+K_CLEAR               clear
+K_RETURN      \r      return
+K_PAUSE               pause
+K_ESCAPE      ^[      escape
+K_SPACE               space
+K_EXCLAIM     !       exclaim
+K_QUOTEDBL    "       quotedbl
+K_HASH        #       hash
+K_DOLLAR      $       dollar
+K_AMPERSAND   &amp;amp;       ampersand
+K_QUOTE               quote
+K_LEFTPAREN   (       left parenthesis
+K_RIGHTPAREN  )       right parenthesis
+K_ASTERISK    *       asterisk
+K_PLUS        +       plus sign
+K_COMMA       ,       comma
+K_MINUS       -       minus sign
+K_PERIOD      .       period
+K_SLASH       /       forward slash
+K_0           0       0
+K_1           1       1
+K_2           2       2
+K_3           3       3
+K_4           4       4
+K_5           5       5
+K_6           6       6
+K_7           7       7
+K_8           8       8
+K_9           9       9
+K_COLON       :       colon
+K_SEMICOLON   ;       semicolon
+K_LESS        &amp;lt;       less-than sign
+K_EQUALS      =       equals sign
+K_GREATER     &amp;gt;       greater-than sign
+K_QUESTION    ?       question mark
+K_AT          @       at
+K_LEFTBRACKET [       left bracket
+K_BACKSLASH   \       backslash
+K_RIGHTBRACKET ]      right bracket
+K_CARET       ^       caret
+K_UNDERSCORE  _       underscore
+K_BACKQUOTE   `       grave
+K_a           a       a
+K_b           b       b
+K_c           c       c
+K_d           d       d
+K_e           e       e
+K_f           f       f
+K_g           g       g
+K_h           h       h
+K_i           i       i
+K_j           j       j
+K_k           k       k
+K_l           l       l
+K_m           m       m
+K_n           n       n
+K_o           o       o
+K_p           p       p
+K_q           q       q
+K_r           r       r
+K_s           s       s
+K_t           t       t
+K_u           u       u
+K_v           v       v
+K_w           w       w
+K_x           x       x
+K_y           y       y
+K_z           z       z
+K_DELETE              delete
+K_KP0                 keypad 0
+K_KP1                 keypad 1
+K_KP2                 keypad 2
+K_KP3                 keypad 3
+K_KP4                 keypad 4
+K_KP5                 keypad 5
+K_KP6                 keypad 6
+K_KP7                 keypad 7
+K_KP8                 keypad 8
+K_KP9                 keypad 9
+K_KP_PERIOD   .       keypad period
+K_KP_DIVIDE   /       keypad divide
+K_KP_MULTIPLY *       keypad multiply
+K_KP_MINUS    -       keypad minus
+K_KP_PLUS     +       keypad plus
+K_KP_ENTER    \r      keypad enter
+K_KP_EQUALS   =       keypad equals
+K_UP                  up arrow
+K_DOWN                down arrow
+K_RIGHT               right arrow
+K_LEFT                left arrow
+K_INSERT              insert
+K_HOME                home
+K_END                 end
+K_PAGEUP              page up
+K_PAGEDOWN            page down
+K_F1                  F1
+K_F2                  F2
+K_F3                  F3
+K_F4                  F4
+K_F5                  F5
+K_F6                  F6
+K_F7                  F7
+K_F8                  F8
+K_F9                  F9
+K_F10                 F10
+K_F11                 F11
+K_F12                 F12
+K_F13                 F13
+K_F14                 F14
+K_F15                 F15
+K_NUMLOCK             numlock
+K_CAPSLOCK            capslock
+K_SCROLLOCK           scrollock
+K_RSHIFT              right shift
+K_LSHIFT              left shift
+K_RCTRL               right ctrl
+K_LCTRL               left ctrl
+K_RALT                right alt
+K_LALT                left alt
+K_RMETA               right meta
+K_LMETA               left meta
+K_LSUPER              left windows key
+K_RSUPER              right windows key
+K_MODE                mode shift
+K_HELP                help
+K_PRINT               print screen
+K_SYSREQ              sysrq
+K_BREAK               break
+K_MENU                menu
+K_POWER               power
+K_EURO                euro
+</code></pre>
+
+<p>还有一个mod属性表示一组修饰键的状态，可以通过位或把它们组合起来：</p>
+
+<p>KMOD_NONE, KMOD_LSHIFT, KMOD_RSHIFT, KMOD_SHIFT, KMOD_CAPS,<br/>
+KMOD_LCTRL, KMOD_RCTRL, KMOD_CTRL, KMOD_LALT, KMOD_RALT,<br/>
+KMOD_ALT, KMOD_LMETA, KMOD_RMETA, KMOD_META, KMOD_NUM, KMOD_MODE</p>
+
+<p>除了通过事件得到键盘输入以外，也可以直接访问键盘。通过pygame.key.get_pressed可以获得当前所有键的状态，pygame.key.get_mods可以获得所有修饰键的状态，比如：</p>
+
+<pre><code class="python">keys = pygame.key.get_pressed()
+mods = pygame.key.get_mods()
+if keys[K_F8] and mods[KMOD_ALT]: #if Alt-F8 is pressed
+    pass
+</code></pre>
+
+<p>key模块下还有很多函数：</p>
+
+<p>key.get_focused —— 当前激活的pygame窗口<br/>
+key.get_pressed —— 获得当前所有键的状态<br/>
+key.get_mods —— 按下的组合键（Alt, Ctrl, Shift）<br/>
+key.set_mods —— 你也可以模拟按下组合键的效果（KMOD_ALT, KMOD_CTRL, KMOD_SHIFT）<br/>
+key.set_repeat —— 设定允许pygame接受重复按键<br/>
+key.name —— 接受键值返回键名</p>
+
+<p>学完键盘模块后偶自己写了一个贪吃蛇的小游戏，下载地址：<a href="http://app.xefan.com/小游戏/贪吃蛇/" target="_blank"><a href="http://app.xefan.com/%E5%B0%8F%E6%B8%B8%E6%88%8F/%E8%B4%AA%E5%90%83%E8%9B%87/">http://app.xefan.com/%E5%B0%8F%E6%B8%B8%E6%88%8F/%E8%B4%AA%E5%90%83%E8%9B%87/</a></a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Pygame学习笔记8：视频]]></title>
+    <link href="http://www.xefan.com/archives/83597.html"/>
+    <updated>2011-09-17T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/83597-Pygame学习笔记8：视频</id>
+    <content type="html"><![CDATA[<p><strong>视频</strong></p>
+
+<p>要在游戏中播放片头动画、过场动画等视频画面，可以使用pygame.movie模块。</p>
+
+<p>要播放视频中的音乐，pygame.movie模块需要对音频接口的完全控制，不能初始化mixer模块。因此要这样完成初始化</p>
+
+<p><em>pygame.init()</em>
+<em> pygame.mixer.quit()</em></p>
+
+<p>或者只初始化</p>
+
+<p><em>pygame.display.init()</em></p>
+
+<p>用movie = pygame.movie.Movie(’filename’)指定文件名载入视频。视频的格式可以为mpeg1。视频文件不会马上全部载入内存，而是在播放的时候一点一点的载入内存。</p>
+
+<p>用movie.set_display(pygame.display.set_mode((640,480)))指定播放的surface。</p>
+
+<p>用movie.set_volume(value)指定播放的音量。音量的值value的取值范围为0.0到1.0。</p>
+
+<p>用movie.play()播放视频。这个函数会立即返回，视频在后台播放。这个函数可以带一个参数loops，指定重复次数。</p>
+
+<p>正在播放的视频可以用movie.stop()停止播放。还可以用movie.pause()暂停播放。可以使用movie.skip(seconds)使视频前进seconds秒钟。</p>
+
+<p>如有不懂的可以参考Pygame的官方例子，在Python安装目录下的\lib\site-packages\pygame\examples\movieplayer.py文件。</p>
+
+<p>不过偶用官方的这个例子在Linux下播放mpeg1文件一切正常，但是在Windows下却只有声音没有画面，偶也不知道是何故。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Pygame学习笔记7：音频]]></title>
+    <link href="http://www.xefan.com/archives/83596.html"/>
+    <updated>2011-08-20T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/83596-Pygame学习笔记7：音频</id>
+    <content type="html"><![CDATA[<p><strong>音乐</strong></p>
+
+<p>要在游戏中播放背景音乐，可以使用pygame.mixer.music模块。</p>
+
+<p>使用pygame.init()进行全部模块的初始化，或者只初始化音频部分：pygame.mixer.init()</p>
+
+<p>使用文件名作为参数载入音乐</p>
+
+<p>pygame.mixer.music.load(&lsquo;music.ogg&rsquo;)</p>
+
+<p>音乐可以是ogg、mp3等格式。载入的音乐不会全部放到内容中，而是以流的形式播放的，即在播放的时候才会一点点从文件中读取。</p>
+
+<p>使用pygame.mixer.music.play()播放载入的音乐。该函数立即返回，音乐播放在后台进行。play方法还可以使用两个参数</p>
+
+<p>pygame.mixer.music.play(loops=0, start=0.0)</p>
+
+<p>loops和start分别代表重复的次数和开始播放的位置。</p>
+
+<p>播放到一半可以使用pygame.mixer.music.stop()停止播放，还可以用pygame.mixer.music.pause()暂停播放。暂停播放的音乐可以用pygame.mixer.music.unpause()</p>
+
+<p>来继续播放。使用pygame.mixer.music.fadeout(time)来进行淡出，在time毫秒的时间内音量由初始值渐变为0，最后停止播放。</p>
+
+<p>可以用pygame.mixer.music.set_volume(value)来设置播放的音量，音量value的范围为0.0到1.0。</p>
+
+<p>要判断是否在播放音乐，可以使用pygame.mixer.music.get_busy()，返回1为正在播放。在音乐播放完成时，可以用事件的方式通知用户程序。使用pygame.mixer.music.set_endevent(pygame.USEREVENT + 1)，来设置当音乐播放完成时发送pygame.USEREVENT+1事件给用户程序。</p>
+
+<p>当前正有音乐在播放时，可以使用pygame.mixer.music.queue(filename)来指定下一个要播放的音乐文件，当前的音乐播放完成后自动开始播放指定的下一个。一次只能指定一个等待播放的音乐文件。</p>
+
+<p>注意：同时只能播放一个音乐文件。音乐文件可以很大，系统以流的形式播放。</p>
+
+<p><strong>音效</strong></p>
+
+<p>要在游戏中播放碰撞、爆炸、语音等音效，需要使用pygame.mixer模块。这个模块支持同时播放多个音效文件，多个文件在多个不同的通道Channel中播放，一个通道一次只能播放一个音效文件。</p>
+
+<p>使用pygame.init()进行全部模块初始化，或者只初始化音频部分pygame.mixer.init()可以这样查看总共有多少个通道pygame.mixer.get_num_channels()可以使用channel = pygame.mixer.Channel(i)取得第i个通道。或者使用channel = pygame.mixer.find_channel()</p>
+
+<p>自动取得一个空闲的通道（没有音效正在播放的通道）。</p>
+
+<p>使用sound = pygame.mixer.Sound(&lsquo;KDE_Startup_2.ogg)指定文件名载入一个音频文件，并创建一个Sound对象。音频文件可以是wav,ogg等格式。音频文件的内容会被全部载入到内存中。</p>
+
+<p>使用channel.play(sound)在一个通道中播放一个音效。或者使用sound.play()自动找一个空闲的通道播放音效。</p>
+
+<p>正在播放的音效可以使用sound.stop()停止音效sound的播放。或者用channel.stop()停止在通道channel中播放的音效。正在播放音效的通道还可以用channel.pause()暂停通道中的音效。暂停的音效还可以用channel.unpause()继续播放。使用channel.fadeout(time)来进行淡出，在time毫秒的时间内音量由初始值渐变为0，最后停止播放。对于一个通道可以用channel.get_busy()检查它是否正在播放音效。</p>
+
+<p>当一个通道中的音效播放完成时，可以通过事件通知给用户程序。使用channel.set_endevent(pygame.USEREVENT + 1)来设置当音乐播放完成时发送pygame.USEREVENT+1事件给用户程序。</p>
+
+<p>使用channel.queue(sound) 为正在播放音效的通道指定下一个要播放的音效。当前的音效播放完成后，下一个音效会自动播放。一个通道只能有一个等待播放的音效。</p>
+
+<p>使用channel.set_volume(value)来设置通道中播放的音效的音量。使用sound.set_volume(value)来设置单个音效的音量。两者的取值范围都是0.0到1.0。音效播放的实际音量是通道音量和音效音量的乘积，比如通道音量0.5，音效音量0.6，则实际播放的音量为0.3。</p>
+
+<p>注意：音效和音乐的区别是：音效要整个文件载入到Sound对象中才能播放，而音乐不用完全载入，而以流的方式播放。</p>
+]]></content>
+  </entry>
+  
+</feed>

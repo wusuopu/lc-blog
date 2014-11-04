@@ -1,0 +1,689 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: 数据库 | 龍昌博客]]></title>
+  <link href="http://www.xefan.com/categories/数据库/atom.xml" rel="self"/>
+  <link href="http://www.xefan.com/"/>
+  <updated>2014-11-04T14:10:28+08:00</updated>
+  <id>http://www.xefan.com/</id>
+  <author>
+    <name><![CDATA[龍昌]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Redis使用笔记]]></title>
+    <link href="http://www.xefan.com/archives/84110.html"/>
+    <updated>2014-06-21T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84110-Redis使用笔记</id>
+    <content type="html"><![CDATA[<p>Redis是一个键值型数据库，之前花了些时间体验了一下Redis，感觉还是很不错的。而且Redis学习起来也很容易，差不多花几个小时应该就能入门了。当时我是看的<a href="https://github.com/karlseguin/the-little-redis-book">《the little redis book》</a>，初学者可以看看。</p>
+
+
+<h2>安装</h2>
+
+
+<p>下载软件包： http://redis.io/download</p>
+
+
+<p>首先运行服务器程序：</p>
+
+
+<pre><code>$ redis-server
+</code></pre>
+
+
+<p>程序默认是监听6379端口。</p>
+
+
+<p>然后再运行客户端程序：</p>
+
+
+<pre><code>$ redis-cli
+</code></pre>
+
+
+<h2>基本数据类型</h2>
+
+
+<p>运行客户端程序连接上Redis服务之后，所有的操作都可以通过该命令行交互完成。</p>
+
+
+<p>Redis有5种不同的数据类型：字符串、散列表、列表、集合、有序集合。所有的数据在Redis中都是以键值对的形式保存的。</p>
+
+
+<p>以下介绍这几种类型数据的基本操作。</p>
+
+
+<h3>String</h3>
+
+
+<p>设置一个键的值为字符串：  </p>
+
+
+<pre><code>set &lt;key&gt; &lt;value&gt;
+</code></pre>
+
+
+<p>获取该键的值：  </p>
+
+
+<pre><code>get &lt;key&gt;
+</code></pre>
+
+
+<p>字符串相关的命令：  </p>
+
+
+<pre><code>help @string
+</code></pre>
+
+
+<h3>Hashes</h3>
+
+
+<p>设置一个散列值：  </p>
+
+
+<pre><code>hset &lt;key&gt; &lt;k&gt; &lt;v&gt;
+</code></pre>
+
+
+<p>获取该键的值：  </p>
+
+
+<pre><code>hget &lt;key&gt; &lt;k&gt;  
+hgetall &lt;key&gt;
+</code></pre>
+
+
+<p>散列相关的命令：  </p>
+
+
+<pre><code>help @hash
+</code></pre>
+
+
+<h3>Lists</h3>
+
+
+<p>添加值：  </p>
+
+
+<pre><code>lpush &lt;key&gt; &lt;v&gt;
+</code></pre>
+
+
+<p>移除值：  </p>
+
+
+<pre><code>lpop &lt;key&gt;  
+help @list
+</code></pre>
+
+
+<h3>Set</h3>
+
+
+<p>添加值：  </p>
+
+
+<pre><code>sadd &lt;key&gt; &lt;v&gt;[ &lt;v&gt; ..]  
+help set
+</code></pre>
+
+
+<h3>Sorted Sets</h3>
+
+
+<p>类似于集合(Set)，但是提供了排序（sorting）和秩划分（ranking）的功能。</p>
+
+
+<p>添加值：  </p>
+
+
+<pre><code>zadd key score member [score] [member]   
+help @sorted_set
+</code></pre>
+
+
+<h2>其他</h2>
+
+
+<h3>有效期</h3>
+
+
+<p>设置某个值在seconds秒后到期：  </p>
+
+
+<pre><code>expire &lt;key&gt; seconds
+</code></pre>
+
+
+<p>设置某个值在time时刻到期：  </p>
+
+
+<pre><code>expireat &lt;key&gt; time
+</code></pre>
+
+
+<p>查看到期时间：  </p>
+
+
+<pre><code>ttl &lt;key&gt;
+</code></pre>
+
+
+<p>清除到期时间：  </p>
+
+
+<pre><code>persist &lt;key&gt;
+</code></pre>
+
+
+<h3>事务（Transactions）</h3>
+
+
+<pre><code>multi  
+do something  
+exec
+</code></pre>
+
+
+<p>multi和exec之间的命令作为原子操作。</p>
+
+
+<p>在multi之前调用watch可监听值的变化，若该值被其他客户端修改，事务将会运行失败。</p>
+
+
+<h3>杂项</h3>
+
+
+<p>选择数据库：</p>
+
+
+<pre><code>select index
+</code></pre>
+
+
+<p>清除当前数据库所属key:</p>
+
+
+<pre><code>flushdb
+</code></pre>
+
+
+<p>清除所有数据库所属key:</p>
+
+
+<pre><code>flushall
+</code></pre>
+
+
+<p>查看key所储存的值的类型：</p>
+
+
+<pre><code>type key
+</code></pre>
+
+
+<p>Redis相关的命令手册： http://redis.io/commands</p>
+
+
+<h2>在应用程序中使用Redis</h2>
+
+
+<p>Redis提供了多种语言的绑定，以Ruby为例：</p>
+
+
+<pre><code>require 'redis'
+r = Redis.new
+r.set 'key', 1234
+puts r.get 'key'
+puts r.keys
+</code></pre>
+
+
+<p>输出结果应该为：</p>
+
+
+<pre><code>"1234"
+["key"]
+</code></pre>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Mongoengine教程(5)——信号]]></title>
+    <link href="http://www.xefan.com/archives/84076.html"/>
+    <updated>2014-04-06T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84076-mongoengine教程(5)——信号</id>
+    <content type="html"><![CDATA[<p>MongoEngine在进行数据操作时会发出一些信号，我们可以连接这些信号进行一些额外的操作。注意：要在MongoEngine中使用信号，需要安装 <em>blinker</em> 这个库。  </p>
+
+
+<pre><code>$ pip install blinker
+</code></pre>
+
+
+<p>MongoEngine提供的信号如下：  </p>
+
+
+<ul>
+<li>pre_init: 在创建一个新的 Document 或者 EmbeddedDocument 实例对象之后，并且对象初始化之前调用。  </li>
+<li>post_init:在 Document 或者 EmbeddedDocument 实例对象初始化完成之后调用。  </li>
+<li>pre_save:在 save 方法执行之前调用。  </li>
+<li>pre_save_post_validation:在数据检验完成之后，数据保存之前调用。  </li>
+<li>post_save:在数据保存完成之后调用。  </li>
+<li>pre_delete:在 delete 方法执行之前调用。  </li>
+<li>post_delete:在记录成功删除之后调用。  </li>
+<li>pre_bulk_insert:在数据检验之后，数据插入之前调用。  </li>
+<li>post_bulk_insert:在数据成功插入之后调用。</li>
+</ul>
+
+
+<h2>事件连接</h2>
+
+
+<p>使用 signals 将信号与回调函数进行连接。</p>
+
+
+<pre><code>from mongoengine import *
+from mongoengine import signals
+
+class Author(Document):
+    name = StringField()
+
+    @classmethod
+    def pre_save(cls, sender, document, **kwargs):
+        print("Pre Save: %s" % document.name)
+
+    @classmethod
+    def post_save(cls, sender, document, **kwargs):
+        print("Post Save: %s" % document.name)
+        if 'created' in kwargs:
+            if kwargs['created']:
+                print("Created")
+            else:
+                print("Updated")
+
+signals.pre_save.connect(Author.pre_save, sender=Author)
+signals.post_save.connect(Author.post_save, sender=Author)
+</code></pre>
+
+
+<p>注意：对于 RefereneField 的<em>reverse_delete_rules</em>参数不会触发信号。</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Mongoengine教程(4)——文件存储]]></title>
+    <link href="http://www.xefan.com/archives/84072.html"/>
+    <updated>2014-04-05T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84072-mongoengine教程(4)——文件存储</id>
+    <content type="html"><![CDATA[<p>MongoDB的GridFS支持直接在数据库中存储文件。要在MongoEngine中使用GridFS，只要使用 FileField 对象即可。以下是一个例子：</p>
+
+
+<pre><code>class Animal(Document):
+    genus = StringField()
+    family = StringField()
+    photo = FileField()
+
+marmot = Animal(genus='Marmota', family='Sciuridae')
+
+marmot_photo = open('gtk.png', 'rb')
+marmot.photo.put(marmot_photo, content_type = 'image/png')
+marmot.save()
+</code></pre>
+
+
+<p>这个例子将 gtk.png 这个图片存入了数据库中。<br>
+文件的读取也很简单：</p>
+
+
+<pre><code>marmot = Animal.objects(genus='Marmota').first()
+photo = marmot.photo.read()
+content_type = marmot.photo.content_type
+</code></pre>
+
+
+<p>FileField不仅可以存储文件，还可以用来存储数据流。只是操作上略微不同。</p>
+
+
+<p>要存储数据流，首先先创建一个新的文件，然后再往里面写入数据。</p>
+
+
+<pre><code>marmot.photo.new_file()
+marmot.photo.write('some_image_data')
+marmot.photo.write('some_more_image_data')
+marmot.photo.close()
+marmot.save()
+</code></pre>
+
+
+<p>如果要删除存储在数据库中的文件，只需要调用该文件对象的 delete 方法：</p>
+
+
+<pre><code>marmot.photo.delete()
+</code></pre>
+
+
+<p>注意：一条文档记录中的FileField字段只保存了对GridFS集合中该文件的ID引用。这意味着如果该文档被删除了，对用的文件不会被删除。因此在删除这类文档时需要小心，以免出现孤立文件。</p>
+
+
+<p>对于已存储的文件可以进行替换修改：</p>
+
+
+<pre><code>another_marmot = open('python.png', 'rb')
+marmot.photo.replace(another_marmot, content_type='image/png')
+</code></pre>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Mongoengine教程(3)——数据查询]]></title>
+    <link href="http://www.xefan.com/archives/84069.html"/>
+    <updated>2014-04-05T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84069-mongoengine教程(3)——数据查询</id>
+    <content type="html"><![CDATA[<p>与Django一样，Document类都有一个 objects 属性。它用于将类与数据库关联起来。objects属性是一个QuerySetManager类型的对象，它的操作会返回一个QuerySet类型的对象。可以通过对QuerySet对象的迭代获取数据库中的数据。</p>
+
+
+<pre><code>class User(Document):
+    name = StringField()
+    country = StringField()
+
+class Paper(Document):
+    content = StringField()
+    author = ReferenceField(User)
+</code></pre>
+
+
+<h2>查询过滤</h2>
+
+
+<p>可以在查询是指定过滤条件以获取想要的结果。例如想要查询英国的用户：</p>
+
+
+<pre><code>uk_users = User.objects(country='uk')
+</code></pre>
+
+
+<p>与Django类似，要查询引用的对象只需要使用双下划线即可。例如想要查询英国用户的论文：</p>
+
+
+<pre><code>uk_papers = Paper.objects(author__country='uk')
+</code></pre>
+
+
+<h2>查询操作</h2>
+
+
+<p>与Django类似，MongoEngine同样也提供了一些条件语句。</p>
+
+
+<ul>
+<li>ne - 不相等</li>
+<li>lt - 小于</li>
+<li>lte - 小于等于</li>
+<li>gt - 大于</li>
+<li>gte - 大于等于</li>
+<li>not - 取反</li>
+<li>in - 值在列表中</li>
+<li>nin - 值不在列表中</li>
+<li>mod - 取模</li>
+<li>all - 与列表的值相同</li>
+<li>size - 数组的大小</li>
+<li>exists - 字段的值存在</li>
+</ul>
+
+
+<p>例如查询年龄小于等于18岁的用户：</p>
+
+
+<pre><code>young_users = Users.objects(age__lte=18)
+</code></pre>
+
+
+<p>对于不同类型的数据提供了不同的条件语句。</p>
+
+
+<h3>查询结果个数限制</h3>
+
+
+<p>跟传统的ORM一样，MongoEngine也可以限制查询结果的个数。一种方法是在QuerySet对象上调用limit和skip方法；另一种方法是使用数组的分片的语法。例如：</p>
+
+
+<pre><code>users = User.objects[10:15]
+users = User.objects.skip(10).limit(5)
+</code></pre>
+
+
+<h2>聚合操作</h2>
+
+
+<p>MongoEngine提供了一些数据库的聚合操作。</p>
+
+
+<p>统计结果个数即可以使用QuerySet的count方法，也可以使用Python风格的方法：</p>
+
+
+<pre><code>num_users = len(User.objects)
+num_users = User.objects.count()
+</code></pre>
+
+
+<p>其他的一些聚合操作。<br>
+求和：</p>
+
+
+<pre><code>yearly_expense = Employee.objects.sum('salary')
+</code></pre>
+
+
+<p>求平均数：</p>
+
+
+<pre><code>mean_age = User.objects.average('age')
+</code></pre>
+
+
+<h2>高级查询</h2>
+
+
+<p>有时需要将多个条件进行组合，前面提到的方法就不能满足需求了。这时可以使用MongoEngine的Q类。它可以将多个查询条件进行 &amp;(与) 和 |(或) 操作。</p>
+
+
+<p>例如下面的语句是查询所有年龄大于等于18岁的英国用户，或者所有年龄大于等于20岁的用户。</p>
+
+
+<pre><code>User.objects((Q(country='uk') &amp; Q(age__gte=18)) | Q(age__gte=20))
+</code></pre>
+
+
+<h2>在服务器端执行javascript代码</h2>
+
+
+<p>通过MongoEngine QuerySet对象的 exec_js 方法可以将javascript代码作为字符串发送给服务器端执行，然后返回执行的结果。</p>
+
+
+<p>例如查询该数据库都有那些集合：</p>
+
+
+<pre><code>User.objects.exec_js("db.getCollectionNames()")
+</code></pre>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Mongoengine教程(2)——文档模式]]></title>
+    <link href="http://www.xefan.com/archives/84066.html"/>
+    <updated>2014-04-03T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/84066-mongoengine教程(2)——文档模式</id>
+    <content type="html"><![CDATA[<p>在MongoDB中一个文档(document)与关系型数据库中的一行(row)相似；文档保存在集合(collection)中，行保存在表(table)中。</p>
+
+
+<h2>定义文档的模式</h2>
+
+
+<p>与django类似，要定义一个文档模式只需要创建一个类继承自 Document，并添加一些 Field 对象。</p>
+
+
+<pre><code>from mongoengine import *
+import datetime
+
+class Page(Document):
+    title = StringField(max_length=200, required=True)
+    date_modified = DateTimeField(default=datetime.datetime.now)
+</code></pre>
+
+
+<p>如上定义了一个文档模式具有 title和date_modified 两个字段。</p>
+
+
+<p>同时MongoDB本身就是无模式的，因此我们还可以创建动态的文档模式。它可以在添加数据时为不同的数据设置不同的字段。</p>
+
+
+<pre><code>class Page(DynamicDocument):
+    title = StringField(max_length=200, required=True)
+</code></pre>
+
+
+<p>添加数据：</p>
+
+
+<pre><code>page = Page(title='Using MongoEngine')
+page.tags = ['mongodb', 'mongoengine']
+page.save()
+</code></pre>
+
+
+<h2>文档字段</h2>
+
+
+<p>文档字段(Field)不是必需的，但是使用它来进行数据验证、设置默认值等操作会比较方便。</p>
+
+
+<p>MongoEngine提供了如下这些类型的Field:</p>
+
+
+<ul>
+<li>BinaryField  </li>
+<li>BooleanField  </li>
+<li>ComplexDateTimeField  </li>
+<li>DateTimeField  </li>
+<li>DecimalField  </li>
+<li>DictField  </li>
+<li>DynamicField  </li>
+<li>EmailField  </li>
+<li>EmbeddedDocumentField  </li>
+<li>FileField  </li>
+<li>FloatField  </li>
+<li>GenericEmbeddedDocumentField  </li>
+<li>GenericReferenceField  </li>
+<li>GeoPointField  </li>
+<li>ImageField  </li>
+<li>IntField  </li>
+<li>ListField  </li>
+<li>MapField  </li>
+<li>ObjectIdField  </li>
+<li>ReferenceField  </li>
+<li>SequenceField  </li>
+<li>SortedListField  </li>
+<li>StringField  </li>
+<li>URLField  </li>
+<li>UUIDField  </li>
+</ul>
+
+
+<h2>文档之间引用关系</h2>
+
+
+<p>在关系型数据库中多个表可以使用外键进行关联。然而MongoDB是无模式的，因此想要达到这样的效果就这能在应用程序中自己手动的进行关联了。</p>
+
+
+<p>不过还好，使用MongoEngine的ReferenceField可以很方便的实现。</p>
+
+
+<pre><code>class User(Document):
+    name = StringField()
+
+class Page(Document):
+    content = StringField()
+    author = ReferenceField(User)
+
+john = User(name="John Smith")
+john.save()
+
+post = Page(content="Test Page")
+post.author = john
+post.save()
+</code></pre>
+
+
+<h3>一对多的关系</h3>
+
+
+<p>对于一对多的关系可以使用ListField来保存一个ReferenceField列表。在进行查询操作是需要传入一个实例对象。</p>
+
+
+<pre><code>class User(Document):
+    name = StringField()
+
+class Page(Document):
+    content = StringField()
+    authors = ListField(ReferenceField(User))
+
+bob = User(name="Bob Jones").save()
+john = User(name="John Smith").save()
+
+Page(content="Test Page", authors=[bob, john]).save()
+Page(content="Another Page", authors=[john]).save()
+
+# Find all pages Bob authored
+Page.objects(authors__in=[bob])
+</code></pre>
+
+
+<h3>引用对象的删除操作</h3>
+
+
+<p>MongoDB默认不会检查数据的完整性，因此在删除一个对象是就需要自己手动的处理引用了该对象的其他对象。</p>
+
+
+<p>同样的MongoEngine也提供了一样的功能。ReferenceField有一个 reverse_delete_rule 参数可以进行设置。它的取值如下：  </p>
+
+
+<ul>
+<li>mongoengine.DO_NOTHING:默认就是这个值，它不会进行任何操作。  </li>
+<li>mongoengine.DENY:如果该对象还被其他对象引用，则拒绝删除。  </li>
+<li>mongoengine.NULLIFY:将其他对象对该对象的引用字段设为null。  </li>
+<li>mongoengine.CASCADE:将引用了该对象的其他对象也删除掉。  </li>
+<li>mongoengine.PULL:移除对该对象的引用。  </li>
+</ul>
+
+
+<h2>索引</h2>
+
+
+<p>与django的Model相似，MongoEngine的Document也可以在meta属性中设置索引。</p>
+
+
+<pre><code>class Page(Document):
+    title = StringField()
+    rating = StringField()
+    meta = {
+        'indexes': ['title', ('title', '-rating')]
+    }
+</code></pre>
+
+
+<p>meta中的indexes可以是一个列表，也可以是一个字典。</p>
+
+]]></content>
+  </entry>
+  
+</feed>

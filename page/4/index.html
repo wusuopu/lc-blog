@@ -1,0 +1,1581 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>龍昌博客</title>
+  <meta name="author" content="龍昌">
+
+  
+  <meta name="description" content="distcc是一个分布式的C/C++编译工具，它可以组织一个网络内的多台计算机同时进行某个编译任务。 对于Debian系列的系统可以执行如下命令进行安装： $ sudo apt-get install distcc 使用 1、首先得先运行服务器软件 运行如下命令启动distccd服务，并接收192 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.xefan.com/page/4/index.html">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="龍昌博客" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.useso.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.useso.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.useso.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">龍昌博客</a></h1>
+  
+    <h2>从Pythoner转向Rubist</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.xefan.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+ <li><a href="/about/">About</a></li>  <li><a href="/gbook/">留言板</a></li> 
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84027.html">使用distcc加快编译速度</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-01-07T00:00:00+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/84027.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/84027.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>distcc是一个分布式的C/C++编译工具，它可以组织一个网络内的多台计算机同时进行某个编译任务。</p>
+
+
+<p>对于Debian系列的系统可以执行如下命令进行安装：</p>
+
+
+<p>$ sudo apt-get install distcc</p>
+
+
+<h3>使用</h3>
+
+
+<p>1、首先得先运行服务器软件</p>
+
+
+<p>运行如下命令启动distccd服务，并接收192.168.1网段内的所有TCP连接：</p>
+
+
+<pre><code>$ distccd --allow 192.168.1.0/24 --log-level error --log-file /tmp/distccd.log --daemon
+</code></pre>
+
+
+<p>2、运行客户端软件</p>
+
+
+<p>设置服务器列表：<br>
+设置DISTCC_HOSTS环境变量；或者修改 ~/.distcc/hosts 或者 /etc/distcc/hosts 文件。<br>
+每行一个服务器主机地址，主机地址可以是如下格式：  </p>
+
+
+<pre><code>localhost       表示本地
+HOST            TCP连接到该主机的3632端口
+HOST:PORT       TCP连接到该主机的指定端口
+@HOST           使用ssh连接
+USER@HOST       使用指定用户进行ssh连接
+</code></pre>
+
+
+<p>所有的服务器的架构最好是相同的。都是32位或者都是64位。  </p>
+
+
+<p>3、在编译的时候使用distcc</p>
+
+
+<p>如果工程使用automake机制：<br>
+在configure阶段执行&#8221;CC=distcc ./configure&#8221; ，然后再执行&#8221;make -j XX; make install&#8221;。</p>
+
+
+<p>如果工程由GNU make管理：<br>
+修改Makefile使得在原来C/C++编译器名称前加上&#8221;distcc &#8220;，例如设置CC=&#8221;distcc arm-linux-gcc&#8221;。然后执行&#8221;make -j XX&#8221;。</p>
+
+
+<p>如果工程由SCons管理：<br>
+修改SConstruct使得在原来C/C++编译器名称前加上&#8221;distcc &#8220;。导出环境变量HOME和DISTCC_HOSTS到构建环境（注意SCons不会自动把系统环境变量导出到builder子进程）：</p>
+
+
+<pre><code>Environment(ENV={'HOME': os.environ['HOME'],'DISTCC_HOSTS': ‘localhost 10.0.0.2’},...)
+</code></pre>
+
+
+<p>然后执行&#8221;scons -j XX&#8221;。</p>
+
+
+<h3>实例</h3>
+
+
+<p>接下来编译Python源代码，测试一下distcc。</p>
+
+
+<pre><code>$ tar xfv Python-2.7.5.tar
+$ cd Python-2.7.5
+$ ./configure
+$ time make
+make  124.32s user 7.11s system 94% cpu 2:19.24 total
+$ time make
+make  0.17s user 0.04s system 89% cpu 0.241 total
+$ make clean
+$ time make
+make  123.52s user 7.32s system 96% cpu 2:16.12 total
+</code></pre>
+
+
+<p>正常编译花了2分10多秒的时间。</p>
+
+
+<pre><code>$ cat /etc/distcc/hosts
+10.0.0.129
+localhost
+$ tar xfv Python-2.7.5.tar
+$ cd Python-2.7.5
+$ CC=distcc ./configure
+$ time make -j 3
+make -j 3  49.58s user 5.53s system 30% cpu 3:01.40 total
+$ time make -j 3
+make -j 3  0.60s user 0.24s system 7% cpu 11.482 total
+$ make clean
+$ time make -j 3
+make -j 3  46.17s user 5.20s system 40% cpu 2:05.66 total
+</code></pre>
+
+
+<p>使用129这台主机和本机一起进行编译，结果花了3分钟的时间。好像使用distcc编译还比正常的编译方式更耗时，有可能是时间花费在了网络传输上。</p>
+
+
+<p>如果有多台主机的话效果应该会好些。还有可以配合使用ccache和distcc进一步加快编译速度。</p>
+
+
+<p>下图是distcc提供的监控工具，用于查看编译执行的情况：</p>
+
+
+<p><a href="http://www.xefan.com/wp-content/uploads/2014/01/distcc-Monitor.png"><img src="http://www.xefan.com/wp-content/uploads/2014/01/distcc-Monitor-300x194.png" alt="" title="distcc Monitor" width="300" height="194" class="aligncenter size-medium wp-image-84028" /></a></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84024.html">使用ccache加快编译速度</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-01-04T00:00:00+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/84024.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/84024.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>ccache是一个编译器缓存，可以将编译的结果缓存起来。这样尽管第一次编译会花费长一点的时间，不过之后再次编译将变得非常非常快。 </p>
+
+
+<h3>1、安装</h3>
+
+
+<p>主流的linux发行版应该都有这个包，对于Debian系列的可以执行以下命令安装：</p>
+
+
+<pre><code>sudo apt-get install ccache
+</code></pre>
+
+
+<h3>2、使用</h3>
+
+
+<p>安装之后基本不用进行什么配置就可以直接使用了。<br>
+例如之前要编译一个hello.c文件要执行命令：  </p>
+
+
+<pre><code>gcc hello.c -o hello
+</code></pre>
+
+
+<p>现在是：</p>
+
+
+<pre><code>ccache gcc hello.c -o hello
+</code></pre>
+
+
+<p>ccache默认是将结果缓存保存到 $HOME/.ccache 目录下。如果想要修改这个目录，可以修改 CCACHE_DIR 环境变量。例如：</p>
+
+
+<pre><code>export CCACHE_DIR=/ramdisk/ccache
+</code></pre>
+
+
+<p>如果觉得每次都在命令前加上ccache比较麻烦的话，有一个一劳永逸的办法。执行如下命令：</p>
+
+
+<pre><code>cp ccache /usr/local/bin/
+ln -s ccache /usr/local/bin/gcc
+ln -s ccache /usr/local/bin/g++
+ln -s ccache /usr/local/bin/cc
+ln -s ccache /usr/local/bin/c++
+</code></pre>
+
+
+<p>不过这样的话每次都是使用的ccache，不太灵活。这个就要自己取舍了。</p>
+
+
+<h3>3、实例</h3>
+
+
+<p>接下来通过一个例子来看看使用ccache和不使用的差别。<br>
+作为一个Python程序员，我们就来编译一个Python试试。</p>
+
+
+<pre><code>$ tar xf Python-2.7.3.tar.gz
+$ cd Python-2.7.3
+$ ./configure
+$ time make
+make  96.49s user 5.10s system 93% cpu 1:48.77 total
+</code></pre>
+
+
+<p>首次编译花了1分48秒。</p>
+
+
+<pre><code>$ time make
+make  0.12s user 0.03s system 88% cpu 0.172 total
+$ make clean
+$ time make
+make  96.46s user 4.98s system 95% cpu 1:46.43 total
+</code></pre>
+
+
+<p>清除结果之后再次编译，还是花了1分46秒。</p>
+
+
+<p>再来看看使用ccache后的结果：</p>
+
+
+<pre><code>$ tar xf Python-2.7.3.tar.gz
+$ cd Python-2.7.3
+$ ./configure
+$ time make
+make  99.42s user 5.84s system 93% cpu 1:52.95 total
+
+$ time make
+make  0.16s user 0.00s system 89% cpu 0.178 total
+$ make clean
+$ time make
+make  3.36s user 1.41s system 52% cpu 9.093 total
+</code></pre>
+
+
+<p>首次编译花了1分52秒，之后都是只花了几秒。</p>
+
+
+<p>查看ccache的统计信息：</p>
+
+
+<pre><code>$ ccache -s
+cache directory                     /home/longchang/.ccache
+cache hit (direct)                   250
+cache hit (preprocessed)               4
+cache miss                           349
+called for link                      132
+alled for preprocessing              84
+compile failed                        29
+preprocessor error                    28
+bad compiler arguments                 5
+unsupported source language            6
+autoconf compile/link                224
+no input file                         24
+files in cache                       710
+cache size                          30.3 Mbytes
+max cache size                       1.0 Gbytes
+</code></pre>
+
+
+<p>清除掉缓存后再次编译：</p>
+
+
+<pre><code>$ ccache -c
+Cleaned cache
+
+$ make clean
+$ time make
+make  99.36s user 5.94s system 92% cpu 1:53.47 total
+
+$ make clean
+$ time make
+make  3.48s user 1.42s system 54% cpu 9.049 total
+</code></pre>
+
+
+<p>ccache手册： <a href="http://ccache.samba.org/manual.html">http://ccache.samba.org/manual.html</a></p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84018.html">使用CSS3绘制海贼王</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-12-11T00:00:00+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>11</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/84018.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/84018.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p style="-qt-block-indent: 0; text-indent: 0px; margin: 0px;">之前国外有网友用CSS3绘制了一个哆啦A梦，最近也在学习CSS，于是就自己画了一个海贼王的图标。</p>
+
+
+<p style="-qt-block-indent: 0; text-indent: 0px; margin: 0px;"></p>
+
+
+<p style="-qt-block-indent: 0; text-indent: 0px; margin: 0px;">以下是画出来的效果：</p>
+
+
+<p style="-qt-block-indent: 0; text-indent: 0px; margin: 0px;"></p>
+
+
+<p style="-qt-block-indent: 0; text-indent: 0px; margin: 0px;"><a href="http://www.xefan.com/wp-content/uploads/2013/12/lufei.png"><img class="aligncenter size-medium wp-image-84019" title="lufei" src="http://www.xefan.com/wp-content/uploads/2013/12/lufei-300x233.png" alt="" width="300" height="233" /></a></p>
+
+
+<p style="-qt-block-indent: 0; text-indent: 0px; margin: 0px;"></p>
+
+
+<p style="-qt-block-indent: 0; text-indent: 0px; margin: 0px;"></p>
+
+
+<p style="-qt-block-indent: 0; text-indent: 0px; margin: 0px;">以下是原图：</p>
+
+
+<p style="-qt-paragraph-type: empty; -qt-block-indent: 0; text-indent: 0px; margin: 0px;"><a href="http://www.xefan.com/wp-content/uploads/2013/12/caimao.jpg"><img class="aligncenter size-medium wp-image-84021" title="caimao" src="http://www.xefan.com/wp-content/uploads/2013/12/caimao-300x192.jpg" alt="" width="300" height="192" /></a></p>
+
+
+<p>源代码： <a href="https://gist.github.com/wusuopu/7910942">https://gist.github.com/wusuopu/7910942</a></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84015.html">Python wsgi教程5——POST请求</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-12-08T00:00:00+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>8</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/84015.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/84015.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>当请求方法为POST时，请求字符串会放在HTTP的body中。可以使用环境变量中的wsgi.input进行读取。同时CONTENT_LENGTH变量记录了内容的长度。</p>
+
+<p>下面是一个简单的例子：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="c">#!/usr/bin/env python</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">from</span> <span class="nn">wsgiref.simple_server</span> <span class="kn">import</span> <span class="n">make_server</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">cgi</span> <span class="kn">import</span> <span class="n">parse_qs</span><span class="p">,</span> <span class="n">escape</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">html</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;</span>
+</span><span class='line'><span class="s">&lt;html&gt;</span>
+</span><span class='line'><span class="s">&lt;body&gt;</span>
+</span><span class='line'><span class="s">   &lt;form method=&quot;post&quot; action=&quot;&quot;&gt;</span>
+</span><span class='line'><span class="s">      &lt;p&gt;</span>
+</span><span class='line'><span class="s">         Age: &lt;input type=&quot;text&quot; name=&quot;age&quot;&gt;</span>
+</span><span class='line'><span class="s">         &lt;/p&gt;</span>
+</span><span class='line'><span class="s">      &lt;p&gt;</span>
+</span><span class='line'><span class="s">         Hobbies:</span>
+</span><span class='line'><span class="s">         &lt;input name=&quot;hobbies&quot; type=&quot;checkbox&quot; value=&quot;software&quot;&gt; Software</span>
+</span><span class='line'><span class="s">         &lt;input name=&quot;hobbies&quot; type=&quot;checkbox&quot; value=&quot;tunning&quot;&gt; Auto Tunning</span>
+</span><span class='line'><span class="s">         &lt;/p&gt;</span>
+</span><span class='line'><span class="s">      &lt;p&gt;</span>
+</span><span class='line'><span class="s">         &lt;input type=&quot;submit&quot; value=&quot;Submit&quot;&gt;</span>
+</span><span class='line'><span class="s">         &lt;/p&gt;</span>
+</span><span class='line'><span class="s">      &lt;/form&gt;</span>
+</span><span class='line'><span class="s">   &lt;p&gt;</span>
+</span><span class='line'><span class="s">      Age: </span><span class="si">%s</span><span class="s">&lt;br&gt;</span>
+</span><span class='line'><span class="s">      Hobbies: </span><span class="si">%s</span><span class="s"></span>
+</span><span class='line'><span class="s">      &lt;/p&gt;</span>
+</span><span class='line'><span class="s">   &lt;/body&gt;</span>
+</span><span class='line'><span class="s">&lt;/html&gt;</span>
+</span><span class='line'><span class="s">&quot;&quot;&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">):</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="c"># the environment variable CONTENT_LENGTH may be empty or missing</span>
+</span><span class='line'>   <span class="k">try</span><span class="p">:</span>
+</span><span class='line'>      <span class="n">request_body_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;CONTENT_LENGTH&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+</span><span class='line'>   <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
+</span><span class='line'>      <span class="n">request_body_size</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="c"># When the method is POST the query string will be sent</span>
+</span><span class='line'>   <span class="c"># in the HTTP request body which is passed by the WSGI server</span>
+</span><span class='line'>   <span class="c"># in the file like wsgi.input environment variable.</span>
+</span><span class='line'>   <span class="n">request_body</span> <span class="o">=</span> <span class="n">environ</span><span class="p">[</span><span class="s">&#39;wsgi.input&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">request_body_size</span><span class="p">)</span>
+</span><span class='line'>   <span class="n">d</span> <span class="o">=</span> <span class="n">parse_qs</span><span class="p">(</span><span class="n">request_body</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="n">age</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;age&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;&#39;</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span> <span class="c"># Returns the first age value.</span>
+</span><span class='line'>   <span class="n">hobbies</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;hobbies&#39;</span><span class="p">,</span> <span class="p">[])</span> <span class="c"># Returns a list of hobbies.</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="c"># Always escape user input to avoid script injection</span>
+</span><span class='line'>   <span class="n">age</span> <span class="o">=</span> <span class="n">escape</span><span class="p">(</span><span class="n">age</span><span class="p">)</span>
+</span><span class='line'>   <span class="n">hobbies</span> <span class="o">=</span> <span class="p">[</span><span class="n">escape</span><span class="p">(</span><span class="n">hobby</span><span class="p">)</span> <span class="k">for</span> <span class="n">hobby</span> <span class="ow">in</span> <span class="n">hobbies</span><span class="p">]</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="n">response_body</span> <span class="o">=</span> <span class="n">html</span> <span class="o">%</span> <span class="p">(</span><span class="n">age</span> <span class="ow">or</span> <span class="s">&#39;Empty&#39;</span><span class="p">,</span>
+</span><span class='line'>               <span class="s">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">hobbies</span> <span class="ow">or</span> <span class="p">[</span><span class="s">&#39;No Hobbies&#39;</span><span class="p">]))</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="n">status</span> <span class="o">=</span> <span class="s">&#39;200 OK&#39;</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="n">response_headers</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/html&#39;</span><span class="p">),</span>
+</span><span class='line'>                  <span class="p">(</span><span class="s">&#39;Content-Length&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">response_body</span><span class="p">)))]</span>
+</span><span class='line'>   <span class="n">start_response</span><span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="n">response_headers</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="k">return</span> <span class="p">[</span><span class="n">response_body</span><span class="p">]</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">httpd</span> <span class="o">=</span> <span class="n">make_server</span><span class="p">(</span><span class="s">&#39;localhost&#39;</span><span class="p">,</span> <span class="mi">8051</span><span class="p">,</span> <span class="n">application</span><span class="p">)</span>
+</span><span class='line'><span class="n">httpd</span><span class="o">.</span><span class="n">serve_forever</span><span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84013.html">Python wsgi教程4——GET请求</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-12-08T00:00:00+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>8</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/84013.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/84013.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>执行之前的程序，然后在浏览器中打开 <a href="http://localhost:8051/?a=10&amp;b=w&amp;b=r">http://localhost:8051/?a=10&amp;b=w&amp;b=r</a> 这样的url。</p>
+
+<p>环境变量字典中保存了请求信息REQUEST_METHOD和QUERY_STRING。问号之后的内容即为此次请求字符串的值。可以写一个函数对它进行解析，或者直接使用CGI模块的parse_qs函数，它返回一个字典，其值为一个列表。</p>
+
+<p>下面是一个简单的例子：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="c">#!/usr/bin/env python</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">from</span> <span class="nn">wsgiref.simple_server</span> <span class="kn">import</span> <span class="n">make_server</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">cgi</span> <span class="kn">import</span> <span class="n">parse_qs</span><span class="p">,</span> <span class="n">escape</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">html</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;</span>
+</span><span class='line'><span class="s">&lt;html&gt;</span>
+</span><span class='line'><span class="s">&lt;body&gt;</span>
+</span><span class='line'><span class="s">   &lt;form method=&quot;get&quot; action=&quot;&quot;&gt;</span>
+</span><span class='line'><span class="s">      &lt;p&gt;</span>
+</span><span class='line'><span class="s">         Age: &lt;input type=&quot;text&quot; name=&quot;age&quot;&gt;</span>
+</span><span class='line'><span class="s">         &lt;/p&gt;</span>
+</span><span class='line'><span class="s">      &lt;p&gt;</span>
+</span><span class='line'><span class="s">         Hobbies:</span>
+</span><span class='line'><span class="s">         &lt;input name=&quot;hobbies&quot; type=&quot;checkbox&quot; value=&quot;software&quot;&gt; Software</span>
+</span><span class='line'><span class="s">         &lt;input name=&quot;hobbies&quot; type=&quot;checkbox&quot; value=&quot;tunning&quot;&gt; Auto Tunning</span>
+</span><span class='line'><span class="s">         &lt;/p&gt;</span>
+</span><span class='line'><span class="s">      &lt;p&gt;</span>
+</span><span class='line'><span class="s">         &lt;input type=&quot;submit&quot; value=&quot;Submit&quot;&gt;</span>
+</span><span class='line'><span class="s">         &lt;/p&gt;</span>
+</span><span class='line'><span class="s">      &lt;/form&gt;</span>
+</span><span class='line'><span class="s">   &lt;p&gt;</span>
+</span><span class='line'><span class="s">      Age: </span><span class="si">%s</span><span class="s">&lt;br&gt;</span>
+</span><span class='line'><span class="s">      Hobbies: </span><span class="si">%s</span><span class="s"></span>
+</span><span class='line'><span class="s">      &lt;/p&gt;</span>
+</span><span class='line'><span class="s">   &lt;/body&gt;</span>
+</span><span class='line'><span class="s">&lt;/html&gt;&quot;&quot;&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">):</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="c"># Returns a dictionary containing lists as values.</span>
+</span><span class='line'>   <span class="n">d</span> <span class="o">=</span> <span class="n">parse_qs</span><span class="p">(</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;QUERY_STRING&#39;</span><span class="p">])</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="c"># In this idiom you must issue a list containing a default value.</span>
+</span><span class='line'>   <span class="n">age</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;age&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;&#39;</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span> <span class="c"># Returns the first age value.</span>
+</span><span class='line'>   <span class="n">hobbies</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;hobbies&#39;</span><span class="p">,</span> <span class="p">[])</span> <span class="c"># Returns a list of hobbies.</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="c"># Always escape user input to avoid script injection</span>
+</span><span class='line'>   <span class="n">age</span> <span class="o">=</span> <span class="n">escape</span><span class="p">(</span><span class="n">age</span><span class="p">)</span>
+</span><span class='line'>   <span class="n">hobbies</span> <span class="o">=</span> <span class="p">[</span><span class="n">escape</span><span class="p">(</span><span class="n">hobby</span><span class="p">)</span> <span class="k">for</span> <span class="n">hobby</span> <span class="ow">in</span> <span class="n">hobbies</span><span class="p">]</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="n">response_body</span> <span class="o">=</span> <span class="n">html</span> <span class="o">%</span> <span class="p">(</span><span class="n">age</span> <span class="ow">or</span> <span class="s">&#39;Empty&#39;</span><span class="p">,</span>
+</span><span class='line'>               <span class="s">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">hobbies</span> <span class="ow">or</span> <span class="p">[</span><span class="s">&#39;No Hobbies&#39;</span><span class="p">]))</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="n">status</span> <span class="o">=</span> <span class="s">&#39;200 OK&#39;</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="c"># Now content type is text/html</span>
+</span><span class='line'>   <span class="n">response_headers</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/html&#39;</span><span class="p">),</span>
+</span><span class='line'>                  <span class="p">(</span><span class="s">&#39;Content-Length&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">response_body</span><span class="p">)))]</span>
+</span><span class='line'>   <span class="n">start_response</span><span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="n">response_headers</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="k">return</span> <span class="p">[</span><span class="n">response_body</span><span class="p">]</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">httpd</span> <span class="o">=</span> <span class="n">make_server</span><span class="p">(</span><span class="s">&#39;localhost&#39;</span><span class="p">,</span> <span class="mi">8051</span><span class="p">,</span> <span class="n">application</span><span class="p">)</span>
+</span><span class='line'><span class="c"># Now it is serve_forever() in instead of handle_request().</span>
+</span><span class='line'><span class="c"># In Windows you can kill it in the Task Manager (python.exe).</span>
+</span><span class='line'><span class="c"># In Linux a Ctrl-C will do it.</span>
+</span><span class='line'><span class="n">httpd</span><span class="o">.</span><span class="n">serve_forever</span><span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84010.html">Python Wsgi教程3——响应</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-12-08T00:00:00+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>8</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/84010.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/84010.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>将上一个例子的返回：</p>
+
+
+<pre><code>return [response_body]
+</code></pre>
+
+
+<p>改为：</p>
+
+
+<pre><code>return response_body
+</code></pre>
+
+
+<p>再次运行会发现速度变慢了。这是因此服务器对发送过来的字符串是按单个字节进行迭代的，所以最好对返回的字符串用一个可迭代对象包装一下。</p>
+
+
+<p>如果返回的这个可迭代对象生成多个字符串，那么正文的长度即为这些字符串长度的总和。</p>
+
+
+<p>接下来看一个例子：</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="c">#! /usr/bin/env python</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">from</span> <span class="nn">wsgiref.simple_server</span> <span class="kn">import</span> <span class="n">make_server</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">):</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="n">response_body</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+</span><span class='line'>                    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">environ</span><span class="o">.</span><span class="n">items</span><span class="p">())]</span>
+</span><span class='line'>   <span class="n">response_body</span> <span class="o">=</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">response_body</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="c"># Response_body has now more than one string</span>
+</span><span class='line'>   <span class="n">response_body</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;The Beggining</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">,</span>
+</span><span class='line'>                    <span class="s">&#39;*&#39;</span> <span class="o">*</span> <span class="mi">30</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">,</span>
+</span><span class='line'>                    <span class="n">response_body</span><span class="p">,</span>
+</span><span class='line'>                    <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">+</span> <span class="s">&#39;*&#39;</span> <span class="o">*</span> <span class="mi">30</span> <span class="p">,</span>
+</span><span class='line'>                    <span class="s">&#39;</span><span class="se">\n</span><span class="s">The End&#39;</span><span class="p">]</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="c"># So the content-lenght is the sum of all string&#39;s lengths</span>
+</span><span class='line'>   <span class="n">content_length</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span class='line'>   <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">response_body</span><span class="p">:</span>
+</span><span class='line'>      <span class="n">content_length</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="n">status</span> <span class="o">=</span> <span class="s">&#39;200 OK&#39;</span>
+</span><span class='line'>   <span class="n">response_headers</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/plain&#39;</span><span class="p">),</span>
+</span><span class='line'>                  <span class="p">(</span><span class="s">&#39;Content-Length&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">content_length</span><span class="p">))]</span>
+</span><span class='line'>   <span class="n">start_response</span><span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="n">response_headers</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="k">return</span> <span class="n">response_body</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">httpd</span> <span class="o">=</span> <span class="n">make_server</span><span class="p">(</span><span class="s">&#39;localhost&#39;</span><span class="p">,</span> <span class="mi">8051</span><span class="p">,</span> <span class="n">application</span><span class="p">)</span>
+</span><span class='line'><span class="n">httpd</span><span class="o">.</span><span class="n">handle_request</span><span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84007.html">Python Wsgi教程2——环境变量</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-12-08T00:00:00+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>8</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/84007.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/84007.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>环境变量字典包含了类似于CGI的变量，它是在每次请求时被服务器填充。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="c">#! /usr/bin/env python</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Our tutorial&#39;s WSGI server</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">wsgiref.simple_server</span> <span class="kn">import</span> <span class="n">make_server</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">):</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="c"># Sorting and stringifying the environment key, value pairs</span>
+</span><span class='line'>   <span class="n">response_body</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+</span><span class='line'>                    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">environ</span><span class="o">.</span><span class="n">items</span><span class="p">())]</span>
+</span><span class='line'>   <span class="n">response_body</span> <span class="o">=</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">response_body</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="n">status</span> <span class="o">=</span> <span class="s">&#39;200 OK&#39;</span>
+</span><span class='line'>   <span class="n">response_headers</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/plain&#39;</span><span class="p">),</span>
+</span><span class='line'>                  <span class="p">(</span><span class="s">&#39;Content-Length&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">response_body</span><span class="p">)))]</span>
+</span><span class='line'>   <span class="n">start_response</span><span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="n">response_headers</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="k">return</span> <span class="p">[</span><span class="n">response_body</span><span class="p">]</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Instantiate the WSGI server.</span>
+</span><span class='line'><span class="c"># It will receive the request, pass it to the application</span>
+</span><span class='line'><span class="c"># and send the application&#39;s response to the client</span>
+</span><span class='line'><span class="n">httpd</span> <span class="o">=</span> <span class="n">make_server</span><span class="p">(</span>
+</span><span class='line'>   <span class="s">&#39;localhost&#39;</span><span class="p">,</span> <span class="c"># The host name.</span>
+</span><span class='line'>   <span class="mi">8051</span><span class="p">,</span> <span class="c"># A port number where to wait for the request.</span>
+</span><span class='line'>   <span class="n">application</span> <span class="c"># Our application object name, in this case a function.</span>
+</span><span class='line'>   <span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Wait for a single request, serve it and quit.</span>
+</span><span class='line'><span class="n">httpd</span><span class="o">.</span><span class="n">handle_request</span><span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>执行该脚本，然后在浏览器中打开<a href="http://localhost:8051/">http://localhost:8051/</a> 查看效果。</p>
+
+<p>这个例子是将环境变量字典的值全部输出。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84004.html">Python Wsgi教程1——介绍</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-12-08T00:00:00+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>8</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/84004.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/84004.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>WSGI(Web Server Gateway Interface)并不是一个服务器，而是一个协议。最开始是用Python写的，现在很多语言都有了对应的实现。详细内容可以看这里： <a href="http://www.python.org/dev/peps/pep-3333/">http://www.python.org/dev/peps/pep-3333/</a></p>
+
+<p>WSGI应用程序接口是一个可调用的对象。它必须接收两个固定的参数：一个包含了类似CGI变量的字典；一个可调用的函数用于返回HTTP状态代码和数据头。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="c"># This is our application object. It could have any name,</span>
+</span><span class='line'><span class="c"># except when using mod_wsgi where it must be &quot;application&quot;</span>
+</span><span class='line'><span class="k">def</span> <span class="nf">application</span><span class="p">(</span> <span class="c"># It accepts two arguments:</span>
+</span><span class='line'>      <span class="c"># environ points to a dictionary containing CGI like environment variables</span>
+</span><span class='line'>      <span class="c"># which is filled by the server for each received request from the client</span>
+</span><span class='line'>      <span class="n">environ</span><span class="p">,</span>
+</span><span class='line'>      <span class="c"># start_response is a callback function supplied by the server</span>
+</span><span class='line'>      <span class="c"># which will be used to send the HTTP status and headers to the server</span>
+</span><span class='line'>      <span class="n">start_response</span><span class="p">):</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="c"># build the response body possibly using the environ dictionary</span>
+</span><span class='line'>   <span class="n">response_body</span> <span class="o">=</span> <span class="s">&#39;The request method was </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">environ</span><span class="p">[</span><span class="s">&#39;REQUEST_METHOD&#39;</span><span class="p">]</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="c"># HTTP response code and message</span>
+</span><span class='line'>   <span class="n">status</span> <span class="o">=</span> <span class="s">&#39;200 OK&#39;</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="c"># These are HTTP headers expected by the client.</span>
+</span><span class='line'>   <span class="c"># They must be wrapped as a list of tupled pairs:</span>
+</span><span class='line'>   <span class="c"># [(Header name, Header value)].</span>
+</span><span class='line'>   <span class="n">response_headers</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/plain&#39;</span><span class="p">),</span>
+</span><span class='line'>                       <span class="p">(</span><span class="s">&#39;Content-Length&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">response_body</span><span class="p">)))]</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="c"># Send them to the server using the supplied function</span>
+</span><span class='line'>   <span class="n">start_response</span><span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="n">response_headers</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="c"># Return the response body.</span>
+</span><span class='line'>   <span class="c"># Notice it is wrapped in a list although it could be any iterable.</span>
+</span><span class='line'>   <span class="k">return</span> <span class="p">[</span><span class="n">response_body</span><span class="p">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>以上是一个应用程序的基本框架。由于没有服务器，因此这段代码目前还不能运行。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84001.html">Python cgi教程6——Session</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-12-07T00:00:00+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/84001.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/84001.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Session是位于服务器端的Cookie。它保存在服务器上的文件或者数据库中。每条session是由session id(SID)进行标识。</p>
+
+
+<h2>基于Cookie的SID</h2>
+
+
+<p>Cookie可以长久胡保存SID，直到Cookie过期。用这种方式更快更安全。但是得客户端的浏览器支持Cookie才行。</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="c">#!/usr/bin/env python</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">sha</span><span class="o">,</span> <span class="nn">time</span><span class="o">,</span> <span class="nn">Cookie</span><span class="o">,</span> <span class="nn">os</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">cookie</span> <span class="o">=</span> <span class="n">Cookie</span><span class="o">.</span><span class="n">SimpleCookie</span><span class="p">()</span>
+</span><span class='line'><span class="n">string_cookie</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;HTTP_COOKIE&#39;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># If new session</span>
+</span><span class='line'><span class="k">if</span> <span class="ow">not</span> <span class="n">string_cookie</span><span class="p">:</span>
+</span><span class='line'>   <span class="c"># The sid will be a hash of the server time</span>
+</span><span class='line'>   <span class="n">sid</span> <span class="o">=</span> <span class="n">sha</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()))</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+</span><span class='line'>   <span class="c"># Set the sid in the cookie</span>
+</span><span class='line'>   <span class="n">cookie</span><span class="p">[</span><span class="s">&#39;sid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sid</span>
+</span><span class='line'>   <span class="c"># Will expire in a year</span>
+</span><span class='line'>   <span class="n">cookie</span><span class="p">[</span><span class="s">&#39;sid&#39;</span><span class="p">][</span><span class="s">&#39;expires&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">12</span> <span class="o">*</span> <span class="mi">30</span> <span class="o">*</span> <span class="mi">24</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span>
+</span><span class='line'><span class="c"># If already existent session</span>
+</span><span class='line'><span class="k">else</span><span class="p">:</span>
+</span><span class='line'>   <span class="n">cookie</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">string_cookie</span><span class="p">)</span>
+</span><span class='line'>   <span class="n">sid</span> <span class="o">=</span> <span class="n">cookie</span><span class="p">[</span><span class="s">&#39;sid&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">print</span> <span class="n">cookie</span>
+</span><span class='line'><span class="k">print</span> <span class="s">&#39;Content-Type: text/html</span><span class="se">\n</span><span class="s">&#39;</span>
+</span><span class='line'><span class="k">print</span> <span class="s">&#39;&lt;html&gt;&lt;body&gt;&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="n">string_cookie</span><span class="p">:</span>
+</span><span class='line'>   <span class="k">print</span> <span class="s">&#39;&lt;p&gt;Already existent session&lt;/p&gt;&#39;</span>
+</span><span class='line'><span class="k">else</span><span class="p">:</span>
+</span><span class='line'>   <span class="k">print</span> <span class="s">&#39;&lt;p&gt;New session&lt;/p&gt;&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">print</span> <span class="s">&#39;&lt;p&gt;SID =&#39;</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="s">&#39;&lt;/p&gt;&#39;</span>
+</span><span class='line'><span class="k">print</span> <span class="s">&#39;&lt;/body&gt;&lt;/html&gt;&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>我们对服务器的时间进行哈希生成一个唯一的Session ID。</p>
+
+
+<h2>基于Query String的SID</h2>
+
+
+<pre><code>#!/usr/bin/env python
+
+import sha, time, cgi, os
+
+sid = cgi.FieldStorage().getfirst('sid')
+
+if sid: # If session exists
+   message = 'Already existent session'
+else: # New session
+   # The sid will be a hash of the server time
+   sid = sha.new(repr(time.time())).hexdigest()
+   message = 'New session'
+
+qs = 'sid=' + sid
+
+print """\
+Content-Type: text/html\n
+&lt;html&gt;&lt;body&gt;
+&lt;p&gt;%s&lt;/p&gt;
+&lt;p&gt;SID = %s&lt;/p&gt;
+&lt;p&gt;&lt;a href="./set_sid_qs.py?sid=%s"&gt;reload&lt;/a&gt;&lt;/p&gt;
+&lt;/body&gt;&lt;/html&gt;
+""" % (message, sid, sid)
+</code></pre>
+
+<p>这是将sid直接在url中传递。</p>
+
+
+<h2>使用隐藏域</h2>
+
+
+<pre><code>#!/usr/bin/env python
+
+import sha, time, cgi, os
+
+sid = cgi.FieldStorage().getfirst('sid')
+
+if sid: # If session exists
+   message = 'Already existent session'
+else: # New session
+   # The sid will be a hash of the server time
+   sid = sha.new(repr(time.time())).hexdigest()
+   message = 'New session'
+
+qs = 'sid=' + sid
+
+print """\
+Content-Type: text/html\n
+&lt;html&gt;&lt;body&gt;
+&lt;p&gt;%s&lt;/p&gt;
+&lt;p&gt;SID = %s&lt;/p&gt;
+&lt;form method="post"&gt;
+&lt;input type="hidden" name=sid value="%s"&gt;
+&lt;input type="submit" value="Submit"&gt;
+&lt;/form&gt;
+&lt;/body&gt;&lt;/html&gt;
+""" % (message, sid, sid)
+</code></pre>
+
+<p>这是将sid放在表单中作为隐藏字段提交。</p>
+
+
+<h2>shelve模块</h2>
+
+
+<p>光有session id是不够的，还需要将内容保存到文件或者数据库中。这里可以使用shelve模块保存到文件。</p>
+
+
+<p><code>session = shelve.open('/tmp/.session/sess_' + sid, writeback=True)</code></p>
+
+<p>它打开文件并返回一个类似于字典的对象。</p>
+
+
+<p><code>session['lastvisit'] = repr(time.time())</code></p>
+
+<p>设置session的值。</p>
+
+
+<p><code>lastvisit = session.get('lastvisit')</code></p>
+
+<p>读取刚刚设置的值。</p>
+
+
+<p><code>session.close()</code></p>
+
+<p>最后操作完成之后要记得关闭文件。</p>
+
+
+<h2>Cookie和Shelve</h2>
+
+
+<p>接下来用一个例子展示下Cookie和Shelve共同使用。</p>
+
+
+<pre><code>#!/usr/bin/env python
+import sha, time, Cookie, os, shelve
+
+cookie = Cookie.SimpleCookie()
+string_cookie = os.environ.get('HTTP_COOKIE')
+
+if not string_cookie:
+   sid = sha.new(repr(time.time())).hexdigest()
+   cookie['sid'] = sid
+   message = 'New session'
+else:
+   cookie.load(string_cookie)
+   sid = cookie['sid'].value
+cookie['sid']['expires'] = 12 * 30 * 24 * 60 * 60
+
+# The shelve module will persist the session data
+# and expose it as a dictionary
+session_dir = os.environ['DOCUMENT_ROOT'] + '/tmp/.session'
+session = shelve.open(session_dir + '/sess_' + sid, writeback=True)
+
+# Retrieve last visit time from the session
+lastvisit = session.get('lastvisit')
+if lastvisit:
+   message = 'Welcome back. Your last visit was at ' + \
+      time.asctime(time.gmtime(float(lastvisit)))
+# Save the current time in the session
+session['lastvisit'] = repr(time.time())
+
+print """\
+%s
+Content-Type: text/html\n
+&lt;html&gt;&lt;body&gt;
+&lt;p&gt;%s&lt;/p&gt;
+&lt;p&gt;SID = %s&lt;/p&gt;
+&lt;/body&gt;&lt;/html&gt;
+""" % (cookie, message, sid)
+</code></pre>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83998.html">Python cgi教程5——Cookie</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-12-07T00:00:00+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83998.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83998.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2>设置Cookie</h2>
+
+
+<p>有两个与cookie相关的操作，设置cookie和读取cookie。</p>
+
+
+<p>以下例子展示了cookie的设置。</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="c">#!/usr/bin/env python</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">time</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># This is the message that contains the cookie</span>
+</span><span class='line'><span class="c"># and will be sent in the HTTP header to the client</span>
+</span><span class='line'><span class="k">print</span> <span class="s">&#39;Set-Cookie: lastvisit=&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">());</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># To save one line of code</span>
+</span><span class='line'><span class="c"># we replaced the print command with a &#39;\n&#39;</span>
+</span><span class='line'><span class="k">print</span> <span class="s">&#39;Content-Type: text/html</span><span class="se">\n</span><span class="s">&#39;</span>
+</span><span class='line'><span class="c"># End of HTTP header</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">print</span> <span class="s">&#39;&lt;html&gt;&lt;body&gt;&#39;</span>
+</span><span class='line'><span class="k">print</span> <span class="s">&#39;Server time is&#39;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">asctime</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">localtime</span><span class="p">())</span>
+</span><span class='line'><span class="k">print</span> <span class="s">&#39;&lt;/body&gt;&lt;/html&gt;&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>这是在数据头中使用<em>Set-Cookie</em>进行的操作。</p>
+
+
+<h2>检索Cookie</h2>
+
+
+<p>浏览器返回来的cookie存放于os.environ字典中，对应的字段名为&#8217;HTTP_COOKIE&#8217;。以下是一个例子：</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="c">#!/usr/bin/env python</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">Cookie</span><span class="o">,</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">time</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">cookie</span> <span class="o">=</span> <span class="n">Cookie</span><span class="o">.</span><span class="n">SimpleCookie</span><span class="p">()</span>
+</span><span class='line'><span class="n">cookie</span><span class="p">[</span><span class="s">&#39;lastvisit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">print</span> <span class="n">cookie</span>
+</span><span class='line'><span class="k">print</span> <span class="s">&#39;Content-Type: text/html</span><span class="se">\n</span><span class="s">&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">print</span> <span class="s">&#39;&lt;html&gt;&lt;body&gt;&#39;</span>
+</span><span class='line'><span class="k">print</span> <span class="s">&#39;&lt;p&gt;Server time is&#39;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">asctime</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">localtime</span><span class="p">()),</span> <span class="s">&#39;&lt;/p&gt;&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># The returned cookie is available in the os.environ dictionary</span>
+</span><span class='line'><span class="n">cookie_string</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;HTTP_COOKIE&#39;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># The first time the page is run there will be no cookies</span>
+</span><span class='line'><span class="k">if</span> <span class="ow">not</span> <span class="n">cookie_string</span><span class="p">:</span>
+</span><span class='line'>   <span class="k">print</span> <span class="s">&#39;&lt;p&gt;First visit or cookies disabled&lt;/p&gt;&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">else</span><span class="p">:</span> <span class="c"># Run the page twice to retrieve the cookie</span>
+</span><span class='line'>   <span class="k">print</span> <span class="s">&#39;&lt;p&gt;The returned cookie string was &quot;&#39;</span> <span class="o">+</span> <span class="n">cookie_string</span> <span class="o">+</span> <span class="s">&#39;&quot;&lt;/p&gt;&#39;</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="c"># load() parses the cookie string</span>
+</span><span class='line'>   <span class="n">cookie</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">cookie_string</span><span class="p">)</span>
+</span><span class='line'>   <span class="c"># Use the value attribute of the cookie to get it</span>
+</span><span class='line'>   <span class="n">lastvisit</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">cookie</span><span class="p">[</span><span class="s">&#39;lastvisit&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="k">print</span> <span class="s">&#39;&lt;p&gt;Your last visit was at&#39;</span><span class="p">,</span>
+</span><span class='line'>   <span class="k">print</span> <span class="n">time</span><span class="o">.</span><span class="n">asctime</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">localtime</span><span class="p">(</span><span class="n">lastvisit</span><span class="p">)),</span> <span class="s">&#39;&lt;/p&gt;&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">print</span> <span class="s">&#39;&lt;/body&gt;&lt;/html&gt;&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>使用SimpleCookie对象的load()方法对字符串进行解析。</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/page/5">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/page/3">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Subscription</h1>
+  <!--以下是QQ邮件列表订阅嵌入代码--><script >var nId = "e7ee5da6d322dc7157c25cfd8a7700bb23a056dd1fb18cb4",nWidth="auto",sColor="light",sText="请输入邮件地址：" ;</script><script src="http://list.qq.com/zh_CN/htmledition/js/qf/page/qfcode.js" charset="gb18030"></script>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84132.html">配置elixir的vim环境</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84130.html">配置coffeescript的vim环境</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84127.html">VIM编译参数</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84124.html">Docker使用笔记</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84121.html">Nginx + Php + FastCGI配置</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (47)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (32)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (26)</a></li><li><a href='/categories/web开发/index.html'>web开发 (16)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (7)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (10)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (21)</a></li></ul>
+</section>
+<section>
+  <h1>Tag Cloud</h1>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.45454545454545%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.9090909090909%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.81818181818181%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.9090909090909%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.36363636363636%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.27272727272727%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.36363636363636%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.81818181818181%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.81818181818181%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 100.9090909090909%'>Django(1)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.9090909090909%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.81818181818181%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.72727272727273%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.9090909090909%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.9090909090909%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.45454545454545%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.81818181818181%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.63636363636364%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.45454545454545%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.9090909090909%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.45454545454545%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.9090909090909%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.9090909090909%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.9090909090909%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(66)</a> <a href='/tags/mongodb/index.html' style='font-size: 109.0909090909091%'>mongodb(10)</a> <a href='/tags/mysql/index.html' style='font-size: 103.63636363636364%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.9090909090909%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.9090909090909%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.18181818181819%'>php(9)</a> <a href='/tags/ps/index.html' style='font-size: 105.45454545454545%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.9090909090909%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 144.54545454545456%'>python(49)</a> <a href='/tags/qt/index.html' style='font-size: 101.81818181818181%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.9090909090909%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 123.63636363636364%'>Ruby(26)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.72727272727273%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.9090909090909%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.54545454545455%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.36363636363636%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.72727272727273%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 121.81818181818181%'>vim(24)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.72727272727273%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.9090909090909%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.9090909090909%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 112.72727272727272%'>Web开发(14)</a> <a href='/tags/windows/index.html' style='font-size: 106.36363636363636%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.9090909090909%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.9090909090909%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.9090909090909%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.9090909090909%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.45454545454545%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.81818181818181%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.9090909090909%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.18181818181819%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.18181818181819%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.9090909090909%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.9090909090909%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.9090909090909%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.81818181818181%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 109.0909090909091%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.18181818181819%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.9090909090909%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.54545454545455%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.9090909090909%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.9090909090909%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 104.54545454545455%'>网络日志(5)</a> <a href='/tags/翻译/index.html' style='font-size: 120.9090909090909%'>翻译(23)</a> <a href='/tags/视频教程/index.html' style='font-size: 109.0909090909091%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.9090909090909%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.81818181818181%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.9090909090909%'>随笔(1)</a> </span>
+</section>
+<section>
+  <h1>Link</h1>
+    <ul id="category-list">
+      <li><a target="_blank" title="我的Github" href="https://github.com/wusuopu">@Github</a></li>
+      <li><a target="_blank" title="我的微博" href="http://www.weibo.com/u/1768691343">@Weibo</a></li>
+      <li><a target="_blank" title="我的Twitter" href="https://twitter.com/longchangjin">@Twitter</a></li>
+      <li><a target="_blank" title="我的豆瓣" href="http://www.douban.com/people/lchj/">@Douban</a></li>
+
+      <li><a target="_blank" title="" href="http://www.vimer.cn/">Vimer的程序世界</a></li>
+      <li><a target="_blank" title="" href="http://pythoner.net/">python开发者社区</a></li>
+      <li><a target="_blank" title="" href="http://simple-is-better.com/">python.cn(news, jobs)</a></li>
+      <li><a target="_blank" title="" href="http://gtk.awaysoft.com/">GTK+ 中文社区</a></li>
+    </ul>
+</section>
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - 龍昌 -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+<div style="display:none;"><script src="http://s94.cnzz.com/stat.php?id=1259846&web_id=1259846&show=pic" language="JavaScript"></script></div>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'longchang';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,1317 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>[翻译]Ruby教程13——面向对象2 - 龍昌博客</title>
+  <meta name="author" content="龍昌">
+
+  
+  <meta name="description" content="Ruby的面向对象编程2 在这章的教程我们继续讨论Ruby的面向对象编程。 我们以属性修饰符开始。将会包涵类常量、类方法和操作符重载。我们将定义多态，并展示在Ruby中如何使用它。我们也会提及模块和异常。 属性修饰符 Ruby的所有变量都是私有的。它只能通过方法来访问。这些方法通常称为设值函数( &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.xefan.com/archives/83942.html">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="龍昌博客" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.useso.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.useso.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.useso.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">龍昌博客</a></h1>
+  
+    <h2>从Pythoner转向Rubist</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.xefan.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+ <li><a href="/about/">About</a></li>  <li><a href="/gbook/">留言板</a></li> 
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">[翻译]Ruby教程13——面向对象2</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-11-17T00:00:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h1>Ruby的面向对象编程2</h1>
+
+
+<p>在这章的教程我们继续讨论Ruby的面向对象编程。</p>
+
+
+<p>我们以属性修饰符开始。将会包涵类常量、类方法和操作符重载。我们将定义多态，并展示在Ruby中如何使用它。我们也会提及模块和异常。</p>
+
+
+<h2>属性修饰符</h2>
+
+
+<p>Ruby的所有变量都是私有的。它只能通过方法来访问。这些方法通常称为设值函数(setters)和获得者(getters)。创建一个setter和getter方法是很平常的事情。加些Ruby有便利的方法来创建这两种方法。它们是<em>attr_reader</em>、<em>attr_writer</em>和<em>attr_accessor</em>。</p>
+
+
+<p><em>attr_reader</em>用于创建getter方法。<em>attr_writer</em>用于setter方法。<em>attr_accessor</em>用于创建两种方法。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Car
+
+    attr_reader :name, :price
+    attr_writer :name, :price
+
+    def to_s
+        "#{@name}: #{@price}"
+    end
+
+end
+
+
+c1 = Car.new
+c2 = Car.new
+
+c1.name = "Porsche"
+c1.price = 23500
+
+c2.name = "Volkswagen"
+c2.price = 9500
+
+puts "The #{c1.name} costs #{c1.price}"
+
+p c1
+p c2
+</code></pre>
+
+
+<p>定义了一个<em>Car</em>类，在类内部我们使用了<em>attr_reader</em>和<em>attr_writer</em>创建了两个<em>getter</em>和<em>setter</em>方法。</p>
+
+
+<pre><code>attr_reader :name, :price
+</code></pre>
+
+
+<p>这里我们创建了两个实例方法名为：<em>name</em>和<em>price</em>。注意<em>attr_reader</em>将方法名符号作为参数。</p>
+
+
+<pre><code>attr_writer :name, :price
+</code></pre>
+
+
+<p><em>attr_writer</em>创建了两个<em>setter</em>方法<em>name</em>、<em>price</em>和两个实例变量<em>@name</em>、 <em>@price</em>。</p>
+
+
+<pre><code>c1.name = "Porsche"
+c1.price = 23500
+</code></pre>
+
+
+<p>这里的上下文中调用了两个<em>setter</em>方法，为实例变量填充数据。</p>
+
+
+<pre><code>puts "The #{c1.name} costs #{c1.price}"
+</code></pre>
+
+
+<p>这里调用了两个<em>getter</em>方法获取数据。</p>
+
+
+<p>$ ./arw.rb <br>
+The Porsche costs 23500<br>
+Porsche: 23500<br>
+Volkswagen: 9500  </p>
+
+
+<p>例子的输出结果。</p>
+
+
+<hr>
+
+
+<p>正如上面阐述的，<em>attr_accessor</em>方法会创建<em>getter</em>、<em>setter</em>方法和它们的实例变量。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Book
+   attr_accessor :title, :pages    
+end
+
+b1 = Book.new
+b1.title = "Hidden motives"
+b1.pages = 255
+
+p "The book #{b1.title} has #{b1.pages} pages"
+</code></pre>
+
+
+<p>定义了一个<em>Book</em>类，它使用<em>attr_accessor</em>创建了两对方法和两个实例变量。</p>
+
+
+<pre><code>class Book
+   attr_accessor :title, :pages    
+end
+</code></pre>
+
+
+<p><em>attr_accessor</em>方法设置了<em>title</em>、<em>pages</em> 方法以及<em>@title</em>、<em>@pages</em>实例变量。</p>
+
+
+<pre><code>b1 = Book.new
+b1.title = "Hidden motives"
+b1.pages = 255
+</code></pre>
+
+
+<p>创建了一个<em>Book</em>对象。调用两个setter方法为对象的实例变量填充数据。</p>
+
+
+<pre><code>p "The book #{b1.title} has #{b1.pages} pages"
+</code></pre>
+
+
+<p>这行的代码我们调用getter方法读取实例变量的值。</p>
+
+
+<p>$ ./accessor.rb<br>
+&#8220;The book Hidden motives has 255 pages&#8221;  </p>
+
+
+<p>例子的输出结果。</p>
+
+
+<h2>类的常量</h2>
+
+
+<p>Ruby允许创建类常量。这些常量不属于特定的对象，它们是属于类的。作为约定，常量以大写字母开头。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class MMath
+
+    PI = 3.141592
+end
+
+
+puts MMath::PI
+</code></pre>
+
+
+<p>创建一个<em>MMath</em>类，包含了一个<em>PI</em>常量。</p>
+
+
+<pre><code>PI = 3.141592
+</code></pre>
+
+
+<p>我们创建了一个<em>PI</em>常量。记住在Ruby中常量不是强制的。</p>
+
+
+<pre><code>puts MMath::PI
+</code></pre>
+
+
+<p>使用<em>::</em>操作符访问<em>PI</em>常量。</p>
+
+
+<p>$ ./classconstant.rb <br>
+3.141592  </p>
+
+
+<p>例子输出结果。</p>
+
+
+<h2>to_s方法</h2>
+
+
+<p>每个对象都有一个<em>to_s</em>方法，它返回该对象的一个字符串描述。注意<em>puts</em>方法将一个对象作为参数时，该对象的<em>to_s</em>方法将被调用。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Being
+
+    def to_s
+        "This is Being class"
+    end
+end
+
+b = Being.new
+puts b.to_s
+puts b
+</code></pre>
+
+
+<p>定义一个<em>Being</em>类并重载了<em>to_s</em>方法。</p>
+
+
+<pre><code>def to_s
+    "This is Being class"
+end
+</code></pre>
+
+
+<p>每个创建的类都继承自基类<em>Object</em>。<em>to_s</em>方法属于这个类。我们重载了<em>to_s</em>方法，使得描述信息更加可读。</p>
+
+
+<pre><code>b = Being.new
+puts b.to_s
+puts b
+</code></pre>
+
+
+<p>创建一个<em>Being</em>的对象，调用两次<em>to_s</em>方法。第一次是显式调用，第二次是隐式调用。</p>
+
+
+<p>$ ./tostring.rb <br>
+This is Being class<br>
+This is Being class  </p>
+
+
+<p>例子的运行结果。</p>
+
+
+<h2>操作符重载</h2>
+
+
+<p>操作符重载是基本参数的不同进行的操作也不同。</p>
+
+
+<p>Ruby中操作符和方法仅有一点区别。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Circle
+
+    attr_accessor :radius
+
+    def initialize r
+        @radius = r
+    end
+
+    def +(other)
+        Circle.new @radius + other.radius
+    end
+
+    def to_s
+        "Circle with radius: #{@radius}"
+    end
+end
+
+
+c1 = Circle.new 5
+c2 = Circle.new 6
+c3 = c1 + c2
+
+p c3
+</code></pre>
+
+
+<p>这个例子中，我们创建了一个<em>Circle</em>类，并重载了+操作符，用于将两个<em>circle</em>对象相加。</p>
+
+
+<pre><code>def +(other)
+    Circle.new @radius + other.radius
+end
+</code></pre>
+
+
+<p>我们定义了一个名为<em>+</em>的方法，这个方法将两个<em>circle</em>对象的半径相加。</p>
+
+
+<pre><code>c1 = Circle.new 5
+c2 = Circle.new 6
+c3 = c1 + c2
+</code></pre>
+
+
+<p>创建两个<em>circle</em>对象。在第三行我们将这两个对象相加生成一个新的对象。</p>
+
+
+<p>$ ./operatoroverloading.rb<br>
+Circle with radius: 11  </p>
+
+
+<p>这两个对象相加生成的第三个对象半径为11。</p>
+
+
+<h2>类方法</h2>
+
+
+<p>Ruby方法分为类方法和实例方法。类方法只能被类调用，不能被实例调用。</p>
+
+
+<p>类方法不能访问实例变量。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Circle
+
+    def initialize x
+        @r = x
+    end
+
+    def self.info
+       "This is a Circle class" 
+    end
+
+    def area
+        @r * @r * 3.141592
+    end
+
+end
+
+
+p Circle.info
+c = Circle.new 3
+p c.area
+</code></pre>
+
+
+<p>上面的例子展示了一个<em>Circle</em>类。除了构造函数之外，还有一个类方法和一个实例方法。</p>
+
+
+<pre><code>def self.info
+    "This is a Circle class" 
+end
+</code></pre>
+
+
+<p>以<em>self</em>关键字开头的是类方法。</p>
+
+
+<pre><code>def area
+    "Circle, radius: #{@r}"
+end
+</code></pre>
+
+
+<p>实例方法不以<em>self</em>关键字开头。</p>
+
+
+<pre><code>p Circle.info
+</code></pre>
+
+
+<p>调用类方法。注意我们是通过类来调用这个方法。</p>
+
+
+<pre><code>c = Circle.new 3
+p c.area
+</code></pre>
+
+
+<p>为了调用实例方法我们必须得先创建一个对象。实例方法总是被对象调用。这里<em>c</em>变量保存了该对象，我们利用点操作符调用<em>area</em>方法。</p>
+
+
+<p>$ ./classmethods.rb<br>
+&#8220;This is a Circle class&#8221;<br>
+28.274328  </p>
+
+
+<p>例子的输出描述了Ruby的类方法。</p>
+
+
+<hr>
+
+
+<p>在Ruby中有三种方式创建类方法。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Wood
+
+    def self.info
+       "This is a Wood class" 
+    end
+end
+
+class Brick
+
+    class &lt;&lt; self
+        def info
+           "This is a Brick class" 
+        end
+    end
+end
+
+class Rock
+
+end
+
+def Rock.info
+   "This is a Rock class" 
+end
+
+
+p Wood.info
+p Brick.info
+p Rock.info
+</code></pre>
+
+
+<p>这个例子创建了三个类，每个都有一个类方法。</p>
+
+
+<pre><code>def self.info
+    "This is a Wood class" 
+end
+</code></pre>
+
+
+<p>类方法可以以<em>self</em>关键字开头。</p>
+
+
+<pre><code>class &lt;&lt; self
+    def info
+        "This is a Brick class" 
+    end
+end
+</code></pre>
+
+
+<p>另一个方式是将方法定义放在<em>class &lt;&lt; self</em>结构之后。</p>
+
+
+<pre><code>def Rock.info
+   "This is a Rock class" 
+end
+</code></pre>
+
+
+<p>这是第三种定义类方法的方式。</p>
+
+
+<p>$ ./classmethods2.rb<br>
+&#8220;This is a Wood class&#8221;<br>
+&#8220;This is a Brick class&#8221;<br>
+&#8220;This is a Rock class&#8221;  </p>
+
+
+<p>调用<em>Wood</em>、<em>Brick</em>和<em>Rock</em>这三个类的类方法的输出结果。</p>
+
+
+<h2>创建实例方法的三种方式</h2>
+
+
+<p>Ruby有三种基本的方式创建实例方法。实例方法是属于实例对象的。它们是通过对象使用点操作符调用。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Wood
+
+    def info
+       "This is a wood object"        
+    end
+end
+
+wood = Wood.new
+p wood.info
+
+class Brick
+
+    attr_accessor :info
+end
+
+brick = Brick.new
+brick.info = "This is a brick object"
+p brick.info
+
+class Rock
+
+end
+
+rock = Rock.new
+
+def rock.info
+    "This is a rock object"
+end
+
+p rock.info
+</code></pre>
+
+
+<p>这个例子我们创建了三个实例对象<em>Wood</em>、<em>Brick</em>和<em>Rock</em>。每个对象都有一介上实例方法。</p>
+
+
+<pre><code>class Wood
+
+    def info
+       "This is a wood object"        
+    end
+end
+
+wood = Wood.new
+p wood.info
+</code></pre>
+
+
+<p>这可能是最常用的一种方式。<em>info</em>方法定义在<em>Wood</em>类的内部。稍后创建一个对象并调用它的<em>info</em>方法。</p>
+
+
+<pre><code>class Brick
+
+    attr_accessor :info
+end
+
+brick = Brick.new
+brick.info = "This is a brick object"
+p brick.info
+</code></pre>
+
+
+<p>另一种创建实例方法的方式是使用属性修饰符。这是一种方便的方式可以减少程序员的按键输入。<em>attr_accessor</em>创建两个方法getter和setter，同样也创建一个实例变量用于存储数据。创建一个<em>brick</em>对象，数据使用setter方法保存在<em>@info</em>变量中。最后使用getter方法读取消息。</p>
+
+
+<pre><code>class Rock
+
+end
+
+rock = Rock.new
+
+def rock.info
+    "This is a rock object"
+end
+
+p rock.info
+</code></pre>
+
+
+<p>第三种方法我们创建了一个空的<em>Rock</em>类。稍后实例化一个对象，动态的为这个对外创建一个方法。</p>
+
+
+<p>$ ./threeways.rb<br>
+&#8220;This is a wood object&#8221;<br>
+&#8220;This is a brick object&#8221;<br>
+&#8220;This is a rock object&#8221;  </p>
+
+
+<p>例子的输出结果。</p>
+
+
+<h2>多态性</h2>
+
+
+<p>多态是使用一个操作符或者函数对不同的数据进行不同的处理。实践中多态意味着如果类B继承自类A，它没有必要将类A的所有都继承；它可以做一些与类A不同的事情。</p>
+
+
+<p>注意静态语言如C++、Java、或者C#和动态语言如Python、Ruby的多态有些不同。在静态语言中编译器决定了方法的定义。在动态语言中我们专注了同名方法的不同操作。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Animal
+
+    def make_noise 
+        "Some noise"
+    end
+
+    def sleep 
+        puts "#{self.class.name} is sleeping." 
+    end
+
+end
+
+class Dog &lt; Animal
+
+    def make_noise 
+        'Woof!'         
+    end
+
+end
+
+class Cat &lt; Animal
+
+    def make_noise 
+        'Meow!' 
+    end 
+end
+
+[Animal.new, Dog.new, Cat.new].each do |animal|
+  puts animal.make_noise
+  animal.sleep
+end
+</code></pre>
+
+
+<p>我们创建了一个简单的继承结构。有一个<em>Animal</em>基类和两个后代<em>Cat</em>和<em>Dog</em>。这三个类都有它自己的<em>make_noise</em>方法实现。后代的实现方法会替换掉<em>Animal</em>类的。</p>
+
+
+<pre><code>class Dog &lt; Animal
+
+    def make_noise 
+        'Woof!'         
+    end
+
+end
+</code></pre>
+
+
+<p><em>Dog</em>类的<em>make_noise</em>实现替换掉了<em>Animal</em>类的实现。</p>
+
+
+<pre><code>[Animal.new, Dog.new, Cat.new].each do |animal|
+  puts animal.make_noise
+  animal.sleep
+end
+</code></pre>
+
+
+<p>为每个类的创建了一个实例对象，并对该对象调用了<em>make_noise</em>方法和<em>sleep</em>方法。</p>
+
+
+<p>$ ./polymorhism.rb<br>
+Some noise<br>
+Animal is sleeping.<br>
+Woof!<br>
+Dog is sleeping.<br>
+Meow!<br>
+Cat is sleeping.  </p>
+
+
+<p>polymorhism.rb脚本的输出结果。</p>
+
+
+<h2>模块</h2>
+
+
+<p>一个Ruby模块是方法、类和常量的集合。模块与类相似也有些不同。模块不能创建实例，没有子类。</p>
+
+
+<p>模块用于将相关的类、方法和常量聚集单独放在一个模块中。这样也避免了命名的冲突，因为模块将它包含的对象进行了封装。从这方面来看Ruby的模块与C#的命名空间和Java的包相似。</p>
+
+
+<p>在Ruby中模块也支持混合类（mixins）。混入类（mixin）是一个创建多继承的工厂。如果一个类继承自多个类，则称为多继承。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+puts Math::PI
+puts Math.sin 2
+</code></pre>
+
+
+<p>Ruby有一个内建的<em>Math</em>模块。它有许多方法和常量。我们使用<em>::</em>操作符访问PI常量。与类相同使用点操作符访问方法。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+include Math
+
+puts PI
+puts sin 2
+</code></pre>
+
+
+<p>如果我包含了一个模块，我们就可以直接引用Math的对象了。模块导入使用<em>include</em>关键字。</p>
+
+
+<p>$ ./modules.rb<br>
+3.141592653589793<br>
+0.9092974268256817  </p>
+
+
+<p>程序的输出结果。</p>
+
+
+<hr>
+
+
+<p>下面的例子我们展示了如何使用模块来组织代码。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+module Forest
+
+    class Rock ; end
+    class Tree ; end
+    class Animal ; end
+
+end
+
+module Town
+
+   class Pool ; end
+   class Cinema ; end
+   class Square ; end
+   class Animal ; end
+
+end
+
+
+p Forest::Tree.new
+p Forest::Rock.new
+p Town::Cinema.new
+
+p Forest::Animal.new
+p Town::Animal.new
+</code></pre>
+
+
+<p>Ruby代码可以主义分组。<em>Rocks</em>和<em>Tree</em>属于<em>Forest</em>。<em>Pools</em>、<em>Cinema</em>、<em>Squares</em>属于<em>Town</em>。使用模块让我们的代码更加有条理。<em>Animals</em>可以在<em>Forest</em>里也可以有<em>Town</em>里。对于一个脚本我们不能定义两个<em>Animal</em>类，它们会冲突。将它们放在不同的模块即可解决这个问题。</p>
+
+
+<pre><code>p Forest::Tree.new
+p Forest::Rock.new
+p Town::Cinema.new
+</code></pre>
+
+
+<p>创建属于<em>Forest</em>和<em>Town</em>的对象。我们使用<em>::</em>操作符访问模块里的对象。</p>
+
+
+<pre><code>p Forest::Animal.new
+p Town::Animal.new
+</code></pre>
+
+
+<p>创建两个Animal对象。Ruby解释器会将它们标识为它们的模块名。</p>
+
+
+<pre><code>$ ./modules3.rb
+#&lt;Forest::Tree:0x97f35ec&gt;
+#&lt;Forest::Rock:0x97f35b0&gt;
+#&lt;Town::Cinema:0x97f3588&gt;
+#&lt;Forest::Animal:0x97f3560&gt;
+#&lt;Town::Animal:0x97f3538&gt;
+</code></pre>
+
+
+<p>modules3.rb程序的输出。</p>
+
+
+<hr>
+
+
+<p>这节的最后一个例子我们将展示使用模块进行多继承。在这里的上下文中模块称为混合类（mixins）。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+module Device
+    def switch_on ; puts "on" end    
+    def switch_off ; puts "off" end
+end
+
+module Volume
+    def volume_up ; puts "volume up" end    
+    def vodule_down ; puts "volume down" end
+end
+
+module Pluggable
+    def plug_in ; puts "plug in" end    
+    def plug_out ; puts "plug out" end
+end
+
+class CellPhone
+    include Device, Volume, Pluggable
+
+    def ring
+        puts "ringing"
+    end    
+end
+
+cph = CellPhone.new
+cph.switch_on
+cph.volume_up
+cph.ring
+</code></pre>
+
+
+<p>我们定义了三个模块和一个类。模块代表了一些功能。一个设备可以调节开头。许多对象都可以分享这个功能，包含电视、手机、电脑和冰箱。相对于为每个对象创建这个功能，我们是将它分隔在一个模块里，它可以被每个对象包含。这样代码将更加有条理更紧凑。</p>
+
+
+<pre><code>module Volume
+    def volume_up ; puts "volume up" end    
+    def vodule_down ; puts "volume down" end
+end
+</code></pre>
+
+
+<p><em>Volume</em>模块组织了负责控制音量等级的方法。如果一个设备需要这些方法，它只需要简单的在自己的类中包含这个模块即可。</p>
+
+
+<pre><code>class CellPhone
+    include Device, Volume, Pluggable
+
+    def ring
+        puts "ringing"
+    end    
+end
+</code></pre>
+
+
+<p><em>CellPhone</em>添加了这三个模块。这些模块的方法混合在<em>CellPhone</em>类中。对于这个类的实例对象同样有效。<em>CellPhone</em>类也有一个自己的<em>ring</em>方法。</p>
+
+
+<pre><code>cph = CellPhone.new
+cph.switch_on
+cph.volume_up
+cph.ring
+</code></pre>
+
+
+<p>创建了一个<em>CellPhone</em>对象并调用了三个方法。</p>
+
+
+<p>$ ./mixins.rb<br>
+on<br>
+volume up<br>
+ringing  </p>
+
+
+<p>例子的运行结果。</p>
+
+
+<h2>异常</h2>
+
+
+<p>异常是对象偏离了正常的程序执行流的信号。<br>
+异常出现、抛出或者开始。</p>
+
+
+<p>在应用程序执行期间，许多事情可能引起错误。磁盘满了我们不能保存文件。网络断了但应用程序试图连接某个网站。所有的这些可能引起应用程序崩溃。为了避免这个的发生，我们应当在程序异常时预先处理错误。对于这个我们可以使用异常处理。</p>
+
+
+<p>异常是对象，它们是内建<em>Exception</em>类的后代。<em>Exception</em>对象携带了关于异常的信息。它的类型（异常的类名），可选的描述字符串，和一个可选的跟踪信息。为了获取关于程序运行异常的额外信息，程序可以子类化<em>Exception</em>或者更多是<em>StandardError</em>。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+x = 35
+y = 0
+
+begin
+    z = x / y
+    puts z
+rescue =&gt; e
+    puts e
+    p e
+end
+</code></pre>
+
+
+<p>上面的程序我们故意的除以0,这个导致一个错误。</p>
+
+
+<pre><code>begin
+    z = x / y
+    puts z
+</code></pre>
+
+
+<p>出错的语句位置<em>begin</em>关键字之后。</p>
+
+
+<pre><code>rescue =&gt; e
+    puts e
+    p e
+end
+</code></pre>
+
+
+<p><em>rescue</em>关键字之后的代码我们处理一个异常。这里我们在终端上打印错误信息。<em>e</em>是一个异常对象，在错误发生时创建的。</p>
+
+
+<pre><code>$ ./zerodivision.rb
+divided by 0
+#&lt;ZeroDivisionError: divided by 0&gt;
+</code></pre>
+
+
+<p>输出结果我们看到了异常信息。最后一行显示了异常对象名为<em>ZeroDivisionError</em>。</p>
+
+
+<hr>
+
+
+<p>程序员可以使用<em>raise</em>关键字发起自己的异常。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+age = 17
+
+begin
+    if age &lt; 18
+        raise "Person is a minor"
+    end
+
+    puts "Entry allowed"
+rescue =&gt; e
+    puts e
+    p e
+    exit 1
+end
+</code></pre>
+
+
+<p>俱乐部不允许不满18岁的青年进入。我们使用Ruby脚本模拟这个情况。</p>
+
+
+<pre><code>begin
+    if age &lt; 18
+        raise "Person is a minor"
+    end
+
+    puts "Entry allowed"
+</code></pre>
+
+
+<p>如果是未成年人，将出现一个异常。如果<em>raise</em>关键字没有指明异常参数，则<em>RuntimeError</em>异常将引发。这个代码不会到达<em>puts &#8220;Entry allowed&#8221;</em>这行。代码执行中断并继续<em>rescue</em>的代码块。</p>
+
+
+<pre><code>rescue =&gt; e
+    puts e
+    p e
+    exit 1
+end
+</code></pre>
+
+
+<p>在<em>rescue</em>代码块中我们打印错误信息，<em>RuntimeError</em>对象的一个字符串描述。我们也调用了<em>exit</em>方法通知环境该脚本错误退出。</p>
+
+
+<pre><code>$ ./raise_exception.rb 
+Person is a minor
+#&lt;RuntimeError: Person is a minor&gt;
+$ echo $?
+1
+</code></pre>
+
+
+<p>未成年人不允许进行俱乐部。bash的$?变量设置了这个脚本错误退出。</p>
+
+
+<hr>
+
+
+<p>Ruby的<em>ensure</em>从名创建的代码块总是会被执行，不管是否有异常。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+begin
+    f = File.open("stones", "r")
+
+    while line = f.gets do
+        puts line
+    end
+
+rescue =&gt; e
+    puts e
+    p e
+ensure
+    f.close if f
+end
+</code></pre>
+
+
+<p>这个例子我们尝试打开并读取stones文件。I/O操作容易出现错误。</p>
+
+
+<pre><code>ensure
+    f.close if f
+end
+</code></pre>
+
+
+<p>在<em>ensure</em>的代码块中我们关闭文件处理对象。我们查检处理对象是否存在，因为它可能没有被创建。分配的资源通常位于<em>ensure</em>代码块里。</p>
+
+
+<hr>
+
+
+<p>如果想到，我们可以创建自定义的异常。Ruby中自定义异常继承自<em>StandardError</em>类。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class BigValueError &lt; StandardError ; end
+
+LIMIT = 333
+x = 3_432_453
+
+begin
+
+    if x &gt; LIMIT
+        raise BigValueError, "Exceeded the maximum value"
+    end
+
+    puts "Script continues"
+
+rescue =&gt; e
+    puts e
+    p e
+    exit 1
+end
+</code></pre>
+
+
+<p>我们有一个情况不能处理大的数字。</p>
+
+
+<pre><code>class BigValueError &lt; StandardError ; end
+</code></pre>
+
+
+<p>我们定义一个<em>BigValueError</em>类。这个类继承自<em>StandardError</em>类。</p>
+
+
+<pre><code>LIMIT = 333
+</code></pre>
+
+
+<p>数字超过这个常量就被认为是大的。</p>
+
+
+<pre><code>if x &gt; LIMIT
+    raise BigValueError, "Exceeded the maximum value"
+end
+</code></pre>
+
+
+<p>如果值比<em>LIMIT</em>在，则抛出一个自定义异常。异常信息为<em>&#8220;Exceeded the maximum value&#8221;</em>。</p>
+
+
+<pre><code>$ ./custom_exception.rb
+Exceeded the maximum value
+#&lt;BigValueError: Exceeded the maximum value&gt;
+</code></pre>
+
+
+<p>执行程序。</p>
+
+
+<p>在这一章我们完成了Ruby语言的面向对象编程。</p>
+
+
+<hr>
+
+
+<p>原文地址： <a href="http://zetcode.com/lang/rubytutorial/oop2/">http://zetcode.com/lang/rubytutorial/oop2/</a><br>
+翻译：龙昌  admin@longchangjin.cn<br>
+完整教程：<a href="https://github.com/wusuopu/Ruby-tutorial">https://github.com/wusuopu/Ruby-tutorial</a> </p>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">龍昌</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2013-11-17T00:00:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+    </p>
+    <p class="meta">
+      Categories: 
+
+<span class="categories">
+  
+    <a class='category' href='/categories/ruby栏目/index.html'>ruby栏目</a>
+  
+</span>
+
+
+    </p>
+    <p class="meta">
+      Tags: 
+
+<span class="tags">
+  
+    <a class='tag' href='/tags/Ruby/index.html'>Ruby</a>, <a class='tag' href='/tags/翻译/index.html'>翻译</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/archives/83939.html" title="Previous Post: [翻译]Ruby教程12——面向对象">&laquo; [翻译]Ruby教程12——面向对象</a>
+      
+      
+        <a class="basic-alignment right" href="/archives/83945.html" title="Next Post: [翻译]Ruby教程14——正则表达式">[翻译]Ruby教程14——正则表达式 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Subscription</h1>
+  <!--以下是QQ邮件列表订阅嵌入代码--><script >var nId = "e7ee5da6d322dc7157c25cfd8a7700bb23a056dd1fb18cb4",nWidth="auto",sColor="light",sText="请输入邮件地址：" ;</script><script src="http://list.qq.com/zh_CN/htmledition/js/qf/page/qfcode.js" charset="gb18030"></script>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84132.html">配置elixir的vim环境</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84130.html">配置coffeescript的vim环境</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84127.html">VIM编译参数</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84124.html">Docker使用笔记</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84121.html">Nginx + Php + FastCGI配置</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (47)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (32)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (26)</a></li><li><a href='/categories/web开发/index.html'>web开发 (16)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (7)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (10)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (21)</a></li></ul>
+</section>
+<section>
+  <h1>Tag Cloud</h1>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.45454545454545%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.9090909090909%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.81818181818181%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.9090909090909%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.36363636363636%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.27272727272727%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.36363636363636%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.81818181818181%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.81818181818181%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 100.9090909090909%'>Django(1)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.9090909090909%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.81818181818181%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.72727272727273%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.9090909090909%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.9090909090909%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.45454545454545%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.81818181818181%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.63636363636364%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.45454545454545%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.9090909090909%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.45454545454545%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.9090909090909%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.9090909090909%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.9090909090909%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(66)</a> <a href='/tags/mongodb/index.html' style='font-size: 109.0909090909091%'>mongodb(10)</a> <a href='/tags/mysql/index.html' style='font-size: 103.63636363636364%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.9090909090909%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.9090909090909%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.18181818181819%'>php(9)</a> <a href='/tags/ps/index.html' style='font-size: 105.45454545454545%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.9090909090909%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 144.54545454545456%'>python(49)</a> <a href='/tags/qt/index.html' style='font-size: 101.81818181818181%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.9090909090909%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 123.63636363636364%'>Ruby(26)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.72727272727273%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.9090909090909%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.54545454545455%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.36363636363636%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.72727272727273%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 121.81818181818181%'>vim(24)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.72727272727273%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.9090909090909%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.9090909090909%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 112.72727272727272%'>Web开发(14)</a> <a href='/tags/windows/index.html' style='font-size: 106.36363636363636%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.9090909090909%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.9090909090909%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.9090909090909%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.9090909090909%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.45454545454545%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.81818181818181%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.9090909090909%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.18181818181819%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.18181818181819%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.9090909090909%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.9090909090909%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.9090909090909%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.81818181818181%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 109.0909090909091%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.18181818181819%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.9090909090909%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.54545454545455%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.9090909090909%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.9090909090909%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 104.54545454545455%'>网络日志(5)</a> <a href='/tags/翻译/index.html' style='font-size: 120.9090909090909%'>翻译(23)</a> <a href='/tags/视频教程/index.html' style='font-size: 109.0909090909091%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.9090909090909%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.81818181818181%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.9090909090909%'>随笔(1)</a> </span>
+</section>
+<section>
+  <h1>Link</h1>
+    <ul id="category-list">
+      <li><a target="_blank" title="我的Github" href="https://github.com/wusuopu">@Github</a></li>
+      <li><a target="_blank" title="我的微博" href="http://www.weibo.com/u/1768691343">@Weibo</a></li>
+      <li><a target="_blank" title="我的Twitter" href="https://twitter.com/longchangjin">@Twitter</a></li>
+      <li><a target="_blank" title="我的豆瓣" href="http://www.douban.com/people/lchj/">@Douban</a></li>
+
+      <li><a target="_blank" title="" href="http://www.vimer.cn/">Vimer的程序世界</a></li>
+      <li><a target="_blank" title="" href="http://pythoner.net/">python开发者社区</a></li>
+      <li><a target="_blank" title="" href="http://simple-is-better.com/">python.cn(news, jobs)</a></li>
+      <li><a target="_blank" title="" href="http://gtk.awaysoft.com/">GTK+ 中文社区</a></li>
+    </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - 龍昌 -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+<div style="display:none;"><script src="http://s94.cnzz.com/stat.php?id=1259846&web_id=1259846&show=pic" language="JavaScript"></script></div>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'longchang';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://www.xefan.com/archives/83942.html';
+        var disqus_url = 'http://www.xefan.com/archives/83942.html';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

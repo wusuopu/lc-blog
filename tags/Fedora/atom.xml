@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Tag: Fedora | 龍昌博客]]></title>
+  <link href="http://www.xefan.com/tags/Fedora/atom.xml" rel="self"/>
+  <link href="http://www.xefan.com/"/>
+  <updated>2014-11-04T14:10:28+08:00</updated>
+  <id>http://www.xefan.com/</id>
+  <author>
+    <name><![CDATA[龍昌]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Fedora SIS显卡分辨率设置]]></title>
+    <link href="http://www.xefan.com/archives/83413.html"/>
+    <updated>2010-09-21T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/83413-Fedora SIS显卡分辨率设置</id>
+    <content type="html"><![CDATA[<p>我的小本是神舟的<strong>天运F3000</strong>，SIS的芯片组。驱动比较难找。安装完Fedora 13后默认为800<em>600的分辨率，且只有800</em>600、640<em>480两种，由于没装显卡驱动（我想装也找不到）所以不能更改为我们喜欢的1024</em>768以上的分辨率。</p>
+
+<p>曾经有人说过，选择了神舟你就选择了草根。既然如此就不要抱怨了自己想办法解决吧。</p>
+
+<p>在网上有人说可以通过修改<em>/etc/X11/xorg.conf</em>这个文件来修改分辨率，可是我这连这个文件也没有。最后我使用的如下方法：</p>
+
+<p>（1）首先以root权限执行命令：<em>Xorg -configure :1</em> ，执行完后就在/root目录下生成了xorg.conf.new文件；然后将其复制到/etc/X11目录下：<em>cp /root/xorg.conf.new /etc/X11/xorg.conf </em>。</p>
+
+<p>（2）在开机时Fedora的grub引导后加上<span style="color: #ff0000"><em>vga=792</em></span>这个参数。这时你的分辨率又回到1024x768，16位色深。</p>
+
+<p>你可以从下面的表格中查找你喜欢的分辨率：</p>
+
+<pre><code>Colours 640x480 800x600 1024x768 1280x1024 1600x1200
+--------+---------------------------------------------
+256      | 769      771      773      775       796
+32,768 | 784        787      790      793       797
+65,536 | 785        788      791      794       798
+16.8M | 786         789      792      795       799
+</code></pre>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Fedora 13 Totem安装解码器]]></title>
+    <link href="http://www.xefan.com/archives/83400.html"/>
+    <updated>2010-09-15T00:00:00+08:00</updated>
+    <id>http://www.xefan.com/archives/83400-fedora 13 totem安装解码器</id>
+    <content type="html"><![CDATA[<p>最近两天刚装上Fedora 13，它自带有totem播放器，不过好像由于版权的原因有的解码器没有安装，最终导致有的多媒体文件打不开。上网查了下找到了解决方法。</p>
+
+<p>以下转自网络：</p>
+
+<hr />
+
+
+<p>一、先下载两个解码器包。</p>
+
+<p>all-20071007.tar.bz2<br/>
+windows-all-20071007.zip</p>
+
+<p>我现在使用的最新的解码器，如果以后有更新大家可以去 <a href="http://www.mplayerhq.hu/MPlayer/releases/codecs/%E8%87%AA%E8%A1%8C%E4%B8%8B%E8%BD%BD%E4%BD%BF%E7%94%A8%E3%80%82">http://www.mplayerhq.hu/MPlayer/releases/codecs/%E8%87%AA%E8%A1%8C%E4%B8%8B%E8%BD%BD%E4%BD%BF%E7%94%A8%E3%80%82</a></p>
+
+<p>二、建立两个目录来保存这两个包中的文件。</p>
+
+<p><em>mkdir /usr/lib/{codecs,wincodecs}<br/>
+tar jxvf all-20071007.tar.bz2<br/>
+mv all-20071007/<em> /usr/lib/codecs<br/>
+unzip windows-all-20071007.zip<br/>
+mv windows-all-20071007/</em> /usr/lib/wincodecs</em></p>
+
+<p>三、为系统添加RPM Fusion 源，方法如下：</p>
+
+<p><em>
+rpm -Uvh <a href="http://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-stable.noarch.rpm">http://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-stable.noarch.rpm</a></p>
+
+<p>rpm -Uvh <a href="http://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-stable.noarch.rpm">http://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-stable.noarch.rpm</a></p>
+
+<p>yum makecache </em></p>
+
+<p>有更新的话，大家可以参考<a href="http://www.rpmfusion.org/Configuration%E8%87%AA%E8%A1%8C%E6%B7%BB%E5%8A%A0">http://www.rpmfusion.org/Configuration%E8%87%AA%E8%A1%8C%E6%B7%BB%E5%8A%A0</a></p>
+
+<p>四、安装多媒体软件与插件.</p>
+
+<p><em>yum install totem<br/>
+yum install gstreamer-plugins-good  gstreamer-plugins-bad gstreamer-plugins-ugly<br/>
+yum install ffmpeg ffmpeg-libs gstreamer-ffmpeg  libmatrosca xvidcore libdvdread libdvdnav lsdvd<br/>
+yum install totem-xine totem-gstreamer  xine-lib-extras-freeworld</em></p>
+
+<p>然后就可以使用totem播放影音文件了！</p>
+
+<hr />
+
+
+<p>如果已经安装了totem就无需执行<em>yum install totem</em>，还有好像Fedora 13的源里没有<em>totem-xine。</em></p>
+]]></content>
+  </entry>
+  
+</feed>

@@ -1,0 +1,1204 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>龍昌博客</title>
+  <meta name="author" content="龍昌">
+
+  
+  <meta name="description" content="MongoEngine是MongoDB的一个ODM(Object-Document Mapper)框架，它提供了类似Django的语法来操作MongoDB数据库。 安装 安装 MongoEngine 需要先安装 PyMongo。 使用pip安装 $ [sudo] pip install &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.xefan.com/page/3/index.html">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="龍昌博客" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.useso.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.useso.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.useso.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">龍昌博客</a></h1>
+  
+    <h2>从Pythoner转向Rubist</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.xefan.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+ <li><a href="/about/">About</a></li>  <li><a href="/gbook/">留言板</a></li> 
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84063.html">Mongoengine教程(1)——概述</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-04-02T00:00:00+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>2</span><span class='date-suffix'>nd</span>, <span class='date-year'>2014</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/84063.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/84063.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>MongoEngine是MongoDB的一个ODM(Object-Document Mapper)框架，它提供了类似Django的语法来操作MongoDB数据库。</p>
+
+
+<h2>安装</h2>
+
+
+<p>安装 MongoEngine 需要先安装 PyMongo。  </p>
+
+
+<h3>使用pip安装</h3>
+
+
+<pre><code>$ [sudo] pip install mongoengine
+</code></pre>
+
+
+<h3>通过源代码安装</h3>
+
+
+<p>先从 <a href="http://pypi.python.org/pypi/mongoengine/">PyPi</a> 或者 <a href="http://github.com/MongoEngine/mongoengine">Github</a> 下载源代码。然后再进行安装。</p>
+
+
+<pre><code>$ [sudo] python setup.py install
+</code></pre>
+
+
+<h2>使用</h2>
+
+
+<p>首先启动 mongodb 服务器：</p>
+
+
+<pre><code>$ mongod
+</code></pre>
+
+
+<h3>连接服务器</h3>
+
+
+<p>使用 connect 方法进行数据库链接，与pymongo的用法相似，其参数可以是多种型式的。</p>
+
+
+<pre><code>from mongoengine import connect
+connect('project1')
+connect('project1', host='mongodb://localhost:27017/test_database')
+</code></pre>
+
+
+<p>从 MongoEngine 0.6 开始增加了多数据库的支持， connect 的第二个参数可以为每个链接设置一个别名。</p>
+
+
+<h3>定义数据模型</h3>
+
+
+<p>mongoengine的 Document 与django的 Model 相似。</p>
+
+
+<pre><code>class User(mongoengine.Document):
+    name = mongoengine.StringField()
+
+    meta = {"db_alias": "default"}
+</code></pre>
+
+
+<h3>数据操作</h3>
+
+
+<p>数据的添加过程也与django相似：</p>
+
+
+<pre><code>User.objects.create(name="test1")
+User.objects.create(name="test2")
+User(name="test3").save()
+</code></pre>
+
+
+<p>查询数据：</p>
+
+
+<pre><code>User.objects.filter(name="test2")
+</code></pre>
+
+
+<p>删除数据：</p>
+
+
+<pre><code>User.objects.filter(name="test2").delete()
+</code></pre>
+
+
+<p>MongoEngine虽然提供了ODM，但是我们同样还是可以直接对数据库进行操作。<br>
+获取 pymongo 的 collection 对象：</p>
+
+
+<pre><code>User.objects._collection
+</code></pre>
+
+
+<p>然后就可以使用原生的pymongo操作了。</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84060.html">Pymongo教程(3)——自定义数据类型</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-03-30T00:00:00+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>30</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/84060.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/84060.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>pymongo提供一些常用的数据类型，如：数据、字符串、日期等。如果感觉还不能满足需求，那么还可以自定义数据类型。</p>
+
+
+<p>首先定义一个类：</p>
+
+
+<pre><code>class Custom(object):
+    def __init__(self, x):
+        self.__x = x
+
+    def x(self):
+        return self.__x
+</code></pre>
+
+
+<p>要将自定义类型的数据存入数据库中需要先进行编码；将数据从数据库读取出来后又需要再解码。</p>
+
+
+<h2>手动编码/解码</h2>
+
+
+<p>我们可以定义两个方法，在插入和查询数据时进行手动的编码、解码。</p>
+
+
+<pre><code>def encode_custom(custom):
+    return {"_type": "custom", "x": custom.x()}
+
+def decode_custom(document):
+    assert document["_type"] == "custom"
+    return Custom(document["x"])
+
+print(db.test.insert({"custom": encode_custom(Custom(5))}))
+print(db.test.find_one()['custom'])
+</code></pre>
+
+
+<h2>自动编码/解码</h2>
+
+
+<p>手动地进行编码虽然可行，但是还是不太方便。我们还可以使用 SONManipulator 进行自动编码。</p>
+
+
+<pre><code>from pymongo.son_manipulator import SONManipulator
+class Transform(SONManipulator):
+    def transform_incoming(self, son, collection):
+        for (key, value) in son.items():
+            if isinstance(value, Custom):
+                son[key] = encode_custom(value)
+            elif isinstance(value, dict): # Make sure we recurse into sub-docs
+                son[key] = self.transform_incoming(value, collection)
+        return son
+
+    def transform_outgoing(self, son, collection):
+        for (key, value) in son.items():
+            if isinstance(value, dict):
+                if "_type" in value and value["_type"] == "custom":
+                    son[key] = decode_custom(value)
+                else: # Again, make sure to recurse into sub-docs
+                    son[key] = self.transform_outgoing(value, collection)
+        return son
+
+db.add_son_manipulator(Transform())
+print(db.test.insert({"custom": Custom(5)}))
+print(db.test.find_one())
+</code></pre>
+
+
+<h2>二进制编码</h2>
+
+
+<p>我们也可以将其编码成二进制进行存储。</p>
+
+
+<pre><code>from bson.binary import Binary
+def to_binary(custom):
+    return Binary(str(custom.x()), 128)
+
+def from_binary(binary):
+    return Custom(int(binary))
+
+class TransformToBinary(SONManipulator):
+    def transform_incoming(self, son, collection):
+        for (key, value) in son.items():
+            if isinstance(value, Custom):
+                son[key] = to_binary(value)
+            elif isinstance(value, dict):
+                son[key] = self.transform_incoming(value, collection)
+        return son
+
+    def transform_outgoing(self, son, collection):
+        for (key, value) in son.items():
+            if isinstance(value, Binary) and value.subtype == 128:
+                son[key] = from_binary(value)
+            elif isinstance(value, dict):
+                son[key] = self.transform_outgoing(value, collection)
+        return son
+
+db.add_son_manipulator(TransformToBinary())
+print(db.test.insert({"custom": Custom(5)}))
+print(db.test.find_one())
+</code></pre>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84057.html">Pymongo教程(2)——聚合操作</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-03-29T00:00:00+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>29</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/84057.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/84057.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在MongoDB中常用的聚合操作有 aggregation、map/reduce和group 。</p>
+
+
+<p>首先先添加一些测试数据：</p>
+
+
+<pre><code>db.things.insert({"x": 1, "tags": ["dog", "cat"]})
+db.things.insert({"x": 2, "tags": ["cat"]})
+db.things.insert({"x": 2, "tags": ["mouse", "cat", "dog"]})
+db.things.insert({"x": 3, "tags": []})
+</code></pre>
+
+
+<h2>aggregation</h2>
+
+
+<p>以下例子是统计 tags 字段内的各个值的出现的次数。</p>
+
+
+<pre><code>from bson.son import SON
+db.things.aggregate([
+    {"$unwind": "$tags"},
+    {"$group": {"_id": "$tags", "count": {"$sum": 1}}},
+    {"$sort": SON([("count", -1), ("_id", -1)])}
+])
+
+{'ok': 1.0, 'result': [{'count': 3, '_id': 'cat'}, {'count': 2, '_id': 'dog'}, {'count': 1, '_id': 'mouse'}]}
+</code></pre>
+
+
+<p>注意：aggregate操作要求服务器程序为 2.1.0 以上的版本。PyMongo 驱动程序为 2.3 以上的版本。</p>
+
+
+<h2>Map/Reduce</h2>
+
+
+<p>上面的操作同样也可以使用 Map/Reduce 完成。</p>
+
+
+<pre><code>from bson.code import Code
+mapper = Code("""
+    function () {
+      this.tags.forEach(function(z) {
+        emit(z, 1);
+      });
+    }
+""")
+
+reducer = Code("""
+    function (key, values) {
+      var total = 0;
+      for (var i = 0; i &lt; values.length; i++) {
+        total += values[i];
+      }
+      return total;
+    }
+""")
+
+result = db.things.map_reduce(mapper, reducer, "myresults")
+for doc in result.find():
+    print(doc)
+
+{u'_id': u'cat', u'value': 3.0}
+{u'_id': u'dog', u'value': 2.0}
+{u'_id': u'mouse', u'value': 1.0}
+</code></pre>
+
+
+<p>map和reduce都是一个javascript的函数； map_reduce 方法会将统计结果保存到一个临时的数据集合中。</p>
+
+
+<h2>Group</h2>
+
+
+<p>group 操作与SQL的 GROUP BY 相似，同时比 Map/Reduce 要简单。</p>
+
+
+<pre><code>reducer = Code("""
+    function(obj, prev){
+      prev.count++;
+    }
+""")
+
+results = db.things.group(key={"x":1}, condition={}, initial={"count": 0}, reduce=reducer)
+for doc in results:
+    print(doc)
+
+{'x': 1.0, 'count': 1.0}
+{'x': 2.0, 'count': 2.0}
+{'x': 3.0, 'count': 1.0}
+</code></pre>
+
+
+<p>注意：在MongoDB的集群环境中不支持 group 操作，可以使用 aggregation 或者 map/reduce 代替。</p>
+
+
+<p>完整的MongoDB聚合文档： http://docs.mongodb.org/manual/aggregation/</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84053.html">Pymongo教程(1)——概述</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-03-29T00:00:00+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>29</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/84053.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/84053.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>MongoDB是使用C++开发的一款文档型数据库，PyMongo是MongoDB的Python驱动。</p>
+
+
+<h2>安装</h2>
+
+
+<h3>使用pip安装</h3>
+
+
+<pre><code>$ [sudo] pip install pymongo
+</code></pre>
+
+
+<p>如果要安装特定的版本则：</p>
+
+
+<pre><code>$ [sudo] pip install pymongo==2.6.3
+</code></pre>
+
+
+<h3>通过源代码安装</h3>
+
+
+<pre><code>$ git clone git://github.com/mongodb/mongo-python-driver.git pymongo
+$ cd pymongo/
+$ [sudo] python setup.py install
+</code></pre>
+
+
+<p>注意：使用C的扩展会对性能提升会有帮助。但是在uwsgi中会出现警告，则可以选择只安装python驱动，而不安装C扩展。</p>
+
+
+<pre><code>$ [sudo] python setup.py --no_ext install
+</code></pre>
+
+
+<p>注意： 如果你使用的是Python3的话，PyMongo只支持 Python 3.1以上的版本。</p>
+
+
+<h2>使用</h2>
+
+
+<p>首先启动 mongodb 服务器：</p>
+
+
+<pre><code>$ mongod
+</code></pre>
+
+
+<h3>连接服务器</h3>
+
+
+<p>然后执行python程序连接服务器：</p>
+
+
+<pre><code>from pymongo import MongoClient
+client = MongoClient()
+</code></pre>
+
+
+<p>以上会连接到默认的主机和端口（localhost:27017），也可以指定主机名和端口：</p>
+
+
+<pre><code>client = MongoClient('localhost', 27017)
+</code></pre>
+
+
+<p>或者：</p>
+
+
+<pre><code>client = MongoClient('mongodb://localhost:27017/')
+</code></pre>
+
+
+<h3>访问数据库</h3>
+
+
+<pre><code>db = client.test_database
+</code></pre>
+
+
+<p>如果数据库的名称不能直接使用属性名的风格访问，那么就需要使用字典的风格：</p>
+
+
+<pre><code>db = client['test-database']
+</code></pre>
+
+
+<h3>访问数据集合</h3>
+
+
+<p>与访问数据库相似：</p>
+
+
+<pre><code>collection = db.test_collection
+collection = db['test-collection']
+</code></pre>
+
+
+<h3>插入数据</h3>
+
+
+<p>在MongoDB中数据是以类似JSON格式进行保存的，在PyMongo中则是使用字典风格。然后可以数据集合对象的 insert() 方法进行插入数据。</p>
+
+
+<pre><code>import datetime
+post = {"author": "Mike",
+        "text": "My first blog post!",
+        "tags": ["mongodb", "python", "pymongo"],
+        "date": datetime.datetime.utcnow()}
+post_id = db.posts.insert(post)
+</code></pre>
+
+
+<h3>查询数据</h3>
+
+
+<p>可以数据集合对象的 find() 方法进行查询数据。</p>
+
+
+<pre><code>db.posts.find({"author": "Mike"})
+db.posts.find_one({"author": "Mike"})
+</code></pre>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84048.html">自动生成.gitignore文件</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-03-07T00:00:00+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/84048.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/84048.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>.gitignore文件是用于对git进行设置，让其忽略对某些文件的跟踪。</p>
+
+
+<p>最近发现每创建一个新的仓库都要把.gitignore文件重新写一遍，甚是麻烦。于是就想能否自动生成.gitignore文件，这样的话就比较方便。最后找到了 gitignore.io 这个网站，它可以根据需求生成相应的.gitignore文件。比较你是用vim编辑器编写python代码，则输入vim  python就会生成对应vim和python的gitignore文件了。</p>
+
+
+<p>为了方便使用我编写了一个shell脚本。从 https://gist.github.com/wusuopu/9408486 下载代码，保存为mkgitignore，并加上执行权限。然后执行如下命令生成.gitignore文件。</p>
+
+
+<pre><code>$ mkgitignore vim,python
+$ mkgitignore vim,python .gitignore
+</code></pre>
+
+
+<p>第一条命令是直接将结果输出到终端，第二条命令是将结果输出到.gitignore文件中。</p>
+
+
+<p>最后补充一个git的小知识：<br>
+如果想要在所有的项目中都忽略掉某些文件的话，那么可以设置一个全局的gitignore。执行如下命令：</p>
+
+
+<pre><code>$ git config --global core.excludesfile ~/.gitignore
+</code></pre>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84045.html">Linux下VNC使用</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-03-01T00:00:00+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2014</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/84045.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/84045.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>安装</h3>
+
+
+<p>VNC (Virtual Network Computer)是虚拟网络计算机的缩写。VNC 是一款优秀的远程控制工具软件。<br>
+VNC程序有多个软件包可选择，例如执行以下命令进行安装：</p>
+
+
+<pre><code>$ sudo apt-get install vnc4server
+$ sudo pacman -S tigervnc
+</code></pre>
+
+
+<h3>启动服务器程序</h3>
+
+
+<p>修改$HOME/.vnc/xstartup配置文件，我是用的xfce，配置如下：</p>
+
+
+<pre><code>#!/bin/sh
+
+# Uncomment the following two lines for normal desktop:
+# unset SESSION_MANAGER
+# exec /etc/X11/xinit/xinitrc
+
+[ -x /etc/vnc/xstartup ] &amp;&amp; exec /etc/vnc/xstartup
+[ -r $HOME/.Xresources ] &amp;&amp; xrdb $HOME/.Xresources
+xsetroot -solid grey
+vncconfig -iconic &amp;
+startxfce4 &amp;
+</code></pre>
+
+
+<p>然后运行服务程序，首次运行需要先设置密码：</p>
+
+
+<pre><code>$ vncserver
+</code></pre>
+
+
+<h3>启动客户端程序</h3>
+
+
+<p>执行如下命令链接vnc服务：</p>
+
+
+<pre><code>$ vncviewer &lt;host&gt;:&lt;DISPLAY&gt;
+</code></pre>
+
+
+<p>例如要链接到10.0.0.101的1号DISPLAY，则是：</p>
+
+
+<pre><code>$ vncviewer 10.0.0.101:1
+</code></pre>
+
+
+<p>然后根据提示输入密码即可。</p>
+
+
+<h3>退出程序</h3>
+
+
+<p>如果要退出客户端程序，直接将程序窗口关闭即可。<br>
+如果要退出服务端程序，则在服务端执行命令：  </p>
+
+
+<pre><code>$ vncserver -kill :1
+</code></pre>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84042.html">修改Mongo命令提示符</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-01-24T00:00:00+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>24</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/84042.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/84042.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>默认的启动mongo终端后，命令行的提示符就只有一个大于符号（&gt;）。虽然这不会有什么问题，但是如果同时开启了多个终端连接时，如一个本地连接一个远程连接。终端来回切换，有时就会忘了哪个是哪个，一旦误操作后果是很严重的。因此如果能够显示当前是哪个连接的话会很方便的。</p>
+
+
+<p>修改mongo的配置文件，将提示符改为“当前连接的主机:当前操作的数据库 (当前执行的命令数)&gt;” 这样的形式。</p>
+
+
+<p>编辑 ~/.mongorc.js 文件，没有则创建：</p>
+
+
+<pre><code>var cmdCountNum = 0;
+var prompt = function () {
+  var host = db.getMongo().host;
+  var database = db.getName();
+  cmdCountNum++;
+  return host + ':' + database + ' (' + cmdCountNum + ')&gt; ';
+}
+</code></pre>
+
+
+<p>现在再执行mongo命令试试。</p>
+
+
+<pre><code>$ mongo
+127.0.0.1:test (1)&gt; db
+test
+127.0.0.1:test (2)&gt;
+</code></pre>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84039.html">使用nvm进行node多版本管理</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-01-23T00:00:00+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>23</span><span class='date-suffix'>rd</span>, <span class='date-year'>2014</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/84039.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/84039.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>nvm与Python的virtualenv和Ruby的rvm类似。<br>
+NVM (Node Version Manager，Node多版本管理器)是一个通用的叫法,它目前有许多不同的实现。通常我们说的 nvm 是指 https://github.com/creationix/nvm 或者 https://github.com/visionmedia/n 。这两个工具都是使用shell编写的。</p>
+
+
+<h2>n</h2>
+
+
+<p>个人感觉 n 比较简洁些，它就只有一个脚本文件。  </p>
+
+
+<h3>安装</h3>
+
+
+<p>如果已经安装了npm的话，可以直接执行命令进行安装n :</p>
+
+
+<pre><code>$ npm install -g n
+</code></pre>
+
+
+<p>或者是直接获取源代码安装：</p>
+
+
+<pre><code>$ git clone https://github.com/visionmedia/n.git
+$ cd n
+$ [sudo] make install
+</code></pre>
+
+
+<h3>使用</h3>
+
+
+<p>直接运行 n 命令查看所有已安装的版本。</p>
+
+
+<pre><code>$ n
+</code></pre>
+
+
+<p>运行命令 n <version> 进行安装指定版本的node。 version 可以是 stable(最新稳定版)、latest(最新版)或者具体的版本数字。</p>
+
+
+<pre><code>$ n stable
+install : v0.10.24
+mkdir : /usr/local/n/versions/0.10.24
+fetch : http://nodejs.org/dist/v0.10.24/node-v0.10.24-linux-x64.tar.gz
+</code></pre>
+
+
+<p>指定的版本将会安装在 /usr/local/n/versions 目录下。</p>
+
+
+<p>运行命令 n rm <version> 删除已安装指定版本的node。</p>
+
+
+<p>运行命令 n use <version> 选择使用指定版本的node。</p>
+
+
+<h2>nvm</h2>
+
+
+<h3>安装</h3>
+
+
+<pre><code>$ git clone https://github.com/creationix/nvm.git ~/.nvm
+$ source ~/.nvm/nvm.sh
+</code></pre>
+
+
+<h3>使用</h3>
+
+
+<p>查看已安装的版本：</p>
+
+
+<pre><code>$ nvm ls
+</code></pre>
+
+
+<p>查看可以安装的版本：</p>
+
+
+<pre><code>$ nvm ls-remote
+</code></pre>
+
+
+<p>安装指定的版本：</p>
+
+
+<pre><code>$ nvm install &lt;version&gt;
+</code></pre>
+
+
+<p>指定的版本将会直接安装在 nvm 程序所在的目录下。</p>
+
+
+<p>删除指定的版本：</p>
+
+
+<pre><code>$ nvm uninstall &lt;version&gt;
+</code></pre>
+
+
+<p>使用选定的版本：</p>
+
+
+<pre><code>$ nvm use &lt;version&gt;
+</code></pre>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84036.html">使用virtualenv安装多个版本python</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-01-22T00:00:00+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2014</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/84036.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/84036.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>使用virtualenv可以在你的系统中安装多个python环境，它与Ruby的rvm和nodejs的nvm类似。如果你要尝试不同版本的库的话，这个是非常有用的。</p>
+
+
+<h3>安装</h3>
+
+
+<p>安装方法很简单，直接执行命令：</p>
+
+
+<pre><code>$ [sudo] pip install virtualenv
+</code></pre>
+
+
+<p>如果是想到体验最新的非正式版，可以执行命令：</p>
+
+
+<pre><code>$ [sudo] pip install https://github.com/pypa/virtualenv/tarball/develop
+</code></pre>
+
+
+<h3>使用</h3>
+
+
+<p>基本使用方法是：</p>
+
+
+<pre><code>$ virtualenv &lt;DEST_DIR&gt;
+</code></pre>
+
+
+<p>则在 &lt;DEST_DIR&gt; 目录下为 /usr/bin/python 创建一个新的虚拟环境。该环境下对应的python解释器为 &lt;DEST_DIR&gt;/bin/python 。</p>
+
+
+<p>想要使用刚刚创建的python环境，可以修改 $PATH 环境变量，在开头加上 &lt;DEST_DIR&gt;/bin 。这样就可以直接执行 python 命令运行了，但是这样的话又会造成系统环境中的python无法正常使用了。 或者每次执行命令时输入完整的路径， &lt;DEST_DIR&gt;/bin/python ，但是这样比较麻烦。不过好在刚创建的虚拟环境中有一个 &lt;DEST_DIR&gt;/bin/activate 脚本文件，运行该脚本即可切换到虚拟环境中。</p>
+
+
+<pre><code>$ source &lt;DEST_DIR&gt;/bin/activate
+$ which python
+&lt;DEST_DIR&gt;/bin/python
+</code></pre>
+
+
+<p>这样默认的就是使用刚刚创建的虚拟环境中的python了。</p>
+
+
+<p>官方文档： http://www.virtualenv.org/en/latest/</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84032.html">使用css3绘制lxde桌面</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-01-15T00:00:00+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>15</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/84032.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/84032.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>最近在学习CSS，本来是打算写点小东西练习练习。正好自己用的是linux系统的lxde桌面，于是就用CSS来绘制一个lxde。</p>
+
+
+<p>在做的过程中发现了less，感觉很不错，于是就把less也加进来了。</p>
+
+
+<p>最后的效果图：</p>
+
+
+<p><img src="https://github.com/wusuopu/css3-lxde/blob/master/snapshoot/lxde0.png?raw=true" /></p>
+
+
+<p><img src="https://github.com/wusuopu/css3-lxde/blob/master/snapshoot/lxde1.png?raw=true" /></p>
+
+
+<p><img src="https://github.com/wusuopu/css3-lxde/blob/master/snapshoot/lxde2.png?raw=true" /></p>
+
+
+<p>源代码： https://github.com/wusuopu/css3-lxde</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/page/4">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/page/2">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Subscription</h1>
+  <!--以下是QQ邮件列表订阅嵌入代码--><script >var nId = "e7ee5da6d322dc7157c25cfd8a7700bb23a056dd1fb18cb4",nWidth="auto",sColor="light",sText="请输入邮件地址：" ;</script><script src="http://list.qq.com/zh_CN/htmledition/js/qf/page/qfcode.js" charset="gb18030"></script>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84132.html">配置elixir的vim环境</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84130.html">配置coffeescript的vim环境</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84127.html">VIM编译参数</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84124.html">Docker使用笔记</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84121.html">Nginx + Php + FastCGI配置</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (47)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (32)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (26)</a></li><li><a href='/categories/web开发/index.html'>web开发 (16)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (7)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (10)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (21)</a></li></ul>
+</section>
+<section>
+  <h1>Tag Cloud</h1>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.45454545454545%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.9090909090909%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.81818181818181%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.9090909090909%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.36363636363636%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.27272727272727%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.36363636363636%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.81818181818181%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.81818181818181%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 100.9090909090909%'>Django(1)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.9090909090909%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.81818181818181%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.72727272727273%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.9090909090909%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.9090909090909%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.45454545454545%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.81818181818181%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.63636363636364%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.45454545454545%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.9090909090909%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.45454545454545%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.9090909090909%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.9090909090909%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.9090909090909%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(66)</a> <a href='/tags/mongodb/index.html' style='font-size: 109.0909090909091%'>mongodb(10)</a> <a href='/tags/mysql/index.html' style='font-size: 103.63636363636364%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.9090909090909%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.9090909090909%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.18181818181819%'>php(9)</a> <a href='/tags/ps/index.html' style='font-size: 105.45454545454545%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.9090909090909%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 144.54545454545456%'>python(49)</a> <a href='/tags/qt/index.html' style='font-size: 101.81818181818181%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.9090909090909%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 123.63636363636364%'>Ruby(26)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.72727272727273%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.9090909090909%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.54545454545455%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.36363636363636%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.72727272727273%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 121.81818181818181%'>vim(24)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.72727272727273%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.9090909090909%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.9090909090909%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 112.72727272727272%'>Web开发(14)</a> <a href='/tags/windows/index.html' style='font-size: 106.36363636363636%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.9090909090909%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.9090909090909%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.9090909090909%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.9090909090909%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.45454545454545%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.81818181818181%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.9090909090909%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.18181818181819%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.18181818181819%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.9090909090909%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.9090909090909%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.9090909090909%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.81818181818181%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 109.0909090909091%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.18181818181819%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.9090909090909%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.54545454545455%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.9090909090909%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.9090909090909%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 104.54545454545455%'>网络日志(5)</a> <a href='/tags/翻译/index.html' style='font-size: 120.9090909090909%'>翻译(23)</a> <a href='/tags/视频教程/index.html' style='font-size: 109.0909090909091%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.9090909090909%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.81818181818181%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.9090909090909%'>随笔(1)</a> </span>
+</section>
+<section>
+  <h1>Link</h1>
+    <ul id="category-list">
+      <li><a target="_blank" title="我的Github" href="https://github.com/wusuopu">@Github</a></li>
+      <li><a target="_blank" title="我的微博" href="http://www.weibo.com/u/1768691343">@Weibo</a></li>
+      <li><a target="_blank" title="我的Twitter" href="https://twitter.com/longchangjin">@Twitter</a></li>
+      <li><a target="_blank" title="我的豆瓣" href="http://www.douban.com/people/lchj/">@Douban</a></li>
+
+      <li><a target="_blank" title="" href="http://www.vimer.cn/">Vimer的程序世界</a></li>
+      <li><a target="_blank" title="" href="http://pythoner.net/">python开发者社区</a></li>
+      <li><a target="_blank" title="" href="http://simple-is-better.com/">python.cn(news, jobs)</a></li>
+      <li><a target="_blank" title="" href="http://gtk.awaysoft.com/">GTK+ 中文社区</a></li>
+    </ul>
+</section>
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - 龍昌 -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+<div style="display:none;"><script src="http://s94.cnzz.com/stat.php?id=1259846&web_id=1259846&show=pic" language="JavaScript"></script></div>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'longchang';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

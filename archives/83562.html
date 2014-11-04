@@ -1,0 +1,878 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>PHP导出Excel - 龍昌博客</title>
+  <meta name="author" content="龍昌">
+
+  
+  <meta name="description" content="PHPExcel是一个用PHP写的开源的相当强大的 MS Office Excel 文档生成类库。 下面给出一个例子，有编程基础应该可以根据这个例子举一反三。 首先，先下载PHPExcel（ http://www.phpexcel.net ）。国外的网站速度比较慢的话可以到这里下载：http:// &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.xefan.com/archives/83562.html">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="龍昌博客" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.useso.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.useso.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.useso.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">龍昌博客</a></h1>
+  
+    <h2>从Pythoner转向Rubist</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.xefan.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+ <li><a href="/about/">About</a></li>  <li><a href="/gbook/">留言板</a></li> 
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">PHP导出Excel</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2011-07-29T00:00:00+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>29</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>PHPExcel是一个用PHP写的开源的相当强大的 MS Office Excel 文档生成类库。</p>
+
+<p>下面给出一个例子，有编程基础应该可以根据这个例子举一反三。</p>
+
+<p>首先，先下载PHPExcel（ <a href="http://www.phpexcel.net">http://www.phpexcel.net</a> ）。国外的网站速度比较慢的话可以到这里下载：<a href="http://u.115.com/file/clgk4q5t">http://u.115.com/file/clgk4q5t</a></p>
+
+<p>下载解压后，将Classes目录里的内容上传到你的服务器上。然后新建一个文件saveas_excel.php，与Classes目录里的文件处于同一目录中。</p>
+
+<p><strong>saveas_excel.php</strong>内容如下：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+<span class='line-number'>93</span>
+<span class='line-number'>94</span>
+<span class='line-number'>95</span>
+<span class='line-number'>96</span>
+<span class='line-number'>97</span>
+<span class='line-number'>98</span>
+<span class='line-number'>99</span>
+<span class='line-number'>100</span>
+<span class='line-number'>101</span>
+<span class='line-number'>102</span>
+<span class='line-number'>103</span>
+<span class='line-number'>104</span>
+<span class='line-number'>105</span>
+<span class='line-number'>106</span>
+<span class='line-number'>107</span>
+<span class='line-number'>108</span>
+<span class='line-number'>109</span>
+<span class='line-number'>110</span>
+<span class='line-number'>111</span>
+<span class='line-number'>112</span>
+<span class='line-number'>113</span>
+<span class='line-number'>114</span>
+<span class='line-number'>115</span>
+<span class='line-number'>116</span>
+<span class='line-number'>117</span>
+<span class='line-number'>118</span>
+<span class='line-number'>119</span>
+<span class='line-number'>120</span>
+<span class='line-number'>121</span>
+<span class='line-number'>122</span>
+<span class='line-number'>123</span>
+<span class='line-number'>124</span>
+<span class='line-number'>125</span>
+<span class='line-number'>126</span>
+<span class='line-number'>127</span>
+<span class='line-number'>128</span>
+<span class='line-number'>129</span>
+<span class='line-number'>130</span>
+<span class='line-number'>131</span>
+<span class='line-number'>132</span>
+<span class='line-number'>133</span>
+<span class='line-number'>134</span>
+<span class='line-number'>135</span>
+<span class='line-number'>136</span>
+<span class='line-number'>137</span>
+<span class='line-number'>138</span>
+<span class='line-number'>139</span>
+<span class='line-number'>140</span>
+<span class='line-number'>141</span>
+<span class='line-number'>142</span>
+<span class='line-number'>143</span>
+<span class='line-number'>144</span>
+<span class='line-number'>145</span>
+<span class='line-number'>146</span>
+<span class='line-number'>147</span>
+<span class='line-number'>148</span>
+<span class='line-number'>149</span>
+<span class='line-number'>150</span>
+<span class='line-number'>151</span>
+<span class='line-number'>152</span>
+<span class='line-number'>153</span>
+<span class='line-number'>154</span>
+<span class='line-number'>155</span>
+<span class='line-number'>156</span>
+<span class='line-number'>157</span>
+<span class='line-number'>158</span>
+<span class='line-number'>159</span>
+<span class='line-number'>160</span>
+<span class='line-number'>161</span>
+<span class='line-number'>162</span>
+<span class='line-number'>163</span>
+<span class='line-number'>164</span>
+<span class='line-number'>165</span>
+<span class='line-number'>166</span>
+<span class='line-number'>167</span>
+<span class='line-number'>168</span>
+<span class='line-number'>169</span>
+<span class='line-number'>170</span>
+<span class='line-number'>171</span>
+<span class='line-number'>172</span>
+<span class='line-number'>173</span>
+<span class='line-number'>174</span>
+<span class='line-number'>175</span>
+<span class='line-number'>176</span>
+<span class='line-number'>177</span>
+<span class='line-number'>178</span>
+<span class='line-number'>179</span>
+<span class='line-number'>180</span>
+<span class='line-number'>181</span>
+<span class='line-number'>182</span>
+<span class='line-number'>183</span>
+<span class='line-number'>184</span>
+<span class='line-number'>185</span>
+<span class='line-number'>186</span>
+<span class='line-number'>187</span>
+<span class='line-number'>188</span>
+<span class='line-number'>189</span>
+<span class='line-number'>190</span>
+<span class='line-number'>191</span>
+<span class='line-number'>192</span>
+<span class='line-number'>193</span>
+<span class='line-number'>194</span>
+<span class='line-number'>195</span>
+<span class='line-number'>196</span>
+<span class='line-number'>197</span>
+<span class='line-number'>198</span>
+<span class='line-number'>199</span>
+<span class='line-number'>200</span>
+<span class='line-number'>201</span>
+<span class='line-number'>202</span>
+<span class='line-number'>203</span>
+<span class='line-number'>204</span>
+<span class='line-number'>205</span>
+<span class='line-number'>206</span>
+<span class='line-number'>207</span>
+<span class='line-number'>208</span>
+<span class='line-number'>209</span>
+<span class='line-number'>210</span>
+<span class='line-number'>211</span>
+<span class='line-number'>212</span>
+<span class='line-number'>213</span>
+<span class='line-number'>214</span>
+<span class='line-number'>215</span>
+<span class='line-number'>216</span>
+<span class='line-number'>217</span>
+<span class='line-number'>218</span>
+<span class='line-number'>219</span>
+<span class='line-number'>220</span>
+<span class='line-number'>221</span>
+<span class='line-number'>222</span>
+<span class='line-number'>223</span>
+<span class='line-number'>224</span>
+<span class='line-number'>225</span>
+<span class='line-number'>226</span>
+<span class='line-number'>227</span>
+<span class='line-number'>228</span>
+<span class='line-number'>229</span>
+<span class='line-number'>230</span>
+<span class='line-number'>231</span>
+<span class='line-number'>232</span>
+<span class='line-number'>233</span>
+<span class='line-number'>234</span>
+<span class='line-number'>235</span>
+<span class='line-number'>236</span>
+<span class='line-number'>237</span>
+<span class='line-number'>238</span>
+<span class='line-number'>239</span>
+<span class='line-number'>240</span>
+<span class='line-number'>241</span>
+<span class='line-number'>242</span>
+<span class='line-number'>243</span>
+<span class='line-number'>244</span>
+<span class='line-number'>245</span>
+<span class='line-number'>246</span>
+<span class='line-number'>247</span>
+<span class='line-number'>248</span>
+<span class='line-number'>249</span>
+<span class='line-number'>250</span>
+<span class='line-number'>251</span>
+<span class='line-number'>252</span>
+<span class='line-number'>253</span>
+<span class='line-number'>254</span>
+<span class='line-number'>255</span>
+<span class='line-number'>256</span>
+<span class='line-number'>257</span>
+<span class='line-number'>258</span>
+<span class='line-number'>259</span>
+<span class='line-number'>260</span>
+<span class='line-number'>261</span>
+<span class='line-number'>262</span>
+<span class='line-number'>263</span>
+<span class='line-number'>264</span>
+<span class='line-number'>265</span>
+<span class='line-number'>266</span>
+<span class='line-number'>267</span>
+<span class='line-number'>268</span>
+<span class='line-number'>269</span>
+<span class='line-number'>270</span>
+<span class='line-number'>271</span>
+<span class='line-number'>272</span>
+<span class='line-number'>273</span>
+<span class='line-number'>274</span>
+<span class='line-number'>275</span>
+<span class='line-number'>276</span>
+<span class='line-number'>277</span>
+<span class='line-number'>278</span>
+<span class='line-number'>279</span>
+<span class='line-number'>280</span>
+<span class='line-number'>281</span>
+<span class='line-number'>282</span>
+<span class='line-number'>283</span>
+<span class='line-number'>284</span>
+<span class='line-number'>285</span>
+<span class='line-number'>286</span>
+<span class='line-number'>287</span>
+<span class='line-number'>288</span>
+<span class='line-number'>289</span>
+<span class='line-number'>290</span>
+<span class='line-number'>291</span>
+<span class='line-number'>292</span>
+<span class='line-number'>293</span>
+<span class='line-number'>294</span>
+<span class='line-number'>295</span>
+<span class='line-number'>296</span>
+<span class='line-number'>297</span>
+<span class='line-number'>298</span>
+<span class='line-number'>299</span>
+<span class='line-number'>300</span>
+<span class='line-number'>301</span>
+<span class='line-number'>302</span>
+<span class='line-number'>303</span>
+<span class='line-number'>304</span>
+<span class='line-number'>305</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//设置PHPExcel类库的include path</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//set_include_path(&#39;.&#39;. PATH_SEPARATOR .</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//                 &#39;D:ZealPHP_LIBS&#39; . PATH_SEPARATOR .</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//                  get_include_path());</span>
+</span><span class='line'>
+</span><span class='line'><span class="sd">/**</span>
+</span><span class='line'>
+</span><span class='line'><span class="sd">* 以下是使用示例，对于以 //// 开头的行是不同的可选方式，请根据实际需要</span>
+</span><span class='line'>
+</span><span class='line'><span class="sd">* 打开对应行的注释。</span>
+</span><span class='line'>
+</span><span class='line'><span class="sd">* 如果使用 Excel5 ，输出的内容应该是GBK编码。</span>
+</span><span class='line'>
+</span><span class='line'><span class="sd">*/</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">require_once</span> <span class="s1">&#39;PHPExcel.php&#39;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// uncomment</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">require_once</span> <span class="s1">&#39;PHPExcel/Writer/Excel5.php&#39;</span><span class="p">;</span>     <span class="c1">// 用于其他低版本xls</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// or</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">////require_once &#39;PHPExcel/Writer/Excel2007.php&#39;; // 用于 excel-2007 格式</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// 创建一个处理对象实例</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objExcel</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">PHPExcel</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// 创建文件格式写入对象实例, uncomment</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objWriter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">PHPExcel_Writer_Excel5</span><span class="p">(</span><span class="nv">$objExcel</span><span class="p">);</span>     <span class="c1">// 用于其他版本格式</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// or</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">////$objWriter = new PHPExcel_Writer_Excel2007($objExcel); // 用于 2007 格式</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">////$objWriter-&gt;setOffice2003Compatibility(true);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//*************************************</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//设置文档基本属性</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objProps</span> <span class="o">=</span> <span class="nv">$objExcel</span><span class="o">-&gt;</span><span class="na">getProperties</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objProps</span><span class="o">-&gt;</span><span class="na">setCreator</span><span class="p">(</span><span class="s2">&quot;Zeal Li&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objProps</span><span class="o">-&gt;</span><span class="na">setLastModifiedBy</span><span class="p">(</span><span class="s2">&quot;Zeal Li&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objProps</span><span class="o">-&gt;</span><span class="na">setTitle</span><span class="p">(</span><span class="s2">&quot;Office XLS Test Document&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objProps</span><span class="o">-&gt;</span><span class="na">setSubject</span><span class="p">(</span><span class="s2">&quot;Office XLS Test Document, Demo&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objProps</span><span class="o">-&gt;</span><span class="na">setDescription</span><span class="p">(</span><span class="s2">&quot;Test document, generated by PHPExcel.&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objProps</span><span class="o">-&gt;</span><span class="na">setKeywords</span><span class="p">(</span><span class="s2">&quot;office excel PHPExcel&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objProps</span><span class="o">-&gt;</span><span class="na">setCategory</span><span class="p">(</span><span class="s2">&quot;Test&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//*************************************</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//设置当前的sheet索引，用于后续的内容操作。</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//一般只有在使用多个sheet的时候才需要显示调用。</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//缺省情况下，PHPExcel会自动创建第一个sheet被设置SheetIndex=0</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objExcel</span><span class="o">-&gt;</span><span class="na">setActiveSheetIndex</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objActSheet</span> <span class="o">=</span> <span class="nv">$objExcel</span><span class="o">-&gt;</span><span class="na">getActiveSheet</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//设置当前活动sheet的名称</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objActSheet</span><span class="o">-&gt;</span><span class="na">setTitle</span><span class="p">(</span><span class="s1">&#39;测试Sheet&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//*************************************</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//设置单元格内容</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//由PHPExcel根据传入内容自动判断单元格内容类型</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objActSheet</span><span class="o">-&gt;</span><span class="na">setCellValue</span><span class="p">(</span><span class="s1">&#39;A1&#39;</span><span class="p">,</span> <span class="s1">&#39;字符串内容&#39;</span><span class="p">);</span>  <span class="c1">// 字符串内容</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objActSheet</span><span class="o">-&gt;</span><span class="na">setCellValue</span><span class="p">(</span><span class="s1">&#39;A2&#39;</span><span class="p">,</span> <span class="mi">26</span><span class="p">);</span>            <span class="c1">// 数值</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objActSheet</span><span class="o">-&gt;</span><span class="na">setCellValue</span><span class="p">(</span><span class="s1">&#39;A3&#39;</span><span class="p">,</span> <span class="k">true</span><span class="p">);</span>          <span class="c1">// 布尔值</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objActSheet</span><span class="o">-&gt;</span><span class="na">setCellValue</span><span class="p">(</span><span class="s1">&#39;A4&#39;</span><span class="p">,</span> <span class="s1">&#39;=SUM(A2:A2)&#39;</span><span class="p">);</span> <span class="c1">// 公式</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//显式指定内容类型</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objActSheet</span><span class="o">-&gt;</span><span class="na">setCellValueExplicit</span><span class="p">(</span><span class="s1">&#39;A5&#39;</span><span class="p">,</span> <span class="s1">&#39;847475847857487584&#39;</span><span class="p">,</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">PHPExcel_Cell_DataType</span><span class="o">::</span><span class="na">TYPE_STRING</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//合并单元格</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objActSheet</span><span class="o">-&gt;</span><span class="na">mergeCells</span><span class="p">(</span><span class="s1">&#39;B1:C22&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//分离单元格</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//$objActSheet-&gt;unmergeCells(&#39;B1:C22&#39;);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//*************************************</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//设置单元格样式</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//设置宽度</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objActSheet</span><span class="o">-&gt;</span><span class="na">getColumnDimension</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">setAutoSize</span><span class="p">(</span><span class="k">true</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objActSheet</span><span class="o">-&gt;</span><span class="na">getColumnDimension</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">setWidth</span><span class="p">(</span><span class="mi">30</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objStyleA5</span> <span class="o">=</span> <span class="nv">$objActSheet</span><span class="o">-&gt;</span><span class="na">getStyle</span><span class="p">(</span><span class="s1">&#39;A5&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//设置单元格内容的数字格式。</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//如果使用了 PHPExcel_Writer_Excel5 来生成内容的话，</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//这里需要注意，在 PHPExcel_Style_NumberFormat 类的 const 变量定义的</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//各种自定义格式化方式中，其它类型都可以正常使用，但当setFormatCode</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//为 FORMAT_NUMBER 的时候，实际出来的效果被没有把格式设置为&quot;0&quot;。需要</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//修改 PHPExcel_Writer_Excel5_Format 类源代码中的 getXf($style) 方法，</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//在 if ($this-&gt;_BIFF_version == 0×0500) { （第363行附近）前面增加一</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//行代码:</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//if($ifmt === &#39;0&#39;) $ifmt = 1;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//设置格式为PHPExcel_Style_NumberFormat::FORMAT_NUMBER，避免某些大数字</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//被使用科学记数方式显示，配合下面的 setAutoSize 方法可以让每一行的内容</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//都按原始内容全部显示出来。</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objStyleA5</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">-&gt;</span><span class="na">getNumberFormat</span><span class="p">()</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">-&gt;</span><span class="na">setFormatCode</span><span class="p">(</span><span class="nx">PHPExcel_Style_NumberFormat</span><span class="o">::</span><span class="na">FORMAT_NUMBER</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//设置字体</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objFontA5</span> <span class="o">=</span> <span class="nv">$objStyleA5</span><span class="o">-&gt;</span><span class="na">getFont</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objFontA5</span><span class="o">-&gt;</span><span class="na">setName</span><span class="p">(</span><span class="s1">&#39;Courier New&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objFontA5</span><span class="o">-&gt;</span><span class="na">setSize</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objFontA5</span><span class="o">-&gt;</span><span class="na">setBold</span><span class="p">(</span><span class="k">true</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objFontA5</span><span class="o">-&gt;</span><span class="na">setUnderline</span><span class="p">(</span><span class="nx">PHPExcel_Style_Font</span><span class="o">::</span><span class="na">UNDERLINE_SINGLE</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objFontA5</span><span class="o">-&gt;</span><span class="na">getColor</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">setARGB</span><span class="p">(</span><span class="s1">&#39;FF999999&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//设置对齐方式</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objAlignA5</span> <span class="o">=</span> <span class="nv">$objStyleA5</span><span class="o">-&gt;</span><span class="na">getAlignment</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objAlignA5</span><span class="o">-&gt;</span><span class="na">setHorizontal</span><span class="p">(</span><span class="nx">PHPExcel_Style_Alignment</span><span class="o">::</span><span class="na">HORIZONTAL_RIGHT</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objAlignA5</span><span class="o">-&gt;</span><span class="na">setVertical</span><span class="p">(</span><span class="nx">PHPExcel_Style_Alignment</span><span class="o">::</span><span class="na">VERTICAL_CENTER</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//设置边框</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objBorderA5</span> <span class="o">=</span> <span class="nv">$objStyleA5</span><span class="o">-&gt;</span><span class="na">getBorders</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objBorderA5</span><span class="o">-&gt;</span><span class="na">getTop</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">setBorderStyle</span><span class="p">(</span><span class="nx">PHPExcel_Style_Border</span><span class="o">::</span><span class="na">BORDER_THIN</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objBorderA5</span><span class="o">-&gt;</span><span class="na">getTop</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">getColor</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">setARGB</span><span class="p">(</span><span class="s1">&#39;FFFF0000&#39;</span><span class="p">);</span> <span class="c1">// color</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objBorderA5</span><span class="o">-&gt;</span><span class="na">getBottom</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">setBorderStyle</span><span class="p">(</span><span class="nx">PHPExcel_Style_Border</span><span class="o">::</span><span class="na">BORDER_THIN</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objBorderA5</span><span class="o">-&gt;</span><span class="na">getLeft</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">setBorderStyle</span><span class="p">(</span><span class="nx">PHPExcel_Style_Border</span><span class="o">::</span><span class="na">BORDER_THIN</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objBorderA5</span><span class="o">-&gt;</span><span class="na">getRight</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">setBorderStyle</span><span class="p">(</span><span class="nx">PHPExcel_Style_Border</span><span class="o">::</span><span class="na">BORDER_THIN</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//设置填充颜色</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objFillA5</span> <span class="o">=</span> <span class="nv">$objStyleA5</span><span class="o">-&gt;</span><span class="na">getFill</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objFillA5</span><span class="o">-&gt;</span><span class="na">setFillType</span><span class="p">(</span><span class="nx">PHPExcel_Style_Fill</span><span class="o">::</span><span class="na">FILL_SOLID</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objFillA5</span><span class="o">-&gt;</span><span class="na">getStartColor</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">setARGB</span><span class="p">(</span><span class="s1">&#39;FFEEEEEE&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//从指定的单元格复制样式信息.</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objActSheet</span><span class="o">-&gt;</span><span class="na">duplicateStyle</span><span class="p">(</span><span class="nv">$objStyleA5</span><span class="p">,</span> <span class="s1">&#39;B1:C22&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//*************************************</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//添加图片</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objDrawing</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">PHPExcel_Worksheet_Drawing</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objDrawing</span><span class="o">-&gt;</span><span class="na">setName</span><span class="p">(</span><span class="s1">&#39;ZealImg&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objDrawing</span><span class="o">-&gt;</span><span class="na">setDescription</span><span class="p">(</span><span class="s1">&#39;Image inserted by Zeal&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objDrawing</span><span class="o">-&gt;</span><span class="na">setPath</span><span class="p">(</span><span class="s1">&#39;./zeali.net.logo.gif&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objDrawing</span><span class="o">-&gt;</span><span class="na">setHeight</span><span class="p">(</span><span class="mi">36</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objDrawing</span><span class="o">-&gt;</span><span class="na">setCoordinates</span><span class="p">(</span><span class="s1">&#39;C23&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objDrawing</span><span class="o">-&gt;</span><span class="na">setOffsetX</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objDrawing</span><span class="o">-&gt;</span><span class="na">setRotation</span><span class="p">(</span><span class="mi">15</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objDrawing</span><span class="o">-&gt;</span><span class="na">getShadow</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">setVisible</span><span class="p">(</span><span class="k">true</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objDrawing</span><span class="o">-&gt;</span><span class="na">getShadow</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">setDirection</span><span class="p">(</span><span class="mi">36</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objDrawing</span><span class="o">-&gt;</span><span class="na">setWorksheet</span><span class="p">(</span><span class="nv">$objActSheet</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//添加一个新的worksheet</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objExcel</span><span class="o">-&gt;</span><span class="na">createSheet</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objExcel</span><span class="o">-&gt;</span><span class="na">getSheet</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">setTitle</span><span class="p">(</span><span class="s1">&#39;测试2&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">////保护单元格</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objExcel</span><span class="o">-&gt;</span><span class="na">getSheet</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">getProtection</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">setSheet</span><span class="p">(</span><span class="k">true</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objExcel</span><span class="o">-&gt;</span><span class="na">getSheet</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">protectCells</span><span class="p">(</span><span class="s1">&#39;A1:C22&#39;</span><span class="p">,</span> <span class="s1">&#39;PHPExcel&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//*************************************</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//输出内容</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$outputFileName</span> <span class="o">=</span> <span class="nb">time</span><span class="p">()</span><span class="o">.</span><span class="s2">&quot;.xls&quot;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">////导出到文件，保存到服务器上，需要自行下载</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//try{</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//    $objWriter-&gt;save($outputFileName);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//    echo &quot;导出到&quot;.$outputFileName.&quot;成功！&quot;;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//catch(Exception $e){</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//    echo &quot;&lt;p&gt;&lt;b&gt;导出失败！&quot;.$outputFileName.&quot;可能正在被使用！&lt;/b&gt;&lt;/p&gt;&quot;;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//    //echo $e;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//or</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">////导出到浏览器，自动下载到本地</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">try</span><span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">header</span><span class="p">(</span><span class="s2">&quot;Content-Type: application/force-download&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">header</span><span class="p">(</span><span class="s2">&quot;Content-Type: application/octet-stream&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">header</span><span class="p">(</span><span class="s2">&quot;Content-Type: application/download&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">header</span><span class="p">(</span><span class="s1">&#39;Content-Disposition:inline;filename=&quot;&#39;</span><span class="o">.</span><span class="nv">$outputFileName</span><span class="o">.</span><span class="s1">&#39;&quot;&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">header</span><span class="p">(</span><span class="s2">&quot;Content-Transfer-Encoding: binary&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">header</span><span class="p">(</span><span class="s2">&quot;Expires: Mon, 26 Jul 1997 05:00:00 GMT&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">header</span><span class="p">(</span><span class="s2">&quot;Last-Modified: &quot;</span> <span class="o">.</span> <span class="nb">gmdate</span><span class="p">(</span><span class="s2">&quot;D, d M Y H:i:s&quot;</span><span class="p">)</span> <span class="o">.</span> <span class="s2">&quot; GMT&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">header</span><span class="p">(</span><span class="s2">&quot;Cache-Control: must-revalidate, post-check=0, pre-check=0&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">header</span><span class="p">(</span><span class="s2">&quot;Pragma: no-cache&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$objWriter</span><span class="o">-&gt;</span><span class="na">save</span><span class="p">(</span><span class="s1">&#39;php://output&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">catch</span><span class="p">(</span><span class="nx">Exception</span> <span class="nv">$e</span><span class="p">){</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">echo</span> <span class="s2">&quot;&lt;p&gt;&lt;b&gt;导出失败！&lt;/b&gt;&lt;/p&gt;&quot;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">?&gt;</span><span class="x"></span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果有不懂的请自己看DocumentationAPI目录中的文档。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">龍昌</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2011-07-29T00:00:00+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>29</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
+    </p>
+    <p class="meta">
+      Categories: 
+
+<span class="categories">
+  
+    <a class='category' href='/categories/编程开发/index.html'>编程开发</a>
+  
+</span>
+
+
+    </p>
+    <p class="meta">
+      Tags: 
+
+<span class="tags">
+  
+    <a class='tag' href='/tags/php/index.html'>php</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/archives/83559.html" title="Previous Post: PHP对XML的读写实例">&laquo; PHP对XML的读写实例</a>
+      
+      
+        <a class="basic-alignment right" href="/archives/83568.html" title="Next Post: NERD_commenter——VIM批量注释与反注释插件">NERD_commenter——VIM批量注释与反注释插件 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Subscription</h1>
+  <!--以下是QQ邮件列表订阅嵌入代码--><script >var nId = "e7ee5da6d322dc7157c25cfd8a7700bb23a056dd1fb18cb4",nWidth="auto",sColor="light",sText="请输入邮件地址：" ;</script><script src="http://list.qq.com/zh_CN/htmledition/js/qf/page/qfcode.js" charset="gb18030"></script>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84132.html">配置elixir的vim环境</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84130.html">配置coffeescript的vim环境</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84127.html">VIM编译参数</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84124.html">Docker使用笔记</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84121.html">Nginx + Php + FastCGI配置</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (47)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (32)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (26)</a></li><li><a href='/categories/web开发/index.html'>web开发 (16)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (7)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (10)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (21)</a></li></ul>
+</section>
+<section>
+  <h1>Tag Cloud</h1>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.45454545454545%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.9090909090909%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.81818181818181%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.9090909090909%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.36363636363636%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.27272727272727%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.36363636363636%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.81818181818181%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.81818181818181%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 100.9090909090909%'>Django(1)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.9090909090909%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.81818181818181%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.72727272727273%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.9090909090909%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.9090909090909%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.45454545454545%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.81818181818181%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.63636363636364%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.45454545454545%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.9090909090909%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.45454545454545%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.9090909090909%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.9090909090909%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.9090909090909%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(66)</a> <a href='/tags/mongodb/index.html' style='font-size: 109.0909090909091%'>mongodb(10)</a> <a href='/tags/mysql/index.html' style='font-size: 103.63636363636364%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.9090909090909%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.9090909090909%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.18181818181819%'>php(9)</a> <a href='/tags/ps/index.html' style='font-size: 105.45454545454545%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.9090909090909%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 144.54545454545456%'>python(49)</a> <a href='/tags/qt/index.html' style='font-size: 101.81818181818181%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.9090909090909%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 123.63636363636364%'>Ruby(26)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.72727272727273%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.9090909090909%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.54545454545455%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.36363636363636%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.72727272727273%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 121.81818181818181%'>vim(24)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.72727272727273%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.9090909090909%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.9090909090909%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 112.72727272727272%'>Web开发(14)</a> <a href='/tags/windows/index.html' style='font-size: 106.36363636363636%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.9090909090909%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.9090909090909%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.9090909090909%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.9090909090909%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.45454545454545%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.81818181818181%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.9090909090909%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.18181818181819%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.18181818181819%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.9090909090909%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.9090909090909%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.9090909090909%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.81818181818181%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 109.0909090909091%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.18181818181819%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.9090909090909%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.54545454545455%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.9090909090909%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.9090909090909%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 104.54545454545455%'>网络日志(5)</a> <a href='/tags/翻译/index.html' style='font-size: 120.9090909090909%'>翻译(23)</a> <a href='/tags/视频教程/index.html' style='font-size: 109.0909090909091%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.9090909090909%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.81818181818181%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.9090909090909%'>随笔(1)</a> </span>
+</section>
+<section>
+  <h1>Link</h1>
+    <ul id="category-list">
+      <li><a target="_blank" title="我的Github" href="https://github.com/wusuopu">@Github</a></li>
+      <li><a target="_blank" title="我的微博" href="http://www.weibo.com/u/1768691343">@Weibo</a></li>
+      <li><a target="_blank" title="我的Twitter" href="https://twitter.com/longchangjin">@Twitter</a></li>
+      <li><a target="_blank" title="我的豆瓣" href="http://www.douban.com/people/lchj/">@Douban</a></li>
+
+      <li><a target="_blank" title="" href="http://www.vimer.cn/">Vimer的程序世界</a></li>
+      <li><a target="_blank" title="" href="http://pythoner.net/">python开发者社区</a></li>
+      <li><a target="_blank" title="" href="http://simple-is-better.com/">python.cn(news, jobs)</a></li>
+      <li><a target="_blank" title="" href="http://gtk.awaysoft.com/">GTK+ 中文社区</a></li>
+    </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - 龍昌 -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+<div style="display:none;"><script src="http://s94.cnzz.com/stat.php?id=1259846&web_id=1259846&show=pic" language="JavaScript"></script></div>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'longchang';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://www.xefan.com/archives/83562.html';
+        var disqus_url = 'http://www.xefan.com/archives/83562.html';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,921 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>龍昌博客</title>
+  <meta name="author" content="龍昌">
+
+  
+  <meta name="description" content="以gentoo为例，先执行命令安装sudo工具
+# emerge sudo 然后再进行配置。sudo的配置文件是/etc/sudoers。应当永远使用visudo命令编辑/etc/sudoers文件。visudo会锁住sudoers文件，保存修改到临时文件，然后检查文件格式， &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.xefan.com/page/10/index.html">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="龍昌博客" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.useso.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.useso.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.useso.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">龍昌博客</a></h1>
+  
+    <h2>从Pythoner转向Rubist</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.xefan.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+ <li><a href="/about/">About</a></li>  <li><a href="/gbook/">留言板</a></li> 
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83817.html">Linux下安装sudo工具</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-04-14T00:00:00+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>14</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83817.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83817.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>以gentoo为例，先执行命令安装sudo工具<br/>
+<code># emerge sudo</code></p>
+
+<p>然后再进行配置。sudo的配置文件是/etc/sudoers。应当永远使用visudo命令编辑/etc/sudoers文件。visudo会锁住sudoers文件，保存修改到临时文件，然后检查文件格式，确保正确后才会覆盖sudoers文件。必须保证sudoers格式正确，否则sudo将无法运行。</p>
+
+<p>编辑/etc/sudoers文件，加入以下内容：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Defaults    env_reset
+</span><span class='line'>Defaults    secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"</span></code></pre></td></tr></table></div></figure>
+
+
+<p>要为某个用户提供特权，使其可以使用sudo执行所有命令，在配置文件中加入：<br/>
+<code>用户名   ALL=(ALL) ALL</code></p>
+
+<p>如果只想允许本地登陆的用户使用sudo：<br/>
+<code>用户名   主机名=(ALL) ALL</code></p>
+
+<p>允许admin用户组成员无密码使用sudo：<br/>
+<code>%admin      ALL=(ALL) NOPASSWD: ALL</code></p>
+
+<p>请把用户名替换为实际用户名称。</p>
+
+<p>只为用户启用部分特权：<br/>
+<code>用户名 主机名=/sbin/halt,/sbin/reboot -Syu</code><br/>
+<code>该用户只能使用sudo执行halt、reboot。</code></p>
+
+<p>在~/.bashrc中加入 complete -cf sudo 开启sudo的自动补全。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83815.html">好久没更新了</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-04-04T00:00:00+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83815.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83815.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>突然发现博客好久没有更新了，一是因为忙，二是因为懒，再是由于现在访问自己的博客还要开代理…………</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83811.html">Gentoo安装笔记</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-01-27T00:00:00+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83811.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83811.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>参考官方手册，并整理一下。<a href="http://www.gentoo.org/doc/zh_cn/handbook/">http://www.gentoo.org/doc/zh_cn/handbook/</a>
+下载iso文件，并使用其进行引导系统。安装光盘上提供了几个内核。默认的是gentoo。<br/>
+即使用boot:gentoo来启动安装光盘即可。</p>
+
+<p>整个安装过程需要联网进行，请确保网络已经配置好了。</p>
+
+<p>1、先创建一个分区，然后挂载到/mnt/gentoo目录下。</p>
+
+<p>2、安装需要的安装文件<br/>
+(1)、下载stage3 tarball文件，并解压到安装目录下，也就是/mnt/gentoo。<br/>
+(2)、下载安装Portage文件。<br/>
+<code># cd /mnt/gentoo</code><br/>
+<code># tar xvf portage-lastest.bar.bz2 -C /mnt/gentoo/usr</code></p>
+
+<p>3、配置编译选项<br/>
+定义CFLAGS和CXXFLAGS变量</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># nano -w /mnt/gentoo/etc/portage/make.conf
+</span><span class='line'>
+</span><span class='line'>CFLAGS="-O2 -march=i686 -pipe"
+</span><span class='line'># 两个变量使用相同的设置
+</span><span class='line'>CXXFLAGS="${CFLAGS}"</span></code></pre></td></tr></table></div></figure>
+
+
+<p>4、安装Gentoo基本系统<br/>
+为了快速下载源代码，建议选择一个速度快的境像。我用的网易的源，在make.conf文件中添加以下内容。<br/>
+<code>GENTOO_MIRRORS="http://mirrors.163.com/gentoo/"</code></p>
+
+<p>(1)、拷贝DNS信息<br/>
+<code># cp -L /etc/resolv.conf /mnt/gentoo/etc</code></p>
+
+<p>(2)、挂载proc和dev文件系统<br/>
+<code># mount -t proc none /mnt/gentoo/proc</code><br/>
+<code># mount -o bind /dev /mnt/gentoo/dev</code></p>
+
+<p>(3)、进入新系统环境<br/>
+<code># chroot /mnt/gentoo /bin/bash</code><br/>
+<code># env-update</code><br/>
+<code># source /etc/profile</code><br/>
+<code># export PS1="(chroot)$PS1"</code></p>
+
+<p>(4)、配置Portage<br/>
+更新Portage树<br/>
+<code># emerge --sync</code></p>
+
+<p>修改/etc/locale.gen文件设置locale然后再执行命令locale-gen</p>
+
+<p>5、配置内核<br/>
+(1)、设置时区，我这用的是上海的时区。<br/>
+<code># cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime</code></p>
+
+<p>(2)、安装源码<br/>
+<code># emerge gentoo-sources</code><br/>
+然后内核源码就会下载到/usr/src/linux目录下。转到该目录进行内核编译配置。<br/>
+<code># cd /usr/src/linux</code><br/>
+执行以下命令进行手动配置，手动配置就要注意驱动都要选对，并且要编译进内核，不要编译成模块。反正我是编译了好几次系统都不能正常启动。最后我就使用自动配置。<br/>
+<code># make menuconfig</code></p>
+
+<p>自动编译内核首先先安装genkernel<br/>
+<code># emerge genkernel</code><br/>
+然后复制光盘上的内核配置文件到genkernel搜索配置文件的默认位置。<br/>
+  # zcat /proc/config.gz &gt; /usr/share/genkernel/arch/x86/kernel-config<br/>
+现在执行如下命令编译内核。这样编译出来的内核支持几乎所有配件，但是耗时较多。<br/>
+<code># genkernel all</code><br/>
+编译完成后将会在/boot目录下生成内核文件和initrd文件。</p>
+
+<p>6、配置系统<br/>
+(1)、文件系统信息<br/>
+编辑/etc/fstab文件，设置分区的挂载。</p>
+
+<p>(2)、网络信息<br/>
+编辑/etc/conf.d/hostname文件，设置主机名。<br/>
+编辑/etc/conf.d/net 文件，设置ip。<br/>
+手动设置ip，设置 config_eth0和routes_eth0：<br/>
+config_eth0=( &ldquo;192.168.0.2 netmask 255.255.255.0 brd 192.168.0.255&rdquo; )<br/>
+routes_eth0=( &ldquo;default via 192.168.0.1&rdquo; )<br/>
+使用DHCP，请定义一下config_eth0：<br/>
+config_eth0=( &ldquo;dhcp&rdquo; )</p>
+
+<p>创建启动脚本，并设置自动启动。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># cd /etc/init.d
+</span><span class='line'># ls -s net.lo net.eth0
+</span><span class='line'># rc-update add net.eth0 default</span></code></pre></td></tr></table></div></figure>
+
+
+<p>(3)、系统信息<br/>
+设置root密码，并创建一个普通用户。<br/>
+<code># passwd</code><br/>
+<code># useradd users</code></p>
+
+<p>7、安装一些系统工具<br/>
+根据自己需求再安装一些系统工具。<br/>
+(1)、系统日志工具<br/>
+<code># emerge syslog-ng</code><br/>
+<code># rc-update add syslog-ng default</code></p>
+
+<p>(2)、守护进程<br/>
+<code># emerge vixie-cron</code><br/>
+<code># rc-update add vixie-cron default</code></p>
+
+<p>(3)、网络工具<br/>
+<code># emerge dhcpd</code><br/>
+<code># emerge ppp</code></p>
+
+<p>8、配置引导程序<br/>
+Gentoo提供的引导程序有GRUB和LILO，我用的是GRUB。<br/>
+安装Grub，请根据自己的情况进行调整。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># emerge grub
+</span><span class='line'># grep -v rootfs /proc/mounts &gt; /etc/mtab
+</span><span class='line'># grub-install --no-floppy /dev/sda
+</span><span class='line'># update-grub -o /boot/grub/grub.conf</span></code></pre></td></tr></table></div></figure>
+
+
+<p>9、重启系统</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># eixt
+</span><span class='line'># umount /mnt/gentoo/{dev,proc,}
+</span><span class='line'># reboot</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83809.html">Arch Linux 2012.12.01安装方法</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-01-03T00:00:00+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83809.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83809.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>自从上次我的Arch系统崩溃之后我就改用其它系统了，距离现在已有小半年了。突然发现Arch又更新了，于是下下来体验一下。<br/>
+在新版的ArchLinux中已经不在使用AIF(Arch Installation Framwork)了，而是使用新的脚本工具(Arch Install Scripts)，<a href="https://github.com/falconindy/arch-install-scripts">https://github.com/falconindy/arch-install-scripts</a></p>
+
+<p>新版的安装过程是通过网络安装，因此整个过程需要联网才行。</p>
+
+<p>1、首先为Arch分配一个分区，然后挂载到/mnt目录。如果使用多个分区，还需要创建它们并正确挂载（/mnt/boot, /mnt/home, &hellip;），这样genfstab才能自动检测到它们。</p>
+
+<p>2、安装基本系统<br/>
+先编辑/etc/pacman.d/mirrorlist选择首先镜像。<br/>
+然后使用pacstrap脚本安装基本系统。<br/>
+<code># pacstrap /mnt base base-devel</code></p>
+
+<p>3、安装引导器<br/>
+安装一个Bootloader，Grub或者Syslinux。<br/>
+(1)安装GRUB:<br/>
+如果是BIOS用户执行命令：<br/>
+<code># pacstrap /mnt grub-bios</code><br/>
+如果是EFI用户执行命令：<br/>
+<code># pacstrap /mnt grub-efi-x86_64</code></p>
+
+<p>(2)安装Syslinux：<br/>
+<code>#pacstrap /mnt syslinux</code></p>
+
+<p>4、配置系统<br/>
+(1)生成fstab文件<br/>
+<code># genfstab -p /mnt &amp;gt;&amp;gt; /mnt/etc/fstab</code></p>
+
+<p>(2)chroot到新安装的系统中去<br/>
+<code># arch-chroot /mnt</code></p>
+
+<p>(3)进行一些系统配置<br/>
+设置主机名：修改/etc/hostname文件，将主机名写入里面。<br/>
+设置时区： cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime<br/>
+设置locale： 修改/etc/locale.gen文件，然后再执行命令locale-gen<br/>
+创建一个初始的RAM disk： mkinitcpio -p linux<br/>
+设置root用户的密码： passwd root<br/>
+配置引导器，在我的电脑上是依次执行如下命令，这个请结合自己的情况进行设置：<br/>
+<code># grub-install --no-floppy /dev/sda</code><br/>
+<code># grub-mkconfig -o /boot/grub/grub.cfg</code></p>
+
+<p>其余的根据自己的需要再进行设置。</p>
+
+<p>5、重启进入新系统<br/>
+先退出chroot，然后卸载之前挂载在/mnt的分区。<br/>
+<code># umount /mnt</code><br/>
+然后重启进入新系统并以root用户登陆。<br/>
+现在一个基本的Arch系统就已经安装好了，接下来可以根据自己的需要来安装相应的软件。</p>
+
+<p>6、安装应用软件<br/>
+Arch系统刚安装好后发现居然连ifconfig命令都没有，可以使用如下命令安装：<br/>
+<code># pacman -S net-tools dnsutils inetutils iproute2</code></p>
+
+<p>安装Yaourt<br/>
+在/etc/pacman.conf中添加以下内容：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[archlinuxfr]
+</span><span class='line'>Server = http://repo.archlinux.fr/$arch</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后再执行命令: pacman -Syu yaourt</p>
+
+<p>安装Xorg：<br/>
+<code># pacman -S xorg-server xorg-xinit xorg-utils xorg-server-utils</code><br/>
+安装显示驱动(根据自己的情况选择安装相应的驱动)：<br/>
+<code># pacman -S xf86-video-fbdev</code><br/>
+安装evdev，支持大部分即插即用设备<br/>
+<code># pacman -S xf86-input-evdev</code><br/>
+安装默认的测试环境：<br/>
+<code># pacman -S xorg-twm xorg-xclock xterm</code><br/>
+然后启动X会话，如果能够看到一个终端和一个时钟就表示已经安装成功了：<br/>
+<code>$ startx</code></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83806.html">使用vim在目录下查找字符串</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2012-10-13T00:00:00+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83806.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83806.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>vim有个vimgrep命令，跟linux下的grep类似。用法如下：<br/>
+:vimgrep /{pattern}/[g][j] {file} &hellip;<br/>
+{pattern}为要查找的字符串;<br/>
+没有参数g的话,则行只查找一次关键字.反之会查找所有的关键字.<br/>
+没有参数j的话,查找后,VIM会跳转至第一个关键字所在的文件.反之,只更新结果列表(quickfix).<br/>
+{file}为要查找的文件，可以有多个。</p>
+
+<p>例如，要在当前目录及其子目录中的python文件查找&#8221;import&#8221;字符串。<br/>
+<code>:vimgrep /import/ **/*.py</code><br/>
+命令中的**表示递归查找。</p>
+
+<p>{pattern}也可以用正则表达式。搜索结果保存在quickfix中，可以使用以下方法查看。</p>
+
+<p>:cnext (:cn) 当前页下一个结果<br/>
+:cprevious (:cp) 当前页上一个结果<br/>
+:clist (:cl) 打开quickfix窗口，列出所有结果，不能直接用鼠标点击打开，只能看<br/>
+:copen (:cope) 打开quickfix窗口，列出所有结果，可以直接用鼠标点击打开<br/>
+:ccl[ose] 关闭 quickfix 窗口。<br/>
+ctrl + ww 切换编辑窗口和quickfix窗口，在quickfix里面和编辑窗口一样jk表示上下移动，回车选中进入编辑窗口</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83797.html">在vim中使用正则表达式</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2012-10-10T00:00:00+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83797.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83797.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>元字符 说明<br/>
+. 匹配任意一个字符<br/>
+[abc] 匹配方括号中的任意一个字符。可以使用-表示字符范围，如[a-z0-9]匹配小写字母和阿拉伯数字。<br/>
+[^abc] 在方括号内开头使用^符号，表示匹配除方括号中字符之外的任意字符。<br/>
+\d 匹配数字，等同于[0-9]。<br/>
+\D 匹配非数字，等同于[^0-9]。<br/>
+\x 匹配十六进制数字，等同于[0-9A-Fa-f]。<br/>
+\X 匹配非十六进制数字，等同于[^0-9A-Fa-f]。<br/>
+\w 匹配单词字母，等同于[0-9A-Za-z<em>]。<br/>
+\W 匹配非单词字母，等同于[^0-9A-Za-z</em>]。<br/>
+\t 匹配&lt;TAB&gt;字符。<br/>
+\s 匹配空白字符，等同于[ /t]。<br/>
+\S 匹配非空白字符，等同于[^ /t]。<br/>
+\a 所有的字母字符. 等同于[a-zA-Z]<br/>
+\l 小写字母 [a-z]<br/>
+\L 非小写字母 [^a-z]<br/>
+\u 大写字母 [A-Z]<br/>
+\U 非大写字母 [^A-Z]</p>
+
+<p>表示数量的元字符<br/>
+元字符 说明<br/>
+*       匹配0-任意个<br/>
++      匹配1-任意个<br/>
+\?      匹配0-1个<br/>
+{n,m}  匹配n-m个<br/>
+{n}    匹配n个<br/>
+{n,}   匹配n-任意个<br/>
+{,m}   匹配0-m个<br/>
+_.     匹配包含换行在内的所有字符<br/>
+{-}    表示前一个字符可出现零次或多次，但在整个正则表达式可以匹配成功的前提下，匹配的字符数越少越好<br/>
+\=      匹配一个可有可无的项<br/>
+_s     匹配空格或断行<br/>
+_[]</p>
+
+<p>元字符 说明<br/>
+*      匹配 * 字符。<br/>
+.      匹配 . 字符。<br/>
+\/      匹配 / 字符。<br/>
+\/      匹配 / 字符。<br/>
+[      匹配 [ 字符。</p>
+
+<p>表示位置的符号<br/>
+元字符 说明<br/>
+$       匹配行尾<br/>
+^       匹配行首<br/>
+&amp;lt;      匹配单词词首<br/>
+&amp;gt;      匹配单词词尾</p>
+
+<p>替换变量<br/>
+在正规表达式中使用 ( 和 ) 符号括起正规表达式，即可在后面使用\1、\2等变量来访问 ( 和 ) 中的内容。</p>
+
+<p>懒惰模式<br/>
+{-n,m}  与{n,m}一样，尽可能少次数地重复<br/>
+{-}     匹配它前面的项一次或0次, 尽可能地少<br/>
+|       &ldquo;或&#8221;操作符<br/>
+&amp;amp;       并列</p>
+
+<p>函数式<br/>
+:s/替换字符串/\=函数式<br/>
+在函数式中可以使用 submatch(1)、submatch(2) 等来引用 \1、\2 等的内容，而submatch(0)可以引用匹配的整个内容。</p>
+
+<p>与Perl正则表达式的区别 ?<br/>
+元字符的区别<br/>
+Vim语法 Perl语法 含义<br/>
++       +       1-任意个<br/>
+\?       ?       0-1个<br/>
+{n,m}   {n,m}   n-m个<br/>
+(和)   (和)    分组</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83795.html">在vim下使用DoxygenToolkit进行自动注释</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2012-09-28T00:00:00+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>28</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83795.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83795.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>doxygen是一个文档生成器，其工作机制是利用注释中的有效信息来自动生成文档。而DoxygenToolkit是vim下一款能够自动生成doxygen可以识别的注释的插件。<br/>
+它会根据配置自动生成注释，主要是license注释、文件注释、函数及类注释。<br/>
+下载地址：<a href="http://www.vim.org/scripts/script.php?script_id=987">http://www.vim.org/scripts/script.php?script_id=987</a></p>
+
+<p>修改.vimrc的配置，加入自己对Doxygen的配置<br/>
+let g:DoxygenToolkit_authorName=&ldquo;longchangjin &lt;admin@longchangjin.cn&gt;&rdquo;<br/>
+let g:DoxygenToolkit_briefTag_funcName=&ldquo;yes&rdquo;<br/>
+let g:doxygen_enhanced_color=1</p>
+
+<p>运行vim 在命令行输入命令即可<br/>
+DoxAuthor:将文件名，作者，时间等<br/>
+DoxLic:  license注释<br/>
+Dox：    函数及类注释</p>
+
+<p>也可做一个按键映射，就不用每次都输入命令了。</p>
+
+<p>如果想自定义注释信息，可以修改DoxygenToolkit.vim文件。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83793.html">VIM配对符号(surrouding)处理插件</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2012-09-23T00:00:00+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>23</span><span class='date-suffix'>rd</span>, <span class='date-year'>2012</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83793.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83793.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在写程序时有许多的配对符号如：(), [], {}, &ldquo;&rdquo;, &lsquo;&#8217;。vim-surround就是一款插件可以快速处理这些配对符号的。
+下载地址：<a href="https://github.com/tpope/vim-surround">https://github.com/tpope/vim-surround</a></p>
+
+<p>下载安装好后就可以使用了，下面是一个示例：</p>
+
+<p>&ldquo;Hello world!&rdquo;  按下 cs&#8221;&lsquo; 后变为 &#8216;Hello world!&rsquo;<br/>
+再按下 cs&#8217;&lt;q&gt;变为  &lt;q&gt;Hello world!&lt;/q&gt;<br/>
+再按下 cst&#8221; 变为  &ldquo;Hello world!&rdquo;<br/>
+再按下 ds&#8221; 则删除掉两端的引号，变为  Hello world!<br/>
+现在将光标移到“&#8221;Hello&#8221;上，按下 ysiw] 变为 [Hello] world!</p>
+
+<p>surround常用快捷键：<br/>
+Normal mode<br/>
+ds  - 删除配对符号<br/>
+cs  - 修改配对符号<br/>
+ys  - 增加配对符号<br/>
+yss - 对该行增加配对符号</p>
+
+<p>Visual mode<br/>
+S   - 增加配对符号，并新增一行</p>
+
+<p>Insert mode <br/>
+&lt;CTRL-s&gt; - 增加配对<br/>
+&lt;CTRL-s&gt;&lt;CTRL-s&gt; - 增加配对符号并新增一行<br/>
+&lt;CTRL-g&gt;s - 同&lt;CTRL-s&gt;<br/>
+&lt;CTRL-g&gt;S - 同&lt;CTRL-s&gt;&lt;CTRL-s&gt;</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83791.html">Pentadactyl使用笔记</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2012-09-21T00:00:00+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2012</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83791.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83791.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>pentadactyl是firefox下的一款vim按键的插件。对于习惯了vim的人来说这个是非常方便的。</p>
+
+<p>pentadactyl的默认按键跟vim差不多，而且也可以自行修改。 pentadactyl的配置文件在windows下是_pentadactylrc，在linux下是.pentadactylrc。如果不存在可以在firefox直接执行命令:mkp，就会生成~/.pentadactyl目录和一个空的~/.pentadactylrc文件。</p>
+
+<p>然后就可以直接编辑这个文件了，编辑完成后再重启一下firefox即可。以下是我在网上找到的一些配置内容，仅供参考。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>"1.0
+</span><span class='line'>loadplugins '\.(js|penta)$'
+</span><span class='line'>group user
+</span><span class='line'>
+</span><span class='line'>" vim: set ft=pentadactyl:
+</span><span class='line'>
+</span><span class='line'>map J &lt;C-d&gt;
+</span><span class='line'>map K &lt;C-u&gt;
+</span><span class='line'>" 修改Ctrl快捷键
+</span><span class='line'>noremap &lt;C-c&gt; &lt;C-v&gt;&lt;C-c&gt;
+</span><span class='line'>noremap &lt;C-a&gt; &lt;C-v&gt;&lt;C-a&gt;
+</span><span class='line'>cnoremap &lt;C-c&gt; &lt;C-v&gt;&lt;C-c&gt;
+</span><span class='line'>cnoremap &lt;C-v&gt; &lt;C-v&gt;&lt;C-v&gt;
+</span><span class='line'>cnoremap &lt;C-x&gt; &lt;C-v&gt;&lt;C-x&gt;
+</span><span class='line'>inoremap &lt;C-a&gt; &lt;C-v&gt;&lt;C-a&gt;
+</span><span class='line'>inoremap &lt;C-c&gt; &lt;C-v&gt;&lt;C-c&gt;
+</span><span class='line'>inoremap &lt;C-v&gt; &lt;C-v&gt;&lt;C-v&gt;
+</span><span class='line'>inoremap &lt;C-x&gt; &lt;C-v&gt;&lt;C-x&gt;
+</span><span class='line'>inoremap &lt;C-z&gt; &lt;C-v&gt;&lt;C-z&gt;
+</span><span class='line'>inoremap &lt;C-y&gt; &lt;C-v&gt;&lt;C-y&gt;
+</span><span class='line'>
+</span><span class='line'>" 在Gmail和Greader中屏蔽Vimperator
+</span><span class='line'>autocmd LocationChange .* :js modes.passAllKeys = /mail\.google\.com/.test(buffer.URL) || /google\.com\/reader\//.test(buffer.URL)
+</span><span class='line'>
+</span><span class='line'>" 在有无菜单、地址栏之间切换：
+</span><span class='line'>map &lt;C-Up&gt; :se go=mnT&lt;CR&gt;
+</span><span class='line'>map &lt;C-Down&gt; :se go=s&lt;CR&gt;：</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83788.html">VIM的w3m插件</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2012-09-16T00:00:00+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>16</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83788.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83788.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>需要先安装w3m，然后再安装插件。</p>
+
+<p>下载地址：<a href="https://github.com/yuratomo/w3m.vim">https://github.com/yuratomo/w3m.vim</a></p>
+
+<p>安装完成之后就可以在vim里运行w3m浏览器了。 执行命令:W3m url，是打开url链接。如果想在新标签里打开使用:W3mTab。 :W3mClose是关闭</p>
+
+<p>其他操作基本和w3m是一样的，更多帮忙可以看它的README文件。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/page/11">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/page/9">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Subscription</h1>
+  <!--以下是QQ邮件列表订阅嵌入代码--><script >var nId = "e7ee5da6d322dc7157c25cfd8a7700bb23a056dd1fb18cb4",nWidth="auto",sColor="light",sText="请输入邮件地址：" ;</script><script src="http://list.qq.com/zh_CN/htmledition/js/qf/page/qfcode.js" charset="gb18030"></script>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84132.html">配置elixir的vim环境</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84130.html">配置coffeescript的vim环境</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84127.html">VIM编译参数</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84124.html">Docker使用笔记</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84121.html">Nginx + Php + FastCGI配置</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (47)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (32)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (26)</a></li><li><a href='/categories/web开发/index.html'>web开发 (16)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (7)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (10)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (21)</a></li></ul>
+</section>
+<section>
+  <h1>Tag Cloud</h1>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.45454545454545%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.9090909090909%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.81818181818181%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.9090909090909%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.36363636363636%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.27272727272727%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.36363636363636%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.81818181818181%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.81818181818181%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 100.9090909090909%'>Django(1)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.9090909090909%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.81818181818181%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.72727272727273%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.9090909090909%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.9090909090909%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.45454545454545%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.81818181818181%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.63636363636364%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.45454545454545%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.9090909090909%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.45454545454545%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.9090909090909%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.9090909090909%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.9090909090909%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(66)</a> <a href='/tags/mongodb/index.html' style='font-size: 109.0909090909091%'>mongodb(10)</a> <a href='/tags/mysql/index.html' style='font-size: 103.63636363636364%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.9090909090909%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.9090909090909%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.18181818181819%'>php(9)</a> <a href='/tags/ps/index.html' style='font-size: 105.45454545454545%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.9090909090909%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 144.54545454545456%'>python(49)</a> <a href='/tags/qt/index.html' style='font-size: 101.81818181818181%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.9090909090909%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 123.63636363636364%'>Ruby(26)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.72727272727273%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.9090909090909%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.54545454545455%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.36363636363636%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.72727272727273%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 121.81818181818181%'>vim(24)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.72727272727273%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.9090909090909%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.9090909090909%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 112.72727272727272%'>Web开发(14)</a> <a href='/tags/windows/index.html' style='font-size: 106.36363636363636%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.9090909090909%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.9090909090909%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.9090909090909%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.9090909090909%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.45454545454545%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.81818181818181%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.9090909090909%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.18181818181819%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.18181818181819%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.9090909090909%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.9090909090909%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.9090909090909%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.81818181818181%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 109.0909090909091%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.18181818181819%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.9090909090909%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.54545454545455%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.9090909090909%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.9090909090909%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 104.54545454545455%'>网络日志(5)</a> <a href='/tags/翻译/index.html' style='font-size: 120.9090909090909%'>翻译(23)</a> <a href='/tags/视频教程/index.html' style='font-size: 109.0909090909091%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.9090909090909%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.81818181818181%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.9090909090909%'>随笔(1)</a> </span>
+</section>
+<section>
+  <h1>Link</h1>
+    <ul id="category-list">
+      <li><a target="_blank" title="我的Github" href="https://github.com/wusuopu">@Github</a></li>
+      <li><a target="_blank" title="我的微博" href="http://www.weibo.com/u/1768691343">@Weibo</a></li>
+      <li><a target="_blank" title="我的Twitter" href="https://twitter.com/longchangjin">@Twitter</a></li>
+      <li><a target="_blank" title="我的豆瓣" href="http://www.douban.com/people/lchj/">@Douban</a></li>
+
+      <li><a target="_blank" title="" href="http://www.vimer.cn/">Vimer的程序世界</a></li>
+      <li><a target="_blank" title="" href="http://pythoner.net/">python开发者社区</a></li>
+      <li><a target="_blank" title="" href="http://simple-is-better.com/">python.cn(news, jobs)</a></li>
+      <li><a target="_blank" title="" href="http://gtk.awaysoft.com/">GTK+ 中文社区</a></li>
+    </ul>
+</section>
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - 龍昌 -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+<div style="display:none;"><script src="http://s94.cnzz.com/stat.php?id=1259846&web_id=1259846&show=pic" language="JavaScript"></script></div>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'longchang';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

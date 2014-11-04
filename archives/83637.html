@@ -1,0 +1,387 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Arch Linux安装xfce和slim - 龍昌博客</title>
+  <meta name="author" content="龍昌">
+
+  
+  <meta name="description" content="这几天终于把Arch Linux + Xfce + slim配置好了，做个笔记备忘。 安装Xfce https://wiki.archlinux.org/index.php/Xfce_(简体中文) 安装准备 请在安装与使用xfce前确认已经安装有xorg以及hal。 # pacman -S &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.xefan.com/archives/83637.html">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="龍昌博客" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.useso.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.useso.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.useso.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">龍昌博客</a></h1>
+  
+    <h2>从Pythoner转向Rubist</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.xefan.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+ <li><a href="/about/">About</a></li>  <li><a href="/gbook/">留言板</a></li> 
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Arch Linux安装xfce和slim</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2011-10-16T00:00:00+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>16</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>这几天终于把Arch Linux + Xfce + slim配置好了，做个笔记备忘。</p>
+
+<h1>安装Xfce</h1>
+
+
+<p><a href="https://wiki.archlinux.org/index.php/Xfce_">https://wiki.archlinux.org/index.php/Xfce_</a>(简体中文)</p>
+
+<p><strong>安装准备</strong></p>
+
+<p>请在安装与使用xfce前确认已经安装有xorg以及hal。</p>
+
+<p><code># pacman -S xorg hal</code></p>
+
+<p>默认安装的archlinux是不包含xorg以及hal的。如果不安装两者，将造成xfce无法启动。HAL 已经被诸如udev,udisks,upower这些程序替代 。</p>
+
+<p><strong>安装XFCE系统(Xfce 4.8)</strong></p>
+
+<p><code># pacman -S xfce4 xfce4-goodies</code><br/>
+<code># pacman -S $(pacman -Sgq xfce4-goodies | grep -v xfce4-xfapplet-plugin)</code></p>
+
+<p>默认安装的xfce4，首次启动出现的小提示窗口里面是没有任何东西的。如果你想看到刚启动时候的技巧和小提示，那么就需要安装fortune-mod</p>
+
+<p><code># pacman -S fortune-mod</code></p>
+
+<p>安装好xfce4之后可能会发现xfce4-mixer通过ALSA并不能控制音量，需要安装gstreamer0.10-base-plugins：</p>
+
+<p><code># pacman -S gstreamer0.10-base-plugins</code></p>
+
+<p>对于笔记本用户，Xfce4-mixer如果不能同时控制外放与耳机，请尝试安装全部Plugins：</p>
+
+<p><code># pacman -S gstreamer0.10-plugins</code></p>
+
+<p><strong>安装和配置Daemons</strong></p>
+
+<p><strong>安装dbus：</strong></p>
+
+<p><code># pacman -S dbus</code></p>
+
+<p>需要在开机的时候自动运行，应该将dbus添加到/etc/rc.conf文件中的DAEMONS：
+DAEMONS=(syslog-ng dbus network crond)</p>
+
+<p>如果不想重启开始dbus服务： <code># /etc/rc.d/dbus start</code></p>
+
+<p>安装gamin (fam已经是过时的东西)，它会在后台自动运行检查文件改动反应给桌面，并且不需要添加到Daemons。</p>
+
+<p><code># pacman -S gamin</code></p>
+
+<h1>运行XFCE</h1>
+
+
+<p><strong>手动启动</strong></p>
+
+<p>你只需要运行： <code>$ startxfce4</code></p>
+
+<p>从终端启动，例如使用xinit/startx 需要配置Xinitrc (简体中文)。
+如果还没有~/.xinitrc 文件，系统里有一份实例文件供参考：<code>$ cp /etc/skel/.xinitrc ~/.xinitrc</code></p>
+
+<p>在最后添加（因为权限的问题推荐在启动xfce之前添加ck-launch-session dbus-launch启）：
+<em>exec ck-launch-session dbus-launch &ndash;exit-with-session startxfce4</em></p>
+
+<p><strong>在XFCE中关机和重启</strong></p>
+
+<p>在/etc/sudoers文件末尾添加如下一行：
+<em>%users ALL=(root) NOPASSWD: /usr/lib/xfce4/session/xfsm-shutdown-helper</em></p>
+
+<p><code># gpasswd -a 你的用户名 users</code></p>
+
+<p><strong>声音</strong><br/>
+<strong>安装ALSA</strong>
+<a href="https://wiki.archlinux.org/index.php/Advanced_Linux_Sound_Architecture_">https://wiki.archlinux.org/index.php/Advanced_Linux_Sound_Architecture_</a>(简体中文)</p>
+
+<p>要求有本地化的ALSA程序和管理</p>
+
+<p><code># pacman -S alsa-lib alsa-utils</code><br/>
+<code># pacman -S alsa-oss</code></p>
+
+<p>所有ALSA程序都很可能需要依赖alsa-lib。</p>
+
+<p><strong>使用ALSA驱动如何让xfce4-mixer来控制音量</strong></p>
+
+<p>新版的xfce4-mixer使用了gstreamer作为后端，这样就不用直接与驱动交流，更加统一。与驱动打交道的工作交给了gstreamer。因此如果你xfce4-mixer无法正常工作，就需要配置好gstreamer。首先当然你得安装xfce4-mixer。</p>
+
+<p><code>pacman -S xfce4-mixer gstreamer0.10-base-plugins</code></p>
+
+<p>你需要至少安装gstreamer0.10-good-plugins,考虑安装gstreamer0.10-bad-plugins</p>
+
+<p><code>pacman -S gstreamer0.10-good-plugins gstreamer0.10-bad-plugins</code></p>
+
+<p>然后删除面板上的mixer插件，然后重新添加一次，或者先登出然后再登录一次，对gstreamer做更改后必须这样做才能让操作生效。</p>
+
+<h1>安装SLiM</h1>
+
+
+<p><a href="https://wiki.archlinux.org/index.php/SLiM_">https://wiki.archlinux.org/index.php/SLiM_</a>(简体中文)</p>
+
+<p><strong>介绍</strong></p>
+
+<p>SLiM是Simple Login Manager（简单登录管理器）的缩写。SLiM是简单、轻量级和容易配置的，相对较易在低端和高端的系统中使用。对于那些希望寻找一个不依赖于GNOME或者KDE，可以在Xfce、Openbox、Fluxbox等环境下使用的登录管理器的人来说，SLiM也是非常合适的。</p>
+
+<p><strong>安装</strong></p>
+
+<p>可以在extra软件仓库中找到SLiM： <code># pacman -S slim</code></p>
+
+<p>同时还可以安装主题包： <code># pacman -S slim-themes archlinux-themes-slim</code></p>
+
+<p><strong>配置</strong></p>
+
+<p>启用SLiM</p>
+
+<p>单用户环境<br/>
+要将SLiM配置为加载某个特定的环境，只需编辑~/.xinitrc如下：<br/>
+将[session-command]替换为适当的会话命令。例如：<br/>
+要启动Xfce:<br/>
+<em>exec ck-launch-session dbus-launch &ndash;exit-with-session startxfce4</em></p>
+
+<p>打开 /etc/rc.conf。<br/>
+<code># vi /etc/rc.conf</code></p>
+
+<p>添加一个服务slim<br/>
+<em>DAEMONS=(syslogd klogd !pcmcia network netfs crond slim)</em></p>
+
+<p>修改默认运行等级<br/>
+1. 切换用户到root.<br/>
+$ su<br/>
+2. 编辑/etc/inittab：<br/>
+<code># vi /etc/inittab</code><br/>
+3. 找到如下这一行：<br/>
+id:3:initdefault:<br/>
+4. 为了启动X11需要把&#8217;3&#8217;修改成&#8217;5&#8217;：<br/>
+id:5:initdefault:<br/>
+5. 保存此文件并退出编辑器，下次启动时你选择的显示管理器就会运行了。</p>
+
+<p>这样就差不多了，细节上的以后再慢慢琢磨。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">龍昌</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2011-10-16T00:00:00+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>16</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
+    </p>
+    <p class="meta">
+      Categories: 
+
+<span class="categories">
+  
+    <a class='category' href='/categories/linux栏目/index.html'>linux栏目</a>
+  
+</span>
+
+
+    </p>
+    <p class="meta">
+      Tags: 
+
+<span class="tags">
+  
+    <a class='tag' href='/tags/Arch/index.html'>Arch</a>, <a class='tag' href='/tags/Linux/index.html'>Linux</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/archives/83634.html" title="Previous Post: Arch Linux安装IBus">&laquo; Arch Linux安装IBus</a>
+      
+      
+        <a class="basic-alignment right" href="/archives/83639.html" title="Next Post: 用PyGTK创建Dialog对话框">用PyGTK创建Dialog对话框 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Subscription</h1>
+  <!--以下是QQ邮件列表订阅嵌入代码--><script >var nId = "e7ee5da6d322dc7157c25cfd8a7700bb23a056dd1fb18cb4",nWidth="auto",sColor="light",sText="请输入邮件地址：" ;</script><script src="http://list.qq.com/zh_CN/htmledition/js/qf/page/qfcode.js" charset="gb18030"></script>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84132.html">配置elixir的vim环境</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84130.html">配置coffeescript的vim环境</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84127.html">VIM编译参数</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84124.html">Docker使用笔记</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84121.html">Nginx + Php + FastCGI配置</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (47)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (32)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (26)</a></li><li><a href='/categories/web开发/index.html'>web开发 (16)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (7)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (10)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (21)</a></li></ul>
+</section>
+<section>
+  <h1>Tag Cloud</h1>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.45454545454545%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.9090909090909%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.81818181818181%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.9090909090909%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.36363636363636%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.27272727272727%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.36363636363636%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.81818181818181%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.81818181818181%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 100.9090909090909%'>Django(1)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.9090909090909%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.81818181818181%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.72727272727273%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.9090909090909%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.9090909090909%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.45454545454545%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.81818181818181%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.63636363636364%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.45454545454545%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.9090909090909%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.45454545454545%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.9090909090909%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.9090909090909%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.9090909090909%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(66)</a> <a href='/tags/mongodb/index.html' style='font-size: 109.0909090909091%'>mongodb(10)</a> <a href='/tags/mysql/index.html' style='font-size: 103.63636363636364%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.9090909090909%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.9090909090909%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.18181818181819%'>php(9)</a> <a href='/tags/ps/index.html' style='font-size: 105.45454545454545%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.9090909090909%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 144.54545454545456%'>python(49)</a> <a href='/tags/qt/index.html' style='font-size: 101.81818181818181%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.9090909090909%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 123.63636363636364%'>Ruby(26)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.72727272727273%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.9090909090909%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.54545454545455%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.36363636363636%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.72727272727273%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 121.81818181818181%'>vim(24)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.72727272727273%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.9090909090909%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.9090909090909%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 112.72727272727272%'>Web开发(14)</a> <a href='/tags/windows/index.html' style='font-size: 106.36363636363636%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.9090909090909%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.9090909090909%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.9090909090909%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.9090909090909%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.45454545454545%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.81818181818181%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.9090909090909%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.18181818181819%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.18181818181819%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.9090909090909%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.9090909090909%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.9090909090909%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.81818181818181%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 109.0909090909091%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.18181818181819%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.9090909090909%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.54545454545455%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.9090909090909%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.9090909090909%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 104.54545454545455%'>网络日志(5)</a> <a href='/tags/翻译/index.html' style='font-size: 120.9090909090909%'>翻译(23)</a> <a href='/tags/视频教程/index.html' style='font-size: 109.0909090909091%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.9090909090909%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.81818181818181%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.9090909090909%'>随笔(1)</a> </span>
+</section>
+<section>
+  <h1>Link</h1>
+    <ul id="category-list">
+      <li><a target="_blank" title="我的Github" href="https://github.com/wusuopu">@Github</a></li>
+      <li><a target="_blank" title="我的微博" href="http://www.weibo.com/u/1768691343">@Weibo</a></li>
+      <li><a target="_blank" title="我的Twitter" href="https://twitter.com/longchangjin">@Twitter</a></li>
+      <li><a target="_blank" title="我的豆瓣" href="http://www.douban.com/people/lchj/">@Douban</a></li>
+
+      <li><a target="_blank" title="" href="http://www.vimer.cn/">Vimer的程序世界</a></li>
+      <li><a target="_blank" title="" href="http://pythoner.net/">python开发者社区</a></li>
+      <li><a target="_blank" title="" href="http://simple-is-better.com/">python.cn(news, jobs)</a></li>
+      <li><a target="_blank" title="" href="http://gtk.awaysoft.com/">GTK+ 中文社区</a></li>
+    </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - 龍昌 -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+<div style="display:none;"><script src="http://s94.cnzz.com/stat.php?id=1259846&web_id=1259846&show=pic" language="JavaScript"></script></div>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'longchang';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://www.xefan.com/archives/83637.html';
+        var disqus_url = 'http://www.xefan.com/archives/83637.html';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

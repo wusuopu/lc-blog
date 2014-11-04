@@ -1,0 +1,1309 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>[翻译]Ruby教程12——面向对象 - 龍昌博客</title>
+  <meta name="author" content="龍昌">
+
+  
+  <meta name="description" content="Ruby的面向对象编程 在这部分的Ruby教程我们将讨论面向对象编程。 编程语言有过程式编程、函数式编程和面向对象编程范式。Ruby中面向对象语言并包含了一些函数式和过程式。 面向对象(OOP)是一种使用对象及其接口来设计应用程序和计算机程序的编程范式。 面向对象的基本概念如下： 抽象（ &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.xefan.com/archives/83939.html">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="龍昌博客" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.useso.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.useso.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.useso.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">龍昌博客</a></h1>
+  
+    <h2>从Pythoner转向Rubist</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.xefan.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+ <li><a href="/about/">About</a></li>  <li><a href="/gbook/">留言板</a></li> 
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">[翻译]Ruby教程12——面向对象</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-11-16T00:00:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>16</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h1>Ruby的面向对象编程</h1>
+
+
+<p>在这部分的Ruby教程我们将讨论面向对象编程。</p>
+
+
+<p>编程语言有过程式编程、函数式编程和面向对象编程范式。Ruby中面向对象语言并包含了一些函数式和过程式。</p>
+
+
+<p>面向对象(OOP)是一种使用对象及其接口来设计应用程序和计算机程序的编程范式。</p>
+
+
+<p>面向对象的基本概念如下：</p>
+
+
+<ul>
+<li>抽象（Abstraction）  </li>
+<li>多态（Polymorphism）  </li>
+<li>封装（Encapsulation）  </li>
+<li>继承（Inheritance）  </li>
+</ul>
+
+
+<p>抽象是对于现实中复杂的问题通过适当的建模将其简化。多态是使用相同的操作符或者函数对不同的输入数据进行不同处理。封装是将一个类的具体实现对其他对象进行隐藏。继承是一种使用已经定义的类来创建新的类的方式。</p>
+
+
+<h2>对象</h2>
+
+
+<p>对象是Ruby面向对象程序的基本组成。一个对象包含了数据和方法。对象之间通过方法进行交流。每个对象可以接收消息、发送消息和处理数据。</p>
+
+
+<p>创建一个对象需要两步。首先定义一个类。类是对象的模板。它是一张蓝图，用来描述这个类的所有对象的状态和行为。一个类可以创建多个对象。运行时创建的对象称为这个类的实例。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Being
+
+end
+
+b = Being.new
+puts b
+</code></pre>
+
+
+<p>第一个例子我们创建了一个简单的对象。</p>
+
+
+<pre><code>class Being
+
+end
+</code></pre>
+
+
+<p>定义一个简单的类，内容为空。表示它没有任何数据和方法。</p>
+
+
+<pre><code>b = Being.new
+</code></pre>
+
+
+<p>创建一个<em>Being</em>类的新实例。这里我们使用<em>new</em>方法，新创建的对象保存在变量b中。</p>
+
+
+<pre><code>puts b
+</code></pre>
+
+
+<p>在终端上打印对象的基本描述。当我们打印一个对象时，实际上是调用的<em>to_s</em>方法。但是我们没有任何的定义，因为每个创建的对象都是继承自<em>Object</em>。它有一些基本的函数，<em>to_s</em>是其中一个。</p>
+
+
+<pre><code>$ ./simple.rb
+#&lt;Being:0x9f3c290&gt;
+</code></pre>
+
+
+<p>我们得到这个对象的类名。</p>
+
+
+<h2>构造函数</h2>
+
+
+<p>构造函数是一个特殊的方法。它在对象创建时自动执行。它没有返回值。构造函数的目的是初始化对象的状态。在Ruby中构造函数名为<em>intialize</em>。</p>
+
+
+<p>构造函数不能被继承。父对象的构造函数是通过<em>super</em>方法来调用。它们的调用顺序与继承顺序一致。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Being
+
+    def initialize
+        puts "Being is created"
+    end
+
+end
+
+Being.new
+</code></pre>
+
+
+<p>定义一个<em>Being</em>类。</p>
+
+
+<pre><code>class Being
+
+    def initialize
+        puts "Being is created"
+    end
+
+end
+</code></pre>
+
+
+<p>类<em>Being</em>定义了一个构造函数名为<em>initialize</em>。它在终端上打印一条信息。Ruby中方法定义位置<em>def</em>和<em>end</em>关键字之间。</p>
+
+
+<pre><code>Being.new
+</code></pre>
+
+
+<p>创建一个<em>Being</em>类的实例对象。在对象初创时构造函数将被调用。</p>
+
+
+<p>$ ./constructor.rb<br>
+Being is created  </p>
+
+
+<p>程序的输出。</p>
+
+
+<hr>
+
+
+<p>对象的属性是绑定在对象里的数据项。这些数据项也称为实例变量（instance variables）或者成员字段（member fields）。实例变量在类中定义但是各个对象都有单独的复本。</p>
+
+
+<p>下面的例子我们初始化类的成员数据。变量初始化是构造函数的典型工作。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Person
+
+    def initialize name
+        @name = name
+    end
+
+    def get_name
+        @name
+    end
+
+end
+
+p1 = Person.new "Jane"
+p2 = Person.new "Beky"
+
+puts p1.get_name
+puts p2.get_name
+</code></pre>
+
+
+<p>上面的例子定义了一个<em>Person</em>类，并且有一个实例变量。</p>
+
+
+<pre><code>class Person
+
+    def initialize name
+        @name = name
+    end
+</code></pre>
+
+
+<p><em>Person</em>的构造函数设置了一个实例变量<em>name</em>。构造函数的<em>name</em>参数是在创建时传递的。构造函数是在实例对象创建时调用。<em>@name</em>是一个实例变量。在Ruby中实例变量以@字符开头。</p>
+
+
+<pre><code>def get_name
+    @name
+end
+</code></pre>
+
+
+<p><em>get_name</em>方法返回成员字段。在Ruby蝇成员字段只能通过方法来访问。</p>
+
+
+<pre><code>p1 = Person.new "Jane"
+p2 = Person.new "Beky"
+</code></pre>
+
+
+<p>我们创建了<em>Person</em>类的两个对象。每个对象的构造函数都传递了一个字符串参数。</p>
+
+
+<pre><code>puts p1.get_name
+puts p2.get_name
+</code></pre>
+
+
+<p>通过调用每个对象的<em>get_name</em>方法来打印成员字段。</p>
+
+
+<p>$ ./person.rb<br>
+Jane<br>
+Beky  </p>
+
+
+<p>从程序的输出看到每个实例都有自己的<em>name</em>成员字段。</p>
+
+
+<hr>
+
+
+<p>我们可以创建一个对象而不调用构造函数。Ruby有一个特殊的<em>allocate</em>方法。<em>allocate</em>方法为新的对象分配空间而不调用<em>initialize</em>。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Being
+
+   def initialize
+       puts "Being created"
+   end   
+end
+
+
+b1 = Being.new
+b2 = Being.allocate
+puts b2
+</code></pre>
+
+
+<p>这个例子我们创建了两个对象。第一介对象使用<em>new</em>方法，第二个对象使用<em>allocate</em>方法。</p>
+
+
+<pre><code>b1 = Being.new
+</code></pre>
+
+
+<p>这里我们通过<em>new</em>关键字创建一个实例对象。构造函数<em>initialize</em>将会调用，并且在终端上打印消息。</p>
+
+
+<pre><code>b2 = Being.allocate
+puts b2
+</code></pre>
+
+
+<p>这里使用<em>allocate</em>方法，没有调用构造函数。使用<em>puts</em>关键字调用对象的<em>to_s</em>方法将其显示。</p>
+
+
+<pre><code>$ ./allocate.rb
+Being created
+#&lt;Being:0x8ea0044&gt;
+</code></pre>
+
+
+<p>程序的输出。</p>
+
+
+<h2>构造函数重载</h2>
+
+
+<p>重载构造函数可以使用类有多种类型的构造函数。这样我们可以使用不同数量或者不同类型的参数来创建对象。</p>
+
+
+<p>Ruby没有我们所知的其他语言那样的构造函数重载。在Ruby中这种行为可以通过一些有默认值的扩展参数来模拟。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+
+class Person
+
+    def initialize name="unknown", age=0
+        @name = name
+        @age = age        
+    end
+
+    def to_s
+        "Name: #{@name}, Age: #{@age}"
+    end
+
+end
+
+p1 = Person.new
+p2 = Person.new "unknown", 17
+p3 = Person.new "Becky", 19
+p4 = Person.new "Robert"
+
+p p1, p2, p3, p4
+</code></pre>
+
+
+<p>这个例子展示了模拟构造函数的重载。当<em>name</em>参数没有指定时使用<em>&#8220;unknow&#8221;</em>代替，对于<em>age</em>使用0。</p>
+
+
+<pre><code>def initialize name="unknown", age=0
+    @name = name
+    @age = age        
+end
+</code></pre>
+
+
+<p>这个构造传入两个参数。它们都有默认值。当我们创建对象没有指定值时就使用默认值。注意参数顺序必须一致。第一个是<em>name</em>，第二介是<em>age</em>。</p>
+
+
+<pre><code>p1 = Person.new
+p2 = Person.new "unknown", 17
+p3 = Person.new "Becky", 19
+p4 = Person.new "Robert"
+
+p p1, p2, p3, p4
+</code></pre>
+
+
+<p>我们创建了四个对象。构造函数传入了不同个数的参数。</p>
+
+
+<p>$ ./consover.rb<br>
+Name: unknown, Age: 0<br>
+Name: unknown, Age: 17<br>
+Name: Becky, Age: 19<br>
+Name: Robert, Age: 0  </p>
+
+
+<p>例子的输出结果。</p>
+
+
+<h2>方法</h2>
+
+
+<p>方法是定义在类里面的函数。它们用于对对象的属性执行一些操作。方法在面向对象范式的封装性中必不可少。例如我们<em>AccessDatabase</em>类中有一个<em>connect</em>方法，我们不需要关心这个方法到底是如何连接数据库的。我们仅需要知道使用这个方法连接数据库。这对程序功能的划分必不可少，尤其是大的应用程序。</p>
+
+
+<p>在Ruby中数据仅能够通过方法访问。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Person
+
+    def initialize name
+        @name = name
+    end
+
+    def get_name
+        @name
+    end
+
+end
+
+per = Person.new "Jane"
+
+puts per.get_name
+puts per.send :get_name
+</code></pre>
+
+
+<p>这个例子展示了调用方法的两个基本方式。</p>
+
+
+<pre><code>puts per.get_name
+</code></pre>
+
+
+<p>通常的方式是在对象后面使用点操作符。</p>
+
+
+<pre><code>puts per.send :get_name
+</code></pre>
+
+
+<p>另种方式是使用内建的<em>send</em>方法。它将方法名符号作为参数传入。</p>
+
+
+<hr>
+
+
+<p>方法通常对对象的数据进行一些操作。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Circle
+
+    @@PI = 3.141592
+
+    def initialize
+        @radius = 0
+    end
+
+    def set_radius radius
+        @radius = radius
+    end
+
+    def area
+        @radius * @radius * @@PI
+    end
+
+end
+
+
+c = Circle.new
+c.set_radius 5
+puts c.area
+</code></pre>
+
+
+<p>这个例子的代码我们定义了一个<em>Circle</em>类两个方法。</p>
+
+
+<pre><code>@@PI = 3.141592
+</code></pre>
+
+
+<p>我们在<em>Circle</em>类中定义了一个<em>@@PI</em>变量。类变量以<em>@@</em>开头。类变量是属于类的，每个对象都可以访问它们的类变量。我们<em>@@PI</em>来计算圆的面积。</p>
+
+
+<p>def initialize
+    @radius = 0
+end</p>
+
+
+<p>定义了一个成员字段。它是圆的半径。如果我们想在外部修改这个变量，我们必须使用公开的<em>set_radius</em>方法。这个数据是受保护的。</p>
+
+
+<pre><code>def set_radius radius
+    @radius = radius
+end
+</code></pre>
+
+
+<p>这是<em>set_radius</em>方法。它为<em>@radius</em>实例变量设置一个新的值。</p>
+
+
+<pre><code>def area
+    @radius * @radius * @@PI
+end
+</code></pre>
+
+
+<p><em>area</em>方法返回圆的面积。</p>
+
+
+<pre><code>c = Circle.new
+c.set_radius 5
+puts c.area
+</code></pre>
+
+
+<p>我们创建一个<em>Circle</em>类的实例对象，并且通过<em>set_radius</em>方法设置它的半径。</p>
+
+
+<p>$ ./circle.rb<br>
+78.5398  </p>
+
+
+<p>例子的输出结果。</p>
+
+
+<h2>访问修饰符</h2>
+
+
+<p>访问修饰符设置成员和方法的可见性。Ruby有三种访问修饰符：<em>public</em>、<em>protected</em>和<em>private</em>。在Ruby中所有的数据都是私有的。访问修饰符可以仅对方法使用。Ruby中的方法是公开的，除非使用了其他修饰符。</p>
+
+
+<p>公开的方法在类的内部和外部都可以访问。保护和私有的方法略微不同。都不能在类外部访问，仅能在这个类和它的子类或者父类内部访问。</p>
+
+
+<p>注意与其他面向对象编程语言不同，继承不会充当访问修饰符。仅有两件事很重要。第一，我们是否可以在类的内部或者外部访问方法。第二，是否我们要使用或者不使用<em>self</em>关键字。</p>
+
+
+<p>访问修饰符保护数据避免受到意外的修改。使用程序更健壮。实现一些主要用于修改数据的方法。这些方法最好是私有的。只有真正需要修改才将接口公开给用户。多年来用户习惯使用特殊方法并对打破向后兼容普遍不满。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Some
+
+     def method1
+         puts "public method1 called"
+     end
+
+    public
+
+     def method2
+         puts "public method2 called"  
+     end
+
+     def method3
+         puts "public method3 called"
+         method1
+         self.method1
+     end          
+end
+
+s = Some.new
+s.method1
+s.method2
+s.method3
+</code></pre>
+
+
+<p>这个例子解释了Ruby公有方法的用法。</p>
+
+
+<pre><code>def method1
+    puts "public method1 called"
+end
+</code></pre>
+
+
+<p><em>method1</em>是公有的，尽管我们没有使用<em>public</em>修饰符。因为方法默认都是公有的，除非指明为其他。</p>
+
+
+<pre><code>public
+
+  def method2
+      puts "public method2 called"  
+  end
+
+  ...
+</code></pre>
+
+
+<p><em>public</em>关键字之后的方法是公有的。</p>
+
+
+<pre><code>def method3
+    puts "public method3 called"
+    method1
+    self.method1
+end
+</code></pre>
+
+
+<p>在公有方法<em>method3</em>中我们通过使用和没有使用<em>self</em>关键字调用了另一个公有方法。</p>
+
+
+<pre><code>s = Some.new
+s.method1
+s.method2
+s.method3
+</code></pre>
+
+
+<p>公有方法是仅能够在类外部调用的方法。</p>
+
+
+<p>$ ./public_methods.rb  
+public method1 called  
+public method2 called  
+public method3 called  
+public method1 called  
+public method1 called</p>
+
+
+<p>例子运行结果。</p>
+
+
+<hr>
+
+
+<p>下一个例子看私有方法。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+
+class Some
+
+    def initialize
+        method1
+        # self.method1
+    end
+
+    private
+
+     def method1
+         puts "private method1 called"  
+     end
+
+end
+
+
+s = Some.new
+# s.method1
+</code></pre>
+
+
+<p>私有方法是Ruby中严厉的方法。它们只能够在类内部调用并且不能使用<em>self</em>关键字。</p>
+
+
+<pre><code>def initialize
+    method1
+    # self.method1
+end
+</code></pre>
+
+
+<p>在构造函数方法中我们调用了私有方法<em>method1</em>。使用<em>self</em>调用的被注释了。私有方法不能指定接收者。</p>
+
+
+<pre><code>private
+
+  def method1
+      puts "private method1 called"  
+  end
+</code></pre>
+
+
+<p><em>private</em>关键字之后的是私有方法。</p>
+
+
+<pre><code>s = Some.new
+# s.method1
+</code></pre>
+
+
+<p>创建了一个<em>Some</em>类的实例对象。在外部调用这个方法是禁止的，如果将这行取消注释Ruby解释器会报错。</p>
+
+
+<p>$ ./private_methods.rb<br>
+private method called  </p>
+
+
+<p>输出结果。</p>
+
+
+<hr>
+
+
+<p>最后我们使用保护方法。保护方法和私有方法的区别很小。保护方法与私有方法相似，不过它们可以通过<em>self</em>关键字调用。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Some
+
+    def initialize
+        method1
+        self.method1
+    end
+
+    protected
+
+     def method1
+         puts "protected method1 called"  
+     end
+
+end
+
+
+s = Some.new
+# s.method1
+</code></pre>
+
+
+<p>上面的例子展示了保护方法的用法。</p>
+
+
+<pre><code>def initialize
+    method1
+    self.method1
+end
+</code></pre>
+
+
+<p>保护方法可以使用和不使用<em>self</em>关键字。</p>
+
+
+<pre><code>protected
+
+  def method1
+      puts "protected method1 called"  
+  end
+</code></pre>
+
+
+<p>保护方法以<em>protected</em>关键字开头。</p>
+
+
+<pre><code>s = Some.new
+# s.method1
+</code></pre>
+
+
+<p>保护方法不能在类外部调用。取消注释会报错。</p>
+
+
+<h2>继承</h2>
+
+
+<p>继承是使用已经定义的类来构造新的类的方式。新构建的类称为派生类。派生自的类称为基类。继承的好处是代码利用，减少程序的复杂性。派生类（后代）覆盖或者扩展基类（祖先）的函数。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Being
+
+    def initialize
+        puts "Being class created"
+    end
+end
+
+class Human &lt; Being
+
+   def initialize
+       super
+       puts "Human class created"
+   end
+end
+
+Being.new
+Human.new
+</code></pre>
+
+
+<p>这个程序我们定义了两个类：一个基类<em>Being</em>和一个派生类<em>Human</em>。</p>
+
+
+<pre><code>class Human &lt; Being
+</code></pre>
+
+
+<p>Ruby中使用<em>&lt;</em>操作符创建继承关系。<em>Human</em>类继承自<em>Being</em>类。</p>
+
+
+<pre><code>def initialize
+    super
+    puts "Human class created"
+end
+</code></pre>
+
+
+<p><em>super</em>方法调用父类的构造函数。</p>
+
+
+<pre><code>Being.new
+Human.new
+</code></pre>
+
+
+<p>实例化了<em>Being</em>类和<em>Human</em>类。</p>
+
+
+<p>$ ./inheritance.rb <br>
+Being class created<br>
+Being class created<br>
+Human class created  </p>
+
+
+<p>首先创建<em>Being</em>类。基类<em>Human</em>同样也调用了父类的构造函数。</p>
+
+
+<hr>
+
+
+<p>一个对象的关系可能很复杂。一个对象可以有多个祖先。Ruby有<em>ancestors</em>方法获取一个类的祖先列表。</p>
+
+
+<p>每个Ruby对象都是<em>Object</em>、<em>BaseObject</em>和<em>Kernel</em>的后代。它们内建于Ruby语言的内核中。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+
+class Being 
+end
+
+class Living &lt; Being 
+end
+
+class Mammal &lt; Living 
+end
+
+class Human &lt; Mammal 
+end
+
+
+p Human.ancestors
+</code></pre>
+
+
+<p>这个例子中定义了四个类。<em>Human</em>、<em>Mammal</em>、<em>Living</em>和<em>Being</em>。</p>
+
+
+<pre><code>p Human.ancestors
+</code></pre>
+
+
+<p>打印Human类的祖先。</p>
+
+
+<p>$ ./ancestors.rb <br>
+[Human, Mammal, Living, Being, Object, Kernel, BasicObject]  </p>
+
+
+<p><em>Human</em>类有三个自定义的和三个内建的祖先。</p>
+
+
+<hr>
+
+
+<p>一个更复杂的例子。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Being
+
+    @@count = 0
+
+    def initialize
+        @@count += 1
+        puts "Being class created"
+    end
+
+    def show_count
+        "There are #{@@count} beings"
+    end
+
+end
+
+class Human &lt; Being
+
+   def initialize
+       super
+       puts "Human is created"
+   end
+end
+
+class Animal &lt; Being
+
+   def initialize
+       super
+       puts "Animal is created"
+   end
+end
+
+class Dog &lt; Animal
+
+   def initialize
+       super
+       puts "Dog is created"
+   end
+end
+
+Human.new
+d = Dog.new
+puts d.show_count
+</code></pre>
+
+
+<p>我们定义了四个类。继承的层级有点复杂。<em>Human</em>和<em>Animal</em>继承自<em>Being</em>。<em>Dog</em>继承自<em>Animal</em>。我们还使用了类变量来统计beings的创建个数。</p>
+
+
+<pre><code>@@count = 0
+</code></pre>
+
+
+<p>我们定义一个类变量。它用于统计beings的创建个数。</p>
+
+
+<pre><code>def initialize
+    @@count += 1
+    puts "Being class created"
+end
+</code></pre>
+
+
+<p>每次<em>Being</em>类实例化时我们将<em>@@count</em>变量加1。这使用我们可以跟踪实例创建的个数。</p>
+
+
+<pre><code>class Animal &lt; Being
+...
+
+class Dog &lt; Animal
+...
+</code></pre>
+
+
+<p><em>Animal</em>继承自<em>Being</em>，<em>Dog</em>继承自<em>Animal</em>。进一步的<em>Dog</em>也继承自<em>Being</em>。</p>
+
+
+<pre><code>Human.new
+d = Dog.new
+puts d.show_count
+</code></pre>
+
+
+<p>我们通过<em>Human</em>和<em>Dog</em>创建实例。然后调用<em>Dog</em>对象的<em>show_count</em>方法。<em>Dog</em>类没有该方法，将调用<em>Being</em>类的。</p>
+
+
+<p>$ ./inheritance2.rb 
+Being class created<br>
+Human is created<br>
+Being class created<br>
+Animal is created<br>
+Dog is created<br>
+There are 2 beings  </p>
+
+
+<p><em>Human</em>对象调用了两个构造函数。<em>Dog</em>对象调用了三个构造函数。创建了两个<em>Being</em>实例。</p>
+
+
+<hr>
+
+
+<p>方法和数据成员可见性在继承中不起作用。这与其他通常的面向对象编程语言是显著的不同。</p>
+
+
+<p>在C#或者Java中公有的和保护的数据成员和方法可以被继承，私有的不能。与这相比，在Ruby中私有的数据成员和方法也可以被继承。数据成员和方法的可见性不会受继承的影响。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Base
+
+    def initialize
+        @name = "Base"
+    end
+
+    private
+
+     def private_method
+         puts "private method called"
+     end
+
+    protected
+
+     def protected_method
+         puts "protected_method called"
+     end
+
+    public
+
+     def get_name
+         return @name
+     end
+end
+
+
+class Derived &lt; Base
+
+    def public_method
+        private_method
+        protected_method
+    end
+end
+
+d = Derived.new
+d.public_method
+puts d.get_name
+</code></pre>
+
+
+<p>这个例子中有两个类。<em>Derived</em>继承乍<em>Base</em>。它继承了三个方法和一个数据字段。</p>
+
+
+<pre><code>def public_method
+    private_method
+    protected_method
+end
+</code></pre>
+
+
+<p><em>Derived</em>类的<em>public_method</em>调用了一个私有方法和一个保护方法。它们定义在父类中。</p>
+
+
+<pre><code>d = Derived.new
+d.public_method
+puts d.get_name
+</code></pre>
+
+
+<p>创建一个<em>Derived</em>类的实例。调用<em>public_method</em>方法和<em>get_name</em>方法，它返回私有的实例变量<em>@name</em>。记住Ruby中所有的实例变量都是私有的。<em>get_name</em>方法返回这个变量不管<em>@name</em>是私有的还是在父类中定义的。</p>
+
+
+<p>$ ./inheritance3.rb<br>
+private method called<br>
+protected_method called<br>
+Base  </p>
+
+
+<p>输出结果证实了在Ruby中公有的、保护的、私有的方法和私有的成员字段都能被继承。</p>
+
+
+<h2>super方法</h2>
+
+
+<p><em>super</em>方法调用父类的同名方法。如果没有传递参数它将自动的把当前的所有参数传入。如果写为<em>super()</em>则没有参数传入。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Base
+
+    def show x=0, y=0
+        p "Base class, x: #{x}, y: #{y}"
+    end
+end
+
+class Derived &lt; Base
+
+    def show x, y
+        super
+        super x
+        super x, y
+        super()
+    end
+end
+
+
+d = Derived.new
+d.show 3, 3
+</code></pre>
+
+
+<p>这个例子有两个类一个继承。它们都定义了<em>show</em>方法。这个方法在<em>Derived</em>类中使用super调用了父类的方法。</p>
+
+
+<pre><code>def show x, y
+    super
+    super x
+    super x, y
+    super()
+end
+</code></pre>
+
+
+<p><em>super</em>不带参数则会传递将当前传入的参数，这里是x=3、y=3。<em>super()</em>方法不传递参数。</p>
+
+
+<p>$ ./super.rb<br>
+&#8220;Base class, x: 3, y: 3&#8221;<br>
+&#8220;Base class, x: 3, y: 0&#8221;<br>
+&#8220;Base class, x: 3, y: 3&#8221;<br>
+&#8220;Base class, x: 0, y: 0&#8221;  </p>
+
+
+<p>输出结果。</p>
+
+
+<p>这是Ruby的面向对象的第一部分。</p>
+
+
+<hr>
+
+
+<p>原文地址： <a href="http://zetcode.com/lang/rubytutorial/oop/">http://zetcode.com/lang/rubytutorial/oop/</a><br>
+翻译：龙昌  admin@longchangjin.cn<br>
+完整教程：<a href="https://github.com/wusuopu/Ruby-tutorial">https://github.com/wusuopu/Ruby-tutorial</a> </p>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">龍昌</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2013-11-16T00:00:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>16</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+    </p>
+    <p class="meta">
+      Categories: 
+
+<span class="categories">
+  
+    <a class='category' href='/categories/ruby栏目/index.html'>ruby栏目</a>
+  
+</span>
+
+
+    </p>
+    <p class="meta">
+      Tags: 
+
+<span class="tags">
+  
+    <a class='tag' href='/tags/Ruby/index.html'>Ruby</a>, <a class='tag' href='/tags/翻译/index.html'>翻译</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/archives/83935.html" title="Previous Post: [翻译]Ruby教程11——哈希表">&laquo; [翻译]Ruby教程11——哈希表</a>
+      
+      
+        <a class="basic-alignment right" href="/archives/83942.html" title="Next Post: [翻译]Ruby教程13——面向对象2">[翻译]Ruby教程13——面向对象2 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Subscription</h1>
+  <!--以下是QQ邮件列表订阅嵌入代码--><script >var nId = "e7ee5da6d322dc7157c25cfd8a7700bb23a056dd1fb18cb4",nWidth="auto",sColor="light",sText="请输入邮件地址：" ;</script><script src="http://list.qq.com/zh_CN/htmledition/js/qf/page/qfcode.js" charset="gb18030"></script>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84132.html">配置elixir的vim环境</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84130.html">配置coffeescript的vim环境</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84127.html">VIM编译参数</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84124.html">Docker使用笔记</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84121.html">Nginx + Php + FastCGI配置</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (47)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (32)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (26)</a></li><li><a href='/categories/web开发/index.html'>web开发 (16)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (7)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (10)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (21)</a></li></ul>
+</section>
+<section>
+  <h1>Tag Cloud</h1>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.45454545454545%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.9090909090909%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.81818181818181%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.9090909090909%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.36363636363636%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.27272727272727%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.36363636363636%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.81818181818181%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.81818181818181%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 100.9090909090909%'>Django(1)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.9090909090909%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.81818181818181%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.72727272727273%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.9090909090909%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.9090909090909%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.45454545454545%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.81818181818181%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.63636363636364%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.45454545454545%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.9090909090909%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.45454545454545%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.9090909090909%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.9090909090909%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.9090909090909%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(66)</a> <a href='/tags/mongodb/index.html' style='font-size: 109.0909090909091%'>mongodb(10)</a> <a href='/tags/mysql/index.html' style='font-size: 103.63636363636364%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.9090909090909%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.9090909090909%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.18181818181819%'>php(9)</a> <a href='/tags/ps/index.html' style='font-size: 105.45454545454545%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.9090909090909%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 144.54545454545456%'>python(49)</a> <a href='/tags/qt/index.html' style='font-size: 101.81818181818181%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.9090909090909%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 123.63636363636364%'>Ruby(26)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.72727272727273%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.9090909090909%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.54545454545455%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.36363636363636%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.72727272727273%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 121.81818181818181%'>vim(24)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.72727272727273%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.9090909090909%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.9090909090909%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 112.72727272727272%'>Web开发(14)</a> <a href='/tags/windows/index.html' style='font-size: 106.36363636363636%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.9090909090909%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.9090909090909%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.9090909090909%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.9090909090909%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.45454545454545%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.81818181818181%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.9090909090909%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.18181818181819%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.18181818181819%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.9090909090909%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.9090909090909%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.9090909090909%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.81818181818181%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 109.0909090909091%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.18181818181819%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.9090909090909%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.54545454545455%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.9090909090909%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.9090909090909%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 104.54545454545455%'>网络日志(5)</a> <a href='/tags/翻译/index.html' style='font-size: 120.9090909090909%'>翻译(23)</a> <a href='/tags/视频教程/index.html' style='font-size: 109.0909090909091%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.9090909090909%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.81818181818181%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.9090909090909%'>随笔(1)</a> </span>
+</section>
+<section>
+  <h1>Link</h1>
+    <ul id="category-list">
+      <li><a target="_blank" title="我的Github" href="https://github.com/wusuopu">@Github</a></li>
+      <li><a target="_blank" title="我的微博" href="http://www.weibo.com/u/1768691343">@Weibo</a></li>
+      <li><a target="_blank" title="我的Twitter" href="https://twitter.com/longchangjin">@Twitter</a></li>
+      <li><a target="_blank" title="我的豆瓣" href="http://www.douban.com/people/lchj/">@Douban</a></li>
+
+      <li><a target="_blank" title="" href="http://www.vimer.cn/">Vimer的程序世界</a></li>
+      <li><a target="_blank" title="" href="http://pythoner.net/">python开发者社区</a></li>
+      <li><a target="_blank" title="" href="http://simple-is-better.com/">python.cn(news, jobs)</a></li>
+      <li><a target="_blank" title="" href="http://gtk.awaysoft.com/">GTK+ 中文社区</a></li>
+    </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - 龍昌 -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+<div style="display:none;"><script src="http://s94.cnzz.com/stat.php?id=1259846&web_id=1259846&show=pic" language="JavaScript"></script></div>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'longchang';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://www.xefan.com/archives/83939.html';
+        var disqus_url = 'http://www.xefan.com/archives/83939.html';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
