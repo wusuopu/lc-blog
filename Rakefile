@@ -104,7 +104,14 @@ task :new_post, :title do |t, args|
   raise "### You haven't set anything up yet. First run `rake install` to set up an Octopress theme." unless File.directory?(source_dir)
   mkdir_p "#{source_dir}/#{posts_dir}"
   # generator post id
-  filename = "#{source_dir}/#{posts_dir}/#{Time.now.utc.strftime('%Y-%m-%d')}-#{title.to_url}.#{new_post_ext}"
+  last_post = Dir["#{source_dir}/#{posts_dir}/*.#{new_post_ext}"].sort[-1]
+  if last_post.nil?
+    post_id = 10000
+  else
+    post_id = File.basename(last_post).split('-')[3].to_i + 1
+    post_id = 10000 if post_id < 10000
+  end
+  filename = "#{source_dir}/#{posts_dir}/#{Time.now.utc.strftime('%Y-%m-%d')}-#{post_id}-#{title}.#{new_post_ext}"
   if File.exist?(filename)
     abort("rake aborted!") if ask("#{filename} already exists. Do you want to overwrite?", ['y', 'n']) == 'n'
   end
@@ -115,7 +122,10 @@ task :new_post, :title do |t, args|
     post.puts "title: \"#{title.gsub(/&/,'&amp;')}\""
     post.puts "date: #{Time.now.utc.strftime('%Y-%m-%d %H:%M:%S %z')}"
     post.puts "comments: true"
+    post.puts "post_id: #{post_id}"
+    post.puts "permalink: /archives/#{post_id}.html"
     post.puts "categories: "
+    post.puts "tags: "
     post.puts "---"
   end
 end
