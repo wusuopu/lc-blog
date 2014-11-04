@@ -9,8 +9,7 @@
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="之前看到在emacs下有管理git的插件，于是就想在vim下也有类似的没。网上搜了下，找到了Git-Vim，可以在VIM下管理git。
-项目地址为: http://github.com/motemen/git-vim 安装了之后就可以直接在vim里输入命令管理git了，如: &hellip;">
+  <meta name="description" content="需要先安装w3m，然后再安装插件。 下载地址：https://github.com/yuratomo/w3m.vim 安装完成之后就可以在vim里运行w3m浏览器了。 执行命令:W3m url，是打开url链接。如果想在新标签里打开使用:W3mTab。 :W3mClose是关闭 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -67,6 +66,44 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83788.html">VIM的w3m插件</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2012-09-16T00:00:00+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>16</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83788.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83788.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>需要先安装w3m，然后再安装插件。</p>
+
+<p>下载地址：<a href="https://github.com/yuratomo/w3m.vim">https://github.com/yuratomo/w3m.vim</a></p>
+
+<p>安装完成之后就可以在vim里运行w3m浏览器了。 执行命令:W3m url，是打开url链接。如果想在新标签里打开使用:W3mTab。 :W3mClose是关闭</p>
+
+<p>其他操作基本和w3m是一样的，更多帮忙可以看它的README文件。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -2859,496 +2896,6 @@ G_IS_OBJECT (list)</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83757.html">Linux串口操作</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2012-05-20T00:00:00+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>12:00 am</span></time>
-        
-           | <a href="http://www.xefan.com/archives/83757.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/83757.html">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>1、所需的头文件</p>
-
-<pre><code>#include &lt;stdio.h&gt;
-#include &lt;stdlib.h&gt;
-#include &lt;unistd.h&gt;     //unix标准函数
-#include &lt;sys/types.h&gt;
-#include &lt;sys/stat.h&gt;
-#include &lt;fcntl.h&gt;      //文件控制
-#include &lt;termios.h&gt;    //POSIX中断控制
-#include &lt;errno.h&gt;
-</code></pre>
-
-<p>2、打开串口</p>
-
-<pre><code>fd = open("/dev/ttyUSB0", O_RDWR);
-</code></pre>
-
-<p>3、设置波特率 <br/>
-最基本的串口设置包括波特率、校验位和停止位设置，主要使用termios.h头文件中定义的termios结构，如下：</p>
-
-<pre><code>struct termios
-{
-    tcflag_t c_iflag;   //输入模式标志
-    tcflag_t c_oflag;   //输出模式标志
-    tcflag_t c_cflag;   //控制模式标志
-    tcflag_t c_lflag;   //本地模式标志
-    cc_t c_line;
-    cc_t c_cc[NCC];
-}
-</code></pre>
-
-<p>4、设置数据位、停止位和校验位</p>
-
-<pre><code>8位数据位、无校验位：
-Opt.c_cflag &amp;= ~PARENB;
-Opt.c_cflag &amp;= ~CSTOPB;
-Opt.c_cflag &amp;= ~CSIZE;
-Opt.c_iflag |= CS8
-7位数据位、奇校验
-Opt.c_cflag |= PARENB;
-Opt.c_cflag |= PARODD;
-Opt.c_cflag &amp;= ~CSTOPB;
-Opt.c_cflag &amp;= ~CSIZE;
-Opt.c_cflag |= CS7;
-7位数据位、偶校验
-Opt.c_cflag |= PARENB;
-Opt.c_cflag &amp;= ~PARODD;
-Opt.c_cflag &amp;= ~CSTOPB;
-Opt.c_cflag &amp;= CSIZE;
-Opt.c_cflag |= CS7;
-7位数据位、Space校验
-Opt.c_cflag &amp;= ~PARENB;
-Opt.c_cflag &amp;= ~CSTOPB;
-Opt.c_cflag &amp;= ~CSIZE;
-Opt.c_cflag |= CS7;
-</code></pre>
-
-<p>5、读写串口<br/>
-读使用read函数；写使用write函数。</p>
-
-<p>6、关闭串口</p>
-
-<pre><code>close(fd);
-</code></pre>
-
-<p>例子：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-<span class='line-number'>64</span>
-<span class='line-number'>65</span>
-<span class='line-number'>66</span>
-<span class='line-number'>67</span>
-<span class='line-number'>68</span>
-<span class='line-number'>69</span>
-<span class='line-number'>70</span>
-<span class='line-number'>71</span>
-<span class='line-number'>72</span>
-<span class='line-number'>73</span>
-<span class='line-number'>74</span>
-<span class='line-number'>75</span>
-<span class='line-number'>76</span>
-<span class='line-number'>77</span>
-<span class='line-number'>78</span>
-<span class='line-number'>79</span>
-<span class='line-number'>80</span>
-<span class='line-number'>81</span>
-<span class='line-number'>82</span>
-<span class='line-number'>83</span>
-<span class='line-number'>84</span>
-<span class='line-number'>85</span>
-<span class='line-number'>86</span>
-<span class='line-number'>87</span>
-<span class='line-number'>88</span>
-<span class='line-number'>89</span>
-<span class='line-number'>90</span>
-<span class='line-number'>91</span>
-<span class='line-number'>92</span>
-<span class='line-number'>93</span>
-<span class='line-number'>94</span>
-<span class='line-number'>95</span>
-<span class='line-number'>96</span>
-<span class='line-number'>97</span>
-<span class='line-number'>98</span>
-<span class='line-number'>99</span>
-<span class='line-number'>100</span>
-<span class='line-number'>101</span>
-<span class='line-number'>102</span>
-<span class='line-number'>103</span>
-<span class='line-number'>104</span>
-<span class='line-number'>105</span>
-<span class='line-number'>106</span>
-<span class='line-number'>107</span>
-<span class='line-number'>108</span>
-<span class='line-number'>109</span>
-<span class='line-number'>110</span>
-<span class='line-number'>111</span>
-<span class='line-number'>112</span>
-<span class='line-number'>113</span>
-<span class='line-number'>114</span>
-<span class='line-number'>115</span>
-<span class='line-number'>116</span>
-<span class='line-number'>117</span>
-<span class='line-number'>118</span>
-<span class='line-number'>119</span>
-<span class='line-number'>120</span>
-<span class='line-number'>121</span>
-<span class='line-number'>122</span>
-<span class='line-number'>123</span>
-<span class='line-number'>124</span>
-<span class='line-number'>125</span>
-<span class='line-number'>126</span>
-<span class='line-number'>127</span>
-<span class='line-number'>128</span>
-<span class='line-number'>129</span>
-<span class='line-number'>130</span>
-<span class='line-number'>131</span>
-<span class='line-number'>132</span>
-<span class='line-number'>133</span>
-<span class='line-number'>134</span>
-<span class='line-number'>135</span>
-<span class='line-number'>136</span>
-<span class='line-number'>137</span>
-<span class='line-number'>138</span>
-<span class='line-number'>139</span>
-<span class='line-number'>140</span>
-<span class='line-number'>141</span>
-<span class='line-number'>142</span>
-<span class='line-number'>143</span>
-<span class='line-number'>144</span>
-<span class='line-number'>145</span>
-<span class='line-number'>146</span>
-<span class='line-number'>147</span>
-<span class='line-number'>148</span>
-<span class='line-number'>149</span>
-<span class='line-number'>150</span>
-<span class='line-number'>151</span>
-<span class='line-number'>152</span>
-<span class='line-number'>153</span>
-<span class='line-number'>154</span>
-<span class='line-number'>155</span>
-<span class='line-number'>156</span>
-<span class='line-number'>157</span>
-<span class='line-number'>158</span>
-<span class='line-number'>159</span>
-<span class='line-number'>160</span>
-<span class='line-number'>161</span>
-<span class='line-number'>162</span>
-<span class='line-number'>163</span>
-<span class='line-number'>164</span>
-<span class='line-number'>165</span>
-<span class='line-number'>166</span>
-<span class='line-number'>167</span>
-<span class='line-number'>168</span>
-<span class='line-number'>169</span>
-<span class='line-number'>170</span>
-<span class='line-number'>171</span>
-<span class='line-number'>172</span>
-<span class='line-number'>173</span>
-<span class='line-number'>174</span>
-<span class='line-number'>175</span>
-<span class='line-number'>176</span>
-<span class='line-number'>177</span>
-<span class='line-number'>178</span>
-<span class='line-number'>179</span>
-<span class='line-number'>180</span>
-<span class='line-number'>181</span>
-<span class='line-number'>182</span>
-<span class='line-number'>183</span>
-<span class='line-number'>184</span>
-<span class='line-number'>185</span>
-<span class='line-number'>186</span>
-<span class='line-number'>187</span>
-<span class='line-number'>188</span>
-<span class='line-number'>189</span>
-<span class='line-number'>190</span>
-<span class='line-number'>191</span>
-<span class='line-number'>192</span>
-<span class='line-number'>193</span>
-<span class='line-number'>194</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="cp">#include &lt;stdio.h&gt;</span>
-</span><span class='line'><span class="cp">#include &lt;stdlib.h&gt;</span>
-</span><span class='line'><span class="cp">#include &lt;unistd.h&gt;     </span><span class="c1">//unix标准函数</span>
-</span><span class='line'><span class="cp">#include &lt;sys/types.h&gt;</span>
-</span><span class='line'><span class="cp">#include &lt;sys/stat.h&gt;</span>
-</span><span class='line'><span class="cp">#include &lt;fcntl.h&gt;      </span><span class="c1">//文件控制</span>
-</span><span class='line'><span class="cp">#include &lt;termios.h&gt;    </span><span class="c1">//POSIX中断控制</span>
-</span><span class='line'><span class="cp">#include &lt;errno.h&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="cp">#define TRUE    1</span>
-</span><span class='line'><span class="cp">#define FALSE   0</span>
-</span><span class='line'><span class="cp">#define SERIAL  &quot;/dev/ttyUSB0&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kt">int</span> <span class="n">speed_arr</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span><span class="n">B115200</span><span class="p">,</span> <span class="n">B57600</span><span class="p">,</span> <span class="n">B38400</span><span class="p">,</span> <span class="n">B19200</span><span class="p">,</span> <span class="n">B9600</span><span class="p">,</span> <span class="n">B4800</span><span class="p">,</span> <span class="n">B2400</span><span class="p">,</span> <span class="n">B1200</span><span class="p">,</span> <span class="n">B600</span><span class="p">,</span> <span class="n">B300</span><span class="p">,</span> <span class="p">};</span>
-</span><span class='line'><span class="kt">int</span> <span class="n">name_arr</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">115200</span><span class="p">,</span> <span class="mi">57600</span><span class="p">,</span> <span class="mi">38400</span><span class="p">,</span> <span class="mi">19200</span><span class="p">,</span> <span class="mi">9600</span><span class="p">,</span> <span class="mi">4800</span><span class="p">,</span> <span class="mi">2400</span><span class="p">,</span> <span class="mi">1200</span><span class="p">,</span> <span class="mi">600</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">//设置波特率</span>
-</span><span class='line'><span class="kt">void</span> <span class="nf">SetSpeed</span><span class="p">(</span><span class="kt">int</span> <span class="n">fd</span><span class="p">,</span> <span class="kt">int</span> <span class="n">speed</span><span class="p">)</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">struct</span> <span class="n">termios</span> <span class="n">Opt</span><span class="p">;</span> <span class="c1">//定义termios结构</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">tcgetattr</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">Opt</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">{</span>
-</span><span class='line'>        <span class="n">perror</span><span class="p">(</span><span class="s">&quot;tcgetattr fd&quot;</span><span class="p">);</span>
-</span><span class='line'>        <span class="k">return</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="k">sizeof</span><span class="p">(</span><span class="n">speed_arr</span><span class="p">)</span><span class="o">/</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">);</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">{</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">speed</span> <span class="o">==</span> <span class="n">name_arr</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-</span><span class='line'>        <span class="p">{</span>
-</span><span class='line'>            <span class="n">tcflush</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">TCIOFLUSH</span><span class="p">);</span>
-</span><span class='line'>            <span class="n">cfsetispeed</span><span class="p">(</span><span class="o">&amp;</span><span class="n">Opt</span><span class="p">,</span> <span class="n">speed_arr</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
-</span><span class='line'>            <span class="n">cfsetospeed</span><span class="p">(</span><span class="o">&amp;</span><span class="n">Opt</span><span class="p">,</span> <span class="n">speed_arr</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
-</span><span class='line'>            <span class="c1">//tcsetattr函数标志：</span>
-</span><span class='line'>            <span class="c1">//TCSANOW:立即执行而不等待数据发送或者接受完成</span>
-</span><span class='line'>            <span class="c1">//TCSADRAIN:等待所有数据传递完成后执行</span>
-</span><span class='line'>            <span class="c1">//TCSAFLUSH:Flush input and output buffers and make the change</span>
-</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="n">tcsetattr</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">TCSANOW</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">Opt</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
-</span><span class='line'>            <span class="p">{</span>
-</span><span class='line'>                <span class="n">perror</span><span class="p">(</span><span class="s">&quot;tcsetattr fd&quot;</span><span class="p">);</span>
-</span><span class='line'>                <span class="k">return</span><span class="p">;</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>            <span class="n">tcflush</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">TCIOFLUSH</span><span class="p">);</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">//设置数据位、停止位和校验位</span>
-</span><span class='line'><span class="kt">int</span> <span class="nf">SetParity</span><span class="p">(</span><span class="kt">int</span> <span class="n">fd</span><span class="p">,</span> <span class="kt">int</span> <span class="n">databits</span><span class="p">,</span> <span class="kt">int</span> <span class="n">stopbits</span><span class="p">,</span> <span class="kt">int</span> <span class="n">parity</span><span class="p">)</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>    <span class="k">struct</span> <span class="n">termios</span> <span class="n">Opt</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">tcgetattr</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">Opt</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">{</span>
-</span><span class='line'>        <span class="n">perror</span><span class="p">(</span><span class="s">&quot;tcgetattr fd&quot;</span><span class="p">);</span>
-</span><span class='line'>        <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="n">Opt</span><span class="p">.</span><span class="n">c_cflag</span> <span class="o">|=</span> <span class="p">(</span><span class="n">CLOCAL</span> <span class="o">|</span> <span class="n">CREAD</span><span class="p">);</span>    <span class="c1">//一般必设置的标志</span>
-</span><span class='line'>    <span class="k">switch</span> <span class="p">(</span><span class="n">databits</span><span class="p">)</span>                   <span class="c1">//设置数据位</span>
-</span><span class='line'>    <span class="p">{</span>
-</span><span class='line'>        <span class="k">case</span> <span class="mi">7</span><span class="o">:</span>
-</span><span class='line'>        <span class="p">{</span>
-</span><span class='line'>            <span class="n">Opt</span><span class="p">.</span><span class="n">c_cflag</span> <span class="o">&amp;=</span> <span class="o">~</span><span class="n">CSIZE</span><span class="p">;</span>
-</span><span class='line'>            <span class="n">Opt</span><span class="p">.</span><span class="n">c_cflag</span> <span class="o">|=</span> <span class="n">CS7</span><span class="p">;</span>
-</span><span class='line'>            <span class="k">break</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="k">case</span> <span class="mi">8</span><span class="o">:</span>
-</span><span class='line'>        <span class="p">{</span>
-</span><span class='line'>            <span class="n">Opt</span><span class="p">.</span><span class="n">c_cflag</span> <span class="o">&amp;=</span> <span class="o">~</span><span class="n">CSIZE</span><span class="p">;</span>
-</span><span class='line'>            <span class="n">Opt</span><span class="p">.</span><span class="n">c_cflag</span> <span class="o">|=</span> <span class="n">CS8</span><span class="p">;</span>
-</span><span class='line'>            <span class="k">break</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="k">default</span><span class="o">:</span>
-</span><span class='line'>        <span class="p">{</span>
-</span><span class='line'>            <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&quot;Unsupport data size.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-</span><span class='line'>            <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="k">switch</span> <span class="p">(</span><span class="n">parity</span><span class="p">)</span>                     <span class="c1">//设置校验位</span>
-</span><span class='line'>    <span class="p">{</span>
-</span><span class='line'>        <span class="k">case</span> <span class="sc">&#39;n&#39;</span><span class="o">:</span>
-</span><span class='line'>        <span class="k">case</span> <span class="sc">&#39;N&#39;</span><span class="o">:</span>
-</span><span class='line'>        <span class="p">{</span>
-</span><span class='line'>            <span class="n">Opt</span><span class="p">.</span><span class="n">c_cflag</span> <span class="o">&amp;=</span> <span class="o">~</span><span class="n">PARENB</span><span class="p">;</span>     <span class="c1">//清除校验位</span>
-</span><span class='line'>            <span class="n">Opt</span><span class="p">.</span><span class="n">c_iflag</span> <span class="o">&amp;=</span> <span class="o">~</span><span class="n">INPCK</span><span class="p">;</span>      <span class="c1">//enable parity checking</span>
-</span><span class='line'>            <span class="k">break</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="k">case</span> <span class="sc">&#39;o&#39;</span><span class="o">:</span>
-</span><span class='line'>        <span class="k">case</span> <span class="sc">&#39;O&#39;</span><span class="o">:</span>
-</span><span class='line'>        <span class="p">{</span>
-</span><span class='line'>            <span class="n">Opt</span><span class="p">.</span><span class="n">c_cflag</span> <span class="o">|=</span> <span class="n">PARENB</span><span class="p">;</span>      <span class="c1">//enable parity</span>
-</span><span class='line'>            <span class="n">Opt</span><span class="p">.</span><span class="n">c_cflag</span> <span class="o">|=</span> <span class="n">PARODD</span><span class="p">;</span>      <span class="c1">//奇校验</span>
-</span><span class='line'>            <span class="n">Opt</span><span class="p">.</span><span class="n">c_iflag</span> <span class="o">|=</span> <span class="n">INPCK</span><span class="p">;</span>       <span class="c1">//disable parity checking</span>
-</span><span class='line'>            <span class="k">break</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="k">case</span> <span class="sc">&#39;e&#39;</span><span class="o">:</span>
-</span><span class='line'>        <span class="k">case</span> <span class="sc">&#39;E&#39;</span><span class="o">:</span>
-</span><span class='line'>        <span class="p">{</span>
-</span><span class='line'>            <span class="n">Opt</span><span class="p">.</span><span class="n">c_cflag</span> <span class="o">|=</span> <span class="n">PARENB</span><span class="p">;</span>      <span class="c1">//enable parity</span>
-</span><span class='line'>            <span class="n">Opt</span><span class="p">.</span><span class="n">c_cflag</span> <span class="o">&amp;=</span> <span class="o">~</span><span class="n">PARODD</span><span class="p">;</span>     <span class="c1">//偶校验</span>
-</span><span class='line'>            <span class="n">Opt</span><span class="p">.</span><span class="n">c_iflag</span> <span class="o">|=</span> <span class="n">INPCK</span><span class="p">;</span>       <span class="c1">//disable parity checking </span>
-</span><span class='line'>            <span class="k">break</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="k">case</span> <span class="sc">&#39;s&#39;</span><span class="o">:</span>
-</span><span class='line'>        <span class="k">case</span> <span class="sc">&#39;S&#39;</span><span class="o">:</span>
-</span><span class='line'>        <span class="p">{</span>
-</span><span class='line'>            <span class="n">Opt</span><span class="p">.</span><span class="n">c_cflag</span> <span class="o">&amp;=</span> <span class="o">~</span><span class="n">PARENB</span><span class="p">;</span>     <span class="c1">//清除校验位</span>
-</span><span class='line'>            <span class="n">Opt</span><span class="p">.</span><span class="n">c_cflag</span> <span class="o">&amp;=</span> <span class="o">~</span><span class="n">CSTOPB</span><span class="p">;</span>     <span class="c1">//?????</span>
-</span><span class='line'>            <span class="n">Opt</span><span class="p">.</span><span class="n">c_iflag</span> <span class="o">|=</span> <span class="n">INPCK</span><span class="p">;</span>       <span class="c1">//disable parity checking</span>
-</span><span class='line'>            <span class="k">break</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="k">default</span><span class="o">:</span>
-</span><span class='line'>        <span class="p">{</span>
-</span><span class='line'>            <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span><span class="s">&quot;Unsupoort parity.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-</span><span class='line'>            <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="k">switch</span> <span class="p">(</span><span class="n">stopbits</span><span class="p">)</span>                   <span class="c1">//设置停止位</span>
-</span><span class='line'>    <span class="p">{</span>
-</span><span class='line'>        <span class="k">case</span> <span class="mi">1</span><span class="o">:</span>
-</span><span class='line'>        <span class="p">{</span>
-</span><span class='line'>            <span class="n">Opt</span><span class="p">.</span><span class="n">c_cflag</span> <span class="o">&amp;=</span> <span class="o">~</span><span class="n">CSTOPB</span><span class="p">;</span>
-</span><span class='line'>            <span class="k">break</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="k">case</span> <span class="mi">2</span><span class="o">:</span>
-</span><span class='line'>        <span class="p">{</span>
-</span><span class='line'>            <span class="n">Opt</span><span class="p">.</span><span class="n">c_cflag</span> <span class="o">|=</span> <span class="n">CSTOPB</span><span class="p">;</span>
-</span><span class='line'>            <span class="k">break</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="k">default</span><span class="o">:</span>
-</span><span class='line'>        <span class="p">{</span>
-</span><span class='line'>            <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&quot;Unsupport stopbits.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-</span><span class='line'>            <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">Opt</span><span class="p">.</span><span class="n">c_cflag</span> <span class="o">|=</span> <span class="p">(</span><span class="n">CLOCAL</span> <span class="o">|</span> <span class="n">CREAD</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">Opt</span><span class="p">.</span><span class="n">c_lflag</span> <span class="o">&amp;=</span> <span class="o">~</span><span class="p">(</span><span class="n">ICANON</span> <span class="o">|</span> <span class="n">ECHO</span> <span class="o">|</span> <span class="n">ECHOE</span> <span class="o">|</span> <span class="n">ISIG</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">Opt</span><span class="p">.</span><span class="n">c_oflag</span> <span class="o">&amp;=</span> <span class="o">~</span><span class="n">OPOST</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">Opt</span><span class="p">.</span><span class="n">c_oflag</span> <span class="o">&amp;=</span> <span class="o">~</span><span class="p">(</span><span class="n">ONLCR</span> <span class="o">|</span> <span class="n">OCRNL</span><span class="p">);</span>        <span class="c1">//添加的</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">Opt</span><span class="p">.</span><span class="n">c_iflag</span> <span class="o">&amp;=</span> <span class="o">~</span><span class="p">(</span><span class="n">ICRNL</span> <span class="o">|</span> <span class="n">INLCR</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">Opt</span><span class="p">.</span><span class="n">c_iflag</span> <span class="o">&amp;=</span> <span class="o">~</span><span class="p">(</span><span class="n">IXON</span> <span class="o">|</span> <span class="n">IXOFF</span> <span class="o">|</span> <span class="n">IXANY</span><span class="p">);</span> <span class="c1">//添加的</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">tcflush</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">TCIFLUSH</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">Opt</span><span class="p">.</span><span class="n">c_cc</span><span class="p">[</span><span class="n">VTIME</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>                    <span class="c1">//设置超时为15sec</span>
-</span><span class='line'>    <span class="n">Opt</span><span class="p">.</span><span class="n">c_cc</span><span class="p">[</span><span class="n">VMIN</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>                     <span class="c1">//Update the Opt and do it now</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">tcsetattr</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">TCSANOW</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">Opt</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">{</span>
-</span><span class='line'>        <span class="n">perror</span><span class="p">(</span><span class="s">&quot;tcsetattr fd&quot;</span><span class="p">);</span>
-</span><span class='line'>        <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="k">return</span> <span class="n">TRUE</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">fd</span><span class="p">;</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">i</span><span class="p">,</span> <span class="n">len</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
-</span><span class='line'>    <span class="kt">char</span> <span class="n">read_buf</span><span class="p">[</span><span class="mi">256</span><span class="p">];</span>
-</span><span class='line'>    <span class="kt">char</span> <span class="n">write_buf</span><span class="p">[</span><span class="mi">256</span><span class="p">];</span>
-</span><span class='line'>    <span class="kt">char</span> <span class="n">c</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">struct</span> <span class="n">termios</span> <span class="n">opt</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">fd</span> <span class="o">=</span> <span class="n">open</span><span class="p">(</span><span class="n">SERIAL</span><span class="p">,</span> <span class="n">O_RDWR</span><span class="o">|</span><span class="n">O_NOCTTY</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">fd</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">{</span>
-</span><span class='line'>        <span class="n">perror</span><span class="p">(</span><span class="s">&quot;open serial</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-</span><span class='line'>        <span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="n">SetSpeed</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="mi">115200</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">SetParity</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="sc">&#39;n&#39;</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">{</span>
-</span><span class='line'>        <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'>        <span class="n">len</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'>        <span class="n">memset</span><span class="p">(</span><span class="n">read_buf</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">read_buf</span><span class="p">));</span>
-</span><span class='line'>        <span class="n">memset</span><span class="p">(</span><span class="n">write_buf</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">write_buf</span><span class="p">));</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="k">while</span> <span class="p">((</span><span class="n">n</span><span class="o">=</span><span class="n">read</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">read_buf</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">read_buf</span><span class="p">)))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
-</span><span class='line'>        <span class="p">{</span>
-</span><span class='line'>            <span class="n">read_buf</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;\0&#39;</span><span class="p">;</span>
-</span><span class='line'>            <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%s&quot;</span><span class="p">,</span> <span class="n">read_buf</span><span class="p">);</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="n">scanf</span><span class="p">(</span><span class="s">&quot;%c&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">c</span><span class="p">);</span>
-</span><span class='line'>        <span class="n">write</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">c</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-</span><span class='line'>        <span class="k">while</span> <span class="p">((</span><span class="n">n</span><span class="o">=</span><span class="n">read</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">read_buf</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">read_buf</span><span class="p">)))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
-</span><span class='line'>        <span class="p">{</span>
-</span><span class='line'>            <span class="n">read_buf</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;\0&#39;</span><span class="p">;</span>
-</span><span class='line'>            <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">read_buf</span><span class="p">);</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/page/12">&larr; Older</a>
@@ -3370,6 +2917,10 @@ Opt.c_cflag |= CS7;
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="http://www.xefan.com/archives/84133.html">博客终于迁移完成了！</a>
+      </li>
+    
+      <li class="post">
         <a href="http://www.xefan.com/archives/84132.html">配置elixir的vim环境</a>
       </li>
     
@@ -3385,19 +2936,15 @@ Opt.c_cflag |= CS7;
         <a href="http://www.xefan.com/archives/84124.html">Docker使用笔记</a>
       </li>
     
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84121.html">Nginx + Php + FastCGI配置</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (47)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (32)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (26)</a></li><li><a href='/categories/web开发/index.html'>web开发 (16)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (7)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (10)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (21)</a></li></ul>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (47)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (32)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (26)</a></li><li><a href='/categories/web开发/index.html'>web开发 (16)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (7)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (21)</a></li></ul>
 </section>
 <section>
   <h1>Tag Cloud</h1>
-    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.45454545454545%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.9090909090909%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.81818181818181%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.9090909090909%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.36363636363636%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.27272727272727%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.36363636363636%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.81818181818181%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.81818181818181%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 100.9090909090909%'>Django(1)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.9090909090909%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.81818181818181%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.72727272727273%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.9090909090909%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.9090909090909%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.45454545454545%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.81818181818181%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.63636363636364%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.45454545454545%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.9090909090909%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.45454545454545%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.9090909090909%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.9090909090909%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.9090909090909%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(66)</a> <a href='/tags/mongodb/index.html' style='font-size: 109.0909090909091%'>mongodb(10)</a> <a href='/tags/mysql/index.html' style='font-size: 103.63636363636364%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.9090909090909%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.9090909090909%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.18181818181819%'>php(9)</a> <a href='/tags/ps/index.html' style='font-size: 105.45454545454545%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.9090909090909%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 144.54545454545456%'>python(49)</a> <a href='/tags/qt/index.html' style='font-size: 101.81818181818181%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.9090909090909%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 123.63636363636364%'>Ruby(26)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.72727272727273%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.9090909090909%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.54545454545455%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.36363636363636%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.72727272727273%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 121.81818181818181%'>vim(24)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.72727272727273%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.9090909090909%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.9090909090909%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 112.72727272727272%'>Web开发(14)</a> <a href='/tags/windows/index.html' style='font-size: 106.36363636363636%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.9090909090909%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.9090909090909%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.9090909090909%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.9090909090909%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.45454545454545%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.81818181818181%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.9090909090909%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.18181818181819%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.18181818181819%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.9090909090909%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.9090909090909%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.9090909090909%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.81818181818181%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 109.0909090909091%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.18181818181819%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.9090909090909%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.54545454545455%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.9090909090909%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.9090909090909%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 104.54545454545455%'>网络日志(5)</a> <a href='/tags/翻译/index.html' style='font-size: 120.9090909090909%'>翻译(23)</a> <a href='/tags/视频教程/index.html' style='font-size: 109.0909090909091%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.9090909090909%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.81818181818181%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.9090909090909%'>随笔(1)</a> </span>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.45454545454545%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.9090909090909%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.81818181818181%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.9090909090909%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.36363636363636%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.27272727272727%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.36363636363636%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.81818181818181%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.81818181818181%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 100.9090909090909%'>Django(1)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.9090909090909%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.81818181818181%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.72727272727273%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.9090909090909%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.9090909090909%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.45454545454545%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.81818181818181%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.63636363636364%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.45454545454545%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.9090909090909%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.45454545454545%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.9090909090909%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.9090909090909%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.9090909090909%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(66)</a> <a href='/tags/mongodb/index.html' style='font-size: 109.0909090909091%'>mongodb(10)</a> <a href='/tags/mysql/index.html' style='font-size: 103.63636363636364%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.9090909090909%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.9090909090909%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.18181818181819%'>php(9)</a> <a href='/tags/ps/index.html' style='font-size: 105.45454545454545%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.9090909090909%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 144.54545454545456%'>python(49)</a> <a href='/tags/qt/index.html' style='font-size: 101.81818181818181%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.9090909090909%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 123.63636363636364%'>Ruby(26)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.72727272727273%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.9090909090909%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.54545454545455%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.36363636363636%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.72727272727273%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 121.81818181818181%'>vim(24)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.72727272727273%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.9090909090909%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.9090909090909%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 112.72727272727272%'>Web开发(14)</a> <a href='/tags/windows/index.html' style='font-size: 106.36363636363636%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.9090909090909%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.9090909090909%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.9090909090909%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.9090909090909%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.45454545454545%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.81818181818181%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.9090909090909%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.18181818181819%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.18181818181819%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.9090909090909%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.9090909090909%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.9090909090909%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.81818181818181%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 109.0909090909091%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.18181818181819%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.9090909090909%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.54545454545455%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.9090909090909%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.9090909090909%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.45454545454545%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 120.9090909090909%'>翻译(23)</a> <a href='/tags/视频教程/index.html' style='font-size: 109.0909090909091%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.9090909090909%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.81818181818181%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.9090909090909%'>随笔(1)</a> </span>
 </section>
 <section>
   <h1>Link</h1>
