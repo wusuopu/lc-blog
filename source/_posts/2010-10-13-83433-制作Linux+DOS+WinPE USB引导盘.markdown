@@ -9,7 +9,7 @@ categories: ["Linux栏目"]
 tags: ["Linux", "USB"]
 ---
 
-在我的前一篇文章《使用UNetbootin制作Linux USB引导盘》（ http://www.xefan.cn/archives/83431.html ）介绍了使用UNetbootin轻松制作Linux的USB引导盘，不过如果我想换一个版本的Linux的话需要先将原来的文件删除再重新制作，这样感觉比较麻烦。于是就思考能不能同时引导多个Linux呢，通过试验发现可以通过修改syslinux.cfg这个文件来实现。
+在我的前一篇文章《使用UNetbootin制作Linux USB引导盘》（ http://www.xefan.com/archives/83431.html ）介绍了使用UNetbootin轻松制作Linux的USB引导盘，不过如果我想换一个版本的Linux的话需要先将原来的文件删除再重新制作，这样感觉比较麻烦。于是就思考能不能同时引导多个Linux呢，通过试验发现可以通过修改syslinux.cfg这个文件来实现。
 
 syslinux.cfg与grub的menu.lst类似，不过又有点不同。反正我是菜鸟也不懂，只要能用就行。有两个方法可以实现引导，一个是使用memdisk，另一个是使用grub。
 
