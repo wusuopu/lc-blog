@@ -9,11 +9,8 @@
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="1、所需的头文件 #include &lt;stdio.h&gt;
-#include &lt;stdlib.h&gt;
-#include &lt;unistd.h&gt; //unix标准函数
-#include &lt;sys/types.h&gt;
-#include &lt;sys/stat.h &hellip;">
+  <meta name="description" content="最近打算开始学习GObject，所以转载几篇GObject的文章。
+原文如下： 去年，曾经用了 10 多天的时间学习了一番 GObject，当时疏于心得的总结，而现在已经忘记的差不多了。 最近因为观察到 GtkGLExt 项目没有跟进 gtk+-3.0 的意思，便想自己动手，丰衣足食， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -70,6 +67,66 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83761.html">[转载]GObject 学习笔记：要相信 GObject 是有用并且简单的！</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2012-05-27T00:00:00+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83761.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83761.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>最近打算开始学习GObject，所以转载几篇GObject的文章。<br/>
+原文如下：</p>
+
+<p>去年，曾经用了 10 多天的时间学习了一番 GObject，当时疏于心得的总结，而现在已经忘记的差不多了。</p>
+
+<p>最近因为观察到 GtkGLExt 项目没有跟进 gtk+-3.0 的意思，便想自己动手，丰衣足食，要么去改造现有的 gtkglext 代码，要么另起炉灶。也许在自由/开源的世界中，期待是可耻的，只有动手才会幸福。但是，这与 GObject 有什么关系？</p>
+
+<p>在 GTK+ 的众多底层库中，GObject 与 GLib 是两块基石，在它们之上矗立着 Cairo、Pango、Clutter、GDK、ATK 等支柱，还有 GtkGLExt 这棵对我而言非常重要的小支柱，没有它我便不知道该如何在 GTK+ 中直接绘制 OpenGL 三维图形。事实上，除了 GtkGLExt 之外，还有 Cogl 可供选择，后者是对 OpenGL 进行抽象封装，主要是为了方便 Clutter 在其上层创造场景图结构。既然是封装，那么就需要容器，Cogl 所使用的容器便是 GObject。</p>
+
+<p>也许你对 GTK+ 支持 OpenGL 的事情并不感兴趣，那么我们便将话题转回至 GObject，并提出这样一个问题：既然 GObject 如此重要，那么它究竟是做什么的？</p>
+
+<p>简单的说，GObject 是一个程序库，它可以帮助我们使用 C 语言编写面向对象程序。</p>
+
+<p>很多人被灌输了这样一种概念：要写面向对象程序，那么就需要学习一种面向对象编程语言，例如 C++、Java、C# 等等，而 C 语言是用来编写结构化程序的。事实上，面向对象只是一种编程思想，不是一种编程语言。换句话说，面向对象是一种游戏规则，它不是游戏。GObject 告诉我们，使用 C 语言编写程序时，可以运用面向对象这种编程思想。</p>
+
+<p>从宏观层面上来论证 GObject 与 C++、Java 之类的面向对象编程语言相比具备何种优越性，这是没有意义的。最优化理论中有一个“没有免费的午餐”定理，大意是说没有一种方法可以适合于全部问题，应当选择合适的方法，并将它放在合适的地方使用。这个定理对于编程语言的选择与使用也有效，因为选择某种最合适的语言，本身就是一个最优化问题。</p>
+
+<p>假如我们选择了 GObject，它最适合处理那些问题？</p>
+
+<p>首先，与操作系统层面相距较近的程序设计，即系统程序设计，例如上文所列举的 GTK+ 及其支柱，使用 GObject 模拟的面向对象机制可以简化程序逻辑结构，同时还能保证程序的性能以及系统接口直接调用。最主要的是，系统程序员大都熟悉 C 语言，沟通较为方便。</p>
+
+<p>其次，有时为了兼顾程序性能与开发效率，会对程序结构进行分层设计，底层模块采用 C 程序库实现，上层则使用动态语言或函数式语言实现，此时使用 GObject 除了可以简化底层模块的逻辑结构，还可以通过 GObject 与上层模块进行胶合。现在，GNOME 3 项目提供了 GObject Introspection 技术，专门用于处理 C + GObject 所实现的程序与上层动态语言或函数式语言的胶合问题 [1]。另外，GNOME 3 项目还实现了两种新的语言 Vala 和 Genie，前者语法类似 C#，后者语法类似 Python，使用它们所编写的程序源码，利用相应的编译器便可以生成 C + GObject 代码，进而可以编译为 C 程序[2, 3]。</p>
+
+<p>那么 GObject 容易掌握么？我认为它应该很容易学习和使用，就像网络上许多人很轻易的诟病它非常繁琐难用一样容易。在打算掌握任何一种技术之前，如果不相信它是简单的，内心深处便会滋生一种逃避的意识。我们也可以例证，如果 GObject 真的很难理解和应用，怎么会存在那么多基于 GObject 实现的程序，难道那些程序的作者皆为天才抑或疯子？这种概率实在太小了。</p>
+
+<p>事实上，GObject 是被人为的复杂化了。因为很多学习 GObject 的人，一上来就奔着要全面洞悉 GObject 的实现原理与细节，但是又缺乏足够的耐心和基础知识。如果换一个角度来考虑这个问题，作为初学者，在学习 C++、Java 之类的面向对象编程语言之时，我们有打算直接潜心理解这些语言的内部实现吗？我们大都是要从 Hello world 之类的示例起步的。对于 GObject 的学习也应当如此。
+~ END ~</p>
+
+<p>原文出处：<a href="http://garfileo.is-programmer.com">http://garfileo.is-programmer.com</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1503,69 +1560,6 @@ TreeModel/ListModel  -树模式（树状/列表），用于保存数据</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83710.html">u-Boot使用nfs根文件系统</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2012-03-16T00:00:00+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>16</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>12:00 am</span></time>
-        
-           | <a href="http://www.xefan.com/archives/83710.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/83710.html">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>使用nfs根文件系统对于开发非常方便，不用每次编译好后又要烧写到开发板上。</p>
-
-<p>设置方法：<br/>
-打开开发板电源后进入u-boot，然后选择“[0] Set the boot parameters”。<br/>
-再选择“[1] Set NFS boot parameter ”。<br/>
-然后依次输入PC的IP、开发板的IP、子网掩码、NFS目录。<br/>
-例子如下：<br/>
-Enter the PC IP address:(xxx.xxx.xxx.xxx)<br/>
-10.10.10.2<br/>
-Enter the SKY2440/TQ2440 IP address:(xxx.xxx.xxx.xxx)<br/>
-10.10.10.3<br/>
-Enter the Mask IP address:(xxx.xxx.xxx.xxx)<br/>
-255.255.255.0<br/>
-Enter NFS directory:(eg: /opt/EmbedSky/root_nfs)<br/>
-/opt/EmbedSky/root<br/>
-bootargs: console=ttySAC0 root=/dev/nfs nfsroot=10.10.10.2:/opt/EmbedSky/root ip=10.10.10.3:10.10.10.2:10.10.10.3:255.255.255.0:SKY2440.embedsky.net:eth0:off</p>
-
-<p>输入好后再选择“[s] Save the parameters to Nand Flash”保存设置即可。</p>
-
-<p>以上是一般情况，下面再说说我的特殊情况。</p>
-
-<p>=====================分割线===============================</p>
-
-<p>我在PC上安装的是ArchLinux，按照以上方法运行时挂载失败，提示Root-NFS: Server returned error -93 while mounting /opt/EmbedSky/root
-－93的意思好像是没有这个协议。</p>
-
-<p>于是我又在虚拟机里安装了ubuntu，再尝试以上方法结果却成功了。<br/>
-最后我查了资料，原因好像是u-boot使用的nfs3，而ArchLinux的官网上说nfs3太老了所以Arch用的是nfs4。因此就出现了这个问题。<br/>
-解决方法：添加一个&#8221;,v3&#8221;参数。如：<br/>
-Enter NFS directory:(eg: /opt/EmbedSky/root_nfs)<br/>
-/opt/EmbedSky/root<span style="color: #ff0000;">,v3</span><br/>
-bootargs: console=ttySAC0 root=/dev/nfs nfsroot=10.10.10.2:/opt/EmbedSky/root<span style="color: #ff0000;">,v3</span> ip=10.10.10.3:10.10.10.2:10.10.10.3:255.255.255.0:SKY2440.embedsky.net:eth0:off</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/page/13">&larr; Older</a>
@@ -1587,6 +1581,10 @@ bootargs: console=ttySAC0 root=/dev/nfs nfsroot=10.10.10.2:/opt/EmbedSky/root<sp
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="http://www.xefan.com/archives/84134.html">配置rails的vim环境</a>
+      </li>
+    
+      <li class="post">
         <a href="http://www.xefan.com/archives/84133.html">博客终于迁移完成了！</a>
       </li>
     
@@ -1602,19 +1600,15 @@ bootargs: console=ttySAC0 root=/dev/nfs nfsroot=10.10.10.2:/opt/EmbedSky/root<sp
         <a href="http://www.xefan.com/archives/84127.html">VIM编译参数</a>
       </li>
     
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84124.html">Docker使用笔记</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (47)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (32)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (26)</a></li><li><a href='/categories/web开发/index.html'>web开发 (16)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (7)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (21)</a></li></ul>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (47)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (32)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (26)</a></li><li><a href='/categories/web开发/index.html'>web开发 (16)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (7)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (22)</a></li></ul>
 </section>
 <section>
   <h1>Tag Cloud</h1>
-    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.45454545454545%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.9090909090909%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.81818181818181%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.9090909090909%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.36363636363636%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.27272727272727%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.36363636363636%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.81818181818181%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.81818181818181%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 100.9090909090909%'>Django(1)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.9090909090909%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.81818181818181%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.72727272727273%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.9090909090909%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.9090909090909%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.45454545454545%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.81818181818181%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.63636363636364%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.45454545454545%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.9090909090909%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.45454545454545%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.9090909090909%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.9090909090909%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.9090909090909%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(66)</a> <a href='/tags/mongodb/index.html' style='font-size: 109.0909090909091%'>mongodb(10)</a> <a href='/tags/mysql/index.html' style='font-size: 103.63636363636364%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.9090909090909%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.9090909090909%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.18181818181819%'>php(9)</a> <a href='/tags/ps/index.html' style='font-size: 105.45454545454545%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.9090909090909%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 144.54545454545456%'>python(49)</a> <a href='/tags/qt/index.html' style='font-size: 101.81818181818181%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.9090909090909%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 123.63636363636364%'>Ruby(26)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.72727272727273%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.9090909090909%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.54545454545455%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.36363636363636%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.72727272727273%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 121.81818181818181%'>vim(24)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.72727272727273%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.9090909090909%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.9090909090909%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 112.72727272727272%'>Web开发(14)</a> <a href='/tags/windows/index.html' style='font-size: 106.36363636363636%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.9090909090909%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.9090909090909%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.9090909090909%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.9090909090909%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.45454545454545%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.81818181818181%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.9090909090909%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.18181818181819%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.18181818181819%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.9090909090909%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.9090909090909%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.9090909090909%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.81818181818181%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 109.0909090909091%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.18181818181819%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.9090909090909%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.54545454545455%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.9090909090909%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.9090909090909%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.45454545454545%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 120.9090909090909%'>翻译(23)</a> <a href='/tags/视频教程/index.html' style='font-size: 109.0909090909091%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.9090909090909%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.81818181818181%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.9090909090909%'>随笔(1)</a> </span>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.45454545454545%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.9090909090909%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.81818181818181%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.9090909090909%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.36363636363636%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.27272727272727%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.36363636363636%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.81818181818181%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.81818181818181%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 100.9090909090909%'>Django(1)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.9090909090909%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.81818181818181%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.72727272727273%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.9090909090909%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.9090909090909%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.45454545454545%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.81818181818181%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.63636363636364%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.45454545454545%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.9090909090909%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.45454545454545%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.9090909090909%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.9090909090909%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.9090909090909%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(66)</a> <a href='/tags/mongodb/index.html' style='font-size: 109.0909090909091%'>mongodb(10)</a> <a href='/tags/mysql/index.html' style='font-size: 103.63636363636364%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.9090909090909%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.9090909090909%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.18181818181819%'>php(9)</a> <a href='/tags/ps/index.html' style='font-size: 105.45454545454545%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.9090909090909%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 144.54545454545456%'>python(49)</a> <a href='/tags/qt/index.html' style='font-size: 101.81818181818181%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.9090909090909%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 123.63636363636364%'>Ruby(26)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.72727272727273%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.9090909090909%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.54545454545455%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.36363636363636%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.72727272727273%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 122.72727272727272%'>vim(25)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.72727272727273%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.9090909090909%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.9090909090909%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 112.72727272727272%'>Web开发(14)</a> <a href='/tags/windows/index.html' style='font-size: 106.36363636363636%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.9090909090909%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.9090909090909%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.9090909090909%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.9090909090909%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.45454545454545%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.81818181818181%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.9090909090909%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.18181818181819%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.18181818181819%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.9090909090909%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.9090909090909%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.9090909090909%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.81818181818181%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 109.0909090909091%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.18181818181819%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.9090909090909%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.54545454545455%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.9090909090909%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.9090909090909%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.45454545454545%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 120.9090909090909%'>翻译(23)</a> <a href='/tags/视频教程/index.html' style='font-size: 109.0909090909091%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.9090909090909%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.81818181818181%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.9090909090909%'>随笔(1)</a> </span>
 </section>
 <section>
   <h1>Link</h1>

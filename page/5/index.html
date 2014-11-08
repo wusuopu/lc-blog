@@ -9,23 +9,8 @@
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="设置Cookie 有两个与cookie相关的操作，设置cookie和读取cookie。 以下例子展示了cookie的设置。 1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-#!/usr/bin/env python
-import time # This is the &hellip;">
+  <meta name="description" content="Session是位于服务器端的Cookie。它保存在服务器上的文件或者数据库中。每条session是由session id(SID)进行标识。 基于Cookie的SID Cookie可以长久胡保存SID，直到Cookie过期。用这种方式更快更安全。但是得客户端的浏览器支持Cookie才行。 1
+2 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -82,6 +67,252 @@ import time # This is the &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84001.html">Python cgi教程6——Session</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-12-07T00:00:00+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/84001.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/84001.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Session是位于服务器端的Cookie。它保存在服务器上的文件或者数据库中。每条session是由session id(SID)进行标识。</p>
+
+
+<h2>基于Cookie的SID</h2>
+
+
+<p>Cookie可以长久胡保存SID，直到Cookie过期。用这种方式更快更安全。但是得客户端的浏览器支持Cookie才行。</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="c">#!/usr/bin/env python</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">sha</span><span class="o">,</span> <span class="nn">time</span><span class="o">,</span> <span class="nn">Cookie</span><span class="o">,</span> <span class="nn">os</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">cookie</span> <span class="o">=</span> <span class="n">Cookie</span><span class="o">.</span><span class="n">SimpleCookie</span><span class="p">()</span>
+</span><span class='line'><span class="n">string_cookie</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;HTTP_COOKIE&#39;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># If new session</span>
+</span><span class='line'><span class="k">if</span> <span class="ow">not</span> <span class="n">string_cookie</span><span class="p">:</span>
+</span><span class='line'>   <span class="c"># The sid will be a hash of the server time</span>
+</span><span class='line'>   <span class="n">sid</span> <span class="o">=</span> <span class="n">sha</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()))</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+</span><span class='line'>   <span class="c"># Set the sid in the cookie</span>
+</span><span class='line'>   <span class="n">cookie</span><span class="p">[</span><span class="s">&#39;sid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sid</span>
+</span><span class='line'>   <span class="c"># Will expire in a year</span>
+</span><span class='line'>   <span class="n">cookie</span><span class="p">[</span><span class="s">&#39;sid&#39;</span><span class="p">][</span><span class="s">&#39;expires&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">12</span> <span class="o">*</span> <span class="mi">30</span> <span class="o">*</span> <span class="mi">24</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span>
+</span><span class='line'><span class="c"># If already existent session</span>
+</span><span class='line'><span class="k">else</span><span class="p">:</span>
+</span><span class='line'>   <span class="n">cookie</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">string_cookie</span><span class="p">)</span>
+</span><span class='line'>   <span class="n">sid</span> <span class="o">=</span> <span class="n">cookie</span><span class="p">[</span><span class="s">&#39;sid&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">print</span> <span class="n">cookie</span>
+</span><span class='line'><span class="k">print</span> <span class="s">&#39;Content-Type: text/html</span><span class="se">\n</span><span class="s">&#39;</span>
+</span><span class='line'><span class="k">print</span> <span class="s">&#39;&lt;html&gt;&lt;body&gt;&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="n">string_cookie</span><span class="p">:</span>
+</span><span class='line'>   <span class="k">print</span> <span class="s">&#39;&lt;p&gt;Already existent session&lt;/p&gt;&#39;</span>
+</span><span class='line'><span class="k">else</span><span class="p">:</span>
+</span><span class='line'>   <span class="k">print</span> <span class="s">&#39;&lt;p&gt;New session&lt;/p&gt;&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">print</span> <span class="s">&#39;&lt;p&gt;SID =&#39;</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="s">&#39;&lt;/p&gt;&#39;</span>
+</span><span class='line'><span class="k">print</span> <span class="s">&#39;&lt;/body&gt;&lt;/html&gt;&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>我们对服务器的时间进行哈希生成一个唯一的Session ID。</p>
+
+
+<h2>基于Query String的SID</h2>
+
+
+<pre><code>#!/usr/bin/env python
+
+import sha, time, cgi, os
+
+sid = cgi.FieldStorage().getfirst('sid')
+
+if sid: # If session exists
+   message = 'Already existent session'
+else: # New session
+   # The sid will be a hash of the server time
+   sid = sha.new(repr(time.time())).hexdigest()
+   message = 'New session'
+
+qs = 'sid=' + sid
+
+print """\
+Content-Type: text/html\n
+&lt;html&gt;&lt;body&gt;
+&lt;p&gt;%s&lt;/p&gt;
+&lt;p&gt;SID = %s&lt;/p&gt;
+&lt;p&gt;&lt;a href="./set_sid_qs.py?sid=%s"&gt;reload&lt;/a&gt;&lt;/p&gt;
+&lt;/body&gt;&lt;/html&gt;
+""" % (message, sid, sid)
+</code></pre>
+
+<p>这是将sid直接在url中传递。</p>
+
+
+<h2>使用隐藏域</h2>
+
+
+<pre><code>#!/usr/bin/env python
+
+import sha, time, cgi, os
+
+sid = cgi.FieldStorage().getfirst('sid')
+
+if sid: # If session exists
+   message = 'Already existent session'
+else: # New session
+   # The sid will be a hash of the server time
+   sid = sha.new(repr(time.time())).hexdigest()
+   message = 'New session'
+
+qs = 'sid=' + sid
+
+print """\
+Content-Type: text/html\n
+&lt;html&gt;&lt;body&gt;
+&lt;p&gt;%s&lt;/p&gt;
+&lt;p&gt;SID = %s&lt;/p&gt;
+&lt;form method="post"&gt;
+&lt;input type="hidden" name=sid value="%s"&gt;
+&lt;input type="submit" value="Submit"&gt;
+&lt;/form&gt;
+&lt;/body&gt;&lt;/html&gt;
+""" % (message, sid, sid)
+</code></pre>
+
+<p>这是将sid放在表单中作为隐藏字段提交。</p>
+
+
+<h2>shelve模块</h2>
+
+
+<p>光有session id是不够的，还需要将内容保存到文件或者数据库中。这里可以使用shelve模块保存到文件。</p>
+
+
+<p><code>session = shelve.open('/tmp/.session/sess_' + sid, writeback=True)</code></p>
+
+<p>它打开文件并返回一个类似于字典的对象。</p>
+
+
+<p><code>session['lastvisit'] = repr(time.time())</code></p>
+
+<p>设置session的值。</p>
+
+
+<p><code>lastvisit = session.get('lastvisit')</code></p>
+
+<p>读取刚刚设置的值。</p>
+
+
+<p><code>session.close()</code></p>
+
+<p>最后操作完成之后要记得关闭文件。</p>
+
+
+<h2>Cookie和Shelve</h2>
+
+
+<p>接下来用一个例子展示下Cookie和Shelve共同使用。</p>
+
+
+<pre><code>#!/usr/bin/env python
+import sha, time, Cookie, os, shelve
+
+cookie = Cookie.SimpleCookie()
+string_cookie = os.environ.get('HTTP_COOKIE')
+
+if not string_cookie:
+   sid = sha.new(repr(time.time())).hexdigest()
+   cookie['sid'] = sid
+   message = 'New session'
+else:
+   cookie.load(string_cookie)
+   sid = cookie['sid'].value
+cookie['sid']['expires'] = 12 * 30 * 24 * 60 * 60
+
+# The shelve module will persist the session data
+# and expose it as a dictionary
+session_dir = os.environ['DOCUMENT_ROOT'] + '/tmp/.session'
+session = shelve.open(session_dir + '/sess_' + sid, writeback=True)
+
+# Retrieve last visit time from the session
+lastvisit = session.get('lastvisit')
+if lastvisit:
+   message = 'Welcome back. Your last visit was at ' + \
+      time.asctime(time.gmtime(float(lastvisit)))
+# Save the current time in the session
+session['lastvisit'] = repr(time.time())
+
+print """\
+%s
+Content-Type: text/html\n
+&lt;html&gt;&lt;body&gt;
+&lt;p&gt;%s&lt;/p&gt;
+&lt;p&gt;SID = %s&lt;/p&gt;
+&lt;/body&gt;&lt;/html&gt;
+""" % (cookie, message, sid)
+</code></pre>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -2640,680 +2871,6 @@ end
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83963.html">[翻译]Ruby GTK教程4——菜单&工具条</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2013-11-23T00:00:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>23</span><span class='date-suffix'>rd</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
-        
-           | <a href="http://www.xefan.com/archives/83963.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/83963.html">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h1>菜单&amp;工具条</h1>
-
-
-<p>这部分的Ruby GTK教程我们将使用菜单和工具条。</p>
-
-
-<p>菜单栏是GUI应用中最常用的部分之一。它是位于各个菜单的一组命令。在命令行应用程序中我们需要记住这些所有神秘的命令，而现在我们将这些大部分的命令按照逻辑归合在一起。接受这些标准将进一步减少在学习新应用上花费的时间。</p>
-
-
-<h2>简单的菜单</h2>
-
-
-<p>我们的第一个例子将创建一个有文件菜单的菜单栏。这个菜单只有一个菜单项，选择这一项将退出应用。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-# ZetCode Ruby GTK tutorial
-#
-# This example shows a simple menu
-#
-# author: jan bodnar
-# website: www.zetcode.com
-# last modified: June 2009
-
-require 'gtk2'
-
-
-class RubyApp &lt; Gtk::Window
-
-    def initialize
-        super
-
-        set_title "Simple menu"
-        signal_connect "destroy" do 
-            Gtk.main_quit 
-        end
-
-        init_ui
-
-        set_default_size 250, 200
-        set_window_position Gtk::Window::POS_CENTER
-
-        show_all
-    end
-
-    def init_ui
-
-        modify_bg Gtk::STATE_NORMAL, Gdk::Color.new(6400, 6400, 6440)
-
-        mb = Gtk::MenuBar.new
-
-        filemenu = Gtk::Menu.new
-        filem = Gtk::MenuItem.new "File"
-        filem.set_submenu filemenu
-
-        exit = Gtk::MenuItem.new "Exit"
-        exit.signal_connect "activate" do
-            Gtk.main_quit
-        end
-
-        filemenu.append exit
-
-        mb.append filem
-
-        vbox = Gtk::VBox.new false, 2
-        vbox.pack_start mb, false, false, 0
-
-        add vbox
-    end
-end
-
-Gtk.init
-    window = RubyApp.new
-Gtk.main
-</code></pre>
-
-
-<p>这是一个最小功能的菜单栏的例子。</p>
-
-
-<pre><code>mb = Gtk::MenuBar.new
-</code></pre>
-
-
-<p>创建<em>MenuBar</em>控件，这是菜单的容器。</p>
-
-
-<pre><code>filemenu = Gtk::Menu.new
-filem = Gtk::MenuItem.new "File"
-filem.set_submenu filemenu
-</code></pre>
-
-
-<p>创建顶级菜单项。</p>
-
-
-<pre><code>exit = Gtk::MenuItem.new "Exit"
-exit.signal_connect "activate" do
-    Gtk.main_quit
-end
-
-filemenu.append exit
-</code></pre>
-
-
-<p>创建退出菜单项并添加到文件菜单项中。</p>
-
-
-<pre><code>mb.append filem
-</code></pre>
-
-
-<p>将顶级菜单项添加到菜单栏控件中。</p>
-
-
-<pre><code>vbox = Gtk::VBox.new false, 2
-vbox.pack_start mb, false, false, 0
-</code></pre>
-
-
-<p>与其他套件不同，我们必须要自己处理菜单栏的布局。我们将菜单栏放入竖直盒子中。</p>
-
-
-<p><img alt="image1" src="http://zetcode.com/img/gui/rubygtk/simplemenu.png"> <br>
-<em>图片：简单的菜单</em></p>
-
-
-<h2>子菜单</h2>
-
-
-<p>最后展示如何创建一个子菜单。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-# ZetCode Ruby GTK tutorial
-#
-# This example shows a submenu
-#
-# author: jan bodnar
-# website: www.zetcode.com
-# last modified: June 2009
-
-require 'gtk2'
-
-
-class RubyApp &lt; Gtk::Window
-
-    def initialize
-        super
-
-        set_title "Submenu"
-        signal_connect "destroy" do 
-            Gtk.main_quit 
-        end
-
-        init_ui
-
-        set_default_size 250, 200
-        set_window_position Gtk::Window::POS_CENTER
-
-        show_all
-    end
-
-    def init_ui
-
-        modify_bg Gtk::STATE_NORMAL, Gdk::Color.new(6400, 6400, 6440)
-
-        mb = Gtk::MenuBar.new
-
-        filemenu = Gtk::Menu.new
-        filem = Gtk::MenuItem.new "File"
-        filem.set_submenu filemenu
-
-        mb.append filem
-
-        imenu = Gtk::Menu.new
-
-        importm = Gtk::MenuItem.new "Import"
-        importm.set_submenu imenu
-
-        inews = Gtk::MenuItem.new "Import news feed..."
-        ibookmarks = Gtk::MenuItem.new "Import bookmarks..."
-        imail = Gtk::MenuItem.new "Import mail..."
-
-        imenu.append inews
-        imenu.append ibookmarks
-        imenu.append imail
-
-        filemenu.append importm
-
-        exit = Gtk::MenuItem.new "Exit"
-        exit.signal_connect "activate" do
-            Gtk.main_quit
-        end
-
-        filemenu.append exit
-
-        vbox = Gtk::VBox.new false, 2
-        vbox.pack_start mb, false, false, 0
-
-        add vbox
-    end
-end
-
-Gtk.init
-    window = RubyApp.new
-Gtk.main
-</code></pre>
-
-
-<p>创建子菜单。</p>
-
-
-<pre><code>imenu = Gtk::Menu.new
-</code></pre>
-
-
-<p>子菜单也是Menu控件。</p>
-
-
-<pre><code>importm = Gtk::MenuItem.new "Import"
-importm.set_submenu imenu
-</code></pre>
-
-
-<p>这是属于文件顶级菜单的菜单项的子菜单。</p>
-
-
-<pre><code>inews = Gtk::MenuItem.new "Import news feed..."
-ibookmarks = Gtk::MenuItem.new "Import bookmarks..."
-imail = Gtk::MenuItem.new "Import mail..."
-
-imenu.append inews
-imenu.append ibookmarks
-imenu.append imail
-</code></pre>
-
-
-<p>子菜单有自己的菜单项。</p>
-
-
-<p><img alt="image2" src="http://zetcode.com/img/gui/rubygtk/submenu.png"><br>
-<em>图片：子菜单</em></p>
-
-
-<h2>图片菜单</h2>
-
-
-<p>接下来的例子我们将进一步探索菜单。我们将在菜单项上添加图片和快捷键（accelerators）。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-# ZetCode Ruby GTK tutorial
-#
-# This example shows a menu with
-# images, accelerators and a separator
-#
-# author: jan bodnar
-# website: www.zetcode.com
-# last modified: June 2009
-
-require 'gtk2'
-
-
-class RubyApp &lt; Gtk::Window
-
-    def initialize
-        super
-
-        set_title "Image menu"
-        signal_connect "destroy" do 
-            Gtk.main_quit 
-        end
-
-        init_ui
-
-        set_default_size 250, 200
-        set_window_position Gtk::Window::POS_CENTER
-
-        show_all
-    end
-
-    def init_ui
-
-        modify_bg Gtk::STATE_NORMAL, Gdk::Color.new(6400, 6400, 6440)
-
-        mb = Gtk::MenuBar.new
-
-        filemenu = Gtk::Menu.new
-        filem = Gtk::MenuItem.new "File"
-        filem.set_submenu filemenu
-
-        agr = Gtk::AccelGroup.new
-        add_accel_group agr
-
-        newi = Gtk::ImageMenuItem.new Gtk::Stock::NEW, agr
-        key, mod = Gtk::Accelerator.parse "N"
-        newi.add_accelerator("activate", agr, key, 
-            mod, Gtk::ACCEL_VISIBLE)
-        filemenu.append newi
-
-        openm = Gtk::ImageMenuItem.new Gtk::Stock::OPEN, agr
-        key, mod = Gtk::Accelerator.parse "O"
-        openm.add_accelerator("activate", agr, key, 
-            mod, Gtk::ACCEL_VISIBLE)
-        filemenu.append openm
-
-        sep = Gtk::SeparatorMenuItem.new
-        filemenu.append sep
-
-        exit = Gtk::ImageMenuItem.new Gtk::Stock::QUIT, agr
-        key, mod = Gtk::Accelerator.parse "Q"
-        exit.add_accelerator("activate", agr, key, 
-            mod, Gtk::ACCEL_VISIBLE)
-
-        exit.signal_connect "activate" do
-            Gtk.main_quit
-        end
-        filemenu.append exit
-
-        mb.append filem
-
-        vbox = Gtk::VBox.new false, 2
-        vbox.pack_start mb, false, false, 0
-
-        add vbox
-    end
-end
-
-Gtk.init
-    window = RubyApp.new
-Gtk.main
-</code></pre>
-
-
-<p>这个例子显示了一个有子菜单的顶级菜单，每个菜单项都有一个图像和一个快捷键。退出菜单的快捷键是激活的。</p>
-
-
-<pre><code>agr = Gtk::AccelGroup.new
-add_accel_group agr
-</code></pre>
-
-
-<p>为了使用快捷键，我们创建了一个全局的<em>AccelGroup</em>对象。它稍后被用到。</p>
-
-
-<pre><code>newi = Gtk::ImageMenuItem.new Gtk::Stock::NEW, agr
-key, mod = Gtk::Accelerator.parse "N"
-newi.add_accelerator("activate", agr, key, 
-    mod, Gtk::ACCEL_VISIBLE)
-filemenu.append newi
-</code></pre>
-
-
-<p>创建图片菜单项。图片来自图片库中。我们也创建了<em>Ctrl+N</em>快捷键。</p>
-
-
-<pre><code>sep = Gtk::SeparatorMenuItem.new
-filemenu.append sep
-</code></pre>
-
-
-<p>这行创建一条分隔线。它用于将菜单项按照逻辑分组。</p>
-
-
-<p><img alt="image3" src="http://zetcode.com/img/gui/rubygtk/imagemenu.png"><br>
-<em>图片：图片菜单</em></p>
-
-
-<p>菜单将我们使用的命令进行分组。工具条提供了一个快速访问最常用命令的方式。</p>
-
-
-<h2>简单的工具条</h2>
-
-
-<p>接下来我们创建一个简单的工具条。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-# ZetCode Ruby GTK tutorial
-#
-# This example shows a toolbar
-# widget
-#
-# author: jan bodnar
-# website: www.zetcode.com
-# last modified: June 2009
-
-require 'gtk2'
-
-
-class RubyApp &lt; Gtk::Window
-
-    def initialize
-        super
-
-        set_title "Toolbar"
-        signal_connect "destroy" do 
-            Gtk.main_quit 
-        end
-
-        init_ui
-
-        set_default_size 250, 200
-        set_window_position Gtk::Window::POS_CENTER
-
-        show_all
-    end
-
-    def init_ui
-
-        toolbar = Gtk::Toolbar.new
-        toolbar.set_toolbar_style Gtk::Toolbar::Style::ICONS
-
-        newtb = Gtk::ToolButton.new Gtk::Stock::NEW
-        opentb = Gtk::ToolButton.new Gtk::Stock::OPEN
-        savetb = Gtk::ToolButton.new Gtk::Stock::SAVE
-        sep = Gtk::SeparatorToolItem.new
-        quittb = Gtk::ToolButton.new Gtk::Stock::QUIT
-
-        toolbar.insert 0, newtb
-        toolbar.insert 1, opentb
-        toolbar.insert 2, savetb
-        toolbar.insert 3, sep
-        toolbar.insert 4, quittb
-
-        quittb.signal_connect "clicked" do
-            Gtk.main_quit
-        end
-
-        vbox = Gtk::VBox.new false, 2
-        vbox.pack_start toolbar, false, false, 0
-
-        add(vbox)
-    end
-end
-
-Gtk.init
-    window = RubyApp.new
-Gtk.main
-</code></pre>
-
-
-<p>这个例子显示了有四个工具按钮的工具栏。</p>
-
-
-<pre><code>toolbar = Gtk::Toolbar.new
-</code></pre>
-
-
-<p>创建<em>Toolbar</em>控件。</p>
-
-
-<pre><code>toolbar.set_toolbar_style Gtk::Toolbar::Style::ICONS
-</code></pre>
-
-
-<p>工具栏上我们只显示图标，没有文字。</p>
-
-
-<pre><code>newtb = Gtk::ToolButton.new Gtk::Stock::NEW
-</code></pre>
-
-
-<p>创建了一个包含图片的ToolButton控件。图片来自内建的图片库。</p>
-
-
-<pre><code>sep = Gtk::SeparatorToolItem.new
-</code></pre>
-
-
-<p>这是一个分隔符，用于将按钮按照逻辑分组。</p>
-
-
-<pre><code>toolbar.insert 0, newtb
-toolbar.insert 1, opentb
-...
-</code></pre>
-
-
-<p>将按钮添加到工具栏。</p>
-
-
-<p><img alt="image4" src="http://zetcode.com/img/gui/rubygtk/toolbar.png"><br>
-<em>图片：工具栏</em></p>
-
-
-<h2>撤消重做</h2>
-
-
-<p>接下来的例子展示了如何停用工具栏上的按钮。这是GUI编程中的常见练习。例如对于保存按钮，在大多数编辑器中如果我们将文档的修改保存到磁盘中了，那么保存按钮会被停用。这是应用程序给用户的提示，所有修改都已保存。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-# ZetCode Ruby GTK tutorial
-#
-# This example shows how to 
-# activate/deactivate a ToolButton
-#
-# author: jan bodnar
-# website: www.zetcode.com
-# last modified: June 2009
-
-require 'gtk2'
-
-
-class RubyApp &lt; Gtk::Window
-
-
-    def initialize
-        super
-
-        set_title "Undo redo"
-        signal_connect "destroy" do 
-            Gtk.main_quit 
-        end
-
-        @count = 2
-
-        init_ui
-
-        set_default_size 250, 200
-        set_window_position Gtk::Window::POS_CENTER
-
-        show_all
-    end
-
-    def init_ui
-
-        toolbar = Gtk::Toolbar.new
-        toolbar.set_toolbar_style Gtk::Toolbar::Style::ICONS
-
-        @undo = Gtk::ToolButton.new Gtk::Stock::UNDO
-        @redo = Gtk::ToolButton.new Gtk::Stock::REDO
-        sep = Gtk::SeparatorToolItem.new
-        quit = Gtk::ToolButton.new Gtk::Stock::QUIT
-
-        toolbar.insert 0, @undo
-        toolbar.insert 1, @redo
-        toolbar.insert 2, sep
-        toolbar.insert 3, quit
-
-        @undo.signal_connect "clicked" do
-            on_undo
-        end
-
-        @redo.signal_connect "clicked" do
-            on_redo
-        end
-
-        quit.signal_connect "clicked" do
-            Gtk.main_quit
-        end
-
-        vbox = Gtk::VBox.new false, 2
-        vbox.pack_start toolbar, false, false, 0
-
-        self.add vbox
-
-    end
-
-    def on_undo
-
-        @count = @count - 1
-
-        if @count &lt;= 0
-            @undo.set_sensitive false
-            @redo.set_sensitive true
-        end
-    end
-
-
-    def on_redo
-        @count = @count + 1
-
-        if @count &gt;= 5
-            @redo.set_sensitive false
-            @undo.set_sensitive true
-        end
-    end
-end
-
-Gtk.init
-    window = RubyApp.new
-Gtk.main
-</code></pre>
-
-
-<p>我们例子从GTK资源中创建了撤消和重做按钮。每个按钮点击多次后会被禁用，变为灰色。</p>
-
-
-<pre><code>@count = 2
-</code></pre>
-
-
-<p><em>@count</em>变量用于描述按钮是禁用还是激活。</p>
-
-
-<pre><code>@undo = Gtk::ToolButton.new Gtk::Stock::UNDO
-@redo = Gtk::ToolButton.new Gtk::Stock::REDO
-</code></pre>
-
-
-<p>创建两个工具按钮，图片来自资源库。</p>
-
-
-<pre><code>@undo.signal_connect "clicked" do
-    on_undo
-end
-</code></pre>
-
-
-<p>点击undo按钮触发<em>on_undo</em>方法。</p>
-
-
-<pre><code>if @count &lt;= 0
-    @undo.set_sensitive false
-    @redo.set_sensitive true
-end
-</code></pre>
-
-
-<p>我们使用<em>set_sensitive</em>方法激活或者禁用控件。</p>
-
-
-<p><img alt="image5" src="http://zetcode.com/img/gui/rubygtk/undoredo.png"><br>
-<em>图片：撤消重做</em></p>
-
-
-<p>这章的Ruby GTK教程我们展示了如何使用菜单和工具栏。</p>
-
-
-<hr>
-
-
-<p>原文地址： <a href="http://zetcode.com/gui/rubygtk/menustoolbars/">http://zetcode.com/gui/rubygtk/menustoolbars/</a><br>
-翻译：龙昌  admin@longchangjin.cn  </p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/page/6">&larr; Older</a>
@@ -3335,6 +2892,10 @@ end
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="http://www.xefan.com/archives/84134.html">配置rails的vim环境</a>
+      </li>
+    
+      <li class="post">
         <a href="http://www.xefan.com/archives/84133.html">博客终于迁移完成了！</a>
       </li>
     
@@ -3350,19 +2911,15 @@ end
         <a href="http://www.xefan.com/archives/84127.html">VIM编译参数</a>
       </li>
     
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84124.html">Docker使用笔记</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (47)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (32)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (26)</a></li><li><a href='/categories/web开发/index.html'>web开发 (16)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (7)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (21)</a></li></ul>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (47)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (32)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (26)</a></li><li><a href='/categories/web开发/index.html'>web开发 (16)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (7)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (22)</a></li></ul>
 </section>
 <section>
   <h1>Tag Cloud</h1>
-    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.45454545454545%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.9090909090909%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.81818181818181%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.9090909090909%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.36363636363636%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.27272727272727%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.36363636363636%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.81818181818181%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.81818181818181%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 100.9090909090909%'>Django(1)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.9090909090909%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.81818181818181%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.72727272727273%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.9090909090909%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.9090909090909%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.45454545454545%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.81818181818181%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.63636363636364%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.45454545454545%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.9090909090909%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.45454545454545%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.9090909090909%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.9090909090909%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.9090909090909%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(66)</a> <a href='/tags/mongodb/index.html' style='font-size: 109.0909090909091%'>mongodb(10)</a> <a href='/tags/mysql/index.html' style='font-size: 103.63636363636364%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.9090909090909%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.9090909090909%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.18181818181819%'>php(9)</a> <a href='/tags/ps/index.html' style='font-size: 105.45454545454545%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.9090909090909%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 144.54545454545456%'>python(49)</a> <a href='/tags/qt/index.html' style='font-size: 101.81818181818181%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.9090909090909%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 123.63636363636364%'>Ruby(26)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.72727272727273%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.9090909090909%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.54545454545455%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.36363636363636%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.72727272727273%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 121.81818181818181%'>vim(24)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.72727272727273%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.9090909090909%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.9090909090909%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 112.72727272727272%'>Web开发(14)</a> <a href='/tags/windows/index.html' style='font-size: 106.36363636363636%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.9090909090909%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.9090909090909%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.9090909090909%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.9090909090909%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.45454545454545%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.81818181818181%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.9090909090909%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.18181818181819%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.18181818181819%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.9090909090909%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.9090909090909%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.9090909090909%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.81818181818181%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 109.0909090909091%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.18181818181819%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.9090909090909%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.54545454545455%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.9090909090909%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.9090909090909%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.45454545454545%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 120.9090909090909%'>翻译(23)</a> <a href='/tags/视频教程/index.html' style='font-size: 109.0909090909091%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.9090909090909%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.81818181818181%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.9090909090909%'>随笔(1)</a> </span>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.45454545454545%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.9090909090909%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.81818181818181%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.9090909090909%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.36363636363636%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.27272727272727%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.36363636363636%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.81818181818181%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.81818181818181%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 100.9090909090909%'>Django(1)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.9090909090909%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.81818181818181%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.72727272727273%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.9090909090909%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.9090909090909%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.45454545454545%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.81818181818181%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.63636363636364%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.45454545454545%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.9090909090909%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.45454545454545%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.9090909090909%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.9090909090909%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.9090909090909%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(66)</a> <a href='/tags/mongodb/index.html' style='font-size: 109.0909090909091%'>mongodb(10)</a> <a href='/tags/mysql/index.html' style='font-size: 103.63636363636364%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.9090909090909%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.9090909090909%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.18181818181819%'>php(9)</a> <a href='/tags/ps/index.html' style='font-size: 105.45454545454545%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.9090909090909%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 144.54545454545456%'>python(49)</a> <a href='/tags/qt/index.html' style='font-size: 101.81818181818181%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.9090909090909%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 123.63636363636364%'>Ruby(26)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.72727272727273%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.9090909090909%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.54545454545455%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.36363636363636%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.72727272727273%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 122.72727272727272%'>vim(25)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.72727272727273%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.9090909090909%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.9090909090909%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 112.72727272727272%'>Web开发(14)</a> <a href='/tags/windows/index.html' style='font-size: 106.36363636363636%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.9090909090909%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.9090909090909%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.9090909090909%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.9090909090909%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.45454545454545%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.81818181818181%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.9090909090909%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.18181818181819%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.18181818181819%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.9090909090909%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.9090909090909%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.9090909090909%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.81818181818181%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 109.0909090909091%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.18181818181819%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.9090909090909%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.54545454545455%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.9090909090909%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.9090909090909%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.45454545454545%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 120.9090909090909%'>翻译(23)</a> <a href='/tags/视频教程/index.html' style='font-size: 109.0909090909091%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.9090909090909%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.81818181818181%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.9090909090909%'>随笔(1)</a> </span>
 </section>
 <section>
   <h1>Link</h1>

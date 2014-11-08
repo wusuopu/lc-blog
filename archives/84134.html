@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Mongoengine教程(2)——文档模式 - 龍昌博客</title>
+  <title>配置rails的vim环境 - 龍昌博客</title>
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="在MongoDB中一个文档(document)与关系型数据库中的一行(row)相似；文档保存在集合(collection)中，行保存在表(table)中。 定义文档的模式 与django类似，要定义一个文档模式只需要创建一个类继承自 Document，并添加一些 Field 对象。 from &hellip;">
+  <meta name="description" content="今天分享一款 vim 的 rails 插件： vim-rails 。 使用该插件可以方便的在多个文件之间进行跳转。如在控制器的 action 上按 gf 键会自动跳转到对应的视图文件。 也可以使用 :Emodel, :Eview, :Econtroller, 命令在模型、视图以及控制器之间进行跳转 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://www.xefan.com/archives/84066.html">
+  <link rel="canonical" href="http://www.xefan.com/archives/84134.html">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="龍昌博客" type="application/atom+xml">
@@ -69,7 +69,7 @@
   
   <header>
     
-      <h1 class="entry-title">Mongoengine教程(2)——文档模式</h1>
+      <h1 class="entry-title">配置rails的vim环境</h1>
     
     
       <p class="meta">
@@ -78,7 +78,7 @@
 
 
 
-<time class='entry-date' datetime='2014-04-03T00:00:00+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2014</span></span> <span class='time'>12:00 am</span></time>
+<time class='entry-date' datetime='2014-11-08T16:02:58+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>8</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>4:02 pm</span></time>
         
            | <a href="#disqus_thread"
              data-disqus-identifier="http://www.xefan.com">Comments</a>
@@ -88,166 +88,29 @@
   </header>
 
 
-<div class="entry-content"><p>在MongoDB中一个文档(document)与关系型数据库中的一行(row)相似；文档保存在集合(collection)中，行保存在表(table)中。</p>
+<div class="entry-content"><p>今天分享一款 vim 的 rails 插件： <code>vim-rails</code> 。</p>
+
+<p>使用该插件可以方便的在多个文件之间进行跳转。如在控制器的 action 上按 <code>gf</code> 键会自动跳转到对应的视图文件。</p>
+
+<p>也可以使用 <code>:Emodel</code>, <code>:Eview</code>, <code>:Econtroller</code>, 命令在模型、视图以及控制器之间进行跳转。</p>
+
+<p>该插件还提供了对 rails 的一些关键字的高亮。</p>
+
+<p>并且还可以直接在 vim 中使用 <code>:Rails</code> 命令。</p>
+
+<p>同时还有 <code>vim-rake</code> 和 <code>vim-bundler</code> 两个插件提供了 <code>rake</code> 和 <code>bundle</code> 的 vim 命令接口。</p>
+
+<p>如果是用的 vundle 进行插件管理的话，可以直接在 .vimrc 配置中添加如下内容即可：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Bundle 'tpope/vim-rails'
+</span><span class='line'>Bundle 'tpope/vim-rake'
+</span><span class='line'>Bundle 'tpope/vim-bundler'</span></code></pre></td></tr></table></div></figure>
 
 
-<h2>定义文档的模式</h2>
-
-
-<p>与django类似，要定义一个文档模式只需要创建一个类继承自 Document，并添加一些 Field 对象。</p>
-
-
-<pre><code>from mongoengine import *
-import datetime
-
-class Page(Document):
-    title = StringField(max_length=200, required=True)
-    date_modified = DateTimeField(default=datetime.datetime.now)
-</code></pre>
-
-
-<p>如上定义了一个文档模式具有 title和date_modified 两个字段。</p>
-
-
-<p>同时MongoDB本身就是无模式的，因此我们还可以创建动态的文档模式。它可以在添加数据时为不同的数据设置不同的字段。</p>
-
-
-<pre><code>class Page(DynamicDocument):
-    title = StringField(max_length=200, required=True)
-</code></pre>
-
-
-<p>添加数据：</p>
-
-
-<pre><code>page = Page(title='Using MongoEngine')
-page.tags = ['mongodb', 'mongoengine']
-page.save()
-</code></pre>
-
-
-<h2>文档字段</h2>
-
-
-<p>文档字段(Field)不是必需的，但是使用它来进行数据验证、设置默认值等操作会比较方便。</p>
-
-
-<p>MongoEngine提供了如下这些类型的Field:</p>
-
-
-<ul>
-<li>BinaryField  </li>
-<li>BooleanField  </li>
-<li>ComplexDateTimeField  </li>
-<li>DateTimeField  </li>
-<li>DecimalField  </li>
-<li>DictField  </li>
-<li>DynamicField  </li>
-<li>EmailField  </li>
-<li>EmbeddedDocumentField  </li>
-<li>FileField  </li>
-<li>FloatField  </li>
-<li>GenericEmbeddedDocumentField  </li>
-<li>GenericReferenceField  </li>
-<li>GeoPointField  </li>
-<li>ImageField  </li>
-<li>IntField  </li>
-<li>ListField  </li>
-<li>MapField  </li>
-<li>ObjectIdField  </li>
-<li>ReferenceField  </li>
-<li>SequenceField  </li>
-<li>SortedListField  </li>
-<li>StringField  </li>
-<li>URLField  </li>
-<li>UUIDField  </li>
-</ul>
-
-
-<h2>文档之间引用关系</h2>
-
-
-<p>在关系型数据库中多个表可以使用外键进行关联。然而MongoDB是无模式的，因此想要达到这样的效果就这能在应用程序中自己手动的进行关联了。</p>
-
-
-<p>不过还好，使用MongoEngine的ReferenceField可以很方便的实现。</p>
-
-
-<pre><code>class User(Document):
-    name = StringField()
-
-class Page(Document):
-    content = StringField()
-    author = ReferenceField(User)
-
-john = User(name="John Smith")
-john.save()
-
-post = Page(content="Test Page")
-post.author = john
-post.save()
-</code></pre>
-
-
-<h3>一对多的关系</h3>
-
-
-<p>对于一对多的关系可以使用ListField来保存一个ReferenceField列表。在进行查询操作是需要传入一个实例对象。</p>
-
-
-<pre><code>class User(Document):
-    name = StringField()
-
-class Page(Document):
-    content = StringField()
-    authors = ListField(ReferenceField(User))
-
-bob = User(name="Bob Jones").save()
-john = User(name="John Smith").save()
-
-Page(content="Test Page", authors=[bob, john]).save()
-Page(content="Another Page", authors=[john]).save()
-
-# Find all pages Bob authored
-Page.objects(authors__in=[bob])
-</code></pre>
-
-
-<h3>引用对象的删除操作</h3>
-
-
-<p>MongoDB默认不会检查数据的完整性，因此在删除一个对象是就需要自己手动的处理引用了该对象的其他对象。</p>
-
-
-<p>同样的MongoEngine也提供了一样的功能。ReferenceField有一个 reverse_delete_rule 参数可以进行设置。它的取值如下：  </p>
-
-
-<ul>
-<li>mongoengine.DO_NOTHING:默认就是这个值，它不会进行任何操作。  </li>
-<li>mongoengine.DENY:如果该对象还被其他对象引用，则拒绝删除。  </li>
-<li>mongoengine.NULLIFY:将其他对象对该对象的引用字段设为null。  </li>
-<li>mongoengine.CASCADE:将引用了该对象的其他对象也删除掉。  </li>
-<li>mongoengine.PULL:移除对该对象的引用。  </li>
-</ul>
-
-
-<h2>索引</h2>
-
-
-<p>与django的Model相似，MongoEngine的Document也可以在meta属性中设置索引。</p>
-
-
-<pre><code>class Page(Document):
-    title = StringField()
-    rating = StringField()
-    meta = {
-        'indexes': ['title', ('title', '-rating')]
-    }
-</code></pre>
-
-
-<p>meta中的indexes可以是一个列表，也可以是一个字典。</p>
-
+<p>然后再在vim执行命令 :BundleInstall 即可。</p>
 </div>
 
 
@@ -263,14 +126,14 @@ Page.objects(authors__in=[bob])
 
 
 
-<time class='entry-date' datetime='2014-04-03T00:00:00+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2014</span></span> <span class='time'>12:00 am</span></time>
+<time class='entry-date' datetime='2014-11-08T16:02:58+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>8</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>4:02 pm</span></time>
     </p>
     <p class="meta">
       Categories: 
 
 <span class="categories">
   
-    <a class='category' href='/categories/数据库/index.html'>数据库</a>
+    <a class='category' href='/categories/资源分享/index.html'>资源分享</a>
   
 </span>
 
@@ -281,7 +144,7 @@ Page.objects(authors__in=[bob])
 
 <span class="tags">
   
-    <a class='tag' href='/tags/mongodb/index.html'>mongodb</a>, <a class='tag' href='/tags/python/index.html'>python</a>
+    <a class='tag' href='/tags/vim/index.html'>vim</a>
   
 </span>
 
@@ -297,10 +160,8 @@ Page.objects(authors__in=[bob])
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/archives/84063.html" title="Previous Post: mongoengine教程(1)——概述">&laquo; mongoengine教程(1)——概述</a>
+        <a class="basic-alignment left" href="/archives/84133.html" title="Previous Post: 博客终于迁移完成了！">&laquo; 博客终于迁移完成了！</a>
       
-      
-        <a class="basic-alignment right" href="/archives/84069.html" title="Next Post: mongoengine教程(3)——数据查询">mongoengine教程(3)——数据查询 &raquo;</a>
       
     </p>
   </footer>
@@ -389,8 +250,8 @@ Page.objects(authors__in=[bob])
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://www.xefan.com/archives/84066.html';
-        var disqus_url = 'http://www.xefan.com/archives/84066.html';
+        var disqus_identifier = 'http://www.xefan.com/archives/84134.html';
+        var disqus_url = 'http://www.xefan.com/archives/84134.html';
         var disqus_script = 'embed.js';
       
     (function () {
