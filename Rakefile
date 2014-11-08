@@ -169,6 +169,30 @@ task :new_page, :filename do |t, args|
   end
 end
 
+desc "List all tags"
+task :list_tags do |t, args|
+  tags = []
+  Dir['public/tags/*'].each do |d|
+    if !File.directory?(d)
+      next
+    end
+    tags.push File.basename(d)
+  end
+  p tags
+end
+
+desc "List all categories"
+task :list_categories do |t, args|
+  tags = []
+  Dir['public/categories/*'].each do |d|
+    if !File.directory?(d)
+      next
+    end
+    tags.push File.basename(d)
+  end
+  p tags
+end
+
 # usage rake isolate[my-post]
 desc "Move all other posts than the one currently being worked on to a temporary stash location (stash) so regenerating the site happens much more quickly."
 task :isolate, :filename do |t, args|
