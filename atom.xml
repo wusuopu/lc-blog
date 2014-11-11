@@ -4,7 +4,7 @@
   <title><![CDATA[龍昌博客]]></title>
   <link href="http://www.xefan.com/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2014-11-08T16:26:31+08:00</updated>
+  <updated>2014-11-11T21:21:26+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -12,6 +12,99 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Nginx + Uwsgi + Django环境配置]]></title>
+    <link href="http://www.xefan.com/archives/84135.html"/>
+    <updated>2014-11-11T21:02:17+08:00</updated>
+    <id>http://www.xefan.com/archives/84135-Nginx+uwsgi+Django环境配置</id>
+    <content type="html"><![CDATA[<p>有段时间没折腾 Django 了，又有点生疏了。最近又部署了一下 Django 的环境，顺便作个笔记以便之后查阅。</p>
+
+<p>首先安装 nginx、uwsgi 以及 uwsgi 的 python 插件。</p>
+
+<p>然后新建一个 uwsgi 的配置文件：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[uwsgi]
+</span><span class='line'>uid = www-data
+</span><span class='line'>chdir = /repo/django-blog
+</span><span class='line'>virtualenv = /repo/django-blog/pyenv2.7/    # python虚拟环境，没有可以不设置
+</span><span class='line'>env = DJANGO_SETTINGS_MODULE=blog.settings
+</span><span class='line'>module = blog.wsgi:application
+</span><span class='line'>master = true
+</span><span class='line'>plugin = python
+</span><span class='line'>pidfile = /tmp/blog-master.pid
+</span><span class='line'>socket = /tmp/blog.sock
+</span><span class='line'>enable-threads = true
+</span><span class='line'>post-buffering=1024000
+</span><span class='line'>post-buffering-busize=655360</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这里我们的 Django 项目代码位于 <code>/repo/django-blog</code> ，项目的配置文件为： <code>blog/settings.py</code> 。</p>
+
+<p><code>virtualenv</code> 项表明我们使用的是 <code>virtualenv</code> 环境，也可以直接系统的 python 环境。不过还是建议使用虚拟环境，以免软件包版本冲突。</p>
+
+<p><code>post-buffering</code> 和 <code>post-buffering-busize</code> 这两项设置了 POST 请求时缓冲区的大小，该值可根据自己的情况进行调整。之前遇到过由于缓冲区不足导致返回的内容不完整。</p>
+
+<p>再安装对应的 python 依赖包，然后运行 uwsgi 服务。</p>
+
+<p>接着修改 nginx 的配置：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>server {
+</span><span class='line'>  listen 80;
+</span><span class='line'>  server_name localhost;
+</span><span class='line'>
+</span><span class='line'>  client_max_body_size 50m;
+</span><span class='line'>
+</span><span class='line'>  access_log /var/log/nginx/blog-access.log;
+</span><span class='line'>  error_log /var/log/nginx/blog-error.log;
+</span><span class='line'>
+</span><span class='line'>  location / {
+</span><span class='line'>    uwsgi_pass unix:///tmp/blog.sock;
+</span><span class='line'>    include uwsgi_params;
+</span><span class='line'>  }
+</span><span class='line'>
+</span><span class='line'>  location /static {
+</span><span class='line'>    alias /repo/django-blog/static/;
+</span><span class='line'>  }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这个内容比较简单， <code>client_max_body_size</code> 项是用于设置 http 请求的 body 最大大小。如果你的程序中有文件上传的，那么就需要根据自身情况来设置允许上传文件的最大值。</p>
+
+<p>最后再启动 nginx 服务。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[配置rails的vim环境]]></title>
@@ -2197,71 +2290,6 @@ signals.post_save.connect(Author.post_save, sender=Author)
 
 
 <p>注意：对于 RefereneField 的<em>reverse_delete_rules</em>参数不会触发信号。</p>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Mongoengine教程(4)——文件存储]]></title>
-    <link href="http://www.xefan.com/archives/84072.html"/>
-    <updated>2014-04-05T00:00:00+08:00</updated>
-    <id>http://www.xefan.com/archives/84072-mongoengine教程(4)——文件存储</id>
-    <content type="html"><![CDATA[<p>MongoDB的GridFS支持直接在数据库中存储文件。要在MongoEngine中使用GridFS，只要使用 FileField 对象即可。以下是一个例子：</p>
-
-
-<pre><code>class Animal(Document):
-    genus = StringField()
-    family = StringField()
-    photo = FileField()
-
-marmot = Animal(genus='Marmota', family='Sciuridae')
-
-marmot_photo = open('gtk.png', 'rb')
-marmot.photo.put(marmot_photo, content_type = 'image/png')
-marmot.save()
-</code></pre>
-
-
-<p>这个例子将 gtk.png 这个图片存入了数据库中。<br>
-文件的读取也很简单：</p>
-
-
-<pre><code>marmot = Animal.objects(genus='Marmota').first()
-photo = marmot.photo.read()
-content_type = marmot.photo.content_type
-</code></pre>
-
-
-<p>FileField不仅可以存储文件，还可以用来存储数据流。只是操作上略微不同。</p>
-
-
-<p>要存储数据流，首先先创建一个新的文件，然后再往里面写入数据。</p>
-
-
-<pre><code>marmot.photo.new_file()
-marmot.photo.write('some_image_data')
-marmot.photo.write('some_more_image_data')
-marmot.photo.close()
-marmot.save()
-</code></pre>
-
-
-<p>如果要删除存储在数据库中的文件，只需要调用该文件对象的 delete 方法：</p>
-
-
-<pre><code>marmot.photo.delete()
-</code></pre>
-
-
-<p>注意：一条文档记录中的FileField字段只保存了对GridFS集合中该文件的ID引用。这意味着如果该文档被删除了，对用的文件不会被删除。因此在删除这类文档时需要小心，以免出现孤立文件。</p>
-
-
-<p>对于已存储的文件可以进行替换修改：</p>
-
-
-<pre><code>another_marmot = open('python.png', 'rb')
-marmot.photo.replace(another_marmot, content_type='image/png')
-</code></pre>
 
 ]]></content>
   </entry>

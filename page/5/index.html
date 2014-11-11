@@ -9,8 +9,7 @@
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="Session是位于服务器端的Cookie。它保存在服务器上的文件或者数据库中。每条session是由session id(SID)进行标识。 基于Cookie的SID Cookie可以长久胡保存SID，直到Cookie过期。用这种方式更快更安全。但是得客户端的浏览器支持Cookie才行。 1
-2 &hellip;">
+  <meta name="description" content="WSGI(Web Server Gateway Interface)并不是一个服务器，而是一个协议。最开始是用Python写的，现在很多语言都有了对应的实现。详细内容可以看这里： http://www.python.org/dev/peps/pep-3333/ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -67,6 +66,101 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84004.html">Python Wsgi教程1——介绍</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-12-08T00:00:00+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>8</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/84004.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/84004.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>WSGI(Web Server Gateway Interface)并不是一个服务器，而是一个协议。最开始是用Python写的，现在很多语言都有了对应的实现。详细内容可以看这里： <a href="http://www.python.org/dev/peps/pep-3333/">http://www.python.org/dev/peps/pep-3333/</a></p>
+
+<p>WSGI应用程序接口是一个可调用的对象。它必须接收两个固定的参数：一个包含了类似CGI变量的字典；一个可调用的函数用于返回HTTP状态代码和数据头。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="c"># This is our application object. It could have any name,</span>
+</span><span class='line'><span class="c"># except when using mod_wsgi where it must be &quot;application&quot;</span>
+</span><span class='line'><span class="k">def</span> <span class="nf">application</span><span class="p">(</span> <span class="c"># It accepts two arguments:</span>
+</span><span class='line'>      <span class="c"># environ points to a dictionary containing CGI like environment variables</span>
+</span><span class='line'>      <span class="c"># which is filled by the server for each received request from the client</span>
+</span><span class='line'>      <span class="n">environ</span><span class="p">,</span>
+</span><span class='line'>      <span class="c"># start_response is a callback function supplied by the server</span>
+</span><span class='line'>      <span class="c"># which will be used to send the HTTP status and headers to the server</span>
+</span><span class='line'>      <span class="n">start_response</span><span class="p">):</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="c"># build the response body possibly using the environ dictionary</span>
+</span><span class='line'>   <span class="n">response_body</span> <span class="o">=</span> <span class="s">&#39;The request method was </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">environ</span><span class="p">[</span><span class="s">&#39;REQUEST_METHOD&#39;</span><span class="p">]</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="c"># HTTP response code and message</span>
+</span><span class='line'>   <span class="n">status</span> <span class="o">=</span> <span class="s">&#39;200 OK&#39;</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="c"># These are HTTP headers expected by the client.</span>
+</span><span class='line'>   <span class="c"># They must be wrapped as a list of tupled pairs:</span>
+</span><span class='line'>   <span class="c"># [(Header name, Header value)].</span>
+</span><span class='line'>   <span class="n">response_headers</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/plain&#39;</span><span class="p">),</span>
+</span><span class='line'>                       <span class="p">(</span><span class="s">&#39;Content-Length&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">response_body</span><span class="p">)))]</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="c"># Send them to the server using the supplied function</span>
+</span><span class='line'>   <span class="n">start_response</span><span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="n">response_headers</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="c"># Return the response body.</span>
+</span><span class='line'>   <span class="c"># Notice it is wrapped in a list although it could be any iterable.</span>
+</span><span class='line'>   <span class="k">return</span> <span class="p">[</span><span class="n">response_body</span><span class="p">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>以上是一个应用程序的基本框架。由于没有服务器，因此这段代码目前还不能运行。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -2382,495 +2476,6 @@ Gtk.main
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83966.html">[翻译]Ruby GTK教程5——对话框</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2013-11-23T00:00:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>23</span><span class='date-suffix'>rd</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
-        
-           | <a href="http://www.xefan.com/archives/83966.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/83966.html">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h1>对话框</h1>
-
-
-<p>在这部分的Ruby GTK教程我们将介绍对话框。</p>
-
-
-<p>对话框是现代GUI应用程序不可缺的一部分。对话是两个或者更多人之间交谈。在计算机程序中对话是一个用于与应用程序交互的窗口。对话框用于输入数据、修改数据、修改设置等。对话框在用户与计算机程序之间的交流具有重要意义。</p>
-
-
-<h2>消息盒子</h2>
-
-
-<p>消息对话框是应用程序便于给用户提供消息的对话框。消息由文本和图片数据组成。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-# ZetCode Ruby GTK tutorial
-#
-# This example shows message
-# dialogs
-#
-# author: jan bodnar
-# website: www.zetcode.com
-# last modified: June 2009
-
-require 'gtk2'
-
-
-class RubyApp &lt; Gtk::Window
-
-    def initialize
-        super
-
-        set_title "Messages"
-        signal_connect "destroy" do 
-            Gtk.main_quit 
-        end
-
-        init_ui
-
-        set_default_size 250, 100
-        set_window_position Gtk::Window::POS_CENTER
-
-        show_all
-    end
-
-    def init_ui
-
-        table = Gtk::Table.new 2, 2, true
-
-        info = Gtk::Button.new "Information"
-        warn = Gtk::Button.new "Warning"
-        ques = Gtk::Button.new "Question"
-        erro = Gtk::Button.new "Error"
-
-        info.signal_connect "clicked" do
-            on_info
-        end
-
-        warn.signal_connect "clicked" do
-            on_warn
-        end
-
-        ques.signal_connect "clicked" do
-            on_ques
-        end
-
-        erro.signal_connect "clicked" do
-            on_erro
-        end
-
-        table.attach info, 0, 1, 0, 1
-        table.attach warn, 1, 2, 0, 1
-        table.attach ques, 0, 1, 1, 2
-        table.attach erro, 1, 2, 1, 2
-
-        add table
-
-    end
-
-    def on_info
-        md = Gtk::MessageDialog.new(self,
-            Gtk::Dialog::DESTROY_WITH_PARENT, Gtk::MessageDialog::INFO, 
-            Gtk::MessageDialog::BUTTONS_CLOSE, "Download completed")
-        md.run
-        md.destroy
-    end
-
-
-    def on_erro
-        md = Gtk::MessageDialog.new(self, Gtk::Dialog::MODAL |
-            Gtk::Dialog::DESTROY_WITH_PARENT, Gtk::MessageDialog::ERROR, 
-            Gtk::MessageDialog::BUTTONS_CLOSE, "Error loading file")
-        md.run
-        md.destroy
-    end
-
-
-    def on_ques
-        md = Gtk::MessageDialog.new(self,
-            Gtk::Dialog::DESTROY_WITH_PARENT, Gtk::MessageDialog::QUESTION, 
-            Gtk::MessageDialog::BUTTONS_CLOSE, "Are you sure to quit?")
-        md.run
-        md.destroy
-    end
-
-    def on_warn
-        md = Gtk::MessageDialog.new(self,
-            Gtk::Dialog::DESTROY_WITH_PARENT, Gtk::MessageDialog::WARNING, 
-            Gtk::MessageDialog::BUTTONS_CLOSE, "Unallowed operation")
-        md.run
-        md.destroy
-    end
-end
-
-Gtk.init
-    window = RubyApp.new
-Gtk.main
-</code></pre>
-
-
-<p>我们的例子中显示了四种消息对话框。信息、警告、询问和错误消息对话框。</p>
-
-
-<pre><code>info = Gtk::Button.new "Information"
-warn = Gtk::Button.new "Warning"
-ques = Gtk::Button.new "Question"
-erro = Gtk::Button.new "Error"
-</code></pre>
-
-
-<p>创建四个按钮。每个按钮将显示不同种类的消息对话框。</p>
-
-
-<pre><code>def on_info
-    md = Gtk::MessageDialog.new(self,
-        Gtk::Dialog::DESTROY_WITH_PARENT, Gtk::MessageDialog::INFO, 
-        Gtk::MessageDialog::BUTTONS_CLOSE, "Download completed")
-    md.run
-    md.destroy
-end
-</code></pre>
-
-
-<p>如果我们点击了<em>info</em>按钮，信息对话框将显示。<em>Gtk::MessageDialog::INFO</em>指定了对话框的类型。<em>Gtk::MessageDialog::BUTTONS_CLOSE</em>指定在对话框中显示的按钮。最后一个参数是要显示的消息。对话框使用<em>run</em>方法显示。程序员必须也要调用<em>destroy</em>或者<em>hide</em>方法。<br>
-<img alt="image1" src="http://zetcode.com/img/gui/rubygtk/information.png">  <img alt="image2" src="http://zetcode.com/img/gui/rubygtk/warning.png">  <br>
-<img alt="image3" src="http://zetcode.com/img/gui/rubygtk/question.png">  <img alt="image4" src="http://zetcode.com/img/gui/rubygtk/error.png">   </p>
-
-
-<h2>关于对话框(AboutDialog)</h2>
-
-
-<p><em>关于对话框</em>显示了应用程序的信息。<em>关于对话框</em>可以显示logo、应用程序名、版本号、版权、网站或者授权信息。它也可能给出作者、文档编写才、翻译者和设计师的信息。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-# ZetCode Ruby GTK tutorial
-#
-# This example demonstrates the
-# AboutDialog dialog
-#
-# author: jan bodnar
-# website: www.zetcode.com
-# last modified: June 2009
-
-require 'gtk2'
-
-
-class RubyApp &lt; Gtk::Window
-
-    def initialize
-        super
-
-        set_title "About dialog"
-        signal_connect "destroy" do 
-            Gtk.main_quit 
-        end
-
-        init_ui
-
-        set_default_size 300, 150
-        set_window_position Gtk::Window::POS_CENTER
-
-        show_all
-    end
-
-    def init_ui
-
-        button = Gtk::Button.new "About"
-        button.set_size_request 80, 30
-
-        button.signal_connect "clicked" do
-            on_clicked
-        end
-
-        fix = Gtk::Fixed.new
-        fix.put button, 20, 20
-
-        add fix
-
-    end
-
-    def on_clicked
-        about = Gtk::AboutDialog.new
-        about.set_program_name "Battery"
-        about.set_version "0.1"
-        about.set_copyright "(c) Jan Bodnar"
-        about.set_comments "Battery is a simple tool for battery checking"
-        about.set_website "http://www.zetcode.com"
-        about.set_logo Gdk::Pixbuf.new "battery.png"
-        about.run
-        about.destroy
-    end
-end
-
-Gtk.init
-    window = RubyApp.new
-Gtk.main
-</code></pre>
-
-
-<p>代码伅使用了<em>AboutDialog</em>的一些特性。</p>
-
-
-<pre><code>about = Gtk::AboutDialog.new
-</code></pre>
-
-
-<p>创建一个AboutDialog。</p>
-
-
-<pre><code>about.set_program_name "Battery"
-about.set_version "0.1"
-about.set_copyright "(c) Jan Bodnar"
-</code></pre>
-
-
-<p>这里我们指定名称、版本号和版权信息。</p>
-
-
-<pre><code>about.set_logo Gdk::Pixbuf.new "battery.png"
-</code></pre>
-
-
-<p>这行创建一个logo。 <br>
-<img alt="image5" src="http://zetcode.com/img/gui/rubygtk/about.png"> <br>
-<em>图片：AboutDialog</em></p>
-
-
-<h2>字体选择对话框</h2>
-
-
-<p>FontSelectionDialog是一个用于选择字体的对话框。它典型的应用于文本编辑或者格式化的应用程序中。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-# ZetCode Ruby GTK tutorial
-#
-# This example works with the
-# FontSelectionDialog
-#
-# author: jan bodnar
-# website: www.zetcode.com
-# last modified: June 2009
-
-require 'gtk2'
-
-
-class RubyApp &lt; Gtk::Window
-
-    def initialize
-        super
-
-        set_title "FontSelectionDialog"
-        signal_connect "destroy" do 
-            Gtk.main_quit 
-        end
-
-        init_ui
-
-        set_default_size 300, 150
-        set_window_position Gtk::Window::POS_CENTER
-
-        show_all
-    end
-
-    def init_ui
-
-        set_border_width 10
-        @label = Gtk::Label.new "The only victory over love is flight."
-        button = Gtk::Button.new "Select font"
-
-        button.signal_connect "clicked" do
-            on_clicked
-        end
-
-        fix = Gtk::Fixed.new
-        fix.put button, 100, 30
-        fix.put @label, 30, 90
-        add fix
-
-    end
-
-    def on_clicked
-        fdia = Gtk::FontSelectionDialog.new "Select font name"
-        response = fdia.run
-
-        if response == Gtk::Dialog::RESPONSE_OK
-            font_desc = Pango::FontDescription.new fdia.font_name
-            if font_desc
-                @label.modify_font font_desc
-            end
-        end
-        fdia.destroy
-    end     
-end
-
-Gtk.init
-    window = RubyApp.new
-Gtk.main
-</code></pre>
-
-
-<p>这个代码例子我们创建了一个按钮和一个标签。点击按钮之后显示字体选择对话框。</p>
-
-
-<pre><code>fdia = Gtk::FontSelectionDialog.new "Select font name"
-</code></pre>
-
-
-<p>创建<em>FontSelectionDialog</em>。</p>
-
-
-<pre><code>if response == Gtk::Dialog::RESPONSE_OK
-    font_desc = Pango::FontDescription.new fdia.font_name
-    if font_desc
-        @label.modify_font font_desc
-    end
-end
-</code></pre>
-
-
-<p>如果点击确定按钮，标签的字体会变为我们在对话框中选中的。<br>
-<img alt="image6" src="http://zetcode.com/img/gui/rubygtk/fontdialog.png"><br>
-<em>图片：FontSelectionDialog</em></p>
-
-
-<h2>颜色选择对话框</h2>
-
-
-<p>ColorSelectionDialog是用于选择颜色的对话框。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-# ZetCode Ruby GTK tutorial
-#
-# This example works with the
-# ColorSelectionDialog
-#
-# author: jan bodnar
-# website: www.zetcode.com
-# last modified: June 2009
-
-require 'gtk2'
-
-
-class RubyApp &lt; Gtk::Window
-
-    def initialize
-        super
-
-        set_title "ColorSelectionDialog"
-        signal_connect "destroy" do 
-            Gtk.main_quit 
-        end
-
-        init_ui
-
-        set_default_size 350, 150
-        set_window_position Gtk::Window::POS_CENTER
-
-        show_all
-    end
-
-    def init_ui
-
-        set_border_width 10
-        @label = Gtk::Label.new "The only victory over love is flight."
-        button = Gtk::Button.new "Select color"
-
-        button.signal_connect "clicked" do
-            on_clicked
-        end
-
-        fix = Gtk::Fixed.new
-        fix.put button, 100, 30
-        fix.put @label, 30, 90
-        add fix
-    end
-
-    def on_clicked
-        cdia = Gtk::ColorSelectionDialog.new "Select color"
-        response = cdia.run
-
-        if response == Gtk::Dialog::RESPONSE_OK
-            colorsel = cdia.colorsel
-            color = colorsel.current_color
-            @label.modify_fg Gtk::STATE_NORMAL, color
-        end
-
-        cdia.destroy
-    end
-end
-
-Gtk.init
-    window = RubyApp.new
-Gtk.main
-</code></pre>
-
-
-<p>这个例子与前一个例子很相似。这次我们是改变标签的颜色。</p>
-
-
-<pre><code>cdia = Gtk::ColorSelectionDialog.new "Select color"
-</code></pre>
-
-
-<p>创建ColorSelectionDialog。</p>
-
-
-<pre><code>if response == Gtk::Dialog::RESPONSE_OK
-    colorsel = cdia.colorsel
-    color = colorsel.current_color
-    @label.modify_fg Gtk::STATE_NORMAL, color
-end
-</code></pre>
-
-
-<p>如果按下OK按钮，我们得到颜色值并修改标签的颜色。</p>
-
-
-<p><img alt="image7" src="http://zetcode.com/img/gui/rubygtk/colordialog.png"><br>
-<em>图片：ColorSelectionDialog</em></p>
-
-
-<p>这部分的Ruby GTK教程我们展示了对话框。</p>
-
-
-<hr>
-
-
-<p>原文地址： <a href="http://zetcode.com/gui/rubygtk/dialogs/">http://zetcode.com/gui/rubygtk/dialogs/</a><br>
-翻译：龙昌  admin@longchangjin.cn </p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/page/6">&larr; Older</a>
@@ -2892,6 +2497,10 @@ end
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="http://www.xefan.com/archives/84135.html">Nginx + Uwsgi + Django环境配置</a>
+      </li>
+    
+      <li class="post">
         <a href="http://www.xefan.com/archives/84134.html">配置rails的vim环境</a>
       </li>
     
@@ -2907,19 +2516,15 @@ end
         <a href="http://www.xefan.com/archives/84130.html">配置coffeescript的vim环境</a>
       </li>
     
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84127.html">VIM编译参数</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (47)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (32)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (26)</a></li><li><a href='/categories/web开发/index.html'>web开发 (16)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (7)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (22)</a></li></ul>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (47)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (33)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (26)</a></li><li><a href='/categories/web开发/index.html'>web开发 (17)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (7)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (22)</a></li></ul>
 </section>
 <section>
   <h1>Tag Cloud</h1>
-    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.45454545454545%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.9090909090909%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.81818181818181%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.9090909090909%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.36363636363636%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.27272727272727%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.36363636363636%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.81818181818181%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.81818181818181%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 100.9090909090909%'>Django(1)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.9090909090909%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.81818181818181%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.72727272727273%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.9090909090909%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.9090909090909%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.45454545454545%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.81818181818181%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.63636363636364%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.45454545454545%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.9090909090909%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.45454545454545%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.9090909090909%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.9090909090909%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.9090909090909%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(66)</a> <a href='/tags/mongodb/index.html' style='font-size: 109.0909090909091%'>mongodb(10)</a> <a href='/tags/mysql/index.html' style='font-size: 103.63636363636364%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.9090909090909%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.9090909090909%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.18181818181819%'>php(9)</a> <a href='/tags/ps/index.html' style='font-size: 105.45454545454545%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.9090909090909%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 144.54545454545456%'>python(49)</a> <a href='/tags/qt/index.html' style='font-size: 101.81818181818181%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.9090909090909%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 123.63636363636364%'>Ruby(26)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.72727272727273%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.9090909090909%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.54545454545455%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.36363636363636%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.72727272727273%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 122.72727272727272%'>vim(25)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.72727272727273%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.9090909090909%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.9090909090909%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 112.72727272727272%'>Web开发(14)</a> <a href='/tags/windows/index.html' style='font-size: 106.36363636363636%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.9090909090909%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.9090909090909%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.9090909090909%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.9090909090909%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.45454545454545%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.81818181818181%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.9090909090909%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.18181818181819%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.18181818181819%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.9090909090909%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.9090909090909%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.9090909090909%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.81818181818181%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 109.0909090909091%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.18181818181819%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.9090909090909%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.54545454545455%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.9090909090909%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.9090909090909%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.45454545454545%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 120.9090909090909%'>翻译(23)</a> <a href='/tags/视频教程/index.html' style='font-size: 109.0909090909091%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.9090909090909%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.81818181818181%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.9090909090909%'>随笔(1)</a> </span>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.45454545454545%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.9090909090909%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.81818181818181%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.9090909090909%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.36363636363636%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.27272727272727%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.36363636363636%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.81818181818181%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.81818181818181%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 101.81818181818181%'>Django(2)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.9090909090909%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.81818181818181%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.72727272727273%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.9090909090909%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.9090909090909%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.45454545454545%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.81818181818181%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.63636363636364%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.45454545454545%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.9090909090909%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.45454545454545%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.9090909090909%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.9090909090909%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.9090909090909%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(66)</a> <a href='/tags/mongodb/index.html' style='font-size: 109.0909090909091%'>mongodb(10)</a> <a href='/tags/mysql/index.html' style='font-size: 103.63636363636364%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.9090909090909%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.9090909090909%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.18181818181819%'>php(9)</a> <a href='/tags/ps/index.html' style='font-size: 105.45454545454545%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.9090909090909%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.45454545454544%'>python(50)</a> <a href='/tags/qt/index.html' style='font-size: 101.81818181818181%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.9090909090909%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 123.63636363636364%'>Ruby(26)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.72727272727273%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.9090909090909%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.54545454545455%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.36363636363636%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.72727272727273%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 122.72727272727272%'>vim(25)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.72727272727273%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.9090909090909%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.9090909090909%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 112.72727272727272%'>Web开发(14)</a> <a href='/tags/windows/index.html' style='font-size: 106.36363636363636%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.9090909090909%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.9090909090909%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.9090909090909%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.9090909090909%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.45454545454545%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.81818181818181%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.9090909090909%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.18181818181819%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.18181818181819%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.9090909090909%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.9090909090909%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.9090909090909%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.81818181818181%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 109.0909090909091%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.18181818181819%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.9090909090909%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.54545454545455%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.9090909090909%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.9090909090909%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.45454545454545%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 120.9090909090909%'>翻译(23)</a> <a href='/tags/视频教程/index.html' style='font-size: 109.0909090909091%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.9090909090909%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.81818181818181%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.9090909090909%'>随笔(1)</a> </span>
 </section>
 <section>
   <h1>Link</h1>

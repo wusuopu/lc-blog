@@ -9,8 +9,7 @@
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="rvm与Python的virtualenv和Node的nvm类似。使用它可以很方便的在你的系统中安装多个Ruby环境。类似的工具还有rbenv、ry、rbfu等。 安装rvm 以下的命令都是在当前用户权限下执行的，最好不要使用sudo。
-下载安装rvm: $ curl -sSL https:// &hellip;">
+  <meta name="description" content="Redis是一个键值型数据库，之前花了些时间体验了一下Redis，感觉还是很不错的。而且Redis学习起来也很容易，差不多花几个小时应该就能入门了。当时我是看的《the little redis book》，初学者可以看看。 安装 下载软件包： http://redis.io/download &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -67,6 +66,271 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84110.html">Redis使用笔记</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-06-21T00:00:00+08:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2014</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/84110.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/84110.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Redis是一个键值型数据库，之前花了些时间体验了一下Redis，感觉还是很不错的。而且Redis学习起来也很容易，差不多花几个小时应该就能入门了。当时我是看的<a href="https://github.com/karlseguin/the-little-redis-book">《the little redis book》</a>，初学者可以看看。</p>
+
+
+<h2>安装</h2>
+
+
+<p>下载软件包： http://redis.io/download</p>
+
+
+<p>首先运行服务器程序：</p>
+
+
+<pre><code>$ redis-server
+</code></pre>
+
+
+<p>程序默认是监听6379端口。</p>
+
+
+<p>然后再运行客户端程序：</p>
+
+
+<pre><code>$ redis-cli
+</code></pre>
+
+
+<h2>基本数据类型</h2>
+
+
+<p>运行客户端程序连接上Redis服务之后，所有的操作都可以通过该命令行交互完成。</p>
+
+
+<p>Redis有5种不同的数据类型：字符串、散列表、列表、集合、有序集合。所有的数据在Redis中都是以键值对的形式保存的。</p>
+
+
+<p>以下介绍这几种类型数据的基本操作。</p>
+
+
+<h3>String</h3>
+
+
+<p>设置一个键的值为字符串：  </p>
+
+
+<pre><code>set &lt;key&gt; &lt;value&gt;
+</code></pre>
+
+
+<p>获取该键的值：  </p>
+
+
+<pre><code>get &lt;key&gt;
+</code></pre>
+
+
+<p>字符串相关的命令：  </p>
+
+
+<pre><code>help @string
+</code></pre>
+
+
+<h3>Hashes</h3>
+
+
+<p>设置一个散列值：  </p>
+
+
+<pre><code>hset &lt;key&gt; &lt;k&gt; &lt;v&gt;
+</code></pre>
+
+
+<p>获取该键的值：  </p>
+
+
+<pre><code>hget &lt;key&gt; &lt;k&gt;  
+hgetall &lt;key&gt;
+</code></pre>
+
+
+<p>散列相关的命令：  </p>
+
+
+<pre><code>help @hash
+</code></pre>
+
+
+<h3>Lists</h3>
+
+
+<p>添加值：  </p>
+
+
+<pre><code>lpush &lt;key&gt; &lt;v&gt;
+</code></pre>
+
+
+<p>移除值：  </p>
+
+
+<pre><code>lpop &lt;key&gt;  
+help @list
+</code></pre>
+
+
+<h3>Set</h3>
+
+
+<p>添加值：  </p>
+
+
+<pre><code>sadd &lt;key&gt; &lt;v&gt;[ &lt;v&gt; ..]  
+help set
+</code></pre>
+
+
+<h3>Sorted Sets</h3>
+
+
+<p>类似于集合(Set)，但是提供了排序（sorting）和秩划分（ranking）的功能。</p>
+
+
+<p>添加值：  </p>
+
+
+<pre><code>zadd key score member [score] [member]   
+help @sorted_set
+</code></pre>
+
+
+<h2>其他</h2>
+
+
+<h3>有效期</h3>
+
+
+<p>设置某个值在seconds秒后到期：  </p>
+
+
+<pre><code>expire &lt;key&gt; seconds
+</code></pre>
+
+
+<p>设置某个值在time时刻到期：  </p>
+
+
+<pre><code>expireat &lt;key&gt; time
+</code></pre>
+
+
+<p>查看到期时间：  </p>
+
+
+<pre><code>ttl &lt;key&gt;
+</code></pre>
+
+
+<p>清除到期时间：  </p>
+
+
+<pre><code>persist &lt;key&gt;
+</code></pre>
+
+
+<h3>事务（Transactions）</h3>
+
+
+<pre><code>multi  
+do something  
+exec
+</code></pre>
+
+
+<p>multi和exec之间的命令作为原子操作。</p>
+
+
+<p>在multi之前调用watch可监听值的变化，若该值被其他客户端修改，事务将会运行失败。</p>
+
+
+<h3>杂项</h3>
+
+
+<p>选择数据库：</p>
+
+
+<pre><code>select index
+</code></pre>
+
+
+<p>清除当前数据库所属key:</p>
+
+
+<pre><code>flushdb
+</code></pre>
+
+
+<p>清除所有数据库所属key:</p>
+
+
+<pre><code>flushall
+</code></pre>
+
+
+<p>查看key所储存的值的类型：</p>
+
+
+<pre><code>type key
+</code></pre>
+
+
+<p>Redis相关的命令手册： http://redis.io/commands</p>
+
+
+<h2>在应用程序中使用Redis</h2>
+
+
+<p>Redis提供了多种语言的绑定，以Ruby为例：</p>
+
+
+<pre><code>require 'redis'
+r = Redis.new
+r.set 'key', 1234
+puts r.get 'key'
+puts r.keys
+</code></pre>
+
+
+<p>输出结果应该为：</p>
+
+
+<pre><code>"1234"
+["key"]
+</code></pre>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1660,94 +1924,6 @@ signals.post_save.connect(Author.post_save, sender=Author)
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84072.html">Mongoengine教程(4)——文件存储</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2014-04-05T00:00:00+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>5</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>12:00 am</span></time>
-        
-           | <a href="http://www.xefan.com/archives/84072.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/84072.html">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>MongoDB的GridFS支持直接在数据库中存储文件。要在MongoEngine中使用GridFS，只要使用 FileField 对象即可。以下是一个例子：</p>
-
-
-<pre><code>class Animal(Document):
-    genus = StringField()
-    family = StringField()
-    photo = FileField()
-
-marmot = Animal(genus='Marmota', family='Sciuridae')
-
-marmot_photo = open('gtk.png', 'rb')
-marmot.photo.put(marmot_photo, content_type = 'image/png')
-marmot.save()
-</code></pre>
-
-
-<p>这个例子将 gtk.png 这个图片存入了数据库中。<br>
-文件的读取也很简单：</p>
-
-
-<pre><code>marmot = Animal.objects(genus='Marmota').first()
-photo = marmot.photo.read()
-content_type = marmot.photo.content_type
-</code></pre>
-
-
-<p>FileField不仅可以存储文件，还可以用来存储数据流。只是操作上略微不同。</p>
-
-
-<p>要存储数据流，首先先创建一个新的文件，然后再往里面写入数据。</p>
-
-
-<pre><code>marmot.photo.new_file()
-marmot.photo.write('some_image_data')
-marmot.photo.write('some_more_image_data')
-marmot.photo.close()
-marmot.save()
-</code></pre>
-
-
-<p>如果要删除存储在数据库中的文件，只需要调用该文件对象的 delete 方法：</p>
-
-
-<pre><code>marmot.photo.delete()
-</code></pre>
-
-
-<p>注意：一条文档记录中的FileField字段只保存了对GridFS集合中该文件的ID引用。这意味着如果该文档被删除了，对用的文件不会被删除。因此在删除这类文档时需要小心，以免出现孤立文件。</p>
-
-
-<p>对于已存储的文件可以进行替换修改：</p>
-
-
-<pre><code>another_marmot = open('python.png', 'rb')
-marmot.photo.replace(another_marmot, content_type='image/png')
-</code></pre>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/page/3">&larr; Older</a>
@@ -1769,6 +1945,10 @@ marmot.photo.replace(another_marmot, content_type='image/png')
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="http://www.xefan.com/archives/84135.html">Nginx + Uwsgi + Django环境配置</a>
+      </li>
+    
+      <li class="post">
         <a href="http://www.xefan.com/archives/84134.html">配置rails的vim环境</a>
       </li>
     
@@ -1784,19 +1964,15 @@ marmot.photo.replace(another_marmot, content_type='image/png')
         <a href="http://www.xefan.com/archives/84130.html">配置coffeescript的vim环境</a>
       </li>
     
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84127.html">VIM编译参数</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (47)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (32)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (26)</a></li><li><a href='/categories/web开发/index.html'>web开发 (16)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (7)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (22)</a></li></ul>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (47)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (33)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (26)</a></li><li><a href='/categories/web开发/index.html'>web开发 (17)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (7)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (22)</a></li></ul>
 </section>
 <section>
   <h1>Tag Cloud</h1>
-    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.45454545454545%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.9090909090909%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.81818181818181%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.9090909090909%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.36363636363636%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.27272727272727%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.36363636363636%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.81818181818181%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.81818181818181%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 100.9090909090909%'>Django(1)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.9090909090909%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.81818181818181%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.72727272727273%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.9090909090909%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.9090909090909%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.45454545454545%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.81818181818181%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.63636363636364%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.45454545454545%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.9090909090909%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.45454545454545%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.9090909090909%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.9090909090909%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.9090909090909%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(66)</a> <a href='/tags/mongodb/index.html' style='font-size: 109.0909090909091%'>mongodb(10)</a> <a href='/tags/mysql/index.html' style='font-size: 103.63636363636364%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.9090909090909%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.9090909090909%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.18181818181819%'>php(9)</a> <a href='/tags/ps/index.html' style='font-size: 105.45454545454545%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.9090909090909%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 144.54545454545456%'>python(49)</a> <a href='/tags/qt/index.html' style='font-size: 101.81818181818181%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.9090909090909%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 123.63636363636364%'>Ruby(26)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.72727272727273%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.9090909090909%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.54545454545455%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.36363636363636%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.72727272727273%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 122.72727272727272%'>vim(25)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.72727272727273%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.9090909090909%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.9090909090909%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 112.72727272727272%'>Web开发(14)</a> <a href='/tags/windows/index.html' style='font-size: 106.36363636363636%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.9090909090909%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.9090909090909%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.9090909090909%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.9090909090909%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.45454545454545%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.81818181818181%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.9090909090909%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.18181818181819%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.18181818181819%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.9090909090909%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.9090909090909%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.9090909090909%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.81818181818181%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 109.0909090909091%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.18181818181819%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.9090909090909%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.54545454545455%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.9090909090909%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.9090909090909%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.45454545454545%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 120.9090909090909%'>翻译(23)</a> <a href='/tags/视频教程/index.html' style='font-size: 109.0909090909091%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.9090909090909%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.81818181818181%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.9090909090909%'>随笔(1)</a> </span>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.45454545454545%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.9090909090909%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.81818181818181%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.9090909090909%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.36363636363636%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.27272727272727%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.36363636363636%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.81818181818181%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.81818181818181%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 101.81818181818181%'>Django(2)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.9090909090909%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.81818181818181%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.72727272727273%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.9090909090909%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.9090909090909%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.45454545454545%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.81818181818181%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.63636363636364%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.45454545454545%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.9090909090909%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.45454545454545%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.9090909090909%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.9090909090909%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.9090909090909%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(66)</a> <a href='/tags/mongodb/index.html' style='font-size: 109.0909090909091%'>mongodb(10)</a> <a href='/tags/mysql/index.html' style='font-size: 103.63636363636364%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.9090909090909%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.9090909090909%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.18181818181819%'>php(9)</a> <a href='/tags/ps/index.html' style='font-size: 105.45454545454545%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.9090909090909%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.45454545454544%'>python(50)</a> <a href='/tags/qt/index.html' style='font-size: 101.81818181818181%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.9090909090909%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 123.63636363636364%'>Ruby(26)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.72727272727273%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.9090909090909%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.54545454545455%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.36363636363636%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.72727272727273%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 122.72727272727272%'>vim(25)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.72727272727273%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.9090909090909%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.9090909090909%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 112.72727272727272%'>Web开发(14)</a> <a href='/tags/windows/index.html' style='font-size: 106.36363636363636%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.9090909090909%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.9090909090909%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.9090909090909%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.9090909090909%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.45454545454545%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.81818181818181%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.9090909090909%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.18181818181819%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.18181818181819%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.9090909090909%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.9090909090909%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.9090909090909%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.81818181818181%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 109.0909090909091%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.18181818181819%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.9090909090909%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.54545454545455%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.9090909090909%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.9090909090909%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.45454545454545%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 120.9090909090909%'>翻译(23)</a> <a href='/tags/视频教程/index.html' style='font-size: 109.0909090909091%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.9090909090909%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.81818181818181%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.9090909090909%'>随笔(1)</a> </span>
 </section>
 <section>
   <h1>Link</h1>

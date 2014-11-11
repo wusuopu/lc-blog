@@ -9,7 +9,7 @@
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="控制流 这章的教程我们将讨论控制流。 条件和循环改变了Ruby程序的流程。条件式是执行条件语句下面的特定语句。循环是执行多次的代码块。程序开始后，语句从源文件顶部到底部一行一行的执行。 if语句 if关键字用于检查一个表达式是否为真。如果为真则执行语句。这个语句可以是单一的语句，也可以是复合语句。 &hellip;">
+  <meta name="description" content="数组 这一部分的教程将介绍数组。数组是有序对象的集合。 一个这是在某个时刻只能保存一项数值。不过数组可以保存多项。这些数据项被称为数组的元素。数组可以保存任何类型的数据。每个元素可以使用索引来引用。第一个元素的索引值为0。 注意Ruby的数组与C、C++或者Java中的数组有很大的不同。 #!/ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -66,6 +66,1476 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83932.html">[翻译]Ruby教程10——数组</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-11-14T00:00:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>14</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83932.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83932.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h1>数组</h1>
+
+
+<p>这一部分的教程将介绍数组。数组是有序对象的集合。</p>
+
+
+<p>一个这是在某个时刻只能保存一项数值。不过数组可以保存多项。这些数据项被称为数组的元素。数组可以保存任何类型的数据。每个元素可以使用索引来引用。第一个元素的索引值为0。</p>
+
+
+<p>注意Ruby的数组与C、C++或者Java中的数组有很大的不同。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+nums = [1, 2, 3, 4, 5]
+
+nums.each do |num|
+    puts num
+end
+</code></pre>
+
+
+<p>我们的第一个例子创建了一个包含5个整数的数组，然后在终端上打印这些元素。</p>
+
+
+<pre><code>nums = [1, 2, 3, 4, 5]
+</code></pre>
+
+
+<p>这行创建了一个包含5个整数的数组，每个元素使用逗号分隔开来。</p>
+
+
+<pre><code>nums.each do |num|
+    puts num
+end
+</code></pre>
+
+
+<p>我们使用<em>each</em>方法遍历数组并在终端上打印每个元素。</p>
+
+
+<p>$ ./array.rb<br>
+1<br>
+2<br>
+3<br>
+4<br>
+5  </p>
+
+
+<p>程序的输出结果。</p>
+
+
+<h2>创建数组</h2>
+
+
+<p>Ruby中数组是一个对象，可以使用<em>new</em>方法进行实例化。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+nums = Array.new
+
+nums.push 1
+nums.push 2
+nums.push 3
+nums.push 4
+nums.push 5
+
+puts nums
+</code></pre>
+
+
+<p>这个脚本中我们创建了一个数组<em>nums</em>，然后往里面添加了5个整数。</p>
+
+
+<pre><code>nums = Array.new
+</code></pre>
+
+
+<p>创建数组对象。</p>
+
+
+<pre><code>nums.push 1
+</code></pre>
+
+
+<p><em>push</em>方法是往数组尾部添加一项数据。</p>
+
+
+<hr>
+
+
+<p>我们继续使用<em>new</em>方法创建数组。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+a1 = Array.new 
+a2 = Array.new 3
+a3 = Array.new 6, "coin"
+a4 = Array.new [11]
+a5 = Array.new (15) {|e| e*e}
+
+puts [a1, a2, a3, a4, a5].inspect
+</code></pre>
+
+
+<p><em>Array</em>类的<em>new</em>方法有一些选项。</p>
+
+
+<pre><code>a1 = Array.new
+</code></pre>
+
+
+<p>创建一个空的数组，支持稍后再往其中填充数据。</p>
+
+
+<pre><code>a2 = Array.new 3
+</code></pre>
+
+
+<p>创建一个数组包含3个<em>nil</em>对象。</p>
+
+
+<pre><code>a3 = Array.new 6, "coin"
+</code></pre>
+
+
+<p>创建一个数组包含6个<em>&#8220;coin&#8221;</em>字符串。第一个选项是数组的大小；第二个选项是填充的对象。</p>
+
+
+<pre><code>a4 = Array.new [11]
+</code></pre>
+
+
+<p>第四个数组只有一项数据。</p>
+
+
+<pre><code>a5 = Array.new (15) {|e| e*e}
+</code></pre>
+
+
+<p>创建一个有15个元素的数组，第个元素都是在代码块中创建。这里计算了序号数的平方。</p>
+
+
+<pre><code>puts [a1, a2, a3, a4, a5].inspect
+</code></pre>
+
+
+<p>将所有的数组放在一个数组中。数组是可以放入另一个数组里的。然后调用数组的<em>inspect</em>方法，它将对其所有的元素都调用该方法。<em>inspect</em>方法将返回代表这个数组的字符串。当我们需要快速检查数组内容时它非常有用。</p>
+
+
+<p>$ ./arraynew.rb<br>
+[[], [nil, nil, nil], [&#8220;coin&#8221;, &#8220;coin&#8221;, &#8220;coin&#8221;, &#8220;coin&#8221;, &#8220;coin&#8221;, &#8220;coin&#8221;], <br>
+[11], [0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 121, 144, 169, 196]]  </p>
+
+
+<p>我们可以所有创建的数组。</p>
+
+
+<hr>
+
+
+<p>接下来的脚本展示了多种创建数组的方法。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+integers = [1, 2, 3, 4, 5]
+animals = %w( donkey dog cat dolphin eagle )
+weights = Array.new
+weights &lt;&lt; 4.55 &lt;&lt; 3.22 &lt;&lt; 3.55 &lt;&lt; 8.55 &lt;&lt; 3.23
+
+puts integers.inspect
+puts animals.inspect
+puts weights.inspect
+</code></pre>
+
+
+<p>我们创建了三个数组分别包含了整数、字符串和小数。</p>
+
+
+<pre><code>integers = [1, 2, 3, 4, 5]
+</code></pre>
+
+
+<p>这行创建了一个包含5个整数的数组。这是最经典的方法。数组的每个元素放在中括号中用逗号隔开。</p>
+
+
+<pre><code>animals = %w( donkey dog cat dolphin eagle )
+</code></pre>
+
+
+<p>这行代码创建了一个有5个元素的字符串数组。这种方式我们不需要逗号和双引号，减少了按键次数。</p>
+
+
+<pre><code>weights = Array.new
+weights &lt;&lt; 4.55 &lt;&lt; 3.22 &lt;&lt; 3.55 &lt;&lt; 8.55 &lt;&lt; 3.23
+</code></pre>
+
+
+<p>第三种方法有两步。首先创建一个数组对象，然后用数据将其初始化。这是正式的数组创建方法。上面方法实际上是这个的简写。</p>
+
+
+<pre><code>puts integers.inspect
+</code></pre>
+
+
+<p>The inspect method prints the string representation of the array to the terminal.</p>
+
+
+<p>$ ./creation.rb<br>
+[1, 2, 3, 4, 5]<br>
+[&#8220;donkey&#8221;, &#8220;dog&#8221;, &#8220;cat&#8221;, &#8220;dolphin&#8221;, &#8220;eagle&#8221;]<br>
+[4.55, 3.22, 3.55, 8.55, 3.23]  </p>
+
+
+<p>例子的输出结果。</p>
+
+
+<hr>
+
+
+<p>数组的数据项没限制必须是数字和字符串。数组可以包含Ruby中的所有类型的数据。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Empty
+
+end
+
+nums = [1, 2, 3, 4, 5]
+
+various = [1, -1, "big", 3.4, Empty.new, nums, :two]
+
+puts various.inspect
+</code></pre>
+
+
+<p>我们在数组中放了多种Ruby对象。</p>
+
+
+<pre><code>various = [1, -1, "big", 3.4, Empty.new, nums, :two]
+</code></pre>
+
+
+<p>这个数组包含了数字、字符串、自定义对象、另一个数组和一个符号。</p>
+
+
+<pre><code>$ ./arrayobjects.rb                                                                                   
+[1, -1, "big", 3.4, #&lt;Empty:0x987f704&gt;, [1, 2, 3, 4, 5], :two]
+</code></pre>
+
+
+<p><em>arrayobjects.rb</em>脚本的运行结果。</p>
+
+
+<hr>
+
+
+<p>下一个例子展示嵌套数组；即一个数组包含另一个数组。Ruby中可以在数组中嵌套数组。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+numbers = [1, 2, 3, [2, 4, 6, [11, 12]]]
+
+puts numbers.length
+puts numbers[0], numbers[1]
+
+puts numbers[3][0]
+puts numbers[3][1]
+
+puts numbers[3][3][0]
+puts numbers[3][3][1]
+
+puts numbers.flatten!.inspect
+</code></pre>
+
+
+<p>数组<em>[11, 12]</em>被嵌套在<em>[2, 4, 6, &#8230;]</em>里，这个数组又被嵌套在<em>[1, 2, 3, &#8230;]</em>数组里。</p>
+
+
+<pre><code>puts numbers.length
+</code></pre>
+
+
+<p><em>length</em>方法返回4。内嵌数组只算一个元素。</p>
+
+
+<pre><code>puts numbers[0], numbers[1]
+</code></pre>
+
+
+<p>这里<em>[]</em>字符用于访问数组的元素。上面这行代码返回第一个和第二个元素。</p>
+
+
+<pre><code>puts numbers[3][0]
+puts numbers[3][1]
+</code></pre>
+
+
+<p>这里我们访问内嵌数组的元素。<em>[3][0]</em>返回内嵌数组的第一个元素，在这里是2。同样的<em>[3][1]</em>返回内嵌数组的第二个元素，这里是4。</p>
+
+
+<pre><code>puts numbers[3][3][0]
+puts numbers[3][3][1]
+</code></pre>
+
+
+<p>现在我们进入更深一层。我们访问更深一层数组的元素。<em>[3][3]</em>返回<em>[11, 12]</em>数组。然后从这个数组获取第一个和第二个元素。</p>
+
+
+<pre><code>puts numbers.flatten!.inspect
+</code></pre>
+
+
+<p><em>flatten!</em>方法将数组变为平坦。它将所有的内嵌数组元素创建成一个新的数组。</p>
+
+
+<p>$ ./arrayofarrays.rb<br>
+4<br>
+1<br>
+2<br>
+2<br>
+4<br>
+11<br>
+12<br>
+[1, 2, 3, 2, 4, 6, 11, 12]  </p>
+
+
+<p>输出结果。 </p>
+
+
+<h2>打印数组内容</h2>
+
+
+<p>要在终端上打印数组的元素有多种方法可以完成。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+integers = [1, 2, 3, 4, 5]
+
+puts integers
+puts integers.inspect
+
+integers.each do |e|
+    puts e
+end
+</code></pre>
+
+
+<p>这个脚本我们将数组的元素打印了三次。</p>
+
+
+<pre><code>puts integers
+</code></pre>
+
+
+<p>数组作为puts/print方法的参数是最简单的方式。每行将打印一个元素。</p>
+
+
+<pre><code>puts integers.inspect
+</code></pre>
+
+
+<p>使用<em>inspect</em>方法输出结果的可读性更好。</p>
+
+
+<pre><code>integers.each do |e|
+    puts e
+end
+</code></pre>
+
+
+<p><em>each</em>方法为每个元素都调用一次一个代码块，元素作为参数传递。我们简单的参元素使用<em>puts</em>方法。</p>
+
+
+<p>$ ./printarray1.rb<br>
+1<br>
+2<br>
+3<br>
+4<br>
+5<br>
+[1, 2, 3, 4, 5]<br>
+1<br>
+2<br>
+3<br>
+4<br>
+5  </p>
+
+
+<p>数组在终端上打印了三次。</p>
+
+
+<hr>
+
+
+<p>第二个例子我们提供了两个额外的方法打印数组。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+integers = [1, 2, 3, 4, 5]
+
+integers.length.times do |idx|
+    puts integers[idx]
+end
+
+integers.each_with_index do |num, idx|
+    puts "value #{num} has index #{idx}"
+end
+</code></pre>
+
+
+<p>第一种情况我们组合使用了<em>length</em>和<em>times</em>方法。第二种情况我们使用了<em>each_with_index</em>方法。</p>
+
+
+<pre><code>integers.length.times do |idx|
+    puts integers[idx]
+end
+</code></pre>
+
+
+<p><em>length</em>方法返回数组的长度。<em>times</em>方法将接下来的代码块迭代<em>length</em>次，传递的值从0到length-1。这些数字作为数组的索引使用。</p>
+
+
+<pre><code>integers.each_with_index do |num, idx|
+    puts "value #{num} has index #{idx}"
+end
+</code></pre>
+
+
+<p><em>each_with_index</em>方法迭代数组并将元素及其索引传递给代码块。用这种方法我们可以简单的打印元素和它的索引。</p>
+
+
+<p>$ ./printarray2.rb<br>
+1<br>
+2<br>
+3<br>
+4<br>
+5<br>
+value 1 has index 0<br>
+value 2 has index 1<br>
+value 3 has index 2<br>
+value 4 has index 3<br>
+value 5 has index 4  </p>
+
+
+<p>输出结果。</p>
+
+
+<h2>读取数组元素</h2>
+
+
+<p>这节我们将从数组读取数据。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+lts = %w{ a b c d e f g h}
+
+puts lts.first
+puts lts.last
+puts lts.at(3)
+</code></pre>
+
+
+<p>第一个例子我们展示了三个简单的方法进行数据检索。</p>
+
+
+<pre><code>puts lts.first
+puts lts.last
+</code></pre>
+
+
+<p><em>first</em>方法读取数组的第一个元素；<em>last</em>方法读取数组的最后一个元素。</p>
+
+
+<pre><code>puts lts.at(3)
+</code></pre>
+
+
+<p><em>at</em>方法返回指定索引的元素。</p>
+
+
+<p>$ ./retrieval.rb<br>
+a<br>
+h<br>
+d  </p>
+
+
+<p><em>retrieval.rb</em>程序的输出结果。</p>
+
+
+<hr>
+
+
+<p><em>[]</em>符号可以用于访问数据。这是传统访问数据的方法，许多语言都使用这种方法。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+lts = %w{ a b c d e f g h }
+
+puts lts[0]
+puts lts[-1]
+puts lts[0, 3].inspect
+puts lts[2..6].inspect
+puts lts[2...6].inspect
+</code></pre>
+
+
+<p>我们展示了5个使用[]符号的例子。</p>
+
+
+<pre><code>puts lts[0]
+puts lts[-1]
+</code></pre>
+
+
+<p>我们获取数组的第一个和最后一个元素。第一项的索引为0,最后一项的索引为-1。</p>
+
+
+<pre><code>puts lts[0, 3].inspect
+</code></pre>
+
+
+<p>当中括号里有两个数时，第一个是开始的索引，第二个是长度。这行代码返回从0开始的3个元素。注意<em>inspect</em>方法仅是为了让输出可读而已。</p>
+
+
+<pre><code>puts lts[2..6].inspect
+puts lts[2...6].inspect
+</code></pre>
+
+
+<p>我们可以在中括号使用范围操作符。第一行读取第2个到第6个元素，第二行读取第2个到第5个元素。</p>
+
+
+<hr>
+
+
+<p>接下来展示<em>values_at</em>方法。这个方法的优势是可以选择多个位置的元素。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+lts = %w{ a b c d e f g h}
+
+puts lts.values_at(1..5).inspect
+puts lts.values_at(1, 3, 5).inspect
+puts lts.values_at(1, 3, 5, 6, 8).inspect
+puts lts.values_at(-1, -3).inspect
+</code></pre>
+
+
+<p><em>values_at method</em>方法返回一个数组包含选中的元素。<em>inspect</em>方法仅是为了让输出可读而已。</p>
+
+
+<pre><code>puts lts.values_at(1..5).inspect
+</code></pre>
+
+
+<p>这行代码返回索引为1到5的元素。</p>
+
+
+<pre><code>puts lts.values_at(1, 3, 5).inspect
+</code></pre>
+
+
+<p>这里我们读取索引为1、3、5的元素。</p>
+
+
+<pre><code>puts lts.values_at(1, 3, 5, 6, 8).inspect
+</code></pre>
+
+
+<p>我们可以指定多个索引，如果指定的索引没有元素则返回<em>nil</em>。</p>
+
+
+<pre><code>puts lts.values_at(-1, -3).inspect
+</code></pre>
+
+
+<p>负数的索引表示从数组尾部开始。</p>
+
+
+<p>$ ./retrieval3.rb<br>
+[&#8220;b&#8221;, &#8220;c&#8221;, &#8220;d&#8221;, &#8220;e&#8221;, &#8220;f&#8221;]<br>
+[&#8220;b&#8221;, &#8220;d&#8221;, &#8220;f&#8221;]<br>
+[&#8220;b&#8221;, &#8220;d&#8221;, &#8220;f&#8221;, &#8220;g&#8221;, nil]<br>
+[&#8220;h&#8221;, &#8220;f&#8221;]  </p>
+
+
+<p>脚本的输出结果。</p>
+
+
+<hr>
+
+
+<p>我们使用<em>fetch</em>方法从数组读取数据。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+lts = [0, 1, 2, 3, 4, 5, 6]
+
+puts lts.fetch(0)
+puts lts.fetch(-2)
+puts lts.fetch(8, 'undefined')
+puts lts.fetch(8) { |e| -2*e }
+</code></pre>
+
+
+<p>我们展示了<em>fetch</em>方法的一些形式的用法。</p>
+
+
+<pre><code>puts lts.fetch(0)
+puts lts.fetch(-2)
+</code></pre>
+
+
+<p>第一行打印了数组的第一个元素。第二行打印了倒数第二个元素。</p>
+
+
+<pre><code>puts lts.fetch(8, 'undefined')
+</code></pre>
+
+
+<p>第三种形式是返回指定索引的元素，如果索引超出范围则返回默认值，这里是<em>&#8216;undefined&#8217;</em>。没有第二个参数则会抛出IndexError错误。</p>
+
+
+<pre><code>puts lts.fetch(8) { |e| -2*e}
+</code></pre>
+
+
+<p>最后一种形式我们定义了一个代码块，传递了索引对应的值，这个方法返回了代码块调用的结果。</p>
+
+
+<p>$ ./retrieval4.rb<br>
+0<br>
+5<br>
+undefined<br>
+-16  </p>
+
+
+<p>脚本的输出结果。</p>
+
+
+<hr>
+
+
+<p>我们将展示<em>take</em>和<em>take_while</em>方法的用法。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+lts = %w{ a b c d e f g h}
+
+
+puts lts.take(4).inspect
+
+lts2 = lts.take_while { |e| e &lt; 'f' }
+puts lts2.inspect
+</code></pre>
+
+
+<p><em>take</em> n方法返回开头的n个元素。<em>take_while</em>方法将元素传递给一个代码块，直到代码块返回<em>nil</em>或者<em>false</em>才停止迭代，并返回之前的元素。</p>
+
+
+<pre><code>puts lts.take(4).inspect
+</code></pre>
+
+
+<p>这里我们返回开头的4个元素。</p>
+
+
+<pre><code>lts2 = lts.take_while { |e| e &lt; 'f' }
+puts lts2.inspect
+</code></pre>
+
+
+<p>这里我们从源数组创建了一个新的数组，这个新数组包含了所有小于&#8217;f&#8217;的字符。</p>
+
+
+<p>$ ./retrieval5.rb<br>
+[&#8220;a&#8221;, &#8220;b&#8221;, &#8220;c&#8221;, &#8220;d&#8221;]<br>
+[&#8220;a&#8221;, &#8220;b&#8221;, &#8220;c&#8221;, &#8220;d&#8221;, &#8220;e&#8221;]  </p>
+
+
+<p><em>retrieval5.rb</em>程序的输出结果。</p>
+
+
+<hr>
+
+
+<p><em>slice</em>方法与[]符号相同。返回一个或者多个元素。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+lts = %w{ a b c d e f g h}
+
+puts lts.slice(0)
+puts lts.slice(-1)
+puts lts.slice(0, 3).inspect
+puts lts.slice(2..6).inspect
+puts lts.slice(2...6).inspect
+</code></pre>
+
+
+<p>展示了5个<em>slice</em> 方法的例子。</p>
+
+
+<pre><code>puts lts.slice(0)
+puts lts.slice(-1)
+</code></pre>
+
+
+<p>这些形式的<em>slice</em>方法返回一个数组元素。第行代码返回第一个元素，第二行代码返回最后一个元素。</p>
+
+
+<pre><code>puts lts.slice(0, 3).inspect
+</code></pre>
+
+
+<p>第一个参数是起始索引，第二个参数是长度。这一行代码返回从0开始的3个元素。</p>
+
+
+<pre><code>puts lts.slice(2..6).inspect
+puts lts.slice(2...6).inspect
+</code></pre>
+
+
+<p>我们可以在<em>slice</em>方法中使用范围操作符。第一行读取第2到6的元素，第二行读取第2到5的元素。</p>
+
+
+<p>$ ./retrieval6.rb<br>
+a<br>
+h<br>
+[&#8220;a&#8221;, &#8220;b&#8221;, &#8220;c&#8221;]<br>
+[&#8220;c&#8221;, &#8220;d&#8221;, &#8220;e&#8221;, &#8220;f&#8221;, &#8220;g&#8221;]<br>
+[&#8220;c&#8221;, &#8220;d&#8221;, &#8220;e&#8221;, &#8220;f&#8221;]  </p>
+
+
+<p><em>slice</em>方法返回数组的一部分，一个或者多个元素。</p>
+
+
+<hr>
+
+
+<p>可以随机选择数组的一个元素。Ruby中的<em>sample</em>方法可以实现。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+lts = %w{ a b c d e f g h}
+
+puts lts.sample
+puts lts.sample(3).inspect
+</code></pre>
+
+
+<p><em>sample</em>方法有两种形式。第一种我们选择一个随机元素。第二种我们选择n个随机元素。</p>
+
+
+<p>$ ./random.rb<br>
+b<br>
+[&#8220;c&#8221;, &#8220;f&#8221;, &#8220;d&#8221;]<br>
+$ ./random.rb<br>
+d<br>
+[&#8220;c&#8221;, &#8220;d&#8221;, &#8220;e&#8221;]  </p>
+
+
+<p>执行两次结果不同。</p>
+
+
+<h2>使用数组</h2>
+
+
+<p>接下来的例子介绍一些Ruby数组的方法。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+num1 = [1, 2, 3, 4, 5]
+num2 = [6, 7, 8, 9, 10]
+
+puts num1 + num2 
+puts num1.concat num2
+</code></pre>
+
+
+<p>我们定义了两个数组，将它们相加。</p>
+
+
+<pre><code>puts num1 + num2 
+puts num1.concat num2
+</code></pre>
+
+
+<p>有两个数组相加的方法。使用+操作符或者<em>concat</em>方法。</p>
+
+
+<hr>
+
+
+<p>Ruby中数组有丰富的方法。例如<em>length</em>方法返回数组的元素个数。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+lts = %w{ a b c d e f}
+
+puts lts.inspect
+puts "Array has #{lts.length} elements"
+puts "The first element is #{lts.first}"
+puts "The last element is #{lts.last}"
+
+puts lts.eql? lts.dup
+puts lts.eql? lts.dup.delete_at(0)
+
+lts.clear
+puts lts.inspect
+puts lts.empty?
+</code></pre>
+
+
+<p>上面的脚本我们介绍了7个新方法。</p>
+
+
+<pre><code>puts "Array has #{lts.length} elements"
+</code></pre>
+
+
+<p><em>length</em>方法决定数组的大小。</p>
+
+
+<pre><code>puts "The first element is #{lts.first}"
+puts "The last element is #{lts.last}"
+</code></pre>
+
+
+<p>这里我们获取第一个和最后一个元素。</p>
+
+
+<pre><code>puts lts.eql? lts.dup
+</code></pre>
+
+
+<p><em>eql?</em>方法指出两个数组是否相等。这里是返回<em>true</em>。<em>dup</em>方法创建一个浅复制对象。</p>
+
+
+<pre><code>puts lts.eql? lts.dup.delete_at(0)
+</code></pre>
+
+
+<p><em>delete_at</em>方法从数组的开头删除元素。现在两个数组不相同了。</p>
+
+
+<pre><code>lts.clear
+</code></pre>
+
+
+<p><em>clear</em>方法删除数组的所有元素。</p>
+
+
+<pre><code>puts lts.empty?
+</code></pre>
+
+
+<p><em>empty?</em>方法检查数组是否为空。这里返回<em>true</em>，因为我们已经将所有元素都删除了。</p>
+
+
+<p>$ ./basics.rb<br>
+[&#8220;a&#8221;, &#8220;b&#8221;, &#8220;c&#8221;, &#8220;d&#8221;, &#8220;e&#8221;, &#8220;f&#8221;]<br>
+Array has 6 elements<br>
+The first element is a<br>
+The last element is f<br>
+true<br>
+false<br>
+[]<br>
+true  </p>
+
+
+<p>输出结果。</p>
+
+
+<hr>
+
+
+<p>一些Ruby的数组方法以感叹号结尾。这是Ruby的习惯。感叹号告诉程序员这个方法会修改数据。感叹号本身没有什么作用，它只是名字的约定。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+chars = %w{a b c d e}
+
+reversed_chars = chars.reverse
+puts reversed_chars.inspect
+puts chars.inspect
+
+reversed_chars = chars.reverse!
+puts reversed_chars.inspect
+puts chars.inspect
+</code></pre>
+
+
+<p>Ruby中有一些比较相似的方法。<em>reverse</em>和<em>reverse!</em>方法都是改为数组元素的顺序，将它们反转。不同在于<em>reverse</em>方法返回反转后的数组，原数组不变。<em>reverse!</em>方法会同时修改原数组。</p>
+
+
+<p>$ ./twotypes.rb<br>
+[&#8220;e&#8221;, &#8220;d&#8221;, &#8220;c&#8221;, &#8220;b&#8221;, &#8220;a&#8221;]<br>
+[&#8220;a&#8221;, &#8220;b&#8221;, &#8220;c&#8221;, &#8220;d&#8221;, &#8220;e&#8221;]<br>
+[&#8220;e&#8221;, &#8220;d&#8221;, &#8220;c&#8221;, &#8220;b&#8221;, &#8220;a&#8221;]<br>
+[&#8220;e&#8221;, &#8220;d&#8221;, &#8220;c&#8221;, &#8220;b&#8221;, &#8220;a&#8221;]  </p>
+
+
+<p>我们清晰的看到前两个数组不同，第三和第四个数组是相同的。</p>
+
+
+<hr>
+
+
+<p>一些其他的方法展示。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+numbers = [1, 2, 2, 2, 3, 4, 5, 8, 11]
+
+puts numbers.index 2
+puts numbers.index 11
+puts numbers.rindex 2
+
+puts numbers.include? 3
+puts numbers.include? 10
+
+puts numbers.join '-'
+puts numbers.uniq!.inspect
+</code></pre>
+
+
+<p>介绍5个额外的方法。</p>
+
+
+<pre><code>puts numbers.index 2
+puts numbers.index 11
+</code></pre>
+
+
+<p><em>index</em>方法返回数组中元素对应的索引。索引是从左算起。第一行返回1,它是第一个2的索引。数组中仅有一个11,它的索引是8。</p>
+
+
+<pre><code>puts numbers.rindex 2
+</code></pre>
+
+
+<p><em>rindex</em>方法返回从右边开始的索引。这里2的最右索引为3。</p>
+
+
+<pre><code>puts numbers.include? 3
+puts numbers.include? 10
+</code></pre>
+
+
+<p><em>include?</em>方法检查一个元素是否在数组中。第一行返回<em>true</em>，3在数组中。第二行返回<em>false</em>，数组中没有10。作为约定Ruby中以问号结尾的方法返回一个布尔值，并且对数组没有影响。</p>
+
+
+<pre><code>puts numbers.join '-'
+</code></pre>
+
+
+<p><em>join</em>方法返回一个字符串，它是将数组的元素用指定的符号分隔开来。</p>
+
+
+<pre><code>puts numbers.uniq!.inspect
+</code></pre>
+
+
+<p><em>uniq!</em>方法移除重复的元素。在数组中有3个2,调用方法之后就只剩一个2了。</p>
+
+
+<p>$ ./methods2.rb <br>
+1<br>
+8<br>
+3<br>
+true<br>
+false<br>
+1-2-2-2-3-4-5-8-11<br>
+[1, 2, 3, 4, 5, 8, 11]  </p>
+
+
+<p>注意<em>join</em>方法产生的是一个字符串，它是数组的数字用<em>-</em>符号分隔。</p>
+
+
+<h2>修改数组</h2>
+
+
+<p>这一节我们介绍与数组修改相关的方法。基本的我们做一些插入和删除操作。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+lts = []
+
+lts.insert 0, 'E', 'F', 'G'
+lts.push 'H'
+lts.push 'I', 'J', 'K'
+lts &lt;&lt; 'L' &lt;&lt; 'M' 
+lts.unshift 'A', 'B', 'C'
+lts.insert(3, 'D')
+
+puts lts.inspect
+</code></pre>
+
+
+<p>从一个空数组开始，我们使用不同的插入方法。</p>
+
+
+<pre><code>lts.insert 0, 'E', 'F', 'G'
+</code></pre>
+
+
+<p><em>insert</em>方法往<em>lts</em>数组插入了3个元素。</p>
+
+
+<pre><code>lts.push 'H'
+lts.push 'I', 'J', 'K'
+</code></pre>
+
+
+<p><em>push</em>方法往数组添加元素，我们可以添加一个或多个元素。</p>
+
+
+<pre><code>lts &lt;&lt; 'L' &lt;&lt; 'M'
+</code></pre>
+
+
+<p><em>&lt;&lt;</em>与<em>push</em>方法相同。这个操作可以链式调用。</p>
+
+
+<pre><code>lts.unshift 'A', 'B', 'C'
+</code></pre>
+
+
+<p><em>unshift</em>方法将元素插入在数组前端。</p>
+
+
+<pre><code>lts.insert(3, 'D')
+</code></pre>
+
+
+<p>这里<em>insert</em>方法在指定的位置插入&#8217;D&#8217;字符。</p>
+
+
+<p>$ ./insertion.rb<br>
+[&#8220;A&#8221;, &#8220;B&#8221;, &#8220;C&#8221;, &#8220;D&#8221;, &#8220;E&#8221;, &#8220;F&#8221;, &#8220;G&#8221;, &#8220;H&#8221;, &#8220;I&#8221;, &#8220;J&#8221;, &#8220;K&#8221;, &#8220;L&#8221;, &#8220;M&#8221;]  </p>
+
+
+<p>使用上面的方法，我们创建了一个包含大写字母的数组。</p>
+
+
+<hr>
+
+
+<p>一些删除数组元素的方法。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+lts = %w{ a b c d e f g h}
+
+lts.pop
+lts.pop
+
+puts lts.inspect
+
+lts.shift
+lts.shift
+
+puts lts.inspect
+
+lts.delete_at(0)
+lts.delete('d')
+
+puts lts.inspect
+
+puts lts.clear
+puts lts.inspect
+</code></pre>
+
+
+<p>这个脚本展示了5个用于删除数组元素的方法。</p>
+
+
+<pre><code>lts = %w{ a b c d e f g h}
+</code></pre>
+
+
+<p>创建一个有8个元素的数组。</p>
+
+
+<pre><code>lts.pop
+</code></pre>
+
+
+<p><em>pop</em>方法移除最后一个元素。</p>
+
+
+<pre><code>lts.shift
+</code></pre>
+
+
+<p><em>shift</em>方法移除数组的第一个元素。</p>
+
+
+<pre><code>lts.delete_at(0)
+</code></pre>
+
+
+<p><em>delete_at</em>方法删除指定位置的元素。我们删除剩余元素的第一个元素。</p>
+
+
+<pre><code>puts lts.clear
+</code></pre>
+
+
+<p><em>clear</em>方法清除所有元素。</p>
+
+
+<pre><code>lts.delete('d')
+</code></pre>
+
+
+<p><em>delete</em>方法删除指定的一项数据。</p>
+
+
+<p>$ ./deletion.rb<br>
+[&#8220;a&#8221;, &#8220;b&#8221;, &#8220;c&#8221;, &#8220;d&#8221;, &#8220;e&#8221;, &#8220;f&#8221;]<br>
+[&#8220;c&#8221;, &#8220;d&#8221;, &#8220;e&#8221;, &#8220;f&#8221;]<br>
+[&#8220;e&#8221;, &#8220;f&#8221;]<br>
+[]  </p>
+
+
+<p>输出结果。</p>
+
+
+<hr>
+
+
+<p>目前为止我们使用的方法同时只修改一个数组项。Ruby中有一些方法可以一次修改多个数组项的。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+nms = [2, -1, -4, 0, 4, 3, -2, 3, 5]
+
+nms.delete_if { |x| x &lt; 0 }
+
+puts nms.inspect
+</code></pre>
+
+
+<p>例子介绍了<em>delete_if</em>方法用于删除所有符合条件式的数据项。</p>
+
+
+<pre><code>nms.delete_if { |x| x &lt; 0 }
+</code></pre>
+
+
+<p>这行删除所有的负数。</p>
+
+
+<p>$ ./delete_if.rb<br>
+[2, 0, 4, 3, 3, 5]  </p>
+
+
+<p>我们从<em>nms</em>数组中删除了所有的负数。</p>
+
+
+<hr>
+
+
+<p>我们展示两个其他的方法处理多数据项。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+lts = %w{ a b c d e f g}
+
+puts lts.inspect
+
+lts.reject! do |e|
+    e =~ /[c language="-y"][/c]/
+end
+
+puts lts.inspect
+
+lts.replace(["x", "y", "z"])
+puts lts.inspect
+</code></pre>
+
+
+<p>我们使用了两个方法，<em>reject!</em>和<em>replace</em>。</p>
+
+
+<pre><code>lts.reject! do |e|
+    e =~ /[c language="-y"][/c]/
+end
+</code></pre>
+
+
+<p><em>reject!</em>方法移除了所有项满足条件式的数据。这里我们删除所有符合正则式的字母。</p>
+
+
+<pre><code>lts.replace(["x", "y", "z"])
+</code></pre>
+
+
+<p><em>replace</em>方法将使用给定的数据替换数组项。如果可能它会截断或者扩展数组。</p>
+
+
+<p>$ ./modify.rb <br>
+[&#8220;a&#8221;, &#8220;b&#8221;, &#8220;c&#8221;, &#8220;d&#8221;, &#8220;e&#8221;, &#8220;f&#8221;, &#8220;g&#8221;]<br>
+[&#8220;a&#8221;, &#8220;b&#8221;]<br>
+[&#8220;x&#8221;, &#8220;y&#8221;, &#8220;z&#8221;]  </p>
+
+
+<p><em>modify.rb</em>例子的输出结果。</p>
+
+
+<h2>集合操作</h2>
+
+
+<p>这一节中我们展示Ruby数组的集合操作。数学中集合是独立对象的收集。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+A = [1, 2, 3, 4, 5]
+B = [4, 5, 6, 7, 8]
+
+union = A | B
+isect = A &amp; B
+diff1  = A - B
+diff2  = B - A
+sdiff = (A - B) | (B - A)
+
+puts "Union of arrays: #{union}"
+puts "Intersection of arrays: #{isect}"
+puts "Difference of arrays A - B: #{diff1}"
+puts "Difference of arrays B - A: #{diff2}"    
+puts "Symmetric difference of arrays: #{sdiff}"
+</code></pre>
+
+
+<p>上面的脚本我们展示了一些集合操作，并集、交集、差集和对称差集。</p>
+
+
+<pre><code>nums1 = [1, 2, 3, 4, 5]
+nums2 = [4, 5, 6, 7, 8]
+</code></pre>
+
+
+<p>字义了两个整数数组。都是集合，因此每个元素都只出现了一次。两个数组有两个相同的数，4和5。</p>
+
+
+<pre><code>union = nums1 | nums2
+</code></pre>
+
+
+<p>数组的并集。两个数组相加，每个元素最终也只出现一次。</p>
+
+
+<pre><code>isect = A &amp; B
+</code></pre>
+
+
+<p>数组交集。输出两个数组都存在的元素。这里是4和5。</p>
+
+
+<pre><code>diff1  = A - B
+diff2  = B - A
+</code></pre>
+
+
+<p>两个差集，也称补集。第一行我们得到了所有在A中出现B中没有出现的元素。第二行我们得到B中出现A中没有出现的元素。</p>
+
+
+<pre><code>sdiff = (A - B) | (B - A)
+</code></pre>
+
+
+<p>对称差集。A或B中存在，但不同时存在于A和B。</p>
+
+
+<p>$ ./setoperations.rb<br>
+Union of arrays: [1, 2, 3, 4, 5, 6, 7, 8]<br>
+Intersection of arrays: [4, 5]<br>
+Difference of arrays A - B: [1, 2, 3]<br>
+Difference of arrays B - A: [6, 7, 8]<br>
+Symmetric difference of arrays: [1, 2, 3, 6, 7, 8]  </p>
+
+
+<p>输出结果。</p>
+
+
+<h2>select、collect、map方法</h2>
+
+
+<p>下面的例子我们展示三个方法：<em>select</em>、<em>collect</em>和<em>map</em>。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+nums = [1, 3, 2, 6, 7, 12, 8, 15]
+
+selected = nums.select do |e|
+    e &gt; 10
+end
+
+puts selected.inspect
+
+collected = nums.collect do |e|
+    e &lt; 10
+end
+
+puts collected.inspect
+
+mapped = nums.map do |e|
+    e*2
+end
+
+puts mapped.inspect
+</code></pre>
+
+
+<p>所有这些方法都对数组的元素执行许多操作。</p>
+
+
+<pre><code>selected = nums.select do |e|
+    e &gt; 10
+end
+</code></pre>
+
+
+<p>上面的代码使用<em>collect</em>方法创建了一个新数组。我们只选择了满足条件式的元素。这里我们选择了所有大于10的元素。</p>
+
+
+<pre><code>collected = nums.collect do |e|
+    e &lt; 10
+end
+</code></pre>
+
+
+<p><em>collect</em>方法稍微不同。它只收集代码块的返回值。新的数组只包含true和false。</p>
+
+
+<pre><code>mapped = nums.map do |e|
+    e*2
+end
+</code></pre>
+
+
+<p><em>map</em>方法与<em>collect</em>方法相同。上面的代码根据已存在的数组创建了一个新的数组。每个元素都乘以2.</p>
+
+
+<p>$ ./mass.rb<br>
+[12, 15]<br>
+[true, true, true, true, true, false, true, false]<br>
+[2, 6, 4, 12, 14, 24, 16, 30]  </p>
+
+
+<p>创建了新数组。</p>
+
+
+<h2>元素排序</h2>
+
+
+<p>最后我们对数组元素进行排序。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+planets = %w{ Mercury Venus Earth Mars Jupiter
+                Saturn Uranus Neptune Pluto }
+
+puts "#{planets.sort}"                
+puts "#{planets.reverse}"
+puts "#{planets.shuffle}"
+</code></pre>
+
+
+<p>例子中使用了三个Ruby数组的方法对数组元素进行重组。</p>
+
+
+<pre><code>puts "#{planets.sort}"
+</code></pre>
+
+
+<p><em>sort</em>方法按字母顺序进行排序。</p>
+
+
+<pre><code>puts "#{planets.reverse}"
+</code></pre>
+
+
+<p><em>reverse</em>方法反转元素并返回新的数组。</p>
+
+
+<pre><code>puts "#{planets.shuffle}"
+</code></pre>
+
+
+<p><em>shuffle</em>方法将数组元素随机重组。</p>
+
+
+<p>$ ./ordering.rb<br>
+[&#8220;Earth&#8221;, &#8220;Jupiter&#8221;, &#8220;Mars&#8221;, &#8220;Mercury&#8221;, &#8220;Neptune&#8221;, &#8220;Pluto&#8221;, &#8220;Saturn&#8221;, &#8230;]<br>
+[&#8220;Pluto&#8221;, &#8220;Neptune&#8221;, &#8220;Uranus&#8221;, &#8220;Saturn&#8221;, &#8220;Jupiter&#8221;, &#8220;Mars&#8221;, &#8220;Earth&#8221;, &#8230;]<br>
+[&#8220;Earth&#8221;, &#8220;Jupiter&#8221;, &#8220;Mercury&#8221;, &#8220;Saturn&#8221;, &#8220;Mars&#8221;, &#8220;Venus&#8221;, &#8220;Uranus&#8221;, &#8230;]  </p>
+
+
+<p>例子的输出结果。</p>
+
+
+<p>在这章我们学习了Ruby的数组。</p>
+
+
+<hr>
+
+
+<p>原文地址： <a href="http://zetcode.com/lang/rubytutorial/arrays/">http://zetcode.com/lang/rubytutorial/arrays/</a><br>
+翻译：龙昌  admin@longchangjin.cn<br>
+完整教程：<a href="https://github.com/wusuopu/Ruby-tutorial">https://github.com/wusuopu/Ruby-tutorial</a> </p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -7693,79 +9163,6 @@ while    yield
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83890.html">Scrapy框架学习笔记3—— Scrapy与mongodb结合</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2013-10-07T00:00:00+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
-        
-           | <a href="http://www.xefan.com/archives/83890.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/83890.html">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>创建一个新的Item Pipeline，并将其添加到settings.py的ITEM_PIPELINES列表中。<br/>
-在process_item方法中将item的数据保存到mongodb中。<br/>
-scrapy的Item与dict相似，而mongodb中的数据是心bson格式保存的。因此Item的数据应该可以直接存储到mongodb中而几乎不用做额外的处理。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">class</span> <span class="nc">MyMongoDBPipeline</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mongodb_server</span><span class="p">,</span> <span class="n">mongodb_port</span><span class="p">,</span> <span class="n">mongodb_db</span><span class="p">,</span> <span class="n">mongodb_collection</span><span class="p">):</span>
-</span><span class='line'>        <span class="n">connection</span> <span class="o">=</span> <span class="n">pymongo</span><span class="o">.</span><span class="n">Connection</span><span class="p">(</span><span class="n">mongodb_server</span><span class="p">,</span> <span class="n">mongodb_port</span><span class="p">)</span>
-</span><span class='line'>        <span class="bp">self</span><span class="o">.</span><span class="n">mongodb_db</span> <span class="o">=</span> <span class="n">mongodb_db</span>
-</span><span class='line'>        <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">connection</span><span class="p">[</span><span class="n">mongodb_db</span><span class="p">]</span>
-</span><span class='line'>        <span class="bp">self</span><span class="o">.</span><span class="n">mongodb_collection</span> <span class="o">=</span> <span class="n">mongodb_collection</span>
-</span><span class='line'>        <span class="bp">self</span><span class="o">.</span><span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">[</span><span class="n">mongodb_collection</span><span class="p">]</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nd">@classmethod</span>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">from_crawler</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">crawler</span><span class="p">):</span>
-</span><span class='line'>        <span class="c"># 连接mongodb</span>
-</span><span class='line'>        <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="s">&#39;localhost&#39;</span><span class="p">,</span> <span class="mi">27017</span><span class="p">,</span> <span class="s">&#39;scrapy&#39;</span><span class="p">,</span> <span class="s">&#39;items&#39;</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">process_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
-</span><span class='line'>        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">item</span><span class="p">))</span>
-</span><span class='line'>        <span class="n">log</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s">&quot;Item </span><span class="si">%s</span><span class="s"> wrote to MongoDB database </span><span class="si">%s</span><span class="s">/</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mongodb_db</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mongodb_collection</span><span class="p">),</span>
-</span><span class='line'>                <span class="n">level</span><span class="o">=</span><span class="n">log</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span> <span class="n">spider</span><span class="o">=</span><span class="n">spider</span><span class="p">)</span>
-</span><span class='line'>        <span class="k">return</span> <span class="n">item</span>
-</span></code></pre></td></tr></table></div></figure>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/page/8">&larr; Older</a>
@@ -7787,6 +9184,10 @@ scrapy的Item与dict相似，而mongodb中的数据是心bson格式保存的。�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="http://www.xefan.com/archives/84135.html">Nginx + Uwsgi + Django环境配置</a>
+      </li>
+    
+      <li class="post">
         <a href="http://www.xefan.com/archives/84134.html">配置rails的vim环境</a>
       </li>
     
@@ -7802,19 +9203,15 @@ scrapy的Item与dict相似，而mongodb中的数据是心bson格式保存的。�
         <a href="http://www.xefan.com/archives/84130.html">配置coffeescript的vim环境</a>
       </li>
     
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84127.html">VIM编译参数</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (47)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (32)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (26)</a></li><li><a href='/categories/web开发/index.html'>web开发 (16)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (7)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (22)</a></li></ul>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (47)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (33)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (26)</a></li><li><a href='/categories/web开发/index.html'>web开发 (17)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (7)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (22)</a></li></ul>
 </section>
 <section>
   <h1>Tag Cloud</h1>
-    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.45454545454545%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.9090909090909%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.81818181818181%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.9090909090909%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.36363636363636%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.27272727272727%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.36363636363636%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.81818181818181%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.81818181818181%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 100.9090909090909%'>Django(1)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.9090909090909%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.81818181818181%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.72727272727273%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.9090909090909%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.9090909090909%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.45454545454545%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.81818181818181%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.63636363636364%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.45454545454545%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.9090909090909%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.45454545454545%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.9090909090909%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.9090909090909%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.9090909090909%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(66)</a> <a href='/tags/mongodb/index.html' style='font-size: 109.0909090909091%'>mongodb(10)</a> <a href='/tags/mysql/index.html' style='font-size: 103.63636363636364%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.9090909090909%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.9090909090909%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.18181818181819%'>php(9)</a> <a href='/tags/ps/index.html' style='font-size: 105.45454545454545%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.9090909090909%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 144.54545454545456%'>python(49)</a> <a href='/tags/qt/index.html' style='font-size: 101.81818181818181%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.9090909090909%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 123.63636363636364%'>Ruby(26)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.72727272727273%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.9090909090909%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.54545454545455%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.36363636363636%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.72727272727273%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 122.72727272727272%'>vim(25)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.72727272727273%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.9090909090909%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.9090909090909%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 112.72727272727272%'>Web开发(14)</a> <a href='/tags/windows/index.html' style='font-size: 106.36363636363636%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.9090909090909%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.9090909090909%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.9090909090909%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.9090909090909%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.45454545454545%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.81818181818181%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.9090909090909%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.18181818181819%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.18181818181819%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.9090909090909%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.9090909090909%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.9090909090909%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.81818181818181%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 109.0909090909091%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.18181818181819%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.9090909090909%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.54545454545455%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.9090909090909%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.9090909090909%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.45454545454545%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 120.9090909090909%'>翻译(23)</a> <a href='/tags/视频教程/index.html' style='font-size: 109.0909090909091%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.9090909090909%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.81818181818181%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.9090909090909%'>随笔(1)</a> </span>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.45454545454545%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.9090909090909%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.81818181818181%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.9090909090909%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.36363636363636%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.27272727272727%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.36363636363636%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.81818181818181%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.81818181818181%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 101.81818181818181%'>Django(2)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.9090909090909%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.81818181818181%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.72727272727273%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.9090909090909%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.9090909090909%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.45454545454545%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.81818181818181%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.63636363636364%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.45454545454545%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.9090909090909%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.45454545454545%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.9090909090909%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.9090909090909%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.9090909090909%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(66)</a> <a href='/tags/mongodb/index.html' style='font-size: 109.0909090909091%'>mongodb(10)</a> <a href='/tags/mysql/index.html' style='font-size: 103.63636363636364%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.9090909090909%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.9090909090909%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.18181818181819%'>php(9)</a> <a href='/tags/ps/index.html' style='font-size: 105.45454545454545%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.9090909090909%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.45454545454544%'>python(50)</a> <a href='/tags/qt/index.html' style='font-size: 101.81818181818181%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.9090909090909%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 123.63636363636364%'>Ruby(26)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.72727272727273%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.9090909090909%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.54545454545455%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.36363636363636%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.72727272727273%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 122.72727272727272%'>vim(25)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.72727272727273%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.9090909090909%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.9090909090909%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 112.72727272727272%'>Web开发(14)</a> <a href='/tags/windows/index.html' style='font-size: 106.36363636363636%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.9090909090909%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.9090909090909%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.9090909090909%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.9090909090909%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.45454545454545%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.81818181818181%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.9090909090909%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.18181818181819%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.18181818181819%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.9090909090909%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.9090909090909%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.9090909090909%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.81818181818181%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 109.0909090909091%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.18181818181819%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.9090909090909%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.54545454545455%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.9090909090909%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.9090909090909%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.45454545454545%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 120.9090909090909%'>翻译(23)</a> <a href='/tags/视频教程/index.html' style='font-size: 109.0909090909091%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.9090909090909%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.81818181818181%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.9090909090909%'>随笔(1)</a> </span>
 </section>
 <section>
   <h1>Link</h1>
