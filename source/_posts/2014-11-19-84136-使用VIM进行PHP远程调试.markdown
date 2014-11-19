@@ -1,0 +1,40 @@
+---
+layout: post
+title: "使用VIM进行PHP远程调试"
+date: 2014-11-19 12:00:30 +0000
+comments: true
+post_id: 84136
+permalink: /archives/84136.html
+categories: ["资源分享"]
+tags: ["vim", "php"]
+---
+
+最近在写 PHP 时感觉它的调试不是很方便，基本都是用的 `var_dump` 将信息输出到页面上进行调试。最终实现是受不了这种方式，就找了一下看看有没有什么简便的方法。
+于是就找到了 `vdebug` 这个 vim 插件，使用它可以方便的进行远程调试。
+
+根据 `vdebug` 的介绍，说是它可以用来调试基于 DBGP 协议的程序，比如： PHP、Python、Ruby等。
+可能只是 DBGP 协议在 PHP 中用得比较多吧，因此看到的大部分介绍都是说的 PHP 调试。
+关于 DBGP 协议的详细介绍可参考： http://xdebug.org/docs-dbgp.php
+
+
+**使用方法：**
+
+首先是在 vim 中安装这个插件，下载地址： https://github.com/joonty/vdebug
+
+由于它的配置信息都写死在代码中的，因此我就 fork 了一份进行自定义的修改，如快捷键设置、远程主机名和端口号。
+
+然后是安装 PHP 的 Xdebug 扩展，并配置一些参数信息。在 `php.ini` 配置文件中添加如下内容：
+
+```
+xdebug.remote_enable=on
+xdebug.remote_handler=dbgp
+xdebug.remote_host=127.0.0.1
+xdebug.remote_port=9010
+```
+
+注意：这里的主机名和端口号要与 `vdebug` 中的一致。
+
+接着使用 vim 打开一个 php 文件，按 `<F5>` 键启动该插件进行调试。然后在浏览器中访问该 php 程序，
+并加上 `XDEBUG_SESSION_START=1` 参数，如： http://127.0.0.1/test.php?XDEBUG_SESSION_START=1
+
+现在就可以在 vim 中对 php 程序进行单步调试了。
