@@ -4,7 +4,7 @@
   <title><![CDATA[龍昌博客]]></title>
   <link href="http://www.xefan.com/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2014-11-11T21:21:26+08:00</updated>
+  <updated>2014-11-19T14:33:11+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -12,6 +12,45 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[使用VIM进行PHP远程调试]]></title>
+    <link href="http://www.xefan.com/archives/84136.html"/>
+    <updated>2014-11-19T20:00:30+08:00</updated>
+    <id>http://www.xefan.com/archives/84136-使用VIM进行PHP远程调试</id>
+    <content type="html"><![CDATA[<p>最近在写 PHP 时感觉它的调试不是很方便，基本都是用的 <code>var_dump</code> 将信息输出到页面上进行调试。最终实现是受不了这种方式，就找了一下看看有没有什么简便的方法。
+于是就找到了 <code>vdebug</code> 这个 vim 插件，使用它可以方便的进行远程调试。</p>
+
+<p>根据 <code>vdebug</code> 的介绍，说是它可以用来调试基于 DBGP 协议的程序，比如： PHP、Python、Ruby等。
+可能只是 DBGP 协议在 PHP 中用得比较多吧，因此看到的大部分介绍都是说的 PHP 调试。
+关于 DBGP 协议的详细介绍可参考： <a href="http://xdebug.org/docs-dbgp.php">http://xdebug.org/docs-dbgp.php</a></p>
+
+<p><strong>使用方法：</strong></p>
+
+<p>首先是在 vim 中安装这个插件，下载地址： <a href="https://github.com/joonty/vdebug">https://github.com/joonty/vdebug</a></p>
+
+<p>由于它的配置信息都写死在代码中的，因此我就 fork 了一份进行自定义的修改，如快捷键设置、远程主机名和端口号。</p>
+
+<p>然后是安装 PHP 的 Xdebug 扩展，并配置一些参数信息。在 <code>php.ini</code> 配置文件中添加如下内容：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>xdebug.remote_enable=on
+</span><span class='line'>xdebug.remote_handler=dbgp
+</span><span class='line'>xdebug.remote_host=127.0.0.1
+</span><span class='line'>xdebug.remote_port=9010</span></code></pre></td></tr></table></div></figure>
+
+
+<p>注意：这里的主机名和端口号要与 <code>vdebug</code> 中的一致。</p>
+
+<p>接着使用 vim 打开一个 php 文件，按 <code>&lt;F5&gt;</code> 键启动该插件进行调试。然后在浏览器中访问该 php 程序，
+并加上 <code>XDEBUG_SESSION_START=1</code> 参数，如： <a href="http://127.0.0.1/test.php?XDEBUG_SESSION_START=1">http://127.0.0.1/test.php?XDEBUG_SESSION_START=1</a></p>
+
+<p>现在就可以在 vim 中对 php 程序进行单步调试了。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Nginx + Uwsgi + Django环境配置]]></title>
@@ -2227,69 +2266,6 @@ print(lc_hello_world.test())
 print(lc_hello_world.add(1, 2))
 print(lc_hello_world.add(1, '2'))    # 这个会报错
 </code></pre>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Mongoengine教程(5)——信号]]></title>
-    <link href="http://www.xefan.com/archives/84076.html"/>
-    <updated>2014-04-06T00:00:00+08:00</updated>
-    <id>http://www.xefan.com/archives/84076-mongoengine教程(5)——信号</id>
-    <content type="html"><![CDATA[<p>MongoEngine在进行数据操作时会发出一些信号，我们可以连接这些信号进行一些额外的操作。注意：要在MongoEngine中使用信号，需要安装 <em>blinker</em> 这个库。  </p>
-
-
-<pre><code>$ pip install blinker
-</code></pre>
-
-
-<p>MongoEngine提供的信号如下：  </p>
-
-
-<ul>
-<li>pre_init: 在创建一个新的 Document 或者 EmbeddedDocument 实例对象之后，并且对象初始化之前调用。  </li>
-<li>post_init:在 Document 或者 EmbeddedDocument 实例对象初始化完成之后调用。  </li>
-<li>pre_save:在 save 方法执行之前调用。  </li>
-<li>pre_save_post_validation:在数据检验完成之后，数据保存之前调用。  </li>
-<li>post_save:在数据保存完成之后调用。  </li>
-<li>pre_delete:在 delete 方法执行之前调用。  </li>
-<li>post_delete:在记录成功删除之后调用。  </li>
-<li>pre_bulk_insert:在数据检验之后，数据插入之前调用。  </li>
-<li>post_bulk_insert:在数据成功插入之后调用。</li>
-</ul>
-
-
-<h2>事件连接</h2>
-
-
-<p>使用 signals 将信号与回调函数进行连接。</p>
-
-
-<pre><code>from mongoengine import *
-from mongoengine import signals
-
-class Author(Document):
-    name = StringField()
-
-    @classmethod
-    def pre_save(cls, sender, document, **kwargs):
-        print("Pre Save: %s" % document.name)
-
-    @classmethod
-    def post_save(cls, sender, document, **kwargs):
-        print("Post Save: %s" % document.name)
-        if 'created' in kwargs:
-            if kwargs['created']:
-                print("Created")
-            else:
-                print("Updated")
-
-signals.pre_save.connect(Author.pre_save, sender=Author)
-signals.post_save.connect(Author.post_save, sender=Author)
-</code></pre>
-
-
-<p>注意：对于 RefereneField 的<em>reverse_delete_rules</em>参数不会触发信号。</p>
 
 ]]></content>
   </entry>

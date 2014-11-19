@@ -9,7 +9,7 @@
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="数组 这一部分的教程将介绍数组。数组是有序对象的集合。 一个这是在某个时刻只能保存一项数值。不过数组可以保存多项。这些数据项被称为数组的元素。数组可以保存任何类型的数据。每个元素可以使用索引来引用。第一个元素的索引值为0。 注意Ruby的数组与C、C++或者Java中的数组有很大的不同。 #!/ &hellip;">
+  <meta name="description" content="哈希表 这部分的教程我们将提到哈希表。哈希表是一个键-值对的集合。与数组相似，不同与数组的是哈希表的索引是确定的，数组的只能是整数。哈希表有时称为相关联的数组。 哈希表是非常有用的集合。它有许多方法供程序员使用。 创建哈希表 有两种创建哈希表的方式：使用new关键字或者哈希表的字面量。 #!/ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -66,6 +66,668 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83935.html">[翻译]Ruby教程11——哈希表</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-11-15T00:00:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>15</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83935.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83935.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h1>哈希表</h1>
+
+
+<p>这部分的教程我们将提到哈希表。哈希表是一个键-值对的集合。与数组相似，不同与数组的是哈希表的索引是确定的，数组的只能是整数。哈希表有时称为相关联的数组。</p>
+
+
+<p>哈希表是非常有用的集合。它有许多方法供程序员使用。</p>
+
+
+<h2>创建哈希表</h2>
+
+
+<p>有两种创建哈希表的方式：使用<em>new</em>关键字或者哈希表的字面量。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+names = Hash.new
+names[1] = "Jane"
+names[2] = "Thomas"
+
+puts names
+</code></pre>
+
+
+<p>第一个脚本创建了一个哈希表并添加了两个键-值对。</p>
+
+
+<pre><code>names = Hash.new
+</code></pre>
+
+
+<p>创建一个哈希对象。</p>
+
+
+<pre><code>names[1] = "Jane"
+names[2] = "Thomas"
+</code></pre>
+
+
+<p>添加两对值。数字1、2是哈希表的键。键放在中括号里。<em>names</em>是属于键的值。</p>
+
+
+<pre><code>puts names
+</code></pre>
+
+
+<p>打印哈希表。</p>
+
+
+<pre><code>$ ./create.rb  
+{1=&gt;"Jane", 2=&gt;"Thomas"}
+</code></pre>
+
+
+<p>从输出结果我们看到一个哈希表是用花括号括起来的。键和值是使用<em>=&gt;</em>符号成对搭配。</p>
+
+
+<hr>
+
+
+<p><em>store</em>方法可以用于给哈希表设置一些初始值。它可以代替花括号。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+names = Hash.new
+names.store(1, "Jane")
+names.store(2, "Thomas")
+names.store(3, "Rebecca")
+
+puts names
+</code></pre>
+
+
+<p>创建了一个相似的脚本，这次我们使用<em>store</em>方法。</p>
+
+
+<pre><code>names.store(1, "Jane")
+</code></pre>
+
+
+<p><em>store</em>方法的第一个参数是键，第二个参数是值。</p>
+
+
+<hr>
+
+
+<p>第三个脚本我们使用字面符来创建哈希表。它的值是用花括号括起来的。并且键和值是用<em>=&gt;</em>符号成对分配。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+domains = { "de" =&gt; "Germany",
+            "sk" =&gt; "Slovakia",
+            "hu" =&gt; "Hungary",
+            "us" =&gt; "United States",
+            "no" =&gt; "Norway"                       
+          }
+
+puts domains["de"]
+puts domains["sk"]
+</code></pre>
+
+
+<p>创建哈希表<em>domains</em>包含5对内容。这里键和值都是字符串。</p>
+
+
+<p>$ ./create3.rb <br>
+Germany<br>
+Slovakia  </p>
+
+
+<p>例子的输出结果。</p>
+
+
+<h2>基本用法</h2>
+
+
+<p>这一节我们展示Ruby哈希表的一些很基础的方法。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+names = Hash.new
+
+names[1] = "Jane"
+names[2] = "Thomas"
+names[3] = "Robert"
+names[4] = "Julia"
+names[5] = "Rebecca"
+
+puts "The size of the hash is #{names.size}"
+
+puts names.keys.inspect
+puts names.values.inspect
+</code></pre>
+
+
+<p>上面的脚本中创建了一个有5个值的哈希表，介绍了哈希表的三个方法。</p>
+
+
+<pre><code>puts "The size of the hash is #{names.size}"
+</code></pre>
+
+
+<p><em>size</em>方法返回哈希表的大小。与<em>length</em>方法相同。</p>
+
+
+<pre><code>puts names.keys.inspect
+puts names.values.inspect
+</code></pre>
+
+
+<p><em>keys</em>方法返回哈希表的所有键。以此类推，<em>values</em>方法返回哈希表的所有值。返回的数据是一个数组形式的。为了使输出更加可读我们使用了<em>inspect</em>方法。</p>
+
+
+<p>$ ./basic.rb<br>
+The size of the hash is 5<br>
+[1, 2, 3, 4, 5]<br>
+[&#8220;Jane&#8221;, &#8220;Thomas&#8221;, &#8220;Robert&#8221;, &#8220;Julia&#8221;, &#8220;Rebecca&#8221;]  </p>
+
+
+<p>例子的输出结果。注意最后两个方法是两个数组。</p>
+
+
+<hr>
+
+
+<p>这节的第二个例子展示了哈希表实例的三个方法。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+names1 = Hash.new
+
+names1[1] = "Jane"
+names1[2] = "Thomas"
+names1[3] = "Robert"
+names1[4] = "Julia"
+names1[5] = "Rebecca"
+
+names2 = names1.dup
+
+puts names1.eql? names2
+
+puts names1.empty?
+names1.clear
+puts names1.empty?
+</code></pre>
+
+
+<p>创建了一个<em>names</em>哈希表，对该对象调用了三个方法。</p>
+
+
+<pre><code>names2 = names1.dup
+</code></pre>
+
+
+<p>通过<em>dup</em>方法创建了一个副本。</p>
+
+
+<pre><code>puts names1.eql? names2
+</code></pre>
+
+
+<p><em>eql?</em>方法比较两个哈希表对象是否相等。这里是相同的，打印true。</p>
+
+
+<pre><code>puts names1.empty?
+</code></pre>
+
+
+<p><em>empty?</em>方法检查哈希表是否为空。这行打印false，因为<em>names1</em>有5项数据。</p>
+
+
+<pre><code>names1.clear
+puts names1.empty?
+</code></pre>
+
+
+<p><em>clear</em>方法删除哈希表的所有内容。接着调用<em>empty?</em>方法返回true。</p>
+
+
+<p>$ ./basic2.rb<br>
+true<br>
+false<br>
+true  </p>
+
+
+<p>输出结果。</p>
+
+
+<hr>
+
+
+<p>有一个方法可以判断一个键或者值是否在这个哈希表中。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+domains = { :de =&gt; "Germany", :sk =&gt; "Slovakia",
+            :no =&gt; "Norway", :us =&gt; "United States"
+          }
+
+puts domains.has_key? :de
+puts domains.include? :no
+puts domains.key? :me
+puts domains.member? :sk
+
+puts domains.has_value? "Slovakia"
+puts domains.value? "Germany"
+</code></pre>
+
+
+<p>创建了一个有4对数据的哈希表<em>domains</em>。键是用的符号，因为它更有效。</p>
+
+
+<pre><code>puts domains.has_key? :de
+puts domains.include? :no
+puts domains.key? :me
+puts domains.member? :sk
+</code></pre>
+
+
+<p>这里我们用了四个方法来判断哈希表是否包含该键。它们的功能都是相同的。</p>
+
+
+<pre><code>puts domains.has_value? "Slovakia"
+puts domains.value? "Germany"
+</code></pre>
+
+
+<p>这里用了两个方法检查这两个字符串是否在哈希表中。</p>
+
+
+<p>$ ./has.rb<br>
+true<br>
+true<br>
+false<br>
+true<br>
+true<br>
+true  </p>
+
+
+<p>输出结果。</p>
+
+
+<hr>
+
+
+<p>这节的最后一个例子，我们将从哈希表中读取内容。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+stones = { 1 =&gt; "garnet", 2 =&gt; "topaz", 
+           3 =&gt; "opal", 4 =&gt; "amethyst"
+         }
+
+puts stones.fetch 1
+puts stones[2]
+puts stones.values_at 1, 2, 3
+</code></pre>
+
+
+<p>这个脚本展示了三个读取值的方法。</p>
+
+
+<pre><code>puts stones.fetch 1
+</code></pre>
+
+
+<p><em>fetch</em>方法通过给定的键读取值。</p>
+
+
+<pre><code>puts stones[2]
+</code></pre>
+
+
+<p>也可以使用中括号来获取一个值，这行会打印<em>&#8220;topaz&#8221;</em>。</p>
+
+
+<pre><code>puts stones.values_at 1, 2, 3
+</code></pre>
+
+
+<p><em>values_at</em>方法可以一次获取多个值。这个方法通过给定的键返回一个数组包含了对应的值。</p>
+
+
+<p>$ ./read.rb<br>
+garnet<br>
+topaz<br>
+garnet<br>
+topaz<br>
+opal  </p>
+
+
+<p>例子的输出结果。</p>
+
+
+<h2>循环遍历哈希表</h2>
+
+
+<p>有一些方法可以用于循环遍历哈希表。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+stones = { 1 =&gt; "garnet", 2 =&gt; "topaz", 
+           3 =&gt; "opal", 4 =&gt; "amethyst"
+         }
+
+stones.each { |k, v| puts "Key: #{k}, Value: #{v}" }
+stones.each_key { |key| puts "#{key}" }
+stones.each_value { |val| puts "#{val}" }
+stones.each_pair { |k, v| puts "Key: #{k}, Value: #{v}" }
+</code></pre>
+
+
+<p>上面的例子我们展示的四个方法。用这些方法显示了所有的键、值。</p>
+
+
+<pre><code>stones.each { |k, v| puts "Key: #{k}, Value: #{v}" }
+</code></pre>
+
+
+<p><em>each</em>方法对每个键都调用了给定的代码块，键-值对作为参数传递。</p>
+
+
+<pre><code>stones.each_key { |key| puts "#{key}" }
+</code></pre>
+
+
+<p>我们使用<em>each_key</em>方法循环遍历了哈希表所有的键。将它们打印在终端上。</p>
+
+
+<pre><code>stones.each_value { |val| puts "#{val}" }
+</code></pre>
+
+
+<p><em>each_value</em>用于循环遍历哈希表所有的值。</p>
+
+
+<pre><code>stones.each_pair { |k, v| puts "Key: #{k}, Value: #{v}" }
+</code></pre>
+
+
+<p><em>each_pair</em>方法与<em>each</em>方法相同。</p>
+
+
+<p>$ ./loop.rb<br>
+Key: 1, Value: garnet<br>
+Key: 2, Value: topaz<br>
+Key: 3, Value: opal<br>
+Key: 4, Value: amethyst<br>
+1<br>
+2<br>
+3<br>
+4<br>
+garnet<br>
+topaz<br>
+opal<br>
+amethyst<br>
+Key: 1, Value: garnet<br>
+Key: 2, Value: topaz<br>
+Key: 3, Value: opal<br>
+Key: 4, Value: amethyst  </p>
+
+
+<p>输出结果。</p>
+
+
+<h2>删除键值对</h2>
+
+
+<p>接下来的例子关注哈希表的删除。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+names = Hash.new
+
+names[1] = "Jane"
+names[2] = "Thomas"
+names[3] = "Robert"
+names[4] = "Julia"
+names[5] = "Rebecca"
+
+names.delete 4
+names.shift
+
+puts names
+</code></pre>
+
+
+<p>这个脚本我们使用了两个方法：<em>delete</em>和<em>shift</em>。<em>delete</em>方法是删除指定的键的值，并将其返回。<em>shift</em>方法删除哈希表的第一对键值，并将其作为数组返回。</p>
+
+
+<pre><code>names.delete 4
+</code></pre>
+
+
+<p>删除<em>4 =&gt; &#8220;Julia&#8221;</em>这对值。</p>
+
+
+<pre><code>names.shift
+</code></pre>
+
+
+<p>这行代码删除<em>1 =&gt; &#8220;Jane&#8221;</em>这对值。</p>
+
+
+<pre><code>$ ./deleteitem.rb  
+{2=&gt;"Thomas", 3=&gt;"Robert", 5=&gt;"Rebecca"}
+</code></pre>
+
+
+<p>输出结果显示还剩的内容。</p>
+
+
+<hr>
+
+
+<p><em>reject</em>和<em>delete_if</em>方法可以从哈希表中移除多项内容。如果这些方法所给定的代码块中的条件式返回true，则删除对应的键值对。这两个方法有个重要区别。<em>reject</em>方法作用于复本，<em>delete_if</em>作用于原对象。</p>
+
+
+<pre><code>#!/usr/local/bin/ruby
+
+names1 = Hash.new
+
+names1[1] = "Jane"
+names1[2] = "Thomas"
+names1[3] = "Robert"
+names1[4] = "Julia"
+names1[5] = "Rebecca"
+
+puts names1.reject { |k, v| v =~ /R.*/ }
+puts names1
+puts names1.delete_if { |k, v| k&lt;=3 }
+puts names1
+</code></pre>
+
+
+<p>这个例子使用上面的方法删除多项键值对。</p>
+
+
+<pre><code>puts names1.reject { |k, v| v =~ /R.*/ }
+</code></pre>
+
+
+<p><em>reject</em>方法移除所有满足代码块中正则式的值，并返回修改后的哈希表，原哈希表不变。</p>
+
+
+<pre><code>puts names1
+</code></pre>
+
+
+<p>这行的输出证实了原哈希表没有改变。</p>
+
+
+<pre><code>puts names1.delete_if { |k, v| k&lt;=3 }
+</code></pre>
+
+
+<p>这里我们删除键小于等于3的键值对。这个方法修改了原对象。</p>
+
+
+<pre><code>$ ./massdelete.rb   
+{1=&gt;"Jane", 2=&gt;"Thomas", 4=&gt;"Julia"}  
+{1=&gt;"Jane", 2=&gt;"Thomas", 3=&gt;"Robert", 4=&gt;"Julia", 5=&gt;"Rebecca"}  
+{4=&gt;"Julia", 5=&gt;"Rebecca"}  
+{4=&gt;"Julia", 5=&gt;"Rebecca"}
+</code></pre>
+
+
+<p>输出结果。</p>
+
+
+<h2>添加内容</h2>
+
+
+<p><em>merge</em>和<em>update</em>方法可以给哈希表添加键值对。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+names1 = Hash.new
+
+names1[1] = "Jane"
+names1[2] = "Thomas"
+
+names2 = Hash.new
+
+names2[3] = "Robert"
+names2[4] = "Julia"
+
+names = names1.merge names2
+puts names
+
+names = names1.update names2
+puts names
+</code></pre>
+
+
+<p>这个脚本中我们创建了两个哈希表，然后对它们调用了<em>merge</em>和<em>update</em>方法。</p>
+
+
+<pre><code>names = names1.merge names2
+puts names
+</code></pre>
+
+
+<p>合并<em>names1</em>和<em>names2</em>，结果分配给<em>names</em>。</p>
+
+
+<pre><code>$ ./merge.rb  
+{1=&gt;"Jane", 2=&gt;"Thomas", 3=&gt;"Robert", 4=&gt;"Julia"}  
+{1=&gt;"Jane", 2=&gt;"Thomas", 3=&gt;"Robert", 4=&gt;"Julia"}
+</code></pre>
+
+
+<p>最后的哈希表包含了<em>names1</em>和<em>names2</em>的内容。</p>
+
+
+<h2>merge与merge!</h2>
+
+
+<p>最后一节，我们重述一下Ruby的习俗。一些Ruby的方法以感叹号结尾。这个标志在语法上没有意义，它只是表明调用这个方法会修改对象的内容。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+names1 = Hash.new
+
+names1[1] = "Jane"
+names1[2] = "Thomas"
+
+names2 = Hash.new
+
+names2[3] = "Robert"
+names2[4] = "Julia"
+
+names = names1.merge names2
+puts names
+puts names1
+
+names = names1.merge! names2
+puts names
+puts names1
+</code></pre>
+
+
+<p>我们展示了<em>merge</em>和<em>merge!</em>方法的不同。</p>
+
+
+<pre><code>names = names1.merge names2
+</code></pre>
+
+
+<p><em>merge</em>不会修改<em>names1</em>，它作用于一个新的复本。</p>
+
+
+<pre><code>names = names1.merge! names2
+</code></pre>
+
+
+<p><em>merge!</em>方法作用于原对象。<em>names1</em>被修改了。</p>
+
+
+<pre><code>$ ./merge2.rb
+{1=&gt;"Jane", 2=&gt;"Thomas", 3=&gt;"Robert", 4=&gt;"Julia"}
+{1=&gt;"Jane", 2=&gt;"Thomas"}
+{1=&gt;"Jane", 2=&gt;"Thomas", 3=&gt;"Robert", 4=&gt;"Julia"}
+{1=&gt;"Jane", 2=&gt;"Thomas", 3=&gt;"Robert", 4=&gt;"Julia"}
+</code></pre>
+
+
+<p><em>merge2.rb</em>程序的输出。</p>
+
+
+<p>在这章我们学习了Ruby的哈希表。</p>
+
+
+<hr>
+
+
+<p>原文地址： <a href="http://zetcode.com/lang/rubytutorial/hashes/">http://zetcode.com/lang/rubytutorial/hashes/</a><br>
+翻译：龙昌  admin@longchangjin.cn<br>
+完整教程：<a href="https://github.com/wusuopu/Ruby-tutorial">https://github.com/wusuopu/Ruby-tutorial</a> </p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -9005,164 +9667,6 @@ while    yield
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83895.html">[翻译]Ruby教程1——Ruby语言介绍</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2013-11-02T00:00:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>2</span><span class='date-suffix'>nd</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
-        
-           | <a href="http://www.xefan.com/archives/83895.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/83895.html">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h1>Ruby</h1>
-
-
-<p>在这部分Ruby教程中，我们将介绍Ruby编程语言。</p>
-
-
-<h2>目标</h2>
-
-
-<p>这个教程的目标是让你入门Ruby。这个教程覆盖了Ruby的主要内容，包括变量、表达式、集合、流程控制结构以及其他的一些主要特性。同样也会描述一些高级的概念，例如面向对象和正则表达式。这不会完全地覆盖这个语言。</p>
-
-
-<h2>Ruby</h2>
-
-
-<p>Ruby是一门动态的、反射的、通用的面向对象编程语言。它的源作者是一个日本程序员——松本行弘 (まつもとゆきひろ)。Ruby第一次发表是在1995年。</p>
-
-
-<p>Ruby支持多种程序范式。包括面向对象、反射、命令式的和反射的编程。Ruby语言主要是受到Perl、Smalltalk、Eiffel和Lisp的影响。不同于java、C#以及C，Ruby没有官方的规范。取而代之的是用原始的C实现的Ruby语言作为实际参考。同时也还存在一些用其他方法实现的Ruby语言，如：JRuby、IronRuby或者MacRuby。</p>
-
-
-<p>Ruby的官方网站是: <a href="htp://ruby-lang.org">ruby-lang.org</a></p>
-
-
-<h2>人气</h2>
-
-
-<p>如今有上百种编程语言，而Ruby属于最流行的一个。在<a href="http://langpop.com">langpop.com</a>和<a href="http://www.tiobe.com/index.php/content/paperinfo/tpci/index.html">tiobe</a>网站Ruby都排在第10名左右。Ruby on Rails——一个非常流行的web应用框架是使用Ruby开发第一个杀手级的应用。</p>
-
-
-<h2>交互式的解释器</h2>
-
-
-<p>我们可以通过脚本或者交互式的解释器来运行Ruby语句。在这个教程中我们将使用交互式的Ruby会话来展示一些小的代码片段。大的代码例子将放在Ruby脚本中。</p>
-
-
-<blockquote>
-<p>$ irb<br>
-  irb(main):001:0&gt; puts RUBY_VERSION<br>
-  2.0.0<br>
-  =&gt; nil  </p>
-</blockquote>
-
-
-<p>这是一个Ruby交互会式会话的例子。我们在终端中打印了一个特别的常量RUBY_VERSION，它被设置为当前使用的Ruby的版本。<br>
-译注：原文的作者使用的是ruby 1.8.7，而如今ruby最新版已经是2.0.0了，因此我在翻译的时候也结合了当前新的内容。</p>
-
-
-<h2>Ruby脚本</h2>
-
-
-<p>我们开始我们的第一个简单的Ruby脚本例子。  </p>
-
-
-<blockquote>
-<p>#!/usr/bin/ruby<br>
- # first.rb<br>
- puts &#8220;This is Ruby&#8221;  </p>
-</blockquote>
-
-
-<p>这个脚本我们将在终端上打印一条消息。</p>
-
-
-<blockquote>
-<p>#!/usr/bin/ruby</p>
-</blockquote>
-
-
-<p>UNIX下的每一个脚本都是以shebang符号开始的。shebang是脚本中开始的前两个字符：<strong>#!</strong>。shebang后面是执行我们脚本的解释器的路径。/usr/bin是Ruby解释器最常用的位置。它也可以定位在/usr/local/bin或者其他什么地方。</p>
-
-
-<blockquote>
-<p># first.rb  </p>
-</blockquote>
-
-
-<p>在Ruby中注释是以#开始。</p>
-
-
-<blockquote>
-<p>puts &#8220;This is Ruby&#8221; </p>
-</blockquote>
-
-
-<p>puts方法是将字符串打印到终端。</p>
-
-
-<blockquote>
-<p>$ which ruby<br>
- /usr/bin/ruby  </p>
-</blockquote>
-
-
-<p>Ruby解释器的路径可以使用which命令找到。</p>
-
-
-<blockquote>
-<p>$ chmod +x first.rb<br>
- $ ./first.rb<br>
- This is Ruby  </p>
-</blockquote>
-
-
-<p>通过chmod命令，我们给脚本增加可执行的权限。</p>
-
-
-<h2>资源</h2>
-
-
-<p>以下资源在编写该教程时会使用到：<br>
-<em> <a href="http://www.ruby-lang.org/">ruby-lang.org</a><br>
-</em> <a href="http://ruby-doc.org/">ruby-doc.org</a><br>
-<em> <a href="http://en.wikipedia.org/wiki/Ruby_(programming_language)">Ruby article on wikipedia.org</a><br>
-</em> <a href="http://ruby.runpaint.org/">ruby.runpaint.org</a></p>
-
-
-<p>在这章的教程中我们介绍了Ruby语言。  </p>
-
-
-<hr>
-
-
-<p>原文地址： <a href="http://zetcode.com/lang/rubytutorial/ruby/">http://zetcode.com/lang/rubytutorial/ruby/</a><br>
-翻译：龙昌  admin@longchangjin.cn<br>
-完整教程：<a href="https://github.com/wusuopu/Ruby-tutorial">https://github.com/wusuopu/Ruby-tutorial</a>  </p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/page/8">&larr; Older</a>
@@ -9184,6 +9688,10 @@ while    yield
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="http://www.xefan.com/archives/84136.html">使用VIM进行PHP远程调试</a>
+      </li>
+    
+      <li class="post">
         <a href="http://www.xefan.com/archives/84135.html">Nginx + Uwsgi + Django环境配置</a>
       </li>
     
@@ -9199,19 +9707,15 @@ while    yield
         <a href="http://www.xefan.com/archives/84132.html">配置elixir的vim环境</a>
       </li>
     
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84130.html">配置coffeescript的vim环境</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (47)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (33)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (26)</a></li><li><a href='/categories/web开发/index.html'>web开发 (17)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (7)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (22)</a></li></ul>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (47)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (33)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (26)</a></li><li><a href='/categories/web开发/index.html'>web开发 (17)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (7)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (23)</a></li></ul>
 </section>
 <section>
   <h1>Tag Cloud</h1>
-    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.45454545454545%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.9090909090909%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.81818181818181%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.9090909090909%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.36363636363636%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.27272727272727%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.36363636363636%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.81818181818181%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.81818181818181%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 101.81818181818181%'>Django(2)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.9090909090909%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.81818181818181%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.72727272727273%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.9090909090909%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.9090909090909%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.45454545454545%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.81818181818181%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.63636363636364%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.45454545454545%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.9090909090909%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.45454545454545%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.9090909090909%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.9090909090909%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.9090909090909%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(66)</a> <a href='/tags/mongodb/index.html' style='font-size: 109.0909090909091%'>mongodb(10)</a> <a href='/tags/mysql/index.html' style='font-size: 103.63636363636364%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.9090909090909%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.9090909090909%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.18181818181819%'>php(9)</a> <a href='/tags/ps/index.html' style='font-size: 105.45454545454545%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.9090909090909%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.45454545454544%'>python(50)</a> <a href='/tags/qt/index.html' style='font-size: 101.81818181818181%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.9090909090909%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 123.63636363636364%'>Ruby(26)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.72727272727273%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.9090909090909%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.54545454545455%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.36363636363636%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.72727272727273%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 122.72727272727272%'>vim(25)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.72727272727273%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.9090909090909%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.9090909090909%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 112.72727272727272%'>Web开发(14)</a> <a href='/tags/windows/index.html' style='font-size: 106.36363636363636%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.9090909090909%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.9090909090909%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.9090909090909%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.9090909090909%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.45454545454545%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.81818181818181%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.9090909090909%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.18181818181819%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.18181818181819%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.9090909090909%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.9090909090909%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.9090909090909%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.81818181818181%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 109.0909090909091%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.18181818181819%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.9090909090909%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.54545454545455%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.9090909090909%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.9090909090909%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.45454545454545%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 120.9090909090909%'>翻译(23)</a> <a href='/tags/视频教程/index.html' style='font-size: 109.0909090909091%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.9090909090909%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.81818181818181%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.9090909090909%'>随笔(1)</a> </span>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.45454545454545%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.9090909090909%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.81818181818181%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.9090909090909%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.36363636363636%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.27272727272727%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.36363636363636%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.81818181818181%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.81818181818181%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 101.81818181818181%'>Django(2)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.9090909090909%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.81818181818181%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.72727272727273%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.9090909090909%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.9090909090909%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.45454545454545%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.81818181818181%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.63636363636364%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.45454545454545%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.9090909090909%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.45454545454545%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.9090909090909%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.9090909090909%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.9090909090909%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(66)</a> <a href='/tags/mongodb/index.html' style='font-size: 109.0909090909091%'>mongodb(10)</a> <a href='/tags/mysql/index.html' style='font-size: 103.63636363636364%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.9090909090909%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.9090909090909%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 109.0909090909091%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.45454545454545%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.9090909090909%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.45454545454544%'>python(50)</a> <a href='/tags/qt/index.html' style='font-size: 101.81818181818181%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.9090909090909%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 123.63636363636364%'>Ruby(26)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.72727272727273%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.9090909090909%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.54545454545455%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.36363636363636%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.72727272727273%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.63636363636364%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.72727272727273%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.9090909090909%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.9090909090909%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 112.72727272727272%'>Web开发(14)</a> <a href='/tags/windows/index.html' style='font-size: 106.36363636363636%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.9090909090909%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.9090909090909%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.9090909090909%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.9090909090909%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.45454545454545%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.81818181818181%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.9090909090909%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.18181818181819%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.18181818181819%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.9090909090909%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.9090909090909%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.9090909090909%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.81818181818181%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 109.0909090909091%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.18181818181819%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.9090909090909%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.54545454545455%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.9090909090909%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.9090909090909%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.45454545454545%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 120.9090909090909%'>翻译(23)</a> <a href='/tags/视频教程/index.html' style='font-size: 109.0909090909091%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.9090909090909%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.81818181818181%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.9090909090909%'>随笔(1)</a> </span>
 </section>
 <section>
   <h1>Link</h1>

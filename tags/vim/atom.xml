@@ -4,7 +4,7 @@
   <title><![CDATA[Tag: Vim | 龍昌博客]]></title>
   <link href="http://www.xefan.com/tags/vim/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2014-11-11T21:21:26+08:00</updated>
+  <updated>2014-11-19T14:33:11+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -12,6 +12,41 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[使用VIM进行PHP远程调试]]></title>
+    <link href="http://www.xefan.com/archives/84136.html"/>
+    <updated>2014-11-19T20:00:30+08:00</updated>
+    <id>http://www.xefan.com/archives/84136-使用VIM进行PHP远程调试</id>
+    <content type="html"><![CDATA[<p>最近在写 PHP 时感觉它的调试不是很方便，基本都是用的 <code>var_dump</code> 将信息输出到页面上进行调试。最终实现是受不了这种方式，就找了一下看看有没有什么简便的方法。
+于是就找到了 <code>vdebug</code> 这个 vim 插件，使用它可以方便的进行远程调试。</p>
+
+<p>根据 <code>vdebug</code> 的介绍，说是它可以用来调试基于 DBGP 协议的程序，比如： PHP、Python、Ruby等。
+可能只是 DBGP 协议在 PHP 中用得比较多吧，因此看到的大部分介绍都是说的 PHP 调试。
+关于 DBGP 协议的详细介绍可参考： <a href="http://xdebug.org/docs-dbgp.php">http://xdebug.org/docs-dbgp.php</a></p>
+
+<p><strong>使用方法：</strong></p>
+
+<p>首先是在 vim 中安装这个插件，下载地址： <a href="https://github.com/joonty/vdebug">https://github.com/joonty/vdebug</a></p>
+
+<p>由于它的配置信息都写死在代码中的，因此我就 fork 了一份进行自定义的修改，如快捷键设置、远程主机名和端口号。</p>
+
+<p>然后是安装 PHP 的 Xdebug 扩展，并配置一些参数信息。在 <code>php.ini</code> 配置文件中添加如下内容：</p>
+
+<pre><code>xdebug.remote_enable=on
+xdebug.remote_handler=dbgp
+xdebug.remote_host=127.0.0.1
+xdebug.remote_port=9010
+</code></pre>
+
+<p>注意：这里的主机名和端口号要与 <code>vdebug</code> 中的一致。</p>
+
+<p>接着使用 vim 打开一个 php 文件，按 <code>&lt;F5&gt;</code> 键启动该插件进行调试。然后在浏览器中访问该 php 程序，
+并加上 <code>XDEBUG_SESSION_START=1</code> 参数，如： <a href="http://127.0.0.1/test.php?XDEBUG_SESSION_START=1">http://127.0.0.1/test.php?XDEBUG_SESSION_START=1</a></p>
+
+<p>现在就可以在 vim 中对 php 程序进行单步调试了。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[配置rails的vim环境]]></title>
@@ -119,122 +154,6 @@ erp --enable-rubyinterp --enable-netbeans --enable-gui --enable-luainterp --enab
 
 
 <p>我的VIM配置文件： https://github.com/wusuopu/my-vimrc</p>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[使用ruby开发vim插件]]></title>
-    <link href="http://www.xefan.com/archives/84117.html"/>
-    <updated>2014-07-03T00:00:00+08:00</updated>
-    <id>http://www.xefan.com/archives/84117-使用ruby开发vim插件</id>
-    <content type="html"><![CDATA[<p>作为一个Vimmer和Pythoner，之前折腾过用python编写vim插件。现在作为半个Rubist，又开始继续折腾。</p>
-
-
-<p>在开始编写插件之前，你需要确认 Vim 是否支持 Ruby，通过以下命令来判别：</p>
-
-
-<pre><code>$ vim --version | grep +ruby
-</code></pre>
-
-
-<p>如果输出为空，则表示你当前的vim不支持Ruby，需要重新编译一下，并启用对Ruby的支持。</p>
-
-
-<p>顺便说下我当前的环境是：</p>
-
-
-<ul>
-<li>vim 7.4  </li>
-<li>ruby 2.1.0  </li>
-</ul>
-
-
-<p>环境检查没有问题那么就开始吧。<br>
-在~/.vim/plugin目录下创建一个 demo.vim 文件。</p>
-
-
-<p>在开头写上以下代码：</p>
-
-
-<pre><code>if !has('ruby')
-    echo "Error: Required vim compiled with +ruby"
-    finish
-endif
-</code></pre>
-
-
-<p>这段代码就是用 VimL 编写的，它将检查 Vim 是否支持 Ruby。</p>
-
-
-<p>接下来再判断该插件是否已经加载过了，以免重复加载：</p>
-
-
-<pre><code>if exists('g:loaded_ruby_demo_plugin')
-    finish
-endif
-let g:loaded_ruby_demo_plugin = 1
-</code></pre>
-
-
-<p>所有的检查都没有问题，则开始插件的正文了。先定义一个函数。</p>
-
-
-<pre><code>function! DemoFun1()
-ruby&lt;&lt;EOF
-buf = VIM::Buffer.current
-puts "current buffer name: #{buf.name} number: #{buf.number} length: #{buf.length}"
-EOF
-endfunction
-</code></pre>
-
-
-<p>function与endfunction是vim中用于定义函数的，在”ruby&lt;&lt;EOF”和”EOF”之间部分的是Ruby代码。这个例子是输出当前缓冲区的名字、编号以及总行数。<br>
-执行命令:call DemoFun1()，应该就可以看到输出结果了。</p>
-
-
-<p>然后再举个例子说下函数的参数处理。</p>
-
-
-<pre><code>function! DemoFun2(arg1)
-ruby&lt;&lt; EOF
-puts "you input: #{VIM.evaluate('a:arg1')}"
-EOF
-endfunction
-</code></pre>
-
-
-<p>这里定义了一个函数接收一个参数，然后将其输出。使用 VIM.evaluate 将vim的变量转化为Ruby的变量。</p>
-
-
-<p>为了方便我们再定义两个命令，以简化对这两个函数的调用。</p>
-
-
-<pre><code>command! -nargs=0 DemoFun1 call DemoFun1()  
-command! -nargs=1 -rang DemoFun2 call DemoFun2(&lt;f-args&gt;)
-</code></pre>
-
-
-<p>要获取完整的代码可以访问： https://gist.github.com/wusuopu/c1182efefa85d4f6839b</p>
-
-
-<p>接下来再简单说下vim中Ruby的使用。</p>
-
-
-<p>vim为Ruby提供了一个VIM模块，通过它可以在Ruby中访问vim的接口。同时还提供了两个全局变量：$curwin、$curbuf，它们分别代表了当前窗口对象以及当前缓冲区对象。</p>
-
-
-<p>VIM模块中有 Buffer 和 Window 两个对象，分别是用来对缓冲区和窗口进行操作的。同时VIM模块还提供了message、set_option、command和evaluate四个函数。</p>
-
-
-<p>想要查看更多的帮忙信息，可以在vim中执行如下命令：</p>
-
-
-<pre><code>:help ruby
-</code></pre>
-
-
-<p>好了，先写这么多吧，其余的自己去尝试吧。</p>
 
 ]]></content>
   </entry>
