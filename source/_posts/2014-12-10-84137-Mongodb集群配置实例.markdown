@@ -1,0 +1,162 @@
+---
+layout: post
+title: "Mongodb集群配置实例"
+date: 2014-12-10 12:33:02 +0000
+comments: true
+post_id: 84137
+permalink: /archives/84137.html
+categories: ["数据库"]
+tags: ["mongodb"]
+---
+
+Mongodb的集群有两种，一个是主从复制，另一种是副本集。
+
+## 主从复制
+根据 Mongodb 的官方文档说明，在生产环境中建议使用副本集代替主从复制。 http://docs.mongodb.org/manual/core/master-slave/
+
+不过对于主从复制还是可以了解一下。假设有如下三台主机：
+
+  * 172.17.0.4    (主)
+  * 172.17.0.5    (从)
+  * 172.17.0.6    (从)
+
+要进行主从复制的配置，首先修改主服务器的配置信息：
+
+```
+master = true         # 以主服务器模式启动
+bind_ip = 0.0.0.0
+```
+
+然后修改另两台从服务器配置信息：
+
+```
+slave = true
+source = 172.17.0.4
+bind_ip = 0.0.0.0
+```
+
+最后启动三台主机上的 Mongodb 服务，再通过一个简单的程序来测试一下。
+
+```ruby
+#!/usr/bin/env ruby
+#-*- coding:utf-8 -*-
+
+require "mongo"
+
+begin
+  conn = Mongo::Connection.new '172.17.0.4'
+  db = conn['test']
+rescue Exception=>e
+  p e
+  exit 1
+end
+
+i = 0
+while i < 100
+  d = {'no' => i}
+  d = db['data'].insert(d)
+  i += 1
+  puts d
+end
+```
+
+执行该脚本，向 `172.17.0.4` 主机的 Mongodb 中插入一些数据。然后发现数据被同步到了另外两台主机上。
+
+
+主从之间安全认证：  
+如果启动了 `auth` 项，那么主从之间的认证需要使用 `keyFile` 选项。
+
+执行如下命令生成 key 文件，并设置为只有 mongodb 的进程用户可读写：
+
+```
+$ openssl rand -base64 741 > /path/mongodb_keyFile
+$ chmow 600 /path/mongodb_keyFile
+$ chown mongodb:mongodb /path/mongodb_keyFile
+```
+
+将该文件复制到这三台主机中，然后分别修改主从的配置信息：
+
+```
+keyFile = /path/mongodb_keyFile
+```
+
+
+## 副本集
+同样的对于这三台主机，我们重新修改配置设置为副本集的形式。
+
+  * 172.17.0.4
+  * 172.17.0.5
+  * 172.17.0.6
+
+首先修改配置文件，设置副本集的名字。  
+注意：副本集中所有主机设置的名字需要一样。这里我们设为 `myrepl0`。  
+注意：设置副本集之前各个 mongodb 的数据目录必须都为空。
+
+```
+replSet = myrepl0
+```
+
+接着启动所有 mongodb 服务，然后对副本集进行初始化。  
+连接任意一台 mongodb 服务，执行如下操作：
+
+```
+> rs.initiate({'_id': 'myrepl0', 'members': [
+    {'_id': 1, 'host': '172.17.0.4:27017'},
+    {'_id': 2, 'host': '172.17.0.7:27017'},
+    {'_id': 3, 'host': '172.17.0.8:27017'}
+]})
+```
+
+现在副本集的初始化已完成，可以通过如下命令查看状态：
+
+```
+> rs.status()
+```
+
+在运行过程中可以随时添加或移除一个节点，如：
+
+```
+rs.add("172.17.0.8:27017")
+rs.remove("172.17.0.8:27017")
+```
+
+可以再通过上面的程序添加一些数据。然后再连接到任意一台主机进行查询，看看数据是否已同步。
+
+详细内容可参考文档： http://docs.mongodb.org/manual/core/replication/
+
+
+
+安全认证：
+
+1.禁用 auth 选项和 replSet 选项再运行 mongodb
+
+2.连接到该 mongodb 服务并创建用户
+
+```
+> use admin
+switched to db admin
+> db.addUser('root','root')
+{
+        "user" : "root",
+        "readOnly" : false,
+        "pwd" : "2a8025f0885adad5a8ce0044070032b3",
+        "_id" : ObjectId("54745351f79804bd44b596fb")
+}
+> 
+```
+
+3.重新以 auth、keyFile 和 replSet 模式启动 mongodb
+
+4.连接到刚刚创建用户的 mongodb 服务
+
+5.跟之前的步骤一样，配置副本集
+
+```
+> rs.initiate({'_id': 'myrepl0', 'members': [
+    {'_id': 1, 'host': '172.17.0.4:27017'},
+    {'_id': 2, 'host': '172.17.0.7:27017'},
+    {'_id': 3, 'host': '172.17.0.8:27017'}
+]})
+```
+
+参考： http://docs.mongodb.org/manual/tutorial/deploy-replica-set-with-auth/
