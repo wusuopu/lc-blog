@@ -4,7 +4,7 @@
   <title><![CDATA[龍昌博客]]></title>
   <link href="http://www.xefan.com/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2014-11-19T14:33:11+08:00</updated>
+  <updated>2014-12-10T21:08:55+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -12,6 +12,220 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Mongodb集群配置实例]]></title>
+    <link href="http://www.xefan.com/archives/84137.html"/>
+    <updated>2014-12-10T20:33:02+08:00</updated>
+    <id>http://www.xefan.com/archives/84137-Mongodb集群配置实例</id>
+    <content type="html"><![CDATA[<p>Mongodb的集群有两种，一个是主从复制，另一种是副本集。</p>
+
+<h2>主从复制</h2>
+
+<p>根据 Mongodb 的官方文档说明，在生产环境中建议使用副本集代替主从复制。 <a href="http://docs.mongodb.org/manual/core/master-slave/">http://docs.mongodb.org/manual/core/master-slave/</a></p>
+
+<p>不过对于主从复制还是可以了解一下。假设有如下三台主机：</p>
+
+<ul>
+<li>172.17.0.4    (主)</li>
+<li>172.17.0.5    (从)</li>
+<li>172.17.0.6    (从)</li>
+</ul>
+
+
+<p>要进行主从复制的配置，首先修改主服务器的配置信息：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>master = true         # 以主服务器模式启动
+</span><span class='line'>bind_ip = 0.0.0.0</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后修改另两台从服务器配置信息：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>slave = true
+</span><span class='line'>source = 172.17.0.4
+</span><span class='line'>bind_ip = 0.0.0.0</span></code></pre></td></tr></table></div></figure>
+
+
+<p>最后启动三台主机上的 Mongodb 服务，再通过一个简单的程序来测试一下。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1">#!/usr/bin/env ruby</span>
+</span><span class='line'><span class="c1">#-*- coding:utf-8 -*-</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">require</span> <span class="s2">&quot;mongo&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">begin</span>
+</span><span class='line'>  <span class="n">conn</span> <span class="o">=</span> <span class="no">Mongo</span><span class="o">::</span><span class="no">Connection</span><span class="o">.</span><span class="n">new</span> <span class="s1">&#39;172.17.0.4&#39;</span>
+</span><span class='line'>  <span class="n">db</span> <span class="o">=</span> <span class="n">conn</span><span class="o">[</span><span class="s1">&#39;test&#39;</span><span class="o">]</span>
+</span><span class='line'><span class="k">rescue</span> <span class="no">Exception</span><span class="o">=&gt;</span><span class="n">e</span>
+</span><span class='line'>  <span class="nb">p</span> <span class="n">e</span>
+</span><span class='line'>  <span class="nb">exit</span> <span class="mi">1</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span class='line'><span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">100</span>
+</span><span class='line'>  <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;no&#39;</span> <span class="o">=&gt;</span> <span class="n">i</span><span class="p">}</span>
+</span><span class='line'>  <span class="n">d</span> <span class="o">=</span> <span class="n">db</span><span class="o">[</span><span class="s1">&#39;data&#39;</span><span class="o">].</span><span class="n">insert</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+</span><span class='line'>  <span class="nb">puts</span> <span class="n">d</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>执行该脚本，向 <code>172.17.0.4</code> 主机的 Mongodb 中插入一些数据。然后发现数据被同步到了另外两台主机上。</p>
+
+<p>主从之间安全认证：<br/>
+如果启动了 <code>auth</code> 项，那么主从之间的认证需要使用 <code>keyFile</code> 选项。</p>
+
+<p>执行如下命令生成 key 文件，并设置为只有 mongodb 的进程用户可读写：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="err">$</span> <span class="n">openssl</span> <span class="nb">rand</span> <span class="o">-</span><span class="n">base64</span> <span class="mi">741</span> <span class="o">&gt;</span> <span class="sr">/path/mon</span><span class="n">godb_keyFile</span>
+</span><span class='line'><span class="err">$</span> <span class="n">chmow</span> <span class="mi">600</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">mongodb_keyFile</span>
+</span><span class='line'><span class="err">$</span> <span class="n">chown</span> <span class="ss">mongodb</span><span class="p">:</span><span class="n">mongodb</span> <span class="sr">/path/mon</span><span class="n">godb_keyFile</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>将该文件复制到这三台主机中，然后分别修改主从的配置信息：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">keyFile</span> <span class="o">=</span> <span class="sr">/path/mon</span><span class="n">godb_keyFile</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>副本集</h2>
+
+<p>同样的对于这三台主机，我们重新修改配置设置为副本集的形式。</p>
+
+<ul>
+<li>172.17.0.4</li>
+<li>172.17.0.5</li>
+<li>172.17.0.6</li>
+</ul>
+
+
+<p>首先修改配置文件，设置副本集的名字。<br/>
+注意：副本集中所有主机设置的名字需要一样。这里我们设为 <code>myrepl0</code>。<br/>
+注意：设置副本集之前各个 mongodb 的数据目录必须都为空。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">replSet</span> <span class="o">=</span> <span class="n">myrepl0</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>接着启动所有 mongodb 服务，然后对副本集进行初始化。<br/>
+连接任意一台 mongodb 服务，执行如下操作：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">&gt;</span> <span class="n">rs</span><span class="o">.</span><span class="n">initiate</span><span class="p">({</span><span class="s1">&#39;_id&#39;</span><span class="p">:</span> <span class="s1">&#39;myrepl0&#39;</span><span class="p">,</span> <span class="s1">&#39;members&#39;</span><span class="p">:</span> <span class="o">[</span>
+</span><span class='line'>    <span class="p">{</span><span class="s1">&#39;_id&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;host&#39;</span><span class="p">:</span> <span class="s1">&#39;172.17.0.4:27017&#39;</span><span class="p">},</span>
+</span><span class='line'>    <span class="p">{</span><span class="s1">&#39;_id&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;host&#39;</span><span class="p">:</span> <span class="s1">&#39;172.17.0.7:27017&#39;</span><span class="p">},</span>
+</span><span class='line'>    <span class="p">{</span><span class="s1">&#39;_id&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;host&#39;</span><span class="p">:</span> <span class="s1">&#39;172.17.0.8:27017&#39;</span><span class="p">}</span>
+</span><span class='line'><span class="o">]</span><span class="p">})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>现在副本集的初始化已完成，可以通过如下命令查看状态：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">&gt;</span> <span class="n">rs</span><span class="o">.</span><span class="n">status</span><span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在运行过程中可以随时添加或移除一个节点，如：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">rs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;172.17.0.8:27017&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="n">rs</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;172.17.0.8:27017&quot;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>可以再通过上面的程序添加一些数据。然后再连接到任意一台主机进行查询，看看数据是否已同步。</p>
+
+<p>详细内容可参考文档： <a href="http://docs.mongodb.org/manual/core/replication/">http://docs.mongodb.org/manual/core/replication/</a></p>
+
+<p>安全认证：</p>
+
+<p>1.禁用 auth 选项和 replSet 选项再运行 mongodb</p>
+
+<p>2.连接到该 mongodb 服务并创建用户</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">&gt;</span> <span class="n">use</span> <span class="n">admin</span>
+</span><span class='line'><span class="n">switched</span> <span class="n">to</span> <span class="n">db</span> <span class="n">admin</span>
+</span><span class='line'><span class="o">&gt;</span> <span class="n">db</span><span class="o">.</span><span class="n">addUser</span><span class="p">(</span><span class="s1">&#39;root&#39;</span><span class="p">,</span><span class="s1">&#39;root&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>        <span class="s2">&quot;user&quot;</span> <span class="p">:</span> <span class="s2">&quot;root&quot;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s2">&quot;readOnly&quot;</span> <span class="p">:</span> <span class="kp">false</span><span class="p">,</span>
+</span><span class='line'>        <span class="s2">&quot;pwd&quot;</span> <span class="p">:</span> <span class="s2">&quot;2a8025f0885adad5a8ce0044070032b3&quot;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s2">&quot;_id&quot;</span> <span class="p">:</span> <span class="no">ObjectId</span><span class="p">(</span><span class="s2">&quot;54745351f79804bd44b596fb&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="o">&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>3.重新以 auth、keyFile 和 replSet 模式启动 mongodb</p>
+
+<p>4.连接到刚刚创建用户的 mongodb 服务</p>
+
+<p>5.跟之前的步骤一样，配置副本集</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">&gt;</span> <span class="n">rs</span><span class="o">.</span><span class="n">initiate</span><span class="p">({</span><span class="s1">&#39;_id&#39;</span><span class="p">:</span> <span class="s1">&#39;myrepl0&#39;</span><span class="p">,</span> <span class="s1">&#39;members&#39;</span><span class="p">:</span> <span class="o">[</span>
+</span><span class='line'>    <span class="p">{</span><span class="s1">&#39;_id&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;host&#39;</span><span class="p">:</span> <span class="s1">&#39;172.17.0.4:27017&#39;</span><span class="p">},</span>
+</span><span class='line'>    <span class="p">{</span><span class="s1">&#39;_id&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;host&#39;</span><span class="p">:</span> <span class="s1">&#39;172.17.0.7:27017&#39;</span><span class="p">},</span>
+</span><span class='line'>    <span class="p">{</span><span class="s1">&#39;_id&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;host&#39;</span><span class="p">:</span> <span class="s1">&#39;172.17.0.8:27017&#39;</span><span class="p">}</span>
+</span><span class='line'><span class="o">]</span><span class="p">})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>参考： <a href="http://docs.mongodb.org/manual/tutorial/deploy-replica-set-with-auth/">http://docs.mongodb.org/manual/tutorial/deploy-replica-set-with-auth/</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[使用VIM进行PHP远程调试]]></title>
@@ -2082,189 +2296,6 @@ lc_hello_world.func2(20)
 
 
 <pre><code>print(lc_hello_world.func3(int, (1.234, )))
-</code></pre>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[使用C语言编写Python扩展1——Hello World]]></title>
-    <link href="http://www.xefan.com/archives/84082.html"/>
-    <updated>2014-04-12T00:00:00+08:00</updated>
-    <id>http://www.xefan.com/archives/84082-使用C语言编写Python扩展1——Hello World</id>
-    <content type="html"><![CDATA[<p>能够使用C语言编写扩展是Python一大卖点吧，这可以将一些关键的代码使用C来写以提升程序的性能。本文是参考了Python的官方文档整理而来的，同时结合了Python2跟Python3。按照惯例现在先从一个Hello World开始讲解一下写扩展的基本流程。</p>
-
-
-<p>详细的内容可以参考官方文档：<br>
-https://docs.python.org/2.7/extending/index.html <br>
-https://docs.python.org/3/extending/index.html  </p>
-
-
-<p>https://docs.python.org/2.7/c-api/index.html<br>
-https://docs.python.org/3/c-api/index.html  </p>
-
-
-<p>同时本文中的示例代码可从 https://github.com/wusuopu/python-c-extension-sample 获取到。  </p>
-
-
-<p>首先介绍一下我当前的开发环境：<br>
- * ArchLinux<br>
- * gcc 4.8.2<br>
- * glibc 2.19<br>
- * Python 2.7.6<br>
- * Python 3.3.5  </p>
-
-
-<h2>开始</h2>
-
-
-<p>先创建一个新的C代码文件 lc_hello.c。为了能够正常使用python的api，需要导入Python.h这个头文件。</p>
-
-
-<pre><code>#include &lt;Python.h&gt;
-</code></pre>
-
-
-<p>然后再定义一个模块的初始化函数。</p>
-
-
-<pre><code>PyMODINIT_FUNC initlc_hello_world(void)
-{
-    Py_InitModule("lc_hello_world", lc_hello_world_methods);
-    printf("init lc_hello_world module\n");
-}
-</code></pre>
-
-
-<p>这个函数是用于模块初始化的，即是在第一次使用import语句导入模块时会执行。其函数名必须为initmodule_name这样的格式，在这里我们的模块名为lc_hello_world，所以函数名就是initlc_hello_world。<br>
-在这个函数中又调用了Py_InitModule函数，它执行了模块初始化的操作。Py_InitModule函数传入了两个参数，第一个参数为字符串，表示模块的名称；第二个参数是一个PyMethodDef的结构体数组，表示该模块都具有哪些方法。与Py_InitModule相似的方法还有Py_InitModule3和Py_InitModule4。因此在initlc_hello_world方法之前还需要先定义 lc_hello_world_methods 数组。  </p>
-
-
-<pre><code>static PyMethodDef lc_hello_world_methods[] = {
-    {"test", (PyCFunction)test_function, METH_NOARGS, "lc_hello_world extending test"},
-    {"add", (PyCFunction)add_function, METH_VARARGS, NULL},
-    {NULL, NULL, 0, NULL}
-};
-</code></pre>
-
-
-<p>PyMethodDef结构体有四个字段。<br>
-  * 第一个是一个字符串，表示在Python中对应的方法的名称；<br>
-  * 第二个是对应的C代码的函数；<br>
-  * 第三个是一个标致位，表示该Python方法是否需要参数，METH_NOARGS表示不需要参数，METH_VARARGS表示需要参数；<br>
-  * 第四个是一个字符串，它是该方法的__doc__属性，这个不是必须的，可以为NULL。<br>
-PyMethodDef结构体数组最后以 {NULL, NULL, 0, NULL}结尾。（感觉好像不是必须的，但是通常都这么做那我们也这么做吧）  </p>
-
-
-<p><strong>注意</strong>：以上的用法都是针对Python2的，在Python3中又有些不同。<br>
-在Python3中模块的初始化函数的函数名变为了PyInit_module_name这样的形式了，因此这里就需要定义一个函数 PyMODINIT_FUNC PyInit_lc_hello_world。并且还需要返回一个 module 类型的变量。<br>
-其次在Python3中创建module对象的函数也由 Py_InitModule 变为了 PyModule_Create。<br>
-因此在Python3中模块的初始化函数应该定义如下：  </p>
-
-
-<pre><code>PyMODINIT_FUNC PyInit_lc_hello_world(void)
-{
-    PyObject *m;
-    m = PyModule_Create(&amp;lc_hello_world_module);
-    if (m == NULL)
-        return NULL;
-    printf("init lc_hello_world module\n");
-    return m;
-}
-</code></pre>
-
-
-<p>PyModule_Create函数需要传入一个 PyModuleDef 类型的指针。<br>
-因此在此之前还需要先定义 lc_hello_world_module 变量。  </p>
-
-
-<pre><code>static struct PyModuleDef lc_hello_world_module = {
-    PyModuleDef_HEAD_INIT,
-    "lc_hello_world",        /* name of module */
-    NULL,                    /* module documentation, may be NULL */
-    -1,                      /* size of per-interpreter state of the module, or -1 if the module keeps state in global variables. */
-    lc_hello_world_methods   /* A pointer to a table of module-level functions, described by PyMethodDef values. Can be NULL if no functions are present. */
-};
-</code></pre>
-
-
-<p>在 lc_hello_world_methods 中我们为模块指定了两个方法，接下来我们需要实现这两个方法。  </p>
-
-
-<pre><code>static PyObject* test_function(PyObject *self)
-{
-    PyObject_Print(self, stdout, 0);
-    printf("lc_hello_world test\n");
-    Py_INCREF(Py_True);
-    return Py_True;
-}
-</code></pre>
-
-
-<p>这段代码定义了Python的test方法所对应的C函数。在这个函数中就只执行了一条printf语句，然后就返回了Py_True。<br>
-Py_True即是Python中的True，Py_INCREF函数执行的操作是对Python对象的计数引用值进行加1。与Py_INCREF对应的是Py_DECREF，它是对计数引用减1,并且计数引用为0时就销毁对象并回收内存。  </p>
-
-
-<pre><code>static PyObject* add_function(PyObject *self, PyObject *args)
-{
-    int num1, num2;
-    PyObject *result=NULL;
-    if (!PyArg_ParseTuple(args, "nn", &amp;num1, &amp;num2)) {
-        printf("传入参数错误！\n");
-        return NULL;
-    }
-    result = PyInt_FromLong(num1+num2);
-    return result;
-}
-</code></pre>
-
-
-<p>这须代码定义了Python的add方法所对应的C函数。该函数需要传入两个整数类型的参数。<br>
-PyArg_ParseTuple是对传入的参数进行解析，关于这个函数的说明请查看Python手册。  </p>
-
-
-<p><strong>注意</strong>：在Python3中整数都是 long 类型的，因此这里的 PyInt_FromLong 需要改为 PyLong_FromLong，其作用是将C的int类型转为Python的int类型。  </p>
-
-
-<h2>编译</h2>
-
-
-<p>扩展模块编写完成后，接下来就是对其进行编译了。先编写一个 setup.py 脚本。  </p>
-
-
-<pre><code>#!/usr/bin/env python
-#-*- coding:utf-8 -*-
-
-from setuptools import setup, Extension
-
-hello_world = Extension('lc_hello_world', sources=["lc_hello.c"])
-setup(ext_modules=[hello_world])
-</code></pre>
-
-
-<p>然后再执行命令进行编译：</p>
-
-
-<pre><code>$ python setup.py build
-</code></pre>
-
-
-<p>执行成功后会在当前目录下的build目录中生成扩展模块文件。</p>
-
-
-<h2>测试</h2>
-
-
-<p>最后就是编写一个小程序来测试刚刚的模块是否可用。</p>
-
-
-<pre><code>import lc_hello_world
-
-print(lc_hello_world.test.__doc__)
-print(lc_hello_world.add.__doc__)
-print(lc_hello_world.test())
-print(lc_hello_world.add(1, 2))
-print(lc_hello_world.add(1, '2'))    # 这个会报错
 </code></pre>
 
 ]]></content>
