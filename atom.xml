@@ -4,7 +4,7 @@
   <title><![CDATA[龍昌博客]]></title>
   <link href="http://www.xefan.com/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2014-12-10T21:08:55+08:00</updated>
+  <updated>2014-12-21T20:04:33+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -12,6 +12,222 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[使用gunicorn部署Django]]></title>
+    <link href="http://www.xefan.com/archives/84138.html"/>
+    <updated>2014-12-13T21:03:27+08:00</updated>
+    <id>http://www.xefan.com/archives/84138-使用gunicorn部署Django</id>
+    <content type="html"><![CDATA[<p><a href="http://gunicorn.org/">Gunicorn</a> 是 Python的 一个 WSGI HTTP服务器，根据它的介绍说是它来自于 Ruby 的 Unicorn。可以方便的部署 Python 的 Web 程序，而且本身支持多种 Python 的框架，如 Django、Paster等。</p>
+
+<p>通过介绍来看貌似很不错的样子，只可惜我现在不玩 Python 了，于是就简单体验一下。</p>
+
+<h2>简单应用</h2>
+
+<p>首先是安装，这个可以直接使用 <code>pip</code> 来完成：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ pip install gunicorn</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后再根据官方文档的介绍部署一个简单的例子试试：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ cd examples
+</span><span class='line'>$ cat test.py
+</span><span class='line'># -*- coding: utf-8 -
+</span><span class='line'>#
+</span><span class='line'># This file is part of gunicorn released under the MIT license.
+</span><span class='line'># See the NOTICE for more information.
+</span><span class='line'>
+</span><span class='line'>def app(environ, start_response):
+</span><span class='line'>    """Simplest possible application object"""
+</span><span class='line'>    data = 'Hello, World!\n'
+</span><span class='line'>    status = '200 OK'
+</span><span class='line'>    response_headers = [
+</span><span class='line'>        ('Content-type','text/plain'),
+</span><span class='line'>        ('Content-Length', str(len(data)))
+</span><span class='line'>    ]
+</span><span class='line'>    start_response(status, response_headers)
+</span><span class='line'>    return iter([data])
+</span><span class='line'>
+</span><span class='line'>$ gunicorn -b 0.0.0.0:8000 --workers=2 test:app</span></code></pre></td></tr></table></div></figure>
+
+
+<p>好的，现在程序运行起来了，可以访问 <a href="http://localhost:8000">http://localhost:8000</a> 看下效果。</p>
+
+<p>gunicorn 也可以通过配置文件来设置一些内容， 一个配置文件是一个 python 脚本，格式类似 <code>.ini</code> 。通过 <code>-c</code> 参数指定要使用的配置文件。如：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># config.ini
+</span><span class='line'>bind = ["0.0.0.0:8000", "unix:///tmp/gunicorn.sock"]
+</span><span class='line'>workers = 3 </span></code></pre></td></tr></table></div></figure>
+
+
+<p>gunicorn 还能与 Django 和 Paster 应用集成：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ gunicorn --env DJANGO_SETTINGS_MODULE=myproject.settings myproject.wsgi:application
+</span><span class='line'>$ gunicorn --paste development.ini -b :8080 --chdir /path/to/project</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>与 Nginx 部署</h2>
+
+<p>gunicorn 本身也是一个 WSGI 应用，可以与 Nginx 一同使用。
+以下是 Nginx + Gunicorn 部署 Django 的事例， Nginx 配置如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># nginx.conf
+</span><span class='line'>http {
+</span><span class='line'>    include mime.types;
+</span><span class='line'>    default_type application/octet-stream;
+</span><span class='line'>    access_log /tmp/nginx.access.log combined;
+</span><span class='line'>    sendfile on;
+</span><span class='line'>
+</span><span class='line'>    upstream app_server {
+</span><span class='line'>        server unix:/tmp/gunicorn.sock fail_timeout=0;
+</span><span class='line'>        # For a TCP configuration:
+</span><span class='line'>        # server 192.168.0.7:8000 fail_timeout=0;
+</span><span class='line'>    }
+</span><span class='line'>
+</span><span class='line'>    server {
+</span><span class='line'>        listen 80 default;
+</span><span class='line'>        client_max_body_size 4G;
+</span><span class='line'>        server_name _;
+</span><span class='line'>
+</span><span class='line'>        keepalive_timeout 5;
+</span><span class='line'>
+</span><span class='line'>        # path for static files
+</span><span class='line'>        root /path/to/app/current/public;
+</span><span class='line'>
+</span><span class='line'>        location / {
+</span><span class='line'>            # checks for static file, if not found proxy to app
+</span><span class='line'>            try_files $uri @proxy_to_app;
+</span><span class='line'>        }
+</span><span class='line'>
+</span><span class='line'>        location @proxy_to_app {
+</span><span class='line'>            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+</span><span class='line'>            proxy_set_header Host $http_host;
+</span><span class='line'>            proxy_redirect off;
+</span><span class='line'>
+</span><span class='line'>            proxy_pass   http://app_server;
+</span><span class='line'>        }
+</span><span class='line'>
+</span><span class='line'>        error_page 500 502 503 504 /500.html;
+</span><span class='line'>        location = /500.html {
+</span><span class='line'>            root /path/to/app/current/public;
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Gunicorn 的配置文件：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># gunicorn.ini
+</span><span class='line'>import os
+</span><span class='line'>
+</span><span class='line'>bind = ["0.0.0.0:8000", "unix:///tmp/gunicorn.sock"]
+</span><span class='line'>workers = 3
+</span><span class='line'>chdir = os.path.dirname(os.path.realpath(__file__))
+</span><span class='line'>raw_env = ["DJANGO_SETTINGS_MODULE=app.settings"]
+</span><span class='line'>accesslog = "/tmp/gunicorn-access.log"
+</span><span class='line'>errorlog = "/tmp/gunicorn.log"
+</span><span class='line'>daemon = True
+</span><span class='line'>pidfile = "/tmp/gunicorn.pid"</span></code></pre></td></tr></table></div></figure>
+
+
+<p>运行：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ gunicorn -c gunicorn.ini webui.wsgi:application
+</span><span class='line'>$ service nginx start</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>其他内容</h2>
+
+<p>与 WSGI 应用一样，如果之后配置有改动可以向 gunicorn 服务进程发送 <code>HUP</code> 信号让其重新加载配置：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ kill -s HUP &lt;pid&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Mongodb集群配置实例]]></title>
@@ -2128,174 +2344,6 @@ print(type(o), type(noddy.Noddy))
 # 这个会报错，noddy.Noddy 类不能被继承
 class A(noddy.Noddy):
     pass
-</code></pre>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[使用C语言编写Python扩展2——函数]]></title>
-    <link href="http://www.xefan.com/archives/84085.html"/>
-    <updated>2014-04-13T00:00:00+08:00</updated>
-    <id>http://www.xefan.com/archives/84085-使用C语言编写Python扩展2——函数</id>
-    <content type="html"><![CDATA[<p>上一节介绍了编写扩展的基本流程。这一回介绍一下在扩展模块中的函数调用，包括在扩展函数的参数提取和关键字参数解析，以及在C语言中调用Python方法。</p>
-
-
-<p>同样的本文中的示例代码可从 https://github.com/wusuopu/python-c-extension-sample 获取到。  </p>
-
-
-<h2>参数提取</h2>
-
-
-<p>接着上一节的例子，我们继续编辑lc_hello.c文件。先往模块中添加一个名为  func1 的函数，即就是在 lc_hello_world_methods 数组中添加一项：  </p>
-
-
-<pre><code>{"func1", (PyCFunction)func1_function, METH_VARARGS, NULL},
-</code></pre>
-
-
-<p>然后就是对该函数的实现。<br>
-参数提取是使用 PyArg_ParseTuple 方法，其定义如下：  </p>
-
-
-<pre><code>int PyArg_ParseTuple(PyObject *arg, char *format, ...);
-</code></pre>
-
-
-<p>其中 <em>arg</em> 参数为Python向C函数传递的参数列表，是一个无组对象；<em>format</em> 参数是一个格式化字符串，它的格式可以参考 Python/C API 文档。<br>
-func1_function 函数实现如下：  </p>
-
-
-<pre><code>static PyObject* func1_function(PyObject *self, PyObject *args)
-{
-    int num, i, j;
-    long lnum=0;
-    const char* s1 = NULL;
-    PyObject *obj = NULL;
-    if (!PyArg_ParseTuple(args, "is(ii)|l",
-                          &amp;num, &amp;s1, &amp;i, &amp;j, &amp;lnum)) {
-        printf("传入参数错误！\n");
-        return NULL;
-    }
-    printf("num: %d\tstr1: %s\n"
-           "i: %d\tj: %d\tlnum: %ld\n",
-           num, s1, i, j, lnum);
-
-    obj = Py_BuildValue("{sisisislss}",
-                        "num", num, "i", i, "j", j, "lnum", lnum, "s1", s1);
-    return obj;
-}
-</code></pre>
-
-
-<p>在Python中该函数可以接收3个或者4个参数。同时该函数使用了 Py_BuildValue 方法构造了一个字典对象并返回。Py_BuildValue的用法与PyArg_ParseTuple类似。<br>
-接下来可以在Python中进行测试：  </p>
-
-
-<pre><code>print(lc_hello_world.func1(11, 'abc', (2, 3), 100))
-print(lc_hello_world.func1(11, 'abc', (2, 3)))
-</code></pre>
-
-
-<h2>关键字参数</h2>
-
-
-<p>再在 lc_hello_world_methods 数组中添加一项：  </p>
-
-
-<pre><code>{"func2", (PyCFunction)func2_function, METH_VARARGS | METH_KEYWORDS, NULL},
-</code></pre>
-
-
-<p>关键字参数解析是使用 PyArg_ParseTupleAndKeywords 方法，其定义如下：  </p>
-
-
-<pre><code>int PyArg_ParseTupleAndKeywords(PyObject *arg, PyObject *kwdict,
-                                char *format, char *kwlist[], ...);
-</code></pre>
-
-
-<p>其中 <em>arg</em> 参数和 <em>format</em> 参数与PyArg_ParseTuple一样。<em>kwdict</em>参数是一个字典对象，保存了关键字参数。<em>kwlist</em>是一个以NULL结尾的字符串数组。<br>
-func2_function 函数实现如下：  </p>
-
-
-<pre><code>static PyObject* func2_function(PyObject *self, PyObject *args, PyObject *kwargs)
-{
-    int voltage;
-    char *state = "a stiff";
-    char *action = "voom";
-    char *type = "Norwegian Blue";
-
-    static char *kwlist[] = {"voltage", "state", "action", "type", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "i|sss", kwlist,
-                                     &amp;voltage, &amp;state, &amp;action, &amp;type))
-        return NULL;
-
-    printf("-- This parrot wouldn't %s if you put %i Volts through it.\n",
-           action, voltage);
-    printf("-- Lovely plumage, the %s -- It's %s!\n", type, state);
-    Py_INCREF(Py_None);
-    return Py_None;
-}
-</code></pre>
-
-
-<p>接下来可以在Python中进行测试：  </p>
-
-
-<pre><code>lc_hello_world.func2(state="ok", action="test", type="func", voltage=13)
-lc_hello_world.func2(20)
-</code></pre>
-
-
-<h2>在扩展模块中调用Python方法</h2>
-
-
-<p>在扩展模块中可以使用  PyObject_CallObject 方法来调用Python的函数方法。其定义如下：  </p>
-
-
-<pre><code>PyObject* PyObject_CallObject(PyObject *callable_object, PyObject *args)
-</code></pre>
-
-
-<p>再在 lc_hello_world_methods 数组中添加一项：  </p>
-
-
-<pre><code>{"func3", (PyCFunction)func3_function, METH_VARARGS, NULL},
-</code></pre>
-
-
-<p>func3_function 函数实现如下：  </p>
-
-
-<pre><code>static PyObject* func3_function(PyObject *self, PyObject *args)
-{
-    PyObject *my_callback = NULL;
-    PyObject *result = NULL;
-    PyObject *arg = NULL;
-    if (!PyArg_ParseTuple(args, "OO:set_callback;argument;", &amp;my_callback, &amp;arg)) {
-        printf("传入参数错误！\n");
-        return NULL;
-    }
-    if (!PyCallable_Check(my_callback)) {
-        PyErr_SetString(PyExc_TypeError, "parameter must be callable");
-        return NULL;
-    }
-    result = PyObject_CallObject(my_callback, arg);
-    if (!result) {
-        Py_INCREF(Py_None);
-        result = Py_None;
-    }
-    return result;
-}
-</code></pre>
-
-
-<p>接下来可以在Python中进行测试：  </p>
-
-
-<pre><code>print(lc_hello_world.func3(int, (1.234, )))
 </code></pre>
 
 ]]></content>

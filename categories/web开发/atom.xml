@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Web开发 | 龍昌博客]]></title>
   <link href="http://www.xefan.com/categories/web开发/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2014-12-10T21:08:55+08:00</updated>
+  <updated>2014-12-21T20:04:33+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -12,6 +12,139 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[使用gunicorn部署Django]]></title>
+    <link href="http://www.xefan.com/archives/84138.html"/>
+    <updated>2014-12-13T21:03:27+08:00</updated>
+    <id>http://www.xefan.com/archives/84138-使用gunicorn部署Django</id>
+    <content type="html"><![CDATA[<p><a href="http://gunicorn.org/">Gunicorn</a> 是 Python的 一个 WSGI HTTP服务器，根据它的介绍说是它来自于 Ruby 的 Unicorn。可以方便的部署 Python 的 Web 程序，而且本身支持多种 Python 的框架，如 Django、Paster等。</p>
+
+<p>通过介绍来看貌似很不错的样子，只可惜我现在不玩 Python 了，于是就简单体验一下。</p>
+
+<h2>简单应用</h2>
+
+<p>首先是安装，这个可以直接使用 <code>pip</code> 来完成：</p>
+
+<pre><code>$ pip install gunicorn
+</code></pre>
+
+<p>然后再根据官方文档的介绍部署一个简单的例子试试：</p>
+
+<pre><code>$ cd examples
+$ cat test.py
+# -*- coding: utf-8 -
+#
+# This file is part of gunicorn released under the MIT license.
+# See the NOTICE for more information.
+
+def app(environ, start_response):
+    """Simplest possible application object"""
+    data = 'Hello, World!\n'
+    status = '200 OK'
+    response_headers = [
+        ('Content-type','text/plain'),
+        ('Content-Length', str(len(data)))
+    ]
+    start_response(status, response_headers)
+    return iter([data])
+
+$ gunicorn -b 0.0.0.0:8000 --workers=2 test:app
+</code></pre>
+
+<p>好的，现在程序运行起来了，可以访问 <a href="http://localhost:8000">http://localhost:8000</a> 看下效果。</p>
+
+<p>gunicorn 也可以通过配置文件来设置一些内容， 一个配置文件是一个 python 脚本，格式类似 <code>.ini</code> 。通过 <code>-c</code> 参数指定要使用的配置文件。如：</p>
+
+<pre><code># config.ini
+bind = ["0.0.0.0:8000", "unix:///tmp/gunicorn.sock"]
+workers = 3 
+</code></pre>
+
+<p>gunicorn 还能与 Django 和 Paster 应用集成：</p>
+
+<pre><code>$ gunicorn --env DJANGO_SETTINGS_MODULE=myproject.settings myproject.wsgi:application
+$ gunicorn --paste development.ini -b :8080 --chdir /path/to/project
+</code></pre>
+
+<h2>与 Nginx 部署</h2>
+
+<p>gunicorn 本身也是一个 WSGI 应用，可以与 Nginx 一同使用。
+以下是 Nginx + Gunicorn 部署 Django 的事例， Nginx 配置如下：</p>
+
+<pre><code># nginx.conf
+http {
+    include mime.types;
+    default_type application/octet-stream;
+    access_log /tmp/nginx.access.log combined;
+    sendfile on;
+
+    upstream app_server {
+        server unix:/tmp/gunicorn.sock fail_timeout=0;
+        # For a TCP configuration:
+        # server 192.168.0.7:8000 fail_timeout=0;
+    }
+
+    server {
+        listen 80 default;
+        client_max_body_size 4G;
+        server_name _;
+
+        keepalive_timeout 5;
+
+        # path for static files
+        root /path/to/app/current/public;
+
+        location / {
+            # checks for static file, if not found proxy to app
+            try_files $uri @proxy_to_app;
+        }
+
+        location @proxy_to_app {
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header Host $http_host;
+            proxy_redirect off;
+
+            proxy_pass   http://app_server;
+        }
+
+        error_page 500 502 503 504 /500.html;
+        location = /500.html {
+            root /path/to/app/current/public;
+        }
+    }
+}
+</code></pre>
+
+<p>Gunicorn 的配置文件：</p>
+
+<pre><code># gunicorn.ini
+import os
+
+bind = ["0.0.0.0:8000", "unix:///tmp/gunicorn.sock"]
+workers = 3
+chdir = os.path.dirname(os.path.realpath(__file__))
+raw_env = ["DJANGO_SETTINGS_MODULE=app.settings"]
+accesslog = "/tmp/gunicorn-access.log"
+errorlog = "/tmp/gunicorn.log"
+daemon = True
+pidfile = "/tmp/gunicorn.pid"
+</code></pre>
+
+<p>运行：</p>
+
+<pre><code>$ gunicorn -c gunicorn.ini webui.wsgi:application
+$ service nginx start
+</code></pre>
+
+<h2>其他内容</h2>
+
+<p>与 WSGI 应用一样，如果之后配置有改动可以向 gunicorn 服务进程发送 <code>HUP</code> 信号让其重新加载配置：</p>
+
+<pre><code>$ kill -s HUP &lt;pid&gt;
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Nginx + Uwsgi + Django环境配置]]></title>
@@ -366,34 +499,6 @@ $ source ~/.nvm/nvm.sh
 
 <pre><code>$ nvm use &lt;version&gt;
 </code></pre>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[使用css3绘制lxde桌面]]></title>
-    <link href="http://www.xefan.com/archives/84032.html"/>
-    <updated>2014-01-15T00:00:00+08:00</updated>
-    <id>http://www.xefan.com/archives/84032-使用css3绘制lxde桌面</id>
-    <content type="html"><![CDATA[<p>最近在学习CSS，本来是打算写点小东西练习练习。正好自己用的是linux系统的lxde桌面，于是就用CSS来绘制一个lxde。</p>
-
-
-<p>在做的过程中发现了less，感觉很不错，于是就把less也加进来了。</p>
-
-
-<p>最后的效果图：</p>
-
-
-<p><img src="https://github.com/wusuopu/css3-lxde/blob/master/snapshoot/lxde0.png?raw=true" /></p>
-
-
-<p><img src="https://github.com/wusuopu/css3-lxde/blob/master/snapshoot/lxde1.png?raw=true" /></p>
-
-
-<p><img src="https://github.com/wusuopu/css3-lxde/blob/master/snapshoot/lxde2.png?raw=true" /></p>
-
-
-<p>源代码： https://github.com/wusuopu/css3-lxde</p>
 
 ]]></content>
   </entry>

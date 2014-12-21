@@ -5,12 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>ASP与MySQL数据处理 - 龍昌博客</title>
+  <title>使用gunicorn部署Django - 龍昌博客</title>
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="首先连接数据库，方法：http://www.xefan.com/archives/66045.html。以下语句为示例语句，请根据实际情况修改
-查询数据： Set RS = conn.Execute(&ldquo;SELECT * FROM user&rdquo;) While Not RS. &hellip;">
+  <meta name="description" content="Gunicorn 是 Python的 一个 WSGI HTTP服务器，根据它的介绍说是它来自于 Ruby 的 Unicorn。可以方便的部署 Python 的 Web 程序，而且本身支持多种 Python 的框架，如 Django、Paster等。 通过介绍来看貌似很不错的样子，只可惜我现在不玩 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://www.xefan.com/archives/66047.html">
+  <link rel="canonical" href="http://www.xefan.com/archives/84138.html">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="龍昌博客" type="application/atom+xml">
@@ -70,7 +69,7 @@
   
   <header>
     
-      <h1 class="entry-title">ASP与MySQL数据处理</h1>
+      <h1 class="entry-title">使用gunicorn部署Django</h1>
     
     
       <p class="meta">
@@ -79,7 +78,7 @@
 
 
 
-<time class='entry-date' datetime='2009-08-16T00:00:00+08:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>16</span><span class='date-suffix'>th</span>, <span class='date-year'>2009</span></span> <span class='time'>12:00 am</span></time>
+<time class='entry-date' datetime='2014-12-13T21:03:27+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>9:03 pm</span></time>
         
            | <a href="#disqus_thread"
              data-disqus-identifier="http://www.xefan.com">Comments</a>
@@ -89,26 +88,214 @@
   </header>
 
 
-<div class="entry-content"><p>首先连接数据库，方法：<a href="http://www.xefan.com/archives/66045.html" target="_blank"><a href="http://www.xefan.com/archives/66045.html">http://www.xefan.com/archives/66045.html</a></a>。以下语句为示例语句，请根据实际情况修改
-<strong>查询数据：</strong></p>
+<div class="entry-content"><p><a href="http://gunicorn.org/">Gunicorn</a> 是 Python的 一个 WSGI HTTP服务器，根据它的介绍说是它来自于 Ruby 的 Unicorn。可以方便的部署 Python 的 Web 程序，而且本身支持多种 Python 的框架，如 Django、Paster等。</p>
 
-<p>Set RS = conn.Execute(&ldquo;SELECT * FROM user&rdquo;) <br/>
-While Not RS.EOF      &lsquo;while&hellip;wend循环，用于读取所有的信息 <br/>
-    Response.Write RS.Fields(&ldquo;username&rdquo;) &amp; &ldquo;, &rdquo; &amp; RS.Fields(&ldquo;password&rdquo;) &amp; &ldquo;&lt;br&gt;&rdquo; <br/>
-    RS.MoveNext   &#8216;记录集指针下移  <br/>
-Wend</p>
+<p>通过介绍来看貌似很不错的样子，只可惜我现在不玩 Python 了，于是就简单体验一下。</p>
 
-<p><strong>插入数据：</strong></p>
+<h2>简单应用</h2>
 
-<p>Set rs = Conn.Execute(&ldquo;insert into user (nm,pw) values (test&#8217;,&lsquo;test&rsquo;)&rdquo;)</p>
+<p>首先是安装，这个可以直接使用 <code>pip</code> 来完成：</p>
 
-<p><strong>更新数据：</strong></p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ pip install gunicorn</span></code></pre></td></tr></table></div></figure>
 
-<p>Set rs = Conn.Execute(&ldquo;update user set nm=&lsquo;用户ASPupdate&rsquo;,pw=&lsquo;pwaspupdate&rsquo; where id=24&rdquo;)</p>
 
-<p><strong>删除数据：</strong></p>
+<p>然后再根据官方文档的介绍部署一个简单的例子试试：</p>
 
-<p>Set rs = Conn.Execute(&ldquo;delete from user where id=25&rdquo;)</p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ cd examples
+</span><span class='line'>$ cat test.py
+</span><span class='line'># -*- coding: utf-8 -
+</span><span class='line'>#
+</span><span class='line'># This file is part of gunicorn released under the MIT license.
+</span><span class='line'># See the NOTICE for more information.
+</span><span class='line'>
+</span><span class='line'>def app(environ, start_response):
+</span><span class='line'>    """Simplest possible application object"""
+</span><span class='line'>    data = 'Hello, World!\n'
+</span><span class='line'>    status = '200 OK'
+</span><span class='line'>    response_headers = [
+</span><span class='line'>        ('Content-type','text/plain'),
+</span><span class='line'>        ('Content-Length', str(len(data)))
+</span><span class='line'>    ]
+</span><span class='line'>    start_response(status, response_headers)
+</span><span class='line'>    return iter([data])
+</span><span class='line'>
+</span><span class='line'>$ gunicorn -b 0.0.0.0:8000 --workers=2 test:app</span></code></pre></td></tr></table></div></figure>
+
+
+<p>好的，现在程序运行起来了，可以访问 <a href="http://localhost:8000">http://localhost:8000</a> 看下效果。</p>
+
+<p>gunicorn 也可以通过配置文件来设置一些内容， 一个配置文件是一个 python 脚本，格式类似 <code>.ini</code> 。通过 <code>-c</code> 参数指定要使用的配置文件。如：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># config.ini
+</span><span class='line'>bind = ["0.0.0.0:8000", "unix:///tmp/gunicorn.sock"]
+</span><span class='line'>workers = 3 </span></code></pre></td></tr></table></div></figure>
+
+
+<p>gunicorn 还能与 Django 和 Paster 应用集成：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ gunicorn --env DJANGO_SETTINGS_MODULE=myproject.settings myproject.wsgi:application
+</span><span class='line'>$ gunicorn --paste development.ini -b :8080 --chdir /path/to/project</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>与 Nginx 部署</h2>
+
+<p>gunicorn 本身也是一个 WSGI 应用，可以与 Nginx 一同使用。
+以下是 Nginx + Gunicorn 部署 Django 的事例， Nginx 配置如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># nginx.conf
+</span><span class='line'>http {
+</span><span class='line'>    include mime.types;
+</span><span class='line'>    default_type application/octet-stream;
+</span><span class='line'>    access_log /tmp/nginx.access.log combined;
+</span><span class='line'>    sendfile on;
+</span><span class='line'>
+</span><span class='line'>    upstream app_server {
+</span><span class='line'>        server unix:/tmp/gunicorn.sock fail_timeout=0;
+</span><span class='line'>        # For a TCP configuration:
+</span><span class='line'>        # server 192.168.0.7:8000 fail_timeout=0;
+</span><span class='line'>    }
+</span><span class='line'>
+</span><span class='line'>    server {
+</span><span class='line'>        listen 80 default;
+</span><span class='line'>        client_max_body_size 4G;
+</span><span class='line'>        server_name _;
+</span><span class='line'>
+</span><span class='line'>        keepalive_timeout 5;
+</span><span class='line'>
+</span><span class='line'>        # path for static files
+</span><span class='line'>        root /path/to/app/current/public;
+</span><span class='line'>
+</span><span class='line'>        location / {
+</span><span class='line'>            # checks for static file, if not found proxy to app
+</span><span class='line'>            try_files $uri @proxy_to_app;
+</span><span class='line'>        }
+</span><span class='line'>
+</span><span class='line'>        location @proxy_to_app {
+</span><span class='line'>            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+</span><span class='line'>            proxy_set_header Host $http_host;
+</span><span class='line'>            proxy_redirect off;
+</span><span class='line'>
+</span><span class='line'>            proxy_pass   http://app_server;
+</span><span class='line'>        }
+</span><span class='line'>
+</span><span class='line'>        error_page 500 502 503 504 /500.html;
+</span><span class='line'>        location = /500.html {
+</span><span class='line'>            root /path/to/app/current/public;
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Gunicorn 的配置文件：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># gunicorn.ini
+</span><span class='line'>import os
+</span><span class='line'>
+</span><span class='line'>bind = ["0.0.0.0:8000", "unix:///tmp/gunicorn.sock"]
+</span><span class='line'>workers = 3
+</span><span class='line'>chdir = os.path.dirname(os.path.realpath(__file__))
+</span><span class='line'>raw_env = ["DJANGO_SETTINGS_MODULE=app.settings"]
+</span><span class='line'>accesslog = "/tmp/gunicorn-access.log"
+</span><span class='line'>errorlog = "/tmp/gunicorn.log"
+</span><span class='line'>daemon = True
+</span><span class='line'>pidfile = "/tmp/gunicorn.pid"</span></code></pre></td></tr></table></div></figure>
+
+
+<p>运行：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ gunicorn -c gunicorn.ini webui.wsgi:application
+</span><span class='line'>$ service nginx start</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>其他内容</h2>
+
+<p>与 WSGI 应用一样，如果之后配置有改动可以向 gunicorn 服务进程发送 <code>HUP</code> 信号让其重新加载配置：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ kill -s HUP &lt;pid&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+
 </div>
 
 
@@ -124,14 +311,14 @@ Wend</p>
 
 
 
-<time class='entry-date' datetime='2009-08-16T00:00:00+08:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>16</span><span class='date-suffix'>th</span>, <span class='date-year'>2009</span></span> <span class='time'>12:00 am</span></time>
+<time class='entry-date' datetime='2014-12-13T21:03:27+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>9:03 pm</span></time>
     </p>
     <p class="meta">
       Categories: 
 
 <span class="categories">
   
-    <a class='category' href='/categories/编程开发/index.html'>编程开发</a>
+    <a class='category' href='/categories/python栏目/index.html'>python栏目</a>, <a class='category' href='/categories/web开发/index.html'>web开发</a>
   
 </span>
 
@@ -142,7 +329,7 @@ Wend</p>
 
 <span class="tags">
   
-    <a class='tag' href='/tags/asp/index.html'>asp</a>, <a class='tag' href='/tags/mysql/index.html'>mysql</a>
+    <a class='tag' href='/tags/Django/index.html'>Django</a>, <a class='tag' href='/tags/python/index.html'>python</a>
   
 </span>
 
@@ -158,10 +345,8 @@ Wend</p>
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/archives/66045.html" title="Previous Post: ASP与MySQL连接">&laquo; ASP与MySQL连接</a>
+        <a class="basic-alignment left" href="/archives/84137.html" title="Previous Post: Mongodb集群配置实例">&laquo; Mongodb集群配置实例</a>
       
-      
-        <a class="basic-alignment right" href="/archives/66653.html" title="Next Post: PHP与MySQL连接">PHP与MySQL连接 &raquo;</a>
       
     </p>
   </footer>
@@ -250,8 +435,8 @@ Wend</p>
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://www.xefan.com/archives/66047.html';
-        var disqus_url = 'http://www.xefan.com/archives/66047.html';
+        var disqus_identifier = 'http://www.xefan.com/archives/84138.html';
+        var disqus_url = 'http://www.xefan.com/archives/84138.html';
         var disqus_script = 'embed.js';
       
     (function () {
