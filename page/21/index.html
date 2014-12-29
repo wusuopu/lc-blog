@@ -9,7 +9,8 @@
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="我的小本是神舟的天运F3000，SIS的芯片组。驱动比较难找。安装完Fedora 13后默认为800600的分辨率，且只有800600、640480两种，由于没装显卡驱动（我想装也找不到）所以不能更改为我们喜欢的1024768以上的分辨率。 曾经有人说过，选择了神舟你就选择了草根。 &hellip;">
+  <meta name="description" content="VirtualBox和VMware都是功能强大的虚拟机软件，各有其优点，也各有缺点。有时实在是让人难以取舍，不知道该用那个好。下面说说这两个软件分别生成的不同格式的硬盘文件相互转换的方法。 VMWare转VirtualBox 方法一：
+使用VBoxManage命令 Usage: &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -66,6 +67,90 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83415.html">VirtualBox和VMware镜像文件互转方法详解</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2010-09-29T00:00:00+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>29</span><span class='date-suffix'>th</span>, <span class='date-year'>2010</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83415.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83415.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>VirtualBox和VMware都是功能强大的虚拟机软件，各有其优点，也各有缺点。有时实在是让人难以取舍，不知道该用那个好。下面说说这两个软件分别生成的不同格式的硬盘文件相互转换的方法。</p>
+
+<p><span style="color: #ff0000"><strong>VMWare转VirtualBox </strong></span></p>
+
+<p>方法一：<br/>
+使用VBoxManage命令</p>
+
+<p>Usage:<br/>
+<em>VBoxManage clonehd          &lt;uuid&gt;|&lt;filename&gt;   &lt;outputfile&gt;<br/>
+[&ndash;format VDI|VMDK|VHD|RAW|&lt;other&gt;]<br/>
+[&ndash;variant Standard,Fixed,Split2G,Stream,ESX]<br/>
+[&ndash;type normal|writethrough|immutable|shareable]<br/>
+[&ndash;remember] [&ndash;existing]</em></p>
+
+<p>例如：<br/>
+<em>VBoxManage clonehd &lsquo;vmdk文件名&rsquo; &lsquo;vdi文件名&rsquo; &ndash;format VDI</em></p>
+
+<p>命令执行过程中如出现如下错误：<br/>
+ERROR: Cannot register the hard disk &lsquo;/stor/virtualbox/sv1/sv1-disk1.vdi&rsquo; with UUID {4e7a0d53-2775-438d-b383-79e69c5cf7f4} because a hard disk &lsquo;/stor/virtualbox/sv1/sv1-disk1.vdi&rsquo; with UUID {4e7a0d53-2775-438d-b383-79e69c5cf7f4} already exists in the media registry (&lsquo;/home/chao/.VirtualBox/VirtualBox.xml&rsquo;)<br/>
+Details: code NS_ERROR_INVALID_ARG (0x80070057), component VirtualBox, interface IVirtualBox, callee nsISupports<br/>
+Context: &ldquo;OpenHardDisk(Bstr(szFilenameAbs), AccessMode_ReadWrite, false, Bstr(&rdquo;&ldquo;), false, Bstr(&rdquo;&ldquo;), srcDisk.asOutParam())&rdquo; at line 628 of file VBoxManageDisk.cpp</p>
+
+<p>则需要先将硬盘镜像从虚拟介质管理器中将镜像释放 并删除，然后再执行命令。</p>
+
+<p>最新版本的VirtualBox是可以直接使用VMDK的。</p>
+
+<p>方法二：<br/>
+使用Qemu软件，下载地址：<a href="http://www.davereyn.co.uk/download.htm%EF%BC%88%E5%8F%AA%E8%83%BD%E5%9C%A8Windows%E4%B8%8B%E7%94%A8%EF%BC%89  ">http://www.davereyn.co.uk/download.htm%EF%BC%88%E5%8F%AA%E8%83%BD%E5%9C%A8Windows%E4%B8%8B%E7%94%A8%EF%BC%89  </a>
+先用Qemu转VMDK为RAW格式，再转RAW为VDI格式。详情请自己看软件说明。</p>
+
+<p><span style="color: #ff0000"><strong>VirtualBox转VMWare</strong></span></p>
+
+<p>因為VirtualBox的转换方式有问题的关系，所以我們得通过两次转化的方法来进行…</p>
+
+<p>第一次就是先把vdi轉成vmdk</p>
+
+<p><em>VBoxManage clonehd &lsquo;vdi文件名&rsquo; &lsquo;vmdk文件名&rsquo; &ndash;format VMDK</em></p>
+
+<p>經過漫長的等候<br/>
+這裡轉換好之後….<br/>
+再來就是第二次的轉換啦…</p>
+
+<p><em>vmware-vdiskmanager -r &lsquo;原vmdk文件&rsquo; -t X &lsquo;转换后的vmdk文件&rsquo;</em></p>
+
+<p>其中的X可以用<br/>
+0 : 做成單一檔案(不預先配置)<br/>
+1 : 切成2GB為一個檔案<br/>
+2 : 預先配置檔案大小<br/>
+3 : 預先配置以2GB為單位的檔案群<br/>
+4 : 預先配置成ESX的格式<br/>
+來代替</p>
+
+<p>這裡我用的是”1″</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -491,44 +576,6 @@ su -c &ldquo;gmake install&rdquo;</em></p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83390.html">概率论与数理统计视频教程</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2010-08-20T00:00:00+08:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2010</span></span> <span class='time'>12:00 am</span></time>
-        
-           | <a href="http://www.xefan.com/archives/83390.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/83390.html">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>主题： 概率论与数理统计<br/>
-出处： 石油大学</p>
-
-<object width="480" height="400"><param name="src" value="http://www.tudou.com/l/hszvRFaN5Is" /><param name="wmode" value="opaque" /><param name="allowfullscreen" value="true" /></object>
-
-
-<p>视频地址：<a href="http://www.tudou.com/playlist/id/9859016/">http://www.tudou.com/playlist/id/9859016/</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/page/22">&larr; Older</a>
@@ -550,6 +597,10 @@ su -c &ldquo;gmake install&rdquo;</em></p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="http://www.xefan.com/archives/84139.html">Mongodb分片配置实例</a>
+      </li>
+    
+      <li class="post">
         <a href="http://www.xefan.com/archives/84138.html">使用gunicorn部署Django</a>
       </li>
     
@@ -565,19 +616,15 @@ su -c &ldquo;gmake install&rdquo;</em></p>
         <a href="http://www.xefan.com/archives/84135.html">Nginx + Uwsgi + Django环境配置</a>
       </li>
     
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84134.html">配置rails的vim环境</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (47)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (26)</a></li><li><a href='/categories/web开发/index.html'>web开发 (18)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (8)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (23)</a></li></ul>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (47)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (26)</a></li><li><a href='/categories/web开发/index.html'>web开发 (18)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (9)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (23)</a></li></ul>
 </section>
 <section>
   <h1>Tag Cloud</h1>
-    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.45454545454545%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.9090909090909%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.81818181818181%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.9090909090909%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.36363636363636%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.27272727272727%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.36363636363636%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.81818181818181%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.81818181818181%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.72727272727273%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.9090909090909%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.81818181818181%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.72727272727273%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.9090909090909%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.9090909090909%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.45454545454545%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.81818181818181%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.63636363636364%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.45454545454545%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.9090909090909%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.45454545454545%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.9090909090909%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.9090909090909%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.9090909090909%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(66)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.0%'>mongodb(11)</a> <a href='/tags/mysql/index.html' style='font-size: 103.63636363636364%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.9090909090909%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.9090909090909%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 109.0909090909091%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.45454545454545%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.9090909090909%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 146.36363636363637%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.81818181818181%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.9090909090909%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 123.63636363636364%'>Ruby(26)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.72727272727273%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.9090909090909%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.54545454545455%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.36363636363636%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.72727272727273%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.63636363636364%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.72727272727273%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.9090909090909%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.9090909090909%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 112.72727272727272%'>Web开发(14)</a> <a href='/tags/windows/index.html' style='font-size: 106.36363636363636%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.9090909090909%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.9090909090909%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.9090909090909%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.9090909090909%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.45454545454545%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.81818181818181%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.9090909090909%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.18181818181819%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.18181818181819%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.9090909090909%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.9090909090909%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.9090909090909%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.81818181818181%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 109.0909090909091%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.18181818181819%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.9090909090909%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.54545454545455%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.9090909090909%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.9090909090909%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.45454545454545%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 120.9090909090909%'>翻译(23)</a> <a href='/tags/视频教程/index.html' style='font-size: 109.0909090909091%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.9090909090909%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.81818181818181%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.9090909090909%'>随笔(1)</a> </span>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.45454545454545%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.9090909090909%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.81818181818181%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.9090909090909%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.36363636363636%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.27272727272727%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.36363636363636%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.81818181818181%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.81818181818181%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.72727272727273%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.9090909090909%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.81818181818181%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.72727272727273%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.9090909090909%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.9090909090909%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.45454545454545%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.81818181818181%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.63636363636364%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.45454545454545%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.9090909090909%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.45454545454545%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.9090909090909%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.9090909090909%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.9090909090909%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(66)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.9090909090909%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.63636363636364%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.9090909090909%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.9090909090909%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 109.0909090909091%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.45454545454545%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.9090909090909%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 146.36363636363637%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.81818181818181%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.9090909090909%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 123.63636363636364%'>Ruby(26)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.72727272727273%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.9090909090909%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.54545454545455%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.36363636363636%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.72727272727273%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.63636363636364%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.72727272727273%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.9090909090909%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.9090909090909%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 112.72727272727272%'>Web开发(14)</a> <a href='/tags/windows/index.html' style='font-size: 106.36363636363636%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.9090909090909%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.9090909090909%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.9090909090909%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.9090909090909%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.45454545454545%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.81818181818181%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.9090909090909%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.18181818181819%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.18181818181819%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.9090909090909%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.9090909090909%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.9090909090909%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.81818181818181%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 109.0909090909091%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.18181818181819%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.9090909090909%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.54545454545455%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.9090909090909%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.9090909090909%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.45454545454545%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 120.9090909090909%'>翻译(23)</a> <a href='/tags/视频教程/index.html' style='font-size: 109.0909090909091%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.9090909090909%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.81818181818181%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.9090909090909%'>随笔(1)</a> </span>
 </section>
 <section>
   <h1>Link</h1>

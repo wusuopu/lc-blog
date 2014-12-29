@@ -4,7 +4,7 @@
   <title><![CDATA[Tag: Mongodb | 龍昌博客]]></title>
   <link href="http://www.xefan.com/tags/mongodb/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2014-12-21T20:04:33+08:00</updated>
+  <updated>2014-12-29T17:06:40+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -12,6 +12,122 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Mongodb分片配置实例]]></title>
+    <link href="http://www.xefan.com/archives/84139.html"/>
+    <updated>2014-12-29T16:52:37+08:00</updated>
+    <id>http://www.xefan.com/archives/84139-Mongodb分片配置实例</id>
+    <content type="html"><![CDATA[<p>数据分片即是从一个集合中选择一个片键(shard key)作为数据拆分的依据，原理与索引类似，然后将集合的数据拆分并保存到不同的服务器上。
+以下通过一个例子来介绍一下Mongodb的分片配置。</p>
+
+<p>有四台主机：</p>
+
+<ul>
+<li>172.17.0.6    (配置服务器)</li>
+<li>172.17.0.7    (mongos)</li>
+<li>172.17.0.8    (片服务器)</li>
+<li>172.17.0.9    (片服务器)</li>
+</ul>
+
+
+<p>1.在 172.17.0.6 上启动 mongod 服务作为配置服务器；<br/>
+修改配置，使其作为一个配置服务器，默认监听 27019 端口。</p>
+
+<pre><code>configsvr = true
+</code></pre>
+
+<p>启动服务 <code>$ service mongodb start</code></p>
+
+<p>2.在 172.17.0.7 上启动 mongos 服务作为路由服务;<br/>
+建立mongos进程。(可以有多台配置服务器)，用法如下：</p>
+
+<pre><code>$ mongos --configdb &lt;config server hostnames&gt;[,&lt;config server hostnames&gt;]
+</code></pre>
+
+<p>例如： <code>$ mongos --configdb 172.17.0.6:27019</code></p>
+
+<p>注意：在同一个分片集群中的每个 mongos 必须使用相同的 configDB 配置。</p>
+
+<p>3.添加分片<br/>
+一个片服务既可以是单个 mongod 实例，也可以是一个副本集。<br/>
+1).先分别在 172.17.0.8 和 172.17.0.9 上启动片服务器，即就是一个普通的 mongod 服务。</p>
+
+<pre><code>$ service mongodb start
+</code></pre>
+
+<p>2).使用 mongo 客户端连接到 mongos 服务</p>
+
+<pre><code>$ mongo --host &lt;hostname of machine running mongos&gt; --port &lt;port mongos listens on&gt;
+</code></pre>
+
+<p>如： <code>$ mongo --host 172.17.0.7 --port 27017</code></p>
+
+<p>3).在 mongo 客户端上执行命令添加分片：</p>
+
+<pre><code>&gt; use admin
+&gt; db.auth(&lt;user&gt;, &lt;pswd&gt;)
+&gt; sh.addShard("172.17.0.8:27017")
+&gt; sh.addShard("172.17.0.9:27017")
+</code></pre>
+
+<p>4.切片数据<br/>
+1).首先对数据库进行切片<br/>
+使用 mongo 客户端连接到 mongos ，执行命令打开数据库的分片功能，用法如下：</p>
+
+<pre><code>&gt; sh.enableSharding("&lt;database&gt;")
+</code></pre>
+
+<p>例如要打开 mydb 数据库的分片功能： <code>&gt; sh.enableSharding("mydb")</code></p>
+
+<p>2).然后对数据集合进行切片<br/>
+命令用法如下：</p>
+
+<pre><code>&gt; sh.shardCollection("&lt;database&gt;.&lt;collection&gt;", shard-key-pattern)
+</code></pre>
+
+<p><code>shard-key-pattern</code> 与索引的用法一样，例如，要对 mydb 数据库的 test 集合按照 <code>_id</code> 字段进行分片： <code>&gt; sh.shardCollection("mydb.test", {"_id": "hashed"})</code></p>
+
+<p>接下来通过一个程序来测试一下，向数据库中添加10000条数据：</p>
+
+<pre><code class="ruby">#!/usr/bin/env ruby
+#-*- coding:utf-8 -*-
+
+require "mongo"
+
+begin
+  conn = Mongo::Connection.new '172.17.0.7'
+  db = conn['mydb']
+rescue Exception=&gt;e
+  p e
+  exit 1
+end
+
+i = 0
+while i &lt; 10000
+  d = {'no' =&gt; i}
+  d = db['test'].insert(d)
+  i += 1
+  puts d
+end
+</code></pre>
+
+<p>然后分别查看 172.17.0.8 和 172.17.0.9 的状态：</p>
+
+<pre><code>172.17.0.8:
+&gt; db.test.count()
+4952
+
+172.17.0.9:
+&gt; db.test.count()
+5048
+</code></pre>
+
+<p>数据基本上是平均的分布在两台服务器上。</p>
+
+<p>参考： <a href="http://docs.mongodb.org/manual/tutorial/deploy-shard-cluster/">http://docs.mongodb.org/manual/tutorial/deploy-shard-cluster/</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Mongodb集群配置实例]]></title>
@@ -424,174 +540,6 @@ num_users = User.objects.count()
 
 <pre><code>User.objects.exec_js("db.getCollectionNames()")
 </code></pre>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Mongoengine教程(2)——文档模式]]></title>
-    <link href="http://www.xefan.com/archives/84066.html"/>
-    <updated>2014-04-03T00:00:00+08:00</updated>
-    <id>http://www.xefan.com/archives/84066-mongoengine教程(2)——文档模式</id>
-    <content type="html"><![CDATA[<p>在MongoDB中一个文档(document)与关系型数据库中的一行(row)相似；文档保存在集合(collection)中，行保存在表(table)中。</p>
-
-
-<h2>定义文档的模式</h2>
-
-
-<p>与django类似，要定义一个文档模式只需要创建一个类继承自 Document，并添加一些 Field 对象。</p>
-
-
-<pre><code>from mongoengine import *
-import datetime
-
-class Page(Document):
-    title = StringField(max_length=200, required=True)
-    date_modified = DateTimeField(default=datetime.datetime.now)
-</code></pre>
-
-
-<p>如上定义了一个文档模式具有 title和date_modified 两个字段。</p>
-
-
-<p>同时MongoDB本身就是无模式的，因此我们还可以创建动态的文档模式。它可以在添加数据时为不同的数据设置不同的字段。</p>
-
-
-<pre><code>class Page(DynamicDocument):
-    title = StringField(max_length=200, required=True)
-</code></pre>
-
-
-<p>添加数据：</p>
-
-
-<pre><code>page = Page(title='Using MongoEngine')
-page.tags = ['mongodb', 'mongoengine']
-page.save()
-</code></pre>
-
-
-<h2>文档字段</h2>
-
-
-<p>文档字段(Field)不是必需的，但是使用它来进行数据验证、设置默认值等操作会比较方便。</p>
-
-
-<p>MongoEngine提供了如下这些类型的Field:</p>
-
-
-<ul>
-<li>BinaryField  </li>
-<li>BooleanField  </li>
-<li>ComplexDateTimeField  </li>
-<li>DateTimeField  </li>
-<li>DecimalField  </li>
-<li>DictField  </li>
-<li>DynamicField  </li>
-<li>EmailField  </li>
-<li>EmbeddedDocumentField  </li>
-<li>FileField  </li>
-<li>FloatField  </li>
-<li>GenericEmbeddedDocumentField  </li>
-<li>GenericReferenceField  </li>
-<li>GeoPointField  </li>
-<li>ImageField  </li>
-<li>IntField  </li>
-<li>ListField  </li>
-<li>MapField  </li>
-<li>ObjectIdField  </li>
-<li>ReferenceField  </li>
-<li>SequenceField  </li>
-<li>SortedListField  </li>
-<li>StringField  </li>
-<li>URLField  </li>
-<li>UUIDField  </li>
-</ul>
-
-
-<h2>文档之间引用关系</h2>
-
-
-<p>在关系型数据库中多个表可以使用外键进行关联。然而MongoDB是无模式的，因此想要达到这样的效果就这能在应用程序中自己手动的进行关联了。</p>
-
-
-<p>不过还好，使用MongoEngine的ReferenceField可以很方便的实现。</p>
-
-
-<pre><code>class User(Document):
-    name = StringField()
-
-class Page(Document):
-    content = StringField()
-    author = ReferenceField(User)
-
-john = User(name="John Smith")
-john.save()
-
-post = Page(content="Test Page")
-post.author = john
-post.save()
-</code></pre>
-
-
-<h3>一对多的关系</h3>
-
-
-<p>对于一对多的关系可以使用ListField来保存一个ReferenceField列表。在进行查询操作是需要传入一个实例对象。</p>
-
-
-<pre><code>class User(Document):
-    name = StringField()
-
-class Page(Document):
-    content = StringField()
-    authors = ListField(ReferenceField(User))
-
-bob = User(name="Bob Jones").save()
-john = User(name="John Smith").save()
-
-Page(content="Test Page", authors=[bob, john]).save()
-Page(content="Another Page", authors=[john]).save()
-
-# Find all pages Bob authored
-Page.objects(authors__in=[bob])
-</code></pre>
-
-
-<h3>引用对象的删除操作</h3>
-
-
-<p>MongoDB默认不会检查数据的完整性，因此在删除一个对象是就需要自己手动的处理引用了该对象的其他对象。</p>
-
-
-<p>同样的MongoEngine也提供了一样的功能。ReferenceField有一个 reverse_delete_rule 参数可以进行设置。它的取值如下：  </p>
-
-
-<ul>
-<li>mongoengine.DO_NOTHING:默认就是这个值，它不会进行任何操作。  </li>
-<li>mongoengine.DENY:如果该对象还被其他对象引用，则拒绝删除。  </li>
-<li>mongoengine.NULLIFY:将其他对象对该对象的引用字段设为null。  </li>
-<li>mongoengine.CASCADE:将引用了该对象的其他对象也删除掉。  </li>
-<li>mongoengine.PULL:移除对该对象的引用。  </li>
-</ul>
-
-
-<h2>索引</h2>
-
-
-<p>与django的Model相似，MongoEngine的Document也可以在meta属性中设置索引。</p>
-
-
-<pre><code>class Page(Document):
-    title = StringField()
-    rating = StringField()
-    meta = {
-        'indexes': ['title', ('title', '-rating')]
-    }
-</code></pre>
-
-
-<p>meta中的indexes可以是一个列表，也可以是一个字典。</p>
 
 ]]></content>
   </entry>

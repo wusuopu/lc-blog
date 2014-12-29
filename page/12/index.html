@@ -9,7 +9,7 @@
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="也许很多人将孔子所说的“温故而知新”理解为：温习学过的知识，从中获得新的领悟。但是，我更倾向于另一种解释：温习学过的知识，继续学习新的知识。本文借助一个更加平易和现实的示例用以温习文档 [1-3] 中的 GObject 知识，并进一步学习类与对象的方法。 Bibtex 文献类的设计，代号Kill &hellip;">
+  <meta name="description" content="在文档 [1] 中，我们构造了一个 KbBibtex 类，其构造过程看似挺复杂，但实际上只需要动手尝试一下，即可明白 GObject 子类化的各项步骤的意义与作用。许多事物之所以被认为复杂，是因为大家在观望。 本文沿用文档 [1] 中的那个 KbBibtex 示例，学习如何对其进行子类化，构造新类 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -66,6 +66,267 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83776.html">[转载]GObject 学习笔记：GObject 的子类继承</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2012-05-30T00:00:00+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>30</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83776.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83776.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在文档 [1] 中，我们构造了一个 KbBibtex 类，其构造过程看似挺复杂，但实际上只需要动手尝试一下，即可明白 GObject 子类化的各项步骤的意义与作用。许多事物之所以被认为复杂，是因为大家在观望。</p>
+
+<p>本文沿用文档 [1] 中的那个 KbBibtex 示例，学习如何对其进行子类化，构造新类，即面向对象程序设计方法中类的继承。</p>
+
+<p><b>文献有很多种类</b></p>
+
+<p>写过论文的人都知道，参考文献的形式有许多种类，例如期刊论文、技术报告、专著等，并非所有的文献格式都能表示文档 [1] 所给出的 KbBibtex 对象属性，即：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">typedef</span> <span class="k">struct</span> <span class="n">_KbBibtexPrivate</span> <span class="n">KbBibtexPrivate</span><span class="p">;</span>
+</span><span class='line'><span class="k">struct</span> <span class="n">_KbBibtexPrivate</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">GString</span> <span class="o">*</span><span class="n">title</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">GString</span> <span class="o">*</span><span class="n">author</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">GString</span> <span class="o">*</span><span class="n">publisher</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">guint</span>   <span class="n">year</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>对于期刊论文而言，也许我们期望的数据结构是：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">typedef</span> <span class="k">struct</span> <span class="n">_KbBibtexPrivate</span> <span class="n">KbBibtexPrivate</span><span class="p">;</span>
+</span><span class='line'><span class="k">struct</span> <span class="n">_KbBibtexPrivate</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">GString</span> <span class="o">*</span><span class="n">title</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">GString</span> <span class="o">*</span><span class="n">author</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">GString</span> <span class="o">*</span><span class="n">journal</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">GString</span> <span class="o">*</span><span class="n">volume</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">GString</span> <span class="o">*</span><span class="n">number</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">GString</span> <span class="o">*</span><span class="n">pages</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">guint</span>   <span class="n">year</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">GString</span> <span class="o">*</span><span class="n">publisher</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>对于技术报告，需求又要变成：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">typedef</span> <span class="k">struct</span> <span class="n">_KbBibtexPrivate</span> <span class="n">KbBibtexPrivate</span><span class="p">;</span>
+</span><span class='line'><span class="k">struct</span> <span class="n">_KbBibtexPrivate</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">GString</span> <span class="o">*</span><span class="n">title</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">GString</span> <span class="o">*</span><span class="n">author</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">GString</span> <span class="o">*</span><span class="n">institution</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">guint</span>   <span class="n">year</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这样的变化非常之多。因此，设计一个“万能”的 KbBibtex 类，使之可以表示任何文献类型，看上去会很美好。</p>
+
+<p><b>类的继承</b></p>
+
+<p>因为期刊论文这种对象只比文档 [1] 中的 KbBibtex 对象多出 4 个属性，即 journal、volume、number、pages，其他属性皆与 KbBibtex 对象相同。</p>
+
+<p>在程序猿的职业生涯中也许不断听到这样的警告：Don&rsquo;t Repeat Yourself（不要重复）！所以面向对象程序设计方法会告诉我们，既然 KbBibtex 对象已经拥有了一部分期刊论文对象所需要的属性，后者与前者都属于 KbBibtex 类（因为它们都是文献类型），那么只需设计一个期刊论文类，让它可以继承 KbBibtex 类的所以所拥有的一切，那么就可以不用 DRY 了。</p>
+
+<p>那么怎么来实现？和 GObject 子类化过程相似，只需建立一个 kb-article.h 头文件，与继承相关的代码如下：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="cp">#include &quot;kb-bibtex.h&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">typedef</span> <span class="k">struct</span> <span class="n">_KbArticle</span> <span class="n">KbArticle</span><span class="p">;</span>
+</span><span class='line'><span class="k">struct</span> <span class="n">_KbArticle</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">KbBibtex</span> <span class="n">parent</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">typedef</span> <span class="k">struct</span> <span class="n">_KbArticleClass</span> <span class="n">KbArticleClass</span><span class="p">;</span>
+</span><span class='line'><span class="k">struct</span> <span class="n">_KbArticleClass</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">KbBibtexClass</span> <span class="n">parent_class</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后，再建立一个 kb-article.c 源文件，其中与继承相关的代码如下：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="n">G_DEFINE_TYPE</span> <span class="p">(</span><span class="n">KbArticle</span><span class="p">,</span> <span class="n">kb_article</span><span class="p">,</span> <span class="n">KB_TYPE_BIBTEX</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>另外，KbBibtex 对象的 kb_bibtex_printf 方法也需要被 KbArticle 对象继承，这只需在 kb_article_printf 函数中调用 kb_bibtex_printf 即可实现，例如：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="kt">void</span>
+</span><span class='line'><span class="nf">kb_article_printf</span> <span class="p">(</span><span class="n">KbArticle</span> <span class="o">*</span><span class="n">self</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>        <span class="n">kb_bibtex_printf</span> <span class="p">(</span><span class="o">&amp;</span><span class="n">self</span><span class="o">-&gt;</span><span class="n">parent</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="cm">/* 剩下代码是 KbArticle 对象的 kb_article_printf 方法的具体实现 */</span>
+</span><span class='line'>        <span class="p">...</span> <span class="p">...</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>当然，kb-article.h 和 kb-article.c 中剩余代码需要类似文档 [1] 中实现 KbBibtex 类那样去实现 KbArticle 类。这部分代码，我希望你能动手去尝试一下。下面，我仅给出测试 KbArticle 类的 main.c 源文件内容：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="cp">#include &quot;kb-article.h&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span>
+</span><span class='line'><span class="nf">main</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>        <span class="n">g_type_init</span> <span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="n">KbArticle</span> <span class="o">*</span><span class="n">entry</span> <span class="o">=</span> <span class="n">g_object_new</span> <span class="p">(</span><span class="n">KB_TYPE_ARTICLE</span><span class="p">,</span>
+</span><span class='line'>                                         <span class="s">&quot;title&quot;</span><span class="p">,</span> <span class="s">&quot;Breaking paragraphs into lines&quot;</span><span class="p">,</span>
+</span><span class='line'>                                         <span class="s">&quot;author&quot;</span><span class="p">,</span> <span class="s">&quot;Knuth, D.E. and Plass, M.F.&quot;</span><span class="p">,</span>
+</span><span class='line'>                                         <span class="s">&quot;publisher&quot;</span><span class="p">,</span> <span class="s">&quot;Wiley Online Library&quot;</span><span class="p">,</span>
+</span><span class='line'>                                         <span class="s">&quot;journal&quot;</span><span class="p">,</span> <span class="s">&quot;Software: Practice and Experience&quot;</span><span class="p">,</span>
+</span><span class='line'>                                         <span class="s">&quot;volume&quot;</span><span class="p">,</span> <span class="s">&quot;11&quot;</span><span class="p">,</span>
+</span><span class='line'>                                         <span class="s">&quot;number&quot;</span><span class="p">,</span> <span class="s">&quot;11&quot;</span><span class="p">,</span>
+</span><span class='line'>                                         <span class="s">&quot;year&quot;</span><span class="p">,</span> <span class="mi">1981</span><span class="p">,</span>
+</span><span class='line'>                                         <span class="s">&quot;pages&quot;</span><span class="p">,</span> <span class="s">&quot;1119-1184&quot;</span><span class="p">,</span>
+</span><span class='line'>                                         <span class="nb">NULL</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">kb_article_printf</span> <span class="p">(</span><span class="n">entry</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="n">g_object_unref</span> <span class="p">(</span><span class="n">entry</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>测试结果表明，一切尽在掌握之中：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="err">$</span> <span class="p">.</span><span class="o">/</span><span class="n">test</span>
+</span><span class='line'>    <span class="nl">Title</span><span class="p">:</span> <span class="n">Breaking</span> <span class="n">paragraphs</span> <span class="n">into</span> <span class="n">lines</span>
+</span><span class='line'>   <span class="nl">Author</span><span class="p">:</span> <span class="n">Knuth</span><span class="p">,</span> <span class="n">D</span><span class="p">.</span><span class="n">E</span><span class="p">.</span> <span class="n">and</span> <span class="n">Plass</span><span class="p">,</span> <span class="n">M</span><span class="p">.</span><span class="n">F</span><span class="p">.</span>
+</span><span class='line'><span class="nl">Publisher</span><span class="p">:</span> <span class="n">Wiley</span> <span class="n">Online</span> <span class="n">Library</span>
+</span><span class='line'>     <span class="nl">Year</span><span class="p">:</span> <span class="mi">1981</span>
+</span><span class='line'>  <span class="nl">Journal</span><span class="p">:</span> <span class="nl">Software</span><span class="p">:</span> <span class="n">Practice</span> <span class="n">and</span> <span class="n">Experience</span>
+</span><span class='line'>   <span class="nl">Volume</span><span class="p">:</span> <span class="mi">11</span>
+</span><span class='line'>   <span class="nl">Number</span><span class="p">:</span> <span class="mi">11</span>
+</span><span class='line'>    <span class="nl">Pages</span><span class="p">:</span> <span class="mi">1119</span><span class="o">-</span><span class="mi">1184</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><b>继承真的很美好？</b></p>
+
+<p>通过类的继承来实现一部分的代码复用真的是很惬意。但是，《C 专家编程》一书的作者却不这么认为，为了说明类的继承通常很难解决现实问题，他运用了一个比喻，将程序比作一本书，并将程序库比作一个图书馆。当你基于一个程序库去写你个人的程序之时，好比你在利用图书馆中的藏书去写你个人的书，显然你不可能很轻松的在那些藏书中复印一部分拼凑出一本书。</p>
+
+<p>就本文开头所举的例子而言，就无法通过继承文档 [1] 所设计的 KbBibtex 类来建立技术报告类，因为技术报告对象是没有 publisher 属性的。</p>
+
+<p>也许你会说，那是 KbBibtex 类设计的太烂了。嗯，我承认这一点，但是你不可能要求别人在设计程序库时候知道你想要什么，就像你不能去抱怨为什么图书馆里的藏书怎么不是为你写书而准备的一样。</p>
+
+<p>基类设计的失误，对于它的所有子类是一场巨大的灾难。要避免这种灾难，还是认真考虑自己所要解决的问题吧。其实很多问题都可以不需要使用继承便可以很好的解决，还有许多问题不需要继承很多的层次也可以很好的解决。</p>
+
+<p>对于本文的问题，不采用继承的实现会更好。比如我们可以这样来改造 KbBibtex 类：</p>
+
+<pre><code>将 Bibtex 文献所有格式的属性都设为 KbBibtex 的类属性
+为 Bibtex 对象拥有一个链表或数组之类的线性表容器，或者效率更高的 Hash 表容器（GLib 库均已提供），容器的第一个单元存储 Bibtex 对象对应的文献类型，其他单元则存储文献的属性。
+在 kb_bibtex_set_property 与 kb_bibtex_get_property 函数中，实现 Bibtex 类属性与 Bibtex 对象属性的数据交换。
+</code></pre>
+
+<p>仅此而已。</p>
+
+<p>如果说继承是美好的，那么平坦一些会更美好。如果你不愿意选择平坦，那么可以选择接口（Interface），这是下一篇文档的主题。</p>
+
+<p>~ End ~</p>
+
+<p>原文出处：<a href="http://garfileo.is-programmer.com">http://garfileo.is-programmer.com</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -3212,269 +3473,6 @@ TCON |= (1&lt; TCON = 0x09; //自动加载，清“手动更新”，启动定�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83731.html">TQ2440 按键裸机驱动</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2012-05-10T00:00:00+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>12:00 am</span></time>
-        
-           | <a href="http://www.xefan.com/archives/83731.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/83731.html">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>根据TQ2440的手册可知KEY1、2、3、4分别由GPF1、4、2、0控制。<br/>
-程序的步骤为：<br/>
-1、先将GPB1、4、2、0设为输入；<br/>
-2、若有按键按下则对应引脚为0，否则为1.</p>
-
-<p>程序如下：<br/>
-文件名 crt0.S</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>.text
-</span><span class='line'>.global _start
-</span><span class='line'>_start:
-</span><span class='line'>        ldr r0, =0x56000010 @WATCHDOG
-</span><span class='line'>        mov r1, #0
-</span><span class='line'>        str r1, [r0]
-</span><span class='line'>        ldr sp, =1024*4
-</span><span class='line'>        bl main
-</span><span class='line'>
-</span><span class='line'>halt_loop:
-</span><span class='line'>        b halt_loop</span></code></pre></td></tr></table></div></figure>
-
-
-<p>文件名 gpio.h</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="cp">#ifndef _GPIO_H</span>
-</span><span class='line'><span class="cp">#define _GPIO_H</span>
-</span><span class='line'>
-</span><span class='line'><span class="cp">#define GPACON (*(volatile unsigned int*)0x56000000)</span>
-</span><span class='line'><span class="cp">#define GPADAT (*(volatile unsigned int*)0x56000004)</span>
-</span><span class='line'>
-</span><span class='line'><span class="cp">#define GPBCON (*(volatile unsigned int*)0x56000010)</span>
-</span><span class='line'><span class="cp">#define GPBDAT (*(volatile unsigned int*)0x56000014)</span>
-</span><span class='line'><span class="cp">#define GPBUP  (*(volatile unsigned int*)0x56000018)</span>
-</span><span class='line'>
-</span><span class='line'><span class="cp">#define GPCCON (*(volatile unsigned int*)0x56000020)</span>
-</span><span class='line'><span class="cp">#define GPCDAT (*(volatile unsigned int*)0x56000024)</span>
-</span><span class='line'><span class="cp">#define GPCUP  (*(volatile unsigned int*)0x56000028)</span>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'><span class="cp">#define GPDCON (*(volatile unsigned int*)0x56000030)</span>
-</span><span class='line'><span class="cp">#define GPDDAT (*(volatile unsigned int*)0x56000034)</span>
-</span><span class='line'><span class="cp">#define GPDUP  (*(volatile unsigned int*)0x56000038)</span>
-</span><span class='line'>
-</span><span class='line'><span class="cp">#define GPECON (*(volatile unsigned int*)0x56000040)</span>
-</span><span class='line'><span class="cp">#define GPEDAT (*(volatile unsigned int*)0x56000044)</span>
-</span><span class='line'><span class="cp">#define GPEUP  (*(volatile unsigned int*)0x56000048)</span>
-</span><span class='line'>
-</span><span class='line'><span class="cp">#define GPFCON (*(volatile unsigned int*)0x56000050)</span>
-</span><span class='line'><span class="cp">#define GPFDAT (*(volatile unsigned int*)0x56000054)</span>
-</span><span class='line'><span class="cp">#define GPFUP  (*(volatile unsigned int*)0x56000058)</span>
-</span><span class='line'>
-</span><span class='line'><span class="cp">#define GPGCON (*(volatile unsigned int*)0x56000060)</span>
-</span><span class='line'><span class="cp">#define GPGDAT (*(volatile unsigned int*)0x56000064)</span>
-</span><span class='line'><span class="cp">#define GPGUP  (*(volatile unsigned int*)0x56000068)</span>
-</span><span class='line'>
-</span><span class='line'><span class="cp">#define GPHCON (*(volatile unsigned int*)0x56000070)</span>
-</span><span class='line'><span class="cp">#define GPHDAT (*(volatile unsigned int*)0x56000074)</span>
-</span><span class='line'><span class="cp">#define GPHUP  (*(volatile unsigned int*)0x56000078)</span>
-</span><span class='line'>
-</span><span class='line'><span class="cp">#define GPJCON (*(volatile unsigned int*)0x560000d0)</span>
-</span><span class='line'><span class="cp">#define GPJDAT (*(volatile unsigned int*)0x560000d4)</span>
-</span><span class='line'><span class="cp">#define GPJUP  (*(volatile unsigned int*)0x560000d8)</span>
-</span><span class='line'>
-</span><span class='line'><span class="cp">#endif</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>文件名 key.c</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="cp">#include &quot;gpio.h&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kt">void</span> <span class="nf">delay</span><span class="p">()</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="mi">100000</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">);</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="kt">void</span> <span class="nf">main</span><span class="p">()</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>    <span class="n">GPFCON</span> <span class="o">=</span> <span class="mi">0</span><span class="n">b0011000000</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">GPFDAT</span> <span class="o">=</span> <span class="mi">0</span><span class="n">b10111</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">GPBCON</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="n">b01010101</span><span class="o">&lt;&lt;</span><span class="mi">10</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">GPBDAT</span> <span class="o">=</span> <span class="mi">0</span><span class="n">b111100000</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">while</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">{</span>
-</span><span class='line'>        <span class="k">if</span><span class="p">((</span><span class="n">GPFDAT</span> <span class="o">&amp;</span> <span class="mi">0</span><span class="n">b10</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>                   <span class="c1">//key1</span>
-</span><span class='line'>        <span class="p">{</span>
-</span><span class='line'>            <span class="n">GPBDAT</span> <span class="o">=</span> <span class="mi">0</span><span class="n">b111000000</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="k">else</span> <span class="k">if</span><span class="p">((</span><span class="n">GPFDAT</span> <span class="o">&amp;</span> <span class="mi">0</span><span class="n">b10000</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>        <span class="c1">//key2</span>
-</span><span class='line'>        <span class="p">{</span>
-</span><span class='line'>            <span class="n">GPBDAT</span> <span class="o">=</span> <span class="mi">0</span><span class="n">b110100000</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="k">else</span> <span class="k">if</span><span class="p">((</span><span class="n">GPFDAT</span> <span class="o">&amp;</span> <span class="mi">0</span><span class="n">b100</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>          <span class="c1">//key3</span>
-</span><span class='line'>        <span class="p">{</span>
-</span><span class='line'>            <span class="n">GPBDAT</span> <span class="o">=</span> <span class="mi">0</span><span class="n">b101100000</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="k">else</span> <span class="k">if</span><span class="p">((</span><span class="n">GPFDAT</span> <span class="o">&amp;</span> <span class="mi">0</span><span class="n">b1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>            <span class="c1">//key4</span>
-</span><span class='line'>        <span class="p">{</span>
-</span><span class='line'>            <span class="n">GPBDAT</span> <span class="o">=</span> <span class="mi">0</span><span class="n">b011100000</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="k">else</span> <span class="k">continue</span><span class="p">;</span>
-</span><span class='line'>        <span class="n">delay</span><span class="p">();</span>
-</span><span class='line'>        <span class="n">GPBDAT</span> <span class="o">=</span> <span class="mi">0</span><span class="n">b111100000</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>文件名 Makefile</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="n">ARCH</span> <span class="o">=</span> <span class="n">arm</span><span class="o">-</span><span class="n">linux</span><span class="o">-</span>
-</span><span class='line'><span class="n">CC</span> <span class="o">=</span> <span class="err">$</span><span class="p">(</span><span class="n">ARCH</span><span class="p">)</span><span class="n">gcc</span>
-</span><span class='line'><span class="n">LD</span> <span class="o">=</span> <span class="err">$</span><span class="p">(</span><span class="n">ARCH</span><span class="p">)</span><span class="n">ld</span>
-</span><span class='line'><span class="n">OBJDUMP</span> <span class="o">=</span> <span class="err">$</span><span class="p">(</span><span class="n">ARCH</span><span class="p">)</span><span class="n">objdump</span>
-</span><span class='line'><span class="n">OBJCOPY</span> <span class="o">=</span> <span class="err">$</span><span class="p">(</span><span class="n">ARCH</span><span class="p">)</span><span class="n">objcopy</span>
-</span><span class='line'>
-</span><span class='line'><span class="nl">all</span><span class="p">:</span> <span class="n">crt0</span><span class="p">.</span><span class="n">S</span> <span class="n">key</span><span class="p">.</span><span class="n">c</span>
-</span><span class='line'>  <span class="err">$</span><span class="p">(</span><span class="n">CC</span><span class="p">)</span> <span class="o">-</span><span class="n">nostdlib</span> <span class="o">-</span><span class="n">g</span> <span class="o">-</span><span class="n">c</span> <span class="o">-</span><span class="n">o</span> <span class="n">crt0</span><span class="p">.</span><span class="n">o</span> <span class="n">crt0</span><span class="p">.</span><span class="n">S</span>
-</span><span class='line'>  <span class="err">$</span><span class="p">(</span><span class="n">CC</span><span class="p">)</span> <span class="o">-</span><span class="n">nostdlib</span> <span class="o">-</span><span class="n">g</span> <span class="o">-</span><span class="n">c</span> <span class="o">-</span><span class="n">o</span> <span class="n">key</span><span class="p">.</span><span class="n">o</span> <span class="n">key</span><span class="p">.</span><span class="n">c</span>
-</span><span class='line'>  <span class="err">$</span><span class="p">(</span><span class="n">LD</span><span class="p">)</span> <span class="o">-</span><span class="n">Ttext</span> <span class="mh">0x00000000</span> <span class="o">-</span><span class="n">g</span> <span class="n">crt0</span><span class="p">.</span><span class="n">o</span> <span class="n">key</span><span class="p">.</span><span class="n">o</span> <span class="o">-</span><span class="n">o</span> <span class="n">key</span><span class="o">-</span><span class="n">elf</span>
-</span><span class='line'>  <span class="err">$</span><span class="p">(</span><span class="n">OBJCOPY</span><span class="p">)</span> <span class="o">-</span><span class="n">O</span> <span class="n">binary</span> <span class="o">-</span><span class="n">S</span> <span class="n">key</span><span class="o">-</span><span class="n">elf</span> <span class="n">key_c</span><span class="p">.</span><span class="n">bin</span>
-</span><span class='line'>  <span class="err">$</span><span class="p">(</span><span class="n">OBJDUMP</span><span class="p">)</span> <span class="o">-</span><span class="n">D</span> <span class="o">-</span><span class="n">m</span> <span class="n">arm</span> <span class="n">key</span><span class="o">-</span><span class="n">elf</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">key</span><span class="p">.</span><span class="n">dis</span>
-</span><span class='line'>
-</span><span class='line'><span class="nl">clean</span><span class="p">:</span>
-</span><span class='line'>  <span class="n">rm</span> <span class="o">-</span><span class="n">f</span> <span class="o">*</span><span class="p">.</span><span class="n">o</span> <span class="n">key</span><span class="o">-</span><span class="n">elf</span> <span class="n">key_c</span><span class="p">.</span><span class="n">bin</span> <span class="n">key</span><span class="p">.</span><span class="n">dis</span>
-</span></code></pre></td></tr></table></div></figure>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/page/13">&larr; Older</a>
@@ -3496,6 +3494,10 @@ TCON |= (1&lt; TCON = 0x09; //自动加载，清“手动更新”，启动定�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="http://www.xefan.com/archives/84139.html">Mongodb分片配置实例</a>
+      </li>
+    
+      <li class="post">
         <a href="http://www.xefan.com/archives/84138.html">使用gunicorn部署Django</a>
       </li>
     
@@ -3511,19 +3513,15 @@ TCON |= (1&lt; TCON = 0x09; //自动加载，清“手动更新”，启动定�
         <a href="http://www.xefan.com/archives/84135.html">Nginx + Uwsgi + Django环境配置</a>
       </li>
     
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84134.html">配置rails的vim环境</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (47)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (26)</a></li><li><a href='/categories/web开发/index.html'>web开发 (18)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (8)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (23)</a></li></ul>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (47)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (26)</a></li><li><a href='/categories/web开发/index.html'>web开发 (18)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (9)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (23)</a></li></ul>
 </section>
 <section>
   <h1>Tag Cloud</h1>
-    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.45454545454545%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.9090909090909%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.81818181818181%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.9090909090909%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.36363636363636%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.27272727272727%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.36363636363636%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.81818181818181%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.81818181818181%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.72727272727273%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.9090909090909%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.81818181818181%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.72727272727273%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.9090909090909%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.9090909090909%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.45454545454545%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.81818181818181%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.63636363636364%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.45454545454545%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.9090909090909%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.45454545454545%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.9090909090909%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.9090909090909%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.9090909090909%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(66)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.0%'>mongodb(11)</a> <a href='/tags/mysql/index.html' style='font-size: 103.63636363636364%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.9090909090909%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.9090909090909%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 109.0909090909091%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.45454545454545%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.9090909090909%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 146.36363636363637%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.81818181818181%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.9090909090909%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 123.63636363636364%'>Ruby(26)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.72727272727273%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.9090909090909%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.54545454545455%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.36363636363636%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.72727272727273%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.63636363636364%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.72727272727273%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.9090909090909%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.9090909090909%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 112.72727272727272%'>Web开发(14)</a> <a href='/tags/windows/index.html' style='font-size: 106.36363636363636%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.9090909090909%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.9090909090909%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.9090909090909%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.9090909090909%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.45454545454545%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.81818181818181%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.9090909090909%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.18181818181819%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.18181818181819%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.9090909090909%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.9090909090909%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.9090909090909%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.81818181818181%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 109.0909090909091%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.18181818181819%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.9090909090909%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.54545454545455%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.9090909090909%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.9090909090909%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.45454545454545%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 120.9090909090909%'>翻译(23)</a> <a href='/tags/视频教程/index.html' style='font-size: 109.0909090909091%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.9090909090909%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.81818181818181%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.9090909090909%'>随笔(1)</a> </span>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.45454545454545%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.9090909090909%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.81818181818181%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.9090909090909%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.36363636363636%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.27272727272727%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.36363636363636%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.81818181818181%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.81818181818181%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.72727272727273%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.9090909090909%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.81818181818181%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.72727272727273%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.9090909090909%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.9090909090909%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.45454545454545%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.81818181818181%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.63636363636364%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.45454545454545%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.9090909090909%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.45454545454545%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.9090909090909%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.9090909090909%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.9090909090909%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(66)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.9090909090909%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.63636363636364%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.9090909090909%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.9090909090909%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 109.0909090909091%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.45454545454545%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.9090909090909%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 146.36363636363637%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.81818181818181%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.9090909090909%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 123.63636363636364%'>Ruby(26)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.72727272727273%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.9090909090909%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.54545454545455%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.36363636363636%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.72727272727273%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.63636363636364%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.72727272727273%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.9090909090909%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.9090909090909%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 112.72727272727272%'>Web开发(14)</a> <a href='/tags/windows/index.html' style='font-size: 106.36363636363636%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.9090909090909%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.9090909090909%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.9090909090909%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.9090909090909%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.45454545454545%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.81818181818181%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.9090909090909%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.18181818181819%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.18181818181819%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.9090909090909%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.9090909090909%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.9090909090909%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.81818181818181%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 109.0909090909091%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.18181818181819%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.9090909090909%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.54545454545455%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.9090909090909%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.9090909090909%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.45454545454545%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 120.9090909090909%'>翻译(23)</a> <a href='/tags/视频教程/index.html' style='font-size: 109.0909090909091%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.9090909090909%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.81818181818181%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.9090909090909%'>随笔(1)</a> </span>
 </section>
 <section>
   <h1>Link</h1>

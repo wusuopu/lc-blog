@@ -4,7 +4,7 @@
   <title><![CDATA[龍昌博客]]></title>
   <link href="http://www.xefan.com/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2014-12-21T20:04:33+08:00</updated>
+  <updated>2014-12-29T17:06:40+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -12,6 +12,161 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Mongodb分片配置实例]]></title>
+    <link href="http://www.xefan.com/archives/84139.html"/>
+    <updated>2014-12-29T16:52:37+08:00</updated>
+    <id>http://www.xefan.com/archives/84139-Mongodb分片配置实例</id>
+    <content type="html"><![CDATA[<p>数据分片即是从一个集合中选择一个片键(shard key)作为数据拆分的依据，原理与索引类似，然后将集合的数据拆分并保存到不同的服务器上。
+以下通过一个例子来介绍一下Mongodb的分片配置。</p>
+
+<p>有四台主机：</p>
+
+<ul>
+<li>172.17.0.6    (配置服务器)</li>
+<li>172.17.0.7    (mongos)</li>
+<li>172.17.0.8    (片服务器)</li>
+<li>172.17.0.9    (片服务器)</li>
+</ul>
+
+
+<p>1.在 172.17.0.6 上启动 mongod 服务作为配置服务器；<br/>
+修改配置，使其作为一个配置服务器，默认监听 27019 端口。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>configsvr = true</span></code></pre></td></tr></table></div></figure>
+
+
+<p>启动服务 <code>$ service mongodb start</code></p>
+
+<p>2.在 172.17.0.7 上启动 mongos 服务作为路由服务;<br/>
+建立mongos进程。(可以有多台配置服务器)，用法如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ mongos --configdb &lt;config server hostnames&gt;[,&lt;config server hostnames&gt;]</span></code></pre></td></tr></table></div></figure>
+
+
+<p>例如： <code>$ mongos --configdb 172.17.0.6:27019</code></p>
+
+<p>注意：在同一个分片集群中的每个 mongos 必须使用相同的 configDB 配置。</p>
+
+<p>3.添加分片<br/>
+一个片服务既可以是单个 mongod 实例，也可以是一个副本集。<br/>
+1).先分别在 172.17.0.8 和 172.17.0.9 上启动片服务器，即就是一个普通的 mongod 服务。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ service mongodb start</span></code></pre></td></tr></table></div></figure>
+
+
+<p>2).使用 mongo 客户端连接到 mongos 服务</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ mongo --host &lt;hostname of machine running mongos&gt; --port &lt;port mongos listens on&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如： <code>$ mongo --host 172.17.0.7 --port 27017</code></p>
+
+<p>3).在 mongo 客户端上执行命令添加分片：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&gt; use admin
+</span><span class='line'>&gt; db.auth(&lt;user&gt;, &lt;pswd&gt;)
+</span><span class='line'>&gt; sh.addShard("172.17.0.8:27017")
+</span><span class='line'>&gt; sh.addShard("172.17.0.9:27017")</span></code></pre></td></tr></table></div></figure>
+
+
+<p>4.切片数据<br/>
+1).首先对数据库进行切片<br/>
+使用 mongo 客户端连接到 mongos ，执行命令打开数据库的分片功能，用法如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&gt; sh.enableSharding("&lt;database&gt;")</span></code></pre></td></tr></table></div></figure>
+
+
+<p>例如要打开 mydb 数据库的分片功能： <code>&gt; sh.enableSharding("mydb")</code></p>
+
+<p>2).然后对数据集合进行切片<br/>
+命令用法如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&gt; sh.shardCollection("&lt;database&gt;.&lt;collection&gt;", shard-key-pattern)</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>shard-key-pattern</code> 与索引的用法一样，例如，要对 mydb 数据库的 test 集合按照 <code>_id</code> 字段进行分片： <code>&gt; sh.shardCollection("mydb.test", {"_id": "hashed"})</code></p>
+
+<p>接下来通过一个程序来测试一下，向数据库中添加10000条数据：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1">#!/usr/bin/env ruby</span>
+</span><span class='line'><span class="c1">#-*- coding:utf-8 -*-</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">require</span> <span class="s2">&quot;mongo&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">begin</span>
+</span><span class='line'>  <span class="n">conn</span> <span class="o">=</span> <span class="no">Mongo</span><span class="o">::</span><span class="no">Connection</span><span class="o">.</span><span class="n">new</span> <span class="s1">&#39;172.17.0.7&#39;</span>
+</span><span class='line'>  <span class="n">db</span> <span class="o">=</span> <span class="n">conn</span><span class="o">[</span><span class="s1">&#39;mydb&#39;</span><span class="o">]</span>
+</span><span class='line'><span class="k">rescue</span> <span class="no">Exception</span><span class="o">=&gt;</span><span class="n">e</span>
+</span><span class='line'>  <span class="nb">p</span> <span class="n">e</span>
+</span><span class='line'>  <span class="nb">exit</span> <span class="mi">1</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span class='line'><span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">10000</span>
+</span><span class='line'>  <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;no&#39;</span> <span class="o">=&gt;</span> <span class="n">i</span><span class="p">}</span>
+</span><span class='line'>  <span class="n">d</span> <span class="o">=</span> <span class="n">db</span><span class="o">[</span><span class="s1">&#39;test&#39;</span><span class="o">].</span><span class="n">insert</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+</span><span class='line'>  <span class="nb">puts</span> <span class="n">d</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后分别查看 172.17.0.8 和 172.17.0.9 的状态：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="mi">172</span><span class="o">.</span><span class="mi">17</span><span class="o">.</span><span class="mi">0</span><span class="o">.</span><span class="mi">8</span><span class="p">:</span>
+</span><span class='line'><span class="o">&gt;</span> <span class="n">db</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+</span><span class='line'><span class="mi">4952</span>
+</span><span class='line'>
+</span><span class='line'><span class="mi">172</span><span class="o">.</span><span class="mi">17</span><span class="o">.</span><span class="mi">0</span><span class="o">.</span><span class="mi">9</span><span class="p">:</span>
+</span><span class='line'><span class="o">&gt;</span> <span class="n">db</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+</span><span class='line'><span class="mi">5048</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>数据基本上是平均的分布在两台服务器上。</p>
+
+<p>参考： <a href="http://docs.mongodb.org/manual/tutorial/deploy-shard-cluster/">http://docs.mongodb.org/manual/tutorial/deploy-shard-cluster/</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[使用gunicorn部署Django]]></title>
@@ -2127,224 +2282,6 @@ static int Noddy_setlast(noddy_NoddyObject *self, PyObject *value, void *closure
 
 
 <p>本文中的示例代码可从 https://github.com/wusuopu/python-c-extension-sample 获取到。  </p>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[使用C语言编写Python扩展3——创建自定义类型(1)]]></title>
-    <link href="http://www.xefan.com/archives/84091.html"/>
-    <updated>2014-04-13T00:00:00+08:00</updated>
-    <id>http://www.xefan.com/archives/84091-使用C语言编写Python扩展3——创建自定义类型(1)</id>
-    <content type="html"><![CDATA[<p>在Python代码中如果要创建一个自定义类使用class关键字即可，但是在C代码中就没那么方便了。<br>
-首先简单介绍下Python中的类型。在python中一切皆对象，python中有两种对象：<br>
-一种是类型对象（class对象）：表示Python定义的类型，例如int, str, object等；<br>
-另一种是实例对象（instance对象）：表示由class对象创建的实例。 
-Python中的所有对象都是直接或者间接继承object，然后object又是typy类型。可以运行下面的例子看看输出结果：  </p>
-
-
-<pre><code>class A(object):
-    pass
-
-a = A()
-
-print(type(a))
-print(isinstance(a, A))
-print(isinstance(a, object))
-print(isinstance(a, type))
-
-print(type(A))
-print(A.__base__)
-print(isinstance(A, object))
-print(isinstance(A, type))
-
-print(type(object))
-print(isinstance(object, type))
-
-print(type(type))
-print(isinstance(type, object))
-</code></pre>
-
-
-<p>python是一门面向对象的编程语言，它是用C写的，而C又是面向过程的编程语言，那么python的类在C中是如何实现的呢？答案就是用结构体来模拟。  </p>
-
-
-<p>在Python的<em>object.h</em>头文件中定义了一个重要的结构体 PyTypeObject 。创建新的类型就是靠的它，该结构体定义如下：  </p>
-
-
-<pre><code>typedef struct _typeobject {
-    PyObject_VAR_HEAD
-    char *tp_name; /* For printing, in format "&lt;module&gt;.&lt;name&gt;" */
-    int tp_basicsize, tp_itemsize; /* For allocation */
-
-    /* Methods to implement standard operations */
-
-    destructor tp_dealloc;
-    printfunc tp_print;
-    getattrfunc tp_getattr;
-    setattrfunc tp_setattr;
-    cmpfunc tp_compare;
-    reprfunc tp_repr;
-
-    /* Method suites for standard classes */
-
-    PyNumberMethods *tp_as_number;
-    PySequenceMethods *tp_as_sequence;
-    PyMappingMethods *tp_as_mapping;
-
-    /* More standard operations (here for binary compatibility) */
-
-    hashfunc tp_hash;
-    ternaryfunc tp_call;
-    reprfunc tp_str;
-    getattrofunc tp_getattro;
-    setattrofunc tp_setattro;
-
-    /* Functions to access object as input/output buffer */
-    PyBufferProcs *tp_as_buffer;
-
-    /* Flags to define presence of optional/expanded features */
-    long tp_flags;
-
-    char *tp_doc; /* Documentation string */
-
-    /* Assigned meaning in release 2.0 */
-    /* call function for all accessible objects */
-    traverseproc tp_traverse;
-
-    /* delete references to contained objects */
-    inquiry tp_clear;
-
-    /* Assigned meaning in release 2.1 */
-    /* rich comparisons */
-    richcmpfunc tp_richcompare;
-
-    /* weak reference enabler */
-    long tp_weaklistoffset;
-
-    /* Added in release 2.2 */
-    /* Iterators */
-    getiterfunc tp_iter;
-    iternextfunc tp_iternext;
-
-    /* Attribute descriptor and subclassing stuff */
-    struct PyMethodDef *tp_methods;
-    struct PyMemberDef *tp_members;
-    struct PyGetSetDef *tp_getset;
-    struct _typeobject *tp_base;
-    PyObject *tp_dict;
-    descrgetfunc tp_descr_get;
-    descrsetfunc tp_descr_set;
-    long tp_dictoffset;
-    initproc tp_init;
-    allocfunc tp_alloc;
-    newfunc tp_new;
-    freefunc tp_free; /* Low-level free-memory routine */
-    inquiry tp_is_gc; /* For PyObject_IS_GC */
-    PyObject *tp_bases;
-    PyObject *tp_mro; /* method resolution order */
-    PyObject *tp_cache;
-    PyObject *tp_subclasses;
-    PyObject *tp_weaklist;
-} PyTypeObject;
-</code></pre>
-
-
-<p>这个比较庞大，里面包含的数据比较多，大部分都是一些函数指针而且可以为空，至于每个字段是什么意思请查看Python文档。  </p>
-
-
-<h2>创建自定义类型</h2>
-
-
-<p>创建一个新的C代码文件 <em>noddy.c</em> ，然后我们编写一个名为 noddy 的扩展模块，该模块包含了一个名为 Noddy 的类。  </p>
-
-
-<p>首先创建一个新的 PyTypeObject 类型的变量：</p>
-
-
-<pre><code>typedef struct {
-    PyObject_HEAD
-    /* Type-specific fields go here. */
-} noddy_NoddyObject;
-static PyTypeObject noddy_NoddyType = {
-    PyVarObject_HEAD_INIT(NULL, 0)
-    "noddy.Noddy",             /*tp_name*/
-    sizeof(noddy_NoddyObject), /*tp_basicsize*/
-    0,                         /*tp_itemsize*/
-    0,                         /*tp_dealloc*/
-    0,                         /*tp_print*/
-    0,                         /*tp_getattr*/
-    0,                         /*tp_setattr*/
-    0,                         /*tp_compare*/
-    0,                         /*tp_repr*/
-    0,                         /*tp_as_number*/
-    0,                         /*tp_as_sequence*/
-    0,                         /*tp_as_mapping*/
-    0,                         /*tp_hash */
-    0,                         /*tp_call*/
-    0,                         /*tp_str*/
-    0,                         /*tp_getattro*/
-    0,                         /*tp_setattro*/
-    0,                         /*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT,        /*tp_flags*/
-    "Noddy objects",           /*tp_doc*/
-};
-</code></pre>
-
-
-<p>这里是定义了一个noddy_NoddyObject结构体，它的第一个字段为 PyObject_HEAD ，因此相当于一个PyObject类型；然后还有一个 noddy_NoddyType 变量，它的第一个字段为 <em>PyVarObject_HEAD_INIT(NULL, 0)</em> ，这个很很重要，按理说这个应该写成 <em>PyVarObject_HEAD_INIT(&amp;PyType_Type, 0)</em> ，即表示Noddy这个类是一个type类型的对象。不过有的C编译器会对这个报错，因此这一项将在后面调用PyType_Ready函数来填充。<br>
-noddy_NoddyType 即是 Noddy 类，它保存了该类的元信息；noddy_NoddyObject结构体用于保存该类的实例对象的数据。<br>
-<em>只要是定义的结构体以PyObject_HEAD开始就属于是一个PyObject类型。PyObject_VAR_HEAD与PyObject_HEAD相似，只是PyObject_HEAD表示的是该类型占用内存大小是固定的如int、float；而PyObject_VAR_HEAD表示该类型占用的内存是可变的如list、dict。</em>   </p>
-
-
-<p>然后创建一个新扩展模块，并完成初始化：</p>
-
-
-<pre><code>static PyMethodDef noddy_methods[] = {
-    {NULL}  /* Sentinel */
-};
-PyMODINIT_FUNC
-initnoddy(void) 
-{
-    PyObject* m;
-
-    noddy_NoddyType.tp_new = PyType_GenericNew;
-    if (PyType_Ready(&amp;noddy_NoddyType) &lt; 0)
-        return;
-
-    m = Py_InitModule3("noddy", noddy_methods,
-                       "Example module that creates an extension type.");
-
-    Py_INCREF(&amp;noddy_NoddyType);
-    PyModule_AddObject(m, "Noddy", (PyObject *)&amp;noddy_NoddyType);
-}
-</code></pre>
-
-
-<p><strong><em>注意</em></strong>：以上是针对Python2的，在Python3中模块的初始化操作略有不同。请参考第一节的内容。  </p>
-
-
-<p>noddy_NoddyType即是我们要创建的 Noddy 类，它是 PyTypeObject 类型的结构变量。为了创建新的类型，我们需要指明 tp_new 方法，它相当于Python中的 __new__，这里我们使用默认的 PyType_GenericNew 即可。<br>
-然后调用 PyType_Ready 完成新类型的创建。<br>
-最后调用 PyModule_AddObject 在该模块中添加刚刚创建的新类型。  </p>
-
-
-<h2>测试</h2>
-
-
-<p>最后就是编写一个小程序来测试刚刚的模块是否可用。</p>
-
-
-<pre><code>import noddy
-
-o = noddy.Noddy()
-print(o)
-print(type(o), type(noddy.Noddy))
-
-# 这个会报错，noddy.Noddy 类不能被继承
-class A(noddy.Noddy):
-    pass
-</code></pre>
 
 ]]></content>
   </entry>

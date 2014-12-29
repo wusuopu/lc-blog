@@ -5,11 +5,14 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>使用C语言编写Python扩展1——Hello World - 龍昌博客</title>
+  <title>Mongodb分片配置实例 - 龍昌博客</title>
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="能够使用C语言编写扩展是Python一大卖点吧，这可以将一些关键的代码使用C来写以提升程序的性能。本文是参考了Python的官方文档整理而来的，同时结合了Python2跟Python3。按照惯例现在先从一个Hello World开始讲解一下写扩展的基本流程。 详细的内容可以参考官方文档： &hellip;">
+  <meta name="description" content="数据分片即是从一个集合中选择一个片键(shard key)作为数据拆分的依据，原理与索引类似，然后将集合的数据拆分并保存到不同的服务器上。
+以下通过一个例子来介绍一下Mongodb的分片配置。 有四台主机： 172.17.0.6 (配置服务器)
+172.17.0.7 (mongos)
+172.17 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +21,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://www.xefan.com/archives/84082.html">
+  <link rel="canonical" href="http://www.xefan.com/archives/84139.html">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="龍昌博客" type="application/atom+xml">
@@ -69,7 +72,7 @@
   
   <header>
     
-      <h1 class="entry-title">使用C语言编写Python扩展1——Hello World</h1>
+      <h1 class="entry-title">Mongodb分片配置实例</h1>
     
     
       <p class="meta">
@@ -78,7 +81,7 @@
 
 
 
-<time class='entry-date' datetime='2014-04-12T00:00:00+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>12</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>12:00 am</span></time>
+<time class='entry-date' datetime='2014-12-29T16:52:37+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>29</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>4:52 pm</span></time>
         
            | <a href="#disqus_thread"
              data-disqus-identifier="http://www.xefan.com">Comments</a>
@@ -88,181 +91,153 @@
   </header>
 
 
-<div class="entry-content"><p>能够使用C语言编写扩展是Python一大卖点吧，这可以将一些关键的代码使用C来写以提升程序的性能。本文是参考了Python的官方文档整理而来的，同时结合了Python2跟Python3。按照惯例现在先从一个Hello World开始讲解一下写扩展的基本流程。</p>
+<div class="entry-content"><p>数据分片即是从一个集合中选择一个片键(shard key)作为数据拆分的依据，原理与索引类似，然后将集合的数据拆分并保存到不同的服务器上。
+以下通过一个例子来介绍一下Mongodb的分片配置。</p>
 
+<p>有四台主机：</p>
 
-<p>详细的内容可以参考官方文档：<br>
-https://docs.python.org/2.7/extending/index.html <br>
-https://docs.python.org/3/extending/index.html  </p>
+<ul>
+<li>172.17.0.6    (配置服务器)</li>
+<li>172.17.0.7    (mongos)</li>
+<li>172.17.0.8    (片服务器)</li>
+<li>172.17.0.9    (片服务器)</li>
+</ul>
 
 
-<p>https://docs.python.org/2.7/c-api/index.html<br>
-https://docs.python.org/3/c-api/index.html  </p>
+<p>1.在 172.17.0.6 上启动 mongod 服务作为配置服务器；<br/>
+修改配置，使其作为一个配置服务器，默认监听 27019 端口。</p>
 
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>configsvr = true</span></code></pre></td></tr></table></div></figure>
 
-<p>同时本文中的示例代码可从 https://github.com/wusuopu/python-c-extension-sample 获取到。  </p>
 
+<p>启动服务 <code>$ service mongodb start</code></p>
 
-<p>首先介绍一下我当前的开发环境：<br>
- * ArchLinux<br>
- * gcc 4.8.2<br>
- * glibc 2.19<br>
- * Python 2.7.6<br>
- * Python 3.3.5  </p>
+<p>2.在 172.17.0.7 上启动 mongos 服务作为路由服务;<br/>
+建立mongos进程。(可以有多台配置服务器)，用法如下：</p>
 
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ mongos --configdb &lt;config server hostnames&gt;[,&lt;config server hostnames&gt;]</span></code></pre></td></tr></table></div></figure>
 
-<h2>开始</h2>
 
+<p>例如： <code>$ mongos --configdb 172.17.0.6:27019</code></p>
 
-<p>先创建一个新的C代码文件 lc_hello.c。为了能够正常使用python的api，需要导入Python.h这个头文件。</p>
+<p>注意：在同一个分片集群中的每个 mongos 必须使用相同的 configDB 配置。</p>
 
+<p>3.添加分片<br/>
+一个片服务既可以是单个 mongod 实例，也可以是一个副本集。<br/>
+1).先分别在 172.17.0.8 和 172.17.0.9 上启动片服务器，即就是一个普通的 mongod 服务。</p>
 
-<pre><code>#include &lt;Python.h&gt;
-</code></pre>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ service mongodb start</span></code></pre></td></tr></table></div></figure>
 
 
-<p>然后再定义一个模块的初始化函数。</p>
+<p>2).使用 mongo 客户端连接到 mongos 服务</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ mongo --host &lt;hostname of machine running mongos&gt; --port &lt;port mongos listens on&gt;</span></code></pre></td></tr></table></div></figure>
 
 
-<pre><code>PyMODINIT_FUNC initlc_hello_world(void)
-{
-    Py_InitModule("lc_hello_world", lc_hello_world_methods);
-    printf("init lc_hello_world module\n");
-}
-</code></pre>
+<p>如： <code>$ mongo --host 172.17.0.7 --port 27017</code></p>
 
+<p>3).在 mongo 客户端上执行命令添加分片：</p>
 
-<p>这个函数是用于模块初始化的，即是在第一次使用import语句导入模块时会执行。其函数名必须为initmodule_name这样的格式，在这里我们的模块名为lc_hello_world，所以函数名就是initlc_hello_world。<br>
-在这个函数中又调用了Py_InitModule函数，它执行了模块初始化的操作。Py_InitModule函数传入了两个参数，第一个参数为字符串，表示模块的名称；第二个参数是一个PyMethodDef的结构体数组，表示该模块都具有哪些方法。与Py_InitModule相似的方法还有Py_InitModule3和Py_InitModule4。因此在initlc_hello_world方法之前还需要先定义 lc_hello_world_methods 数组。  </p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&gt; use admin
+</span><span class='line'>&gt; db.auth(&lt;user&gt;, &lt;pswd&gt;)
+</span><span class='line'>&gt; sh.addShard("172.17.0.8:27017")
+</span><span class='line'>&gt; sh.addShard("172.17.0.9:27017")</span></code></pre></td></tr></table></div></figure>
 
 
-<pre><code>static PyMethodDef lc_hello_world_methods[] = {
-    {"test", (PyCFunction)test_function, METH_NOARGS, "lc_hello_world extending test"},
-    {"add", (PyCFunction)add_function, METH_VARARGS, NULL},
-    {NULL, NULL, 0, NULL}
-};
-</code></pre>
+<p>4.切片数据<br/>
+1).首先对数据库进行切片<br/>
+使用 mongo 客户端连接到 mongos ，执行命令打开数据库的分片功能，用法如下：</p>
 
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&gt; sh.enableSharding("&lt;database&gt;")</span></code></pre></td></tr></table></div></figure>
 
-<p>PyMethodDef结构体有四个字段。<br>
-  * 第一个是一个字符串，表示在Python中对应的方法的名称；<br>
-  * 第二个是对应的C代码的函数；<br>
-  * 第三个是一个标致位，表示该Python方法是否需要参数，METH_NOARGS表示不需要参数，METH_VARARGS表示需要参数；<br>
-  * 第四个是一个字符串，它是该方法的__doc__属性，这个不是必须的，可以为NULL。<br>
-PyMethodDef结构体数组最后以 {NULL, NULL, 0, NULL}结尾。（感觉好像不是必须的，但是通常都这么做那我们也这么做吧）  </p>
 
+<p>例如要打开 mydb 数据库的分片功能： <code>&gt; sh.enableSharding("mydb")</code></p>
 
-<p><strong>注意</strong>：以上的用法都是针对Python2的，在Python3中又有些不同。<br>
-在Python3中模块的初始化函数的函数名变为了PyInit_module_name这样的形式了，因此这里就需要定义一个函数 PyMODINIT_FUNC PyInit_lc_hello_world。并且还需要返回一个 module 类型的变量。<br>
-其次在Python3中创建module对象的函数也由 Py_InitModule 变为了 PyModule_Create。<br>
-因此在Python3中模块的初始化函数应该定义如下：  </p>
+<p>2).然后对数据集合进行切片<br/>
+命令用法如下：</p>
 
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&gt; sh.shardCollection("&lt;database&gt;.&lt;collection&gt;", shard-key-pattern)</span></code></pre></td></tr></table></div></figure>
 
-<pre><code>PyMODINIT_FUNC PyInit_lc_hello_world(void)
-{
-    PyObject *m;
-    m = PyModule_Create(&amp;lc_hello_world_module);
-    if (m == NULL)
-        return NULL;
-    printf("init lc_hello_world module\n");
-    return m;
-}
-</code></pre>
 
+<p><code>shard-key-pattern</code> 与索引的用法一样，例如，要对 mydb 数据库的 test 集合按照 <code>_id</code> 字段进行分片： <code>&gt; sh.shardCollection("mydb.test", {"_id": "hashed"})</code></p>
 
-<p>PyModule_Create函数需要传入一个 PyModuleDef 类型的指针。<br>
-因此在此之前还需要先定义 lc_hello_world_module 变量。  </p>
+<p>接下来通过一个程序来测试一下，向数据库中添加10000条数据：</p>
 
-
-<pre><code>static struct PyModuleDef lc_hello_world_module = {
-    PyModuleDef_HEAD_INIT,
-    "lc_hello_world",        /* name of module */
-    NULL,                    /* module documentation, may be NULL */
-    -1,                      /* size of per-interpreter state of the module, or -1 if the module keeps state in global variables. */
-    lc_hello_world_methods   /* A pointer to a table of module-level functions, described by PyMethodDef values. Can be NULL if no functions are present. */
-};
-</code></pre>
-
-
-<p>在 lc_hello_world_methods 中我们为模块指定了两个方法，接下来我们需要实现这两个方法。  </p>
-
-
-<pre><code>static PyObject* test_function(PyObject *self)
-{
-    PyObject_Print(self, stdout, 0);
-    printf("lc_hello_world test\n");
-    Py_INCREF(Py_True);
-    return Py_True;
-}
-</code></pre>
-
-
-<p>这段代码定义了Python的test方法所对应的C函数。在这个函数中就只执行了一条printf语句，然后就返回了Py_True。<br>
-Py_True即是Python中的True，Py_INCREF函数执行的操作是对Python对象的计数引用值进行加1。与Py_INCREF对应的是Py_DECREF，它是对计数引用减1,并且计数引用为0时就销毁对象并回收内存。  </p>
-
-
-<pre><code>static PyObject* add_function(PyObject *self, PyObject *args)
-{
-    int num1, num2;
-    PyObject *result=NULL;
-    if (!PyArg_ParseTuple(args, "nn", &amp;num1, &amp;num2)) {
-        printf("传入参数错误！\n");
-        return NULL;
-    }
-    result = PyInt_FromLong(num1+num2);
-    return result;
-}
-</code></pre>
-
-
-<p>这须代码定义了Python的add方法所对应的C函数。该函数需要传入两个整数类型的参数。<br>
-PyArg_ParseTuple是对传入的参数进行解析，关于这个函数的说明请查看Python手册。  </p>
-
-
-<p><strong>注意</strong>：在Python3中整数都是 long 类型的，因此这里的 PyInt_FromLong 需要改为 PyLong_FromLong，其作用是将C的int类型转为Python的int类型。  </p>
-
-
-<h2>编译</h2>
-
-
-<p>扩展模块编写完成后，接下来就是对其进行编译了。先编写一个 setup.py 脚本。  </p>
-
-
-<pre><code>#!/usr/bin/env python
-#-*- coding:utf-8 -*-
-
-from setuptools import setup, Extension
-
-hello_world = Extension('lc_hello_world', sources=["lc_hello.c"])
-setup(ext_modules=[hello_world])
-</code></pre>
-
-
-<p>然后再执行命令进行编译：</p>
-
-
-<pre><code>$ python setup.py build
-</code></pre>
-
-
-<p>执行成功后会在当前目录下的build目录中生成扩展模块文件。</p>
-
-
-<h2>测试</h2>
-
-
-<p>最后就是编写一个小程序来测试刚刚的模块是否可用。</p>
-
-
-<pre><code>import lc_hello_world
-
-print(lc_hello_world.test.__doc__)
-print(lc_hello_world.add.__doc__)
-print(lc_hello_world.test())
-print(lc_hello_world.add(1, 2))
-print(lc_hello_world.add(1, '2'))    # 这个会报错
-</code></pre>
-
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1">#!/usr/bin/env ruby</span>
+</span><span class='line'><span class="c1">#-*- coding:utf-8 -*-</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">require</span> <span class="s2">&quot;mongo&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">begin</span>
+</span><span class='line'>  <span class="n">conn</span> <span class="o">=</span> <span class="no">Mongo</span><span class="o">::</span><span class="no">Connection</span><span class="o">.</span><span class="n">new</span> <span class="s1">&#39;172.17.0.7&#39;</span>
+</span><span class='line'>  <span class="n">db</span> <span class="o">=</span> <span class="n">conn</span><span class="o">[</span><span class="s1">&#39;mydb&#39;</span><span class="o">]</span>
+</span><span class='line'><span class="k">rescue</span> <span class="no">Exception</span><span class="o">=&gt;</span><span class="n">e</span>
+</span><span class='line'>  <span class="nb">p</span> <span class="n">e</span>
+</span><span class='line'>  <span class="nb">exit</span> <span class="mi">1</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span class='line'><span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">10000</span>
+</span><span class='line'>  <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;no&#39;</span> <span class="o">=&gt;</span> <span class="n">i</span><span class="p">}</span>
+</span><span class='line'>  <span class="n">d</span> <span class="o">=</span> <span class="n">db</span><span class="o">[</span><span class="s1">&#39;test&#39;</span><span class="o">].</span><span class="n">insert</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+</span><span class='line'>  <span class="nb">puts</span> <span class="n">d</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后分别查看 172.17.0.8 和 172.17.0.9 的状态：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="mi">172</span><span class="o">.</span><span class="mi">17</span><span class="o">.</span><span class="mi">0</span><span class="o">.</span><span class="mi">8</span><span class="p">:</span>
+</span><span class='line'><span class="o">&gt;</span> <span class="n">db</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+</span><span class='line'><span class="mi">4952</span>
+</span><span class='line'>
+</span><span class='line'><span class="mi">172</span><span class="o">.</span><span class="mi">17</span><span class="o">.</span><span class="mi">0</span><span class="o">.</span><span class="mi">9</span><span class="p">:</span>
+</span><span class='line'><span class="o">&gt;</span> <span class="n">db</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+</span><span class='line'><span class="mi">5048</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>数据基本上是平均的分布在两台服务器上。</p>
+
+<p>参考： <a href="http://docs.mongodb.org/manual/tutorial/deploy-shard-cluster/">http://docs.mongodb.org/manual/tutorial/deploy-shard-cluster/</a></p>
 </div>
 
 
@@ -278,14 +253,14 @@ print(lc_hello_world.add(1, '2'))    # 这个会报错
 
 
 
-<time class='entry-date' datetime='2014-04-12T00:00:00+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>12</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>12:00 am</span></time>
+<time class='entry-date' datetime='2014-12-29T16:52:37+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>29</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>4:52 pm</span></time>
     </p>
     <p class="meta">
       Categories: 
 
 <span class="categories">
   
-    <a class='category' href='/categories/python栏目/index.html'>python栏目</a>
+    <a class='category' href='/categories/数据库/index.html'>数据库</a>
   
 </span>
 
@@ -296,7 +271,7 @@ print(lc_hello_world.add(1, '2'))    # 这个会报错
 
 <span class="tags">
   
-    <a class='tag' href='/tags/C/index.html'>C</a>, <a class='tag' href='/tags/python/index.html'>python</a>
+    <a class='tag' href='/tags/mongodb/index.html'>mongodb</a>
   
 </span>
 
@@ -312,10 +287,8 @@ print(lc_hello_world.add(1, '2'))    # 这个会报错
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/archives/84076.html" title="Previous Post: mongoengine教程(5)——信号">&laquo; mongoengine教程(5)——信号</a>
+        <a class="basic-alignment left" href="/archives/84138.html" title="Previous Post: 使用gunicorn部署Django">&laquo; 使用gunicorn部署Django</a>
       
-      
-        <a class="basic-alignment right" href="/archives/84085.html" title="Next Post: 使用C语言编写Python扩展2——函数">使用C语言编写Python扩展2——函数 &raquo;</a>
       
     </p>
   </footer>
@@ -404,8 +377,8 @@ print(lc_hello_world.add(1, '2'))    # 这个会报错
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://www.xefan.com/archives/84082.html';
-        var disqus_url = 'http://www.xefan.com/archives/84082.html';
+        var disqus_identifier = 'http://www.xefan.com/archives/84139.html';
+        var disqus_url = 'http://www.xefan.com/archives/84139.html';
         var disqus_script = 'embed.js';
       
     (function () {
