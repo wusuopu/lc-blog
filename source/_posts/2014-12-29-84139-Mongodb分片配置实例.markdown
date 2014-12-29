@@ -1,0 +1,126 @@
+---
+layout: post
+title: "Mongodb分片配置实例"
+date: 2014-12-29 08:52:37 +0000
+comments: true
+post_id: 84139
+permalink: /archives/84139.html
+categories: ["数据库"]
+tags: ["mongodb"]
+---
+
+数据分片即是从一个集合中选择一个片键(shard key)作为数据拆分的依据，原理与索引类似，然后将集合的数据拆分并保存到不同的服务器上。
+以下通过一个例子来介绍一下Mongodb的分片配置。
+
+有四台主机：
+
+  * 172.17.0.6    (配置服务器)
+  * 172.17.0.7    (mongos)
+  * 172.17.0.8    (片服务器)
+  * 172.17.0.9    (片服务器)
+
+1.在 172.17.0.6 上启动 mongod 服务作为配置服务器；  
+修改配置，使其作为一个配置服务器，默认监听 27019 端口。
+
+```
+configsvr = true
+```
+
+启动服务 `$ service mongodb start`
+
+2.在 172.17.0.7 上启动 mongos 服务作为路由服务;  
+建立mongos进程。(可以有多台配置服务器)，用法如下：
+
+```
+$ mongos --configdb <config server hostnames>[,<config server hostnames>]
+```
+
+例如： `$ mongos --configdb 172.17.0.6:27019`
+
+注意：在同一个分片集群中的每个 mongos 必须使用相同的 configDB 配置。
+
+
+3.添加分片  
+一个片服务既可以是单个 mongod 实例，也可以是一个副本集。  
+1).先分别在 172.17.0.8 和 172.17.0.9 上启动片服务器，即就是一个普通的 mongod 服务。
+
+```
+$ service mongodb start
+```
+
+2).使用 mongo 客户端连接到 mongos 服务
+
+```
+$ mongo --host <hostname of machine running mongos> --port <port mongos listens on>
+```
+
+如： `$ mongo --host 172.17.0.7 --port 27017`
+
+3).在 mongo 客户端上执行命令添加分片：
+
+```
+> use admin
+> db.auth(<user>, <pswd>)
+> sh.addShard("172.17.0.8:27017")
+> sh.addShard("172.17.0.9:27017")
+```
+
+4.切片数据  
+1).首先对数据库进行切片  
+使用 mongo 客户端连接到 mongos ，执行命令打开数据库的分片功能，用法如下：
+
+```
+> sh.enableSharding("<database>")
+```
+
+例如要打开 mydb 数据库的分片功能： `> sh.enableSharding("mydb")`
+
+2).然后对数据集合进行切片  
+命令用法如下：  
+
+```
+> sh.shardCollection("<database>.<collection>", shard-key-pattern)
+```
+
+`shard-key-pattern` 与索引的用法一样，例如，要对 mydb 数据库的 test 集合按照 `_id` 字段进行分片： `> sh.shardCollection("mydb.test", {"_id": "hashed"})`
+
+接下来通过一个程序来测试一下，向数据库中添加10000条数据：
+
+```ruby
+#!/usr/bin/env ruby
+#-*- coding:utf-8 -*-
+
+require "mongo"
+
+begin
+  conn = Mongo::Connection.new '172.17.0.7'
+  db = conn['mydb']
+rescue Exception=>e
+  p e
+  exit 1
+end
+
+i = 0
+while i < 10000
+  d = {'no' => i}
+  d = db['test'].insert(d)
+  i += 1
+  puts d
+end
+```
+
+然后分别查看 172.17.0.8 和 172.17.0.9 的状态：
+
+```
+172.17.0.8:
+> db.test.count()
+4952
+
+172.17.0.9:
+> db.test.count()
+5048
+```
+
+数据基本上是平均的分布在两台服务器上。
+
+参考： http://docs.mongodb.org/manual/tutorial/deploy-shard-cluster/
