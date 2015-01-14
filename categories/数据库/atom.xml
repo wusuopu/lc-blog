@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 数据库 | 龍昌博客]]></title>
   <link href="http://www.xefan.com/categories/数据库/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2014-12-29T17:06:40+08:00</updated>
+  <updated>2015-01-14T18:18:29+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -12,6 +12,55 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Redis集群配置实例]]></title>
+    <link href="http://www.xefan.com/archives/84140.html"/>
+    <updated>2015-01-14T18:11:36+08:00</updated>
+    <id>http://www.xefan.com/archives/84140-Redis集群配置实例</id>
+    <content type="html"><![CDATA[<p>通过配置 redis 的主从集群可将请求的负荷分散到多台服务器上。</p>
+
+<p>redis 的集群配置比较简单，以下是一个例子。
+假设有如下三台主机：</p>
+
+<ul>
+<li>172.17.0.11 (主)</li>
+<li>172.17.0.12 (从)</li>
+<li>172.17.0.13 (从)</li>
+</ul>
+
+
+<p>在从服务器上添加如下配置：</p>
+
+<pre><code>slaveof 172.17.0.11 6379
+</code></pre>
+
+<p>如果主服务器设置了认证密码，那么还需要再添加一条配置：</p>
+
+<pre><code>masterauth &lt;password&gt;
+</code></pre>
+
+<p>然后分别启动三台服务器的 redis 服务即可。</p>
+
+<p>接下来连接主服务器添加一些数据测试一下。</p>
+
+<pre><code>$ redis-cli -h 172.17.0.11
+172.17.0.11:6379&gt; set foo1 bar1
+OK
+</code></pre>
+
+<p>然后再连接到从服务器查询结果。</p>
+
+<pre><code>$ redis-cli -h 172.17.0.12
+172.17.0.12:6379&gt; get foo1
+"bar1"
+</code></pre>
+
+<p>这时发现数据已经同步过来了。</p>
+
+<p>注意：从服务器默认是只读的。如果需要设置为可写，可将 <code>slave-read-only</code> 设置项的值设为 <code>no</code> 即可。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Mongodb分片配置实例]]></title>
@@ -582,71 +631,6 @@ signals.post_save.connect(Author.post_save, sender=Author)
 
 
 <p>注意：对于 RefereneField 的<em>reverse_delete_rules</em>参数不会触发信号。</p>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Mongoengine教程(4)——文件存储]]></title>
-    <link href="http://www.xefan.com/archives/84072.html"/>
-    <updated>2014-04-05T00:00:00+08:00</updated>
-    <id>http://www.xefan.com/archives/84072-mongoengine教程(4)——文件存储</id>
-    <content type="html"><![CDATA[<p>MongoDB的GridFS支持直接在数据库中存储文件。要在MongoEngine中使用GridFS，只要使用 FileField 对象即可。以下是一个例子：</p>
-
-
-<pre><code>class Animal(Document):
-    genus = StringField()
-    family = StringField()
-    photo = FileField()
-
-marmot = Animal(genus='Marmota', family='Sciuridae')
-
-marmot_photo = open('gtk.png', 'rb')
-marmot.photo.put(marmot_photo, content_type = 'image/png')
-marmot.save()
-</code></pre>
-
-
-<p>这个例子将 gtk.png 这个图片存入了数据库中。<br>
-文件的读取也很简单：</p>
-
-
-<pre><code>marmot = Animal.objects(genus='Marmota').first()
-photo = marmot.photo.read()
-content_type = marmot.photo.content_type
-</code></pre>
-
-
-<p>FileField不仅可以存储文件，还可以用来存储数据流。只是操作上略微不同。</p>
-
-
-<p>要存储数据流，首先先创建一个新的文件，然后再往里面写入数据。</p>
-
-
-<pre><code>marmot.photo.new_file()
-marmot.photo.write('some_image_data')
-marmot.photo.write('some_more_image_data')
-marmot.photo.close()
-marmot.save()
-</code></pre>
-
-
-<p>如果要删除存储在数据库中的文件，只需要调用该文件对象的 delete 方法：</p>
-
-
-<pre><code>marmot.photo.delete()
-</code></pre>
-
-
-<p>注意：一条文档记录中的FileField字段只保存了对GridFS集合中该文件的ID引用。这意味着如果该文档被删除了，对用的文件不会被删除。因此在删除这类文档时需要小心，以免出现孤立文件。</p>
-
-
-<p>对于已存储的文件可以进行替换修改：</p>
-
-
-<pre><code>another_marmot = open('python.png', 'rb')
-marmot.photo.replace(another_marmot, content_type='image/png')
-</code></pre>
 
 ]]></content>
   </entry>

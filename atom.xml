@@ -4,7 +4,7 @@
   <title><![CDATA[龍昌博客]]></title>
   <link href="http://www.xefan.com/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2014-12-29T17:06:40+08:00</updated>
+  <updated>2015-01-14T18:18:29+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -12,6 +12,63 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Redis集群配置实例]]></title>
+    <link href="http://www.xefan.com/archives/84140.html"/>
+    <updated>2015-01-14T18:11:36+08:00</updated>
+    <id>http://www.xefan.com/archives/84140-Redis集群配置实例</id>
+    <content type="html"><![CDATA[<p>通过配置 redis 的主从集群可将请求的负荷分散到多台服务器上。</p>
+
+<p>redis 的集群配置比较简单，以下是一个例子。
+假设有如下三台主机：</p>
+
+<ul>
+<li>172.17.0.11 (主)</li>
+<li>172.17.0.12 (从)</li>
+<li>172.17.0.13 (从)</li>
+</ul>
+
+
+<p>在从服务器上添加如下配置：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>slaveof 172.17.0.11 6379</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果主服务器设置了认证密码，那么还需要再添加一条配置：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>masterauth &lt;password&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后分别启动三台服务器的 redis 服务即可。</p>
+
+<p>接下来连接主服务器添加一些数据测试一下。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ redis-cli -h 172.17.0.11
+</span><span class='line'>172.17.0.11:6379&gt; set foo1 bar1
+</span><span class='line'>OK</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后再连接到从服务器查询结果。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ redis-cli -h 172.17.0.12
+</span><span class='line'>172.17.0.12:6379&gt; get foo1
+</span><span class='line'>"bar1"</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这时发现数据已经同步过来了。</p>
+
+<p>注意：从服务器默认是只读的。如果需要设置为可写，可将 <code>slave-read-only</code> 设置项的值设为 <code>no</code> 即可。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Mongodb分片配置实例]]></title>
@@ -1992,293 +2049,6 @@ del o
 
 gc.collect()
 </code></pre>
-
-
-<p>本文中的示例代码可从 https://github.com/wusuopu/python-c-extension-sample 获取到。  </p>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[使用C语言编写Python扩展4——创建自定义类型(2)]]></title>
-    <link href="http://www.xefan.com/archives/84093.html"/>
-    <updated>2014-04-14T00:00:00+08:00</updated>
-    <id>http://www.xefan.com/archives/84093-使用C语言编写Python扩展4——创建自定义类型(2)</id>
-    <content type="html"><![CDATA[<p>上一节中我们创建了一个简单的类。这一节我们将对这个类进行扩展，添加属性、方法，并且支持子类。</p>
-
-
-<h2>为类型添加方法和数据</h2>
-
-
-<p>接着上一节的例子，继续编辑<em>noddy.c</em>。  </p>
-
-
-<pre><code>typedef struct {
-    PyObject_HEAD
-    /* Type-specific fields go here. */
-    PyObject *first; /* first name */
-    PyObject *last;  /* last name */
-    int number;
-} noddy_NoddyObject;
-</code></pre>
-
-
-<p>修改 noddy_NoddyObject 结构体，为其添加三个字段。  </p>
-
-
-<p>然后定义自己的__new__方法，为对象分配内存空间：  </p>
-
-
-<pre><code>static PyObject * Noddy_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
-{
-    noddy_NoddyObject*self;
-    self = (noddy_NoddyObject*)type-&gt;tp_alloc(type, 0);
-    if (self != NULL) {
-        self-&gt;first = PyString_FromString("");
-        if (self-&gt;first == NULL)
-        {
-          Py_DECREF(self);
-          return NULL;
-        }
-        self-&gt;last = PyString_FromString("");
-        if (self-&gt;last == NULL)
-        {
-          Py_DECREF(self);
-          return NULL;
-        }
-        self-&gt;number = 0;
-    }
-    return (PyObject *)self;
-}
-</code></pre>
-
-
-<p>接着定义对象的初始化函数__init__：  </p>
-
-
-<pre><code>static int Noddy_init(noddy_NoddyObject*self, PyObject *args, PyObject *kwds)
-{
-    PyObject *first=NULL, *last=NULL, *tmp;
-    static char *kwlist[] = {"first", "last", "number", NULL};
-
-    if (! PyArg_ParseTupleAndKeywords(args, kwds, "|OOi", kwlist, 
-                                      &amp;first, &amp;last, 
-                                      &amp;self-&gt;number))
-        return -1;
-
-    if (first) {
-        tmp = self-&gt;first;
-        Py_INCREF(first);
-        self-&gt;first = first;
-        Py_XDECREF(tmp);
-    }
-
-    if (last) {
-        tmp = self-&gt;last;
-        Py_INCREF(last);
-        self-&gt;last = last;
-        Py_XDECREF(tmp);
-    }
-    return 0;
-}
-</code></pre>
-
-
-<p>由于对象包含了几项数据，因此在对象销毁时需要先释放数据的资源。定义资源释放方法：</p>
-
-
-<pre><code>static void Noddy_dealloc(noddy_NoddyObject* self)
-{
-    Py_XDECREF(self-&gt;first);
-    Py_XDECREF(self-&gt;last);
-    Py_TYPE(self)-&gt;tp_free((PyObject*)self);
-}
-</code></pre>
-
-
-<p>然后再为该类定义一个方法用于返回该对象的first值和last值：  </p>
-
-
-<pre><code>static PyObject * Noddy_name(noddy_NoddyObject* self)
-{
-    static PyObject *format = NULL;
-    PyObject *args, *result;
-    if (format == NULL) {
-        format = PyString_FromString("%s %s");
-        if (format == NULL)
-            return NULL;
-    }
-    if (self-&gt;first == NULL) {
-        PyErr_SetString(PyExc_AttributeError, "first");
-        return NULL;
-    }
-    if (self-&gt;last == NULL) {
-        PyErr_SetString(PyExc_AttributeError, "last");
-        return NULL;
-    }
-    args = Py_BuildValue("OO", self-&gt;first, self-&gt;last);
-    if (args == NULL)
-        return NULL;
-    result = PyString_Format(format, args);
-    Py_DECREF(args);
-    return result;
-}
-static PyMethodDef Noddy_methods[] = {
-    {"name", (PyCFunction)Noddy_name, METH_NOARGS, "Return the name, combining the first and last name"},
-    {NULL}  /* Sentinel */
-};
-</code></pre>
-
-
-<p>最后在定义 noddy_NoddyType 变量时将对应字段进行填充：</p>
-
-
-<pre><code>static PyTypeObject noddy_NoddyType = {
-    PyObject_HEAD_INIT(NULL)
-    0,                         /*ob_size*/
-    "noddy.Noddy",             /*tp_name*/
-    sizeof(noddy_NoddyObject), /*tp_basicsize*/
-    0,                         /*tp_itemsize*/
-    (destructor)Noddy_dealloc, /*tp_dealloc*/
-    0,                         /*tp_print*/
-    0,                         /*tp_getattr*/
-    0,                         /*tp_setattr*/
-    0,                         /*tp_compare*/
-    0,                         /*tp_repr*/
-    0,                         /*tp_as_number*/
-    0,                         /*tp_as_sequence*/
-    0,                         /*tp_as_mapping*/
-    0,                         /*tp_hash */
-    0,                         /*tp_call*/
-    0,                         /*tp_str*/
-    0,                         /*tp_getattro*/
-    0,                         /*tp_setattro*/
-    0,                         /*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,  /*tp_flags*/
-    "Noddy objects",           /*tp_doc*/
-    0,                         /* tp_traverse */
-    0,                         /* tp_clear */
-    0,                         /* tp_richcompare */
-    0,                         /* tp_weaklistoffset */
-    0,                         /* tp_iter */
-    0,                         /* tp_iternext */
-    Noddy_methods,             /* tp_methods */
-    0,                         /* tp_members */
-    0,                         /* tp_getset */
-    0,                         /* tp_base */
-    0,                         /* tp_dict */
-    0,                         /* tp_descr_get */
-    0,                         /* tp_descr_set */
-    0,                         /* tp_dictoffset */
-    (initproc)Noddy_init,      /* tp_init */
-    0,                         /* tp_alloc */
-    Noddy_new,                 /* tp_new */
-};
-</code></pre>
-
-
-<p>tp_flags字段增加了  Py_TPFLAGS_BASETYPE 属性，表示该类可以被继承。最后进行编译测试：  </p>
-
-
-<pre><code>import noddy
-
-o = noddy.Noddy("abc", "def", 12)
-print(o, o.name())
-print(type(o), type(noddy.Noddy))
-print(o.number, o.first, o.last)
-
-class A(noddy.Noddy):
-    pass
-</code></pre>
-
-
-<p>运行以上程序会发现Noddy对象没有number、first和last这几个属性。这是因为虽然在noddy_NoddyObject结构体中定义了这几个字段，但是它们仍然在Python中是不可见的。<br>
-为了能在Python中访问这几个属性，需要设置noddy_NoddyType的tp_members字段。  </p>
-
-
-<pre><code>static PyMemberDef Noddy_members[] = {
-    {"first", T_OBJECT_EX, offsetof(noddy_NoddyObject, first), 0, "first name"},
-    {"last", T_OBJECT_EX, offsetof(noddy_NoddyObject, last), 0, "last name"},
-    {"number", T_INT, offsetof(noddy_NoddyObject, number), 0, "noddy number"},
-    {NULL}  /* Sentinel */
-};
-</code></pre>
-
-
-<p>先定义一个 PyMemberDef 结构体类型的数组，然后将noddy_NoddyType的tp_members字段设为Noddy_members。PyMemberDef和T_OBJECT_EX以及T_INT均是在 <em>structmember.h</em> 头文件中定义的，因此还需要先包含该文件。  </p>
-
-
-<pre><code>#include &lt;structmember.h&gt;
-</code></pre>
-
-
-<h2>数据属性的访问控制</h2>
-
-
-<p>数据属性的访问控制可以对属性的设置进行合法性检查，例如这里我们想要确保 Noddy 对象的first属性和last属性都必须是字符串。<br>
-首先定义属性的get方法和set方法：  </p>
-
-
-<pre><code>static PyObject * Noddy_getfirst(noddy_NoddyObject *self, void *closure)
-{
-    Py_INCREF(self-&gt;first);
-    return self-&gt;first;
-}
-static int Noddy_setfirst(noddy_NoddyObject *self, PyObject *value, void *closure)
-{
-  if (value == NULL) {
-    PyErr_SetString(PyExc_TypeError, "Cannot delete the first attribute");
-    return -1;
-  }
-  if (! PyString_Check(value)) {
-    PyErr_SetString(PyExc_TypeError, 
-                    "The first attribute value must be a string");
-    return -1;
-  }
-  Py_DECREF(self-&gt;first);
-  Py_INCREF(value);
-  self-&gt;first = value;    
-  return 0;
-}
-static PyObject * Noddy_getlast(noddy_NoddyObject *self, void *closure)
-{
-    Py_INCREF(self-&gt;last);
-    return self-&gt;last;
-}
-static int Noddy_setlast(noddy_NoddyObject *self, PyObject *value, void *closure)
-{
-  if (value == NULL) {
-    PyErr_SetString(PyExc_TypeError, "Cannot delete the last attribute");
-    return -1;
-  }
-  if (! PyString_Check(value)) {
-    PyErr_SetString(PyExc_TypeError, 
-                    "The last attribute value must be a string");
-    return -1;
-  }
-  Py_DECREF(self-&gt;last);
-  Py_INCREF(value);
-  self-&gt;last = value;    
-  return 0;
-}
-</code></pre>
-
-
-<p>然后创建一个 PyGetSetDef 结构类型的数组：  </p>
-
-
-<pre><code>static PyGetSetDef Noddy_getseters[] = {
-    {"first", (getter)Noddy_getfirst, (setter)Noddy_setfirst, "first name", NULL},
-    {"last", (getter)Noddy_getlast, (setter)Noddy_setlast, "last name", NULL},
-    {NULL}  /* Sentinel */
-};
-</code></pre>
-
-
-<p>最后再设置 noddy_NoddyType 的tp_getset字段的值为 Noddy_getseters 即可。  </p>
-
-
-<p><strong>注意</strong>：以上的代码均是针对Python2的，在Python3中略有不同。  </p>
 
 
 <p>本文中的示例代码可从 https://github.com/wusuopu/python-c-extension-sample 获取到。  </p>
