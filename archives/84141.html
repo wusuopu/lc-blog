@@ -5,13 +5,14 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>在vim下使用DoxygenToolkit进行自动注释 - 龍昌博客</title>
+  <title>Vagrant使用笔记 - 龍昌博客</title>
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="doxygen是一个文档生成器，其工作机制是利用注释中的有效信息来自动生成文档。而DoxygenToolkit是vim下一款能够自动生成doxygen可以识别的注释的插件。
-它会根据配置自动生成注释，主要是license注释、文件注释、函数及类注释。
-下载地址：http://www.vim.org &hellip;">
+  <meta name="description" content="Vgrant是一个基于 Ruby 使用 Virtualbox 进行创建和部署虚拟化环境的工具。
+类似的工具之前有使用过 Docker。就我个人而言这两款工具之间，Docker是轻量级的VM，
+因此性能应该会比较好，但是只能在64位的系统下使用。
+而 Vgrant 是使用 Virtualbox &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -20,7 +21,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://www.xefan.com/archives/83795.html">
+  <link rel="canonical" href="http://www.xefan.com/archives/84141.html">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="龍昌博客" type="application/atom+xml">
@@ -71,7 +72,7 @@
   
   <header>
     
-      <h1 class="entry-title">在vim下使用DoxygenToolkit进行自动注释</h1>
+      <h1 class="entry-title">Vagrant使用笔记</h1>
     
     
       <p class="meta">
@@ -80,7 +81,7 @@
 
 
 
-<time class='entry-date' datetime='2012-09-28T00:00:00+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>28</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>12:00 am</span></time>
+<time class='entry-date' datetime='2015-02-24T19:17:43+08:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>24</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>7:17 pm</span></time>
         
            | <a href="#disqus_thread"
              data-disqus-identifier="http://www.xefan.com">Comments</a>
@@ -90,23 +91,70 @@
   </header>
 
 
-<div class="entry-content"><p>doxygen是一个文档生成器，其工作机制是利用注释中的有效信息来自动生成文档。而DoxygenToolkit是vim下一款能够自动生成doxygen可以识别的注释的插件。<br/>
-它会根据配置自动生成注释，主要是license注释、文件注释、函数及类注释。<br/>
-下载地址：<a href="http://www.vim.org/scripts/script.php?script_id=987">http://www.vim.org/scripts/script.php?script_id=987</a></p>
+<div class="entry-content"><p>Vgrant是一个基于 Ruby 使用 Virtualbox 进行创建和部署虚拟化环境的工具。
+类似的工具之前有使用过 Docker。就我个人而言这两款工具之间，Docker是轻量级的VM，
+因此性能应该会比较好，但是只能在64位的系统下使用。
+而 Vgrant 是使用 Virtualbox 进行虚拟化，因此性能上不及 Docker，
+不过它可以在32/64位的 Linux、Windows 等系统上运行。</p>
 
-<p>修改.vimrc的配置，加入自己对Doxygen的配置<br/>
-let g:DoxygenToolkit_authorName=&ldquo;longchangjin &lt;admin@longchangjin.cn&gt;&rdquo;<br/>
-let g:DoxygenToolkit_briefTag_funcName=&ldquo;yes&rdquo;<br/>
-let g:doxygen_enhanced_color=1</p>
+<p>我觉得 Vgrant 比较适合用于在开发环境中使用，而 Docker 比较适合用于生产环境。</p>
 
-<p>运行vim 在命令行输入命令即可<br/>
-DoxAuthor:将文件名，作者，时间等<br/>
-DoxLic:  license注释<br/>
-Dox：    函数及类注释</p>
+<h2>安装</h2>
 
-<p>也可做一个按键映射，就不用每次都输入命令了。</p>
+<p>首先安装 virtualbox，然后再安装 Vgrant。</p>
 
-<p>如果想自定义注释信息，可以修改DoxygenToolkit.vim文件。</p>
+<p>1.通过源代码安装</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>git clone https://github.com/mitchellh/vagrant
+</span><span class='line'>cd vagrant
+</span><span class='line'>bundle install
+</span><span class='line'>rake install</span></code></pre></td></tr></table></div></figure>
+
+
+<p>2.通过安装包安装<br/>
+根据情况选择下载对应的安装包： <a href="http://www.vagrantup.com/downloads.html">http://www.vagrantup.com/downloads.html</a></p>
+
+<p>注意：如果是 Windows 系统，可能还需要将 Vgrant 的路径添加到环境变量中，以便使用 vgrant 命令。</p>
+
+<h2>使用</h2>
+
+<p>Vagrant 的使用方法也很简单，基本如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># 这里我先添加一个 ArchLinux 的镜像
+</span><span class='line'>vagrant box add archlinux http://vagrant.srijn.net/archlinux-x64-2014-01-07.box
+</span><span class='line'># 进行初始化
+</span><span class='line'>vagrant init archlinux
+</span><span class='line'># 运行虚拟机
+</span><span class='line'>vagrant up
+</span><span class='line'># 如果需要进行ssh连接到虚拟机中进行一些操作，可以执行该命令
+</span><span class='line'>vagrant ssh</span></code></pre></td></tr></table></div></figure>
+
+
+<p>其他的一些命令：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># 关闭虚拟机
+</span><span class='line'>vagrant halt
+</span><span class='line'># 删除创建的虚拟机
+</span><span class='line'>vagrant destroy</span></code></pre></td></tr></table></div></figure>
+
+
+<p>vagrant的一些镜像： <a href="http://www.vagrantbox.es/">http://www.vagrantbox.es/</a></p>
 </div>
 
 
@@ -122,14 +170,14 @@ Dox：    函数及类注释</p>
 
 
 
-<time class='entry-date' datetime='2012-09-28T00:00:00+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>28</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>12:00 am</span></time>
+<time class='entry-date' datetime='2015-02-24T19:17:43+08:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>24</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>7:17 pm</span></time>
     </p>
     <p class="meta">
       Categories: 
 
 <span class="categories">
   
-    <a class='category' href='/categories/开源软件/index.html'>开源软件</a>
+    <a class='category' href='/categories/linux栏目/index.html'>linux栏目</a>
   
 </span>
 
@@ -140,7 +188,7 @@ Dox：    函数及类注释</p>
 
 <span class="tags">
   
-    <a class='tag' href='/tags/vim/index.html'>vim</a>
+    <a class='tag' href='/tags/Linux/index.html'>Linux</a>, <a class='tag' href='/tags/Ruby/index.html'>Ruby</a>
   
 </span>
 
@@ -156,10 +204,8 @@ Dox：    函数及类注释</p>
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/archives/83793.html" title="Previous Post: VIM配对符号(surrouding)处理插件">&laquo; VIM配对符号(surrouding)处理插件</a>
+        <a class="basic-alignment left" href="/archives/84140.html" title="Previous Post: Redis集群配置实例">&laquo; Redis集群配置实例</a>
       
-      
-        <a class="basic-alignment right" href="/archives/83797.html" title="Next Post: 在vim中使用正则表达式">在vim中使用正则表达式 &raquo;</a>
       
     </p>
   </footer>
@@ -248,8 +294,8 @@ Dox：    函数及类注释</p>
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://www.xefan.com/archives/83795.html';
-        var disqus_url = 'http://www.xefan.com/archives/83795.html';
+        var disqus_identifier = 'http://www.xefan.com/archives/84141.html';
+        var disqus_url = 'http://www.xefan.com/archives/84141.html';
         var disqus_script = 'embed.js';
       
     (function () {

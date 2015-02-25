@@ -4,7 +4,7 @@
   <title><![CDATA[龍昌博客]]></title>
   <link href="http://www.xefan.com/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2015-01-14T18:18:29+08:00</updated>
+  <updated>2015-02-25T10:09:21+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -12,6 +12,78 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Vagrant使用笔记]]></title>
+    <link href="http://www.xefan.com/archives/84141.html"/>
+    <updated>2015-02-24T19:17:43+08:00</updated>
+    <id>http://www.xefan.com/archives/84141-Vagrant使用笔记</id>
+    <content type="html"><![CDATA[<p>Vgrant是一个基于 Ruby 使用 Virtualbox 进行创建和部署虚拟化环境的工具。
+类似的工具之前有使用过 Docker。就我个人而言这两款工具之间，Docker是轻量级的VM，
+因此性能应该会比较好，但是只能在64位的系统下使用。
+而 Vgrant 是使用 Virtualbox 进行虚拟化，因此性能上不及 Docker，
+不过它可以在32/64位的 Linux、Windows 等系统上运行。</p>
+
+<p>我觉得 Vgrant 比较适合用于在开发环境中使用，而 Docker 比较适合用于生产环境。</p>
+
+<h2>安装</h2>
+
+<p>首先安装 virtualbox，然后再安装 Vgrant。</p>
+
+<p>1.通过源代码安装</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>git clone https://github.com/mitchellh/vagrant
+</span><span class='line'>cd vagrant
+</span><span class='line'>bundle install
+</span><span class='line'>rake install</span></code></pre></td></tr></table></div></figure>
+
+
+<p>2.通过安装包安装<br/>
+根据情况选择下载对应的安装包： <a href="http://www.vagrantup.com/downloads.html">http://www.vagrantup.com/downloads.html</a></p>
+
+<p>注意：如果是 Windows 系统，可能还需要将 Vgrant 的路径添加到环境变量中，以便使用 vgrant 命令。</p>
+
+<h2>使用</h2>
+
+<p>Vagrant 的使用方法也很简单，基本如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># 这里我先添加一个 ArchLinux 的镜像
+</span><span class='line'>vagrant box add archlinux http://vagrant.srijn.net/archlinux-x64-2014-01-07.box
+</span><span class='line'># 进行初始化
+</span><span class='line'>vagrant init archlinux
+</span><span class='line'># 运行虚拟机
+</span><span class='line'>vagrant up
+</span><span class='line'># 如果需要进行ssh连接到虚拟机中进行一些操作，可以执行该命令
+</span><span class='line'>vagrant ssh</span></code></pre></td></tr></table></div></figure>
+
+
+<p>其他的一些命令：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># 关闭虚拟机
+</span><span class='line'>vagrant halt
+</span><span class='line'># 删除创建的虚拟机
+</span><span class='line'>vagrant destroy</span></code></pre></td></tr></table></div></figure>
+
+
+<p>vagrant的一些镜像： <a href="http://www.vagrantbox.es/">http://www.vagrantbox.es/</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Redis集群配置实例]]></title>
@@ -1884,174 +1956,6 @@ $ cp /etc/xdg/awesome/rc.lua ~/.config/awesome
 
 <p>两个都试用了几天，我个人的感受是awesome比较强大，配置文件就是一个lua有脚本，因此可以在配置文件里完成一些比较复杂的功能。但是同时lua脚本作为配置，修改起来比较复杂，需要会一点lua语言。<br>
 相对而言i3就比较简洁了，同时功能也会少一些，不过我感觉也够用了。</p>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[使用C语言编写Python扩展5——垃圾回收管理]]></title>
-    <link href="http://www.xefan.com/archives/84096.html"/>
-    <updated>2014-04-15T00:00:00+08:00</updated>
-    <id>http://www.xefan.com/archives/84096-使用C语言编写Python扩展5——垃圾回收管理</id>
-    <content type="html"><![CDATA[<p>上一节介绍了创建一个具有属性的类，由于对象具有属性数据，因此在进行内存管理时要多加注意。这一节就介绍一下Python的垃圾回收管理。<br>
-在Python中垃圾回收主要是靠的计数引用方法，但是单凭计数引用还是不够的。先看看下面这段Python代码。  </p>
-
-
-<pre><code>n = []
-m = []
-n.append(m)
-m.append(n)
-del m
-del n
-</code></pre>
-
-
-<p>如果只靠计数引用的话执行上面这段代码之后n和m都不能被回收，因为它们的引用计算值都不为0。<br>
-像上面例子这样相互循环引用称作循环引用垃圾，在Python中有循环垃圾回收器（cyclic-garbage collector）专门用于回收此类计数引用无法处理的垃圾内存。  </p>
-
-
-<p>接着上一节的例子，继续编辑<em>noddy.c</em>。  </p>
-
-
-<p>为了让该对象类型支持垃圾回收，将PyTypeObject的tp_flags字段增加Py_TPFLAGS_HAVE_GC这个标志位。同时与GC(Garbage Collection)相关的tp_traverse和tp_clear这两个字段也要设置。  </p>
-
-
-<ul>
-<li>tp_traverse是用于垃圾回收器（garbage collector）遍历该实例对象中所有需要回收的属性对象。  </li>
-<li>tp_clear是用于清除内部各个属性对象的。  </li>
-</ul>
-
-
-<p>首先定义tp_traverse和tp_clear所对应的函数：  </p>
-
-
-<pre><code>static int Noddy_traverse(noddy_NoddyObject *self, visitproc visit, void *arg)
-{
-    Py_VISIT(self-&gt;first);
-    Py_VISIT(self-&gt;last);
-    return 0;
-}
-static int Noddy_clear(noddy_NoddyObject *self)
-{
-    Py_CLEAR(self-&gt;first);
-    Py_CLEAR(self-&gt;last);
-    return 0;
-}
-</code></pre>
-
-
-<p>Py_VISIT和Py_CLEAR是两个宏，简化了visit操作和clear操作。  </p>
-
-
-<p>然后再修改noddy_NoddyType结构体定义：  </p>
-
-
-<pre><code>static PyTypeObject noddy_NoddyType = {
-    PyObject_HEAD_INIT(NULL)
-    0,                         /*ob_size*/
-    "noddy.Noddy",             /*tp_name*/
-    sizeof(noddy_NoddyObject), /*tp_basicsize*/
-    0,                         /*tp_itemsize*/
-    (destructor)Noddy_dealloc, /*tp_dealloc*/
-    0,                         /*tp_print*/
-    0,                         /*tp_getattr*/
-    0,                         /*tp_setattr*/
-    0,                         /*tp_compare*/
-    0,                         /*tp_repr*/
-    0,                         /*tp_as_number*/
-    0,                         /*tp_as_sequence*/
-    0,                         /*tp_as_mapping*/
-    0,                         /*tp_hash */
-    0,                         /*tp_call*/
-    0,                         /*tp_str*/
-    0,                         /*tp_getattro*/
-    0,                         /*tp_setattro*/
-    0,                         /*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE | Py_TPFLAGS_HAVE_GC,  /*tp_flags*/
-    "Noddy objects",           /*tp_doc*/
-    (traverseproc)Noddy_traverse,   /* tp_traverse */
-    (inquiry)Noddy_clear,      /* tp_clear */
-    0,                         /* tp_richcompare */
-    0,                         /* tp_weaklistoffset */
-    0,                         /* tp_iter */
-    0,                         /* tp_iternext */
-    Noddy_methods,             /* tp_methods */
-    Noddy_members,             /* tp_members */
-    0,                         /* tp_getset */
-    0,                         /* tp_base */
-    0,                         /* tp_dict */
-    0,                         /* tp_descr_get */
-    0,                         /* tp_descr_set */
-    0,                         /* tp_dictoffset */
-    (initproc)Noddy_init,      /* tp_init */
-    0,                         /* tp_alloc */
-    Noddy_new,                 /* tp_new */
-};
-</code></pre>
-
-
-<p><strong>注意</strong>：<br>
-Python的官方手册中说道如果设置了Py_TPFLAGS_HAVE_GC这个标志位的话，那么就必须使用PyObject_GC_New这个函数来创建实例对象，使用PyObject_GC_Del来销毁已创建了的实例对象。  </p>
-
-
-<p>使用PyObject_GC_New创建实例对象之后再用PyObject_GC_Track将该实例添加到垃圾回收器所跟踪的对象集合中去。<br>
-在对象销毁时再执行PyObject_GC_UnTrack和PyObject_GC_Del函数。  </p>
-
-
-<p>然后再修改tp_new函数和tp_dealloc函数：  </p>
-
-
-<pre><code>static PyObject * Noddy_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
-{
-    noddy_NoddyObject*self;
-    self = (noddy_NoddyObject*)PyObject_GC_New(noddy_NoddyObject, type);
-    if (self != NULL) {
-        PyObject_GC_Track(self);
-        self-&gt;first = PyString_FromString("");
-        if (self-&gt;first == NULL)
-        {
-          Py_DECREF(self);
-          return NULL;
-        }
-        self-&gt;last = PyString_FromString("");
-        if (self-&gt;last == NULL)
-        {
-          Py_DECREF(self);
-          return NULL;
-        }
-        self-&gt;number = 0;
-    }
-    return (PyObject *)self;
-}
-
-static void Noddy_dealloc(noddy_NoddyObject* self)
-{
-    PyObject_GC_UnTrack(self);
-    Noddy_clear(self);
-    PyObject_GC_Del(self);
-}
-</code></pre>
-
-
-<p>最后再写一段Python程序来测试下该模块：  </p>
-
-
-<pre><code>import gc
-import noddy
-
-gc.set_debug(gc.DEBUG_STATS | gc.DEBUG_LEAK)
-
-o = noddy.Noddy()
-l = [o]
-o.first = l
-del l
-del o
-
-gc.collect()
-</code></pre>
-
-
-<p>本文中的示例代码可从 https://github.com/wusuopu/python-c-extension-sample 获取到。  </p>
 
 ]]></content>
   </entry>
