@@ -1,0 +1,61 @@
+---
+layout: post
+title: "Vagrant使用笔记"
+date: 2015-02-24 11:17:43 +0000
+comments: true
+post_id: 84141
+permalink: /archives/84141.html
+categories: ["Linux栏目"]
+tags: ["Linux", "Ruby"]
+---
+
+Vgrant是一个基于 Ruby 使用 Virtualbox 进行创建和部署虚拟化环境的工具。
+类似的工具之前有使用过 Docker。就我个人而言这两款工具之间，Docker是轻量级的VM，
+因此性能应该会比较好，但是只能在64位的系统下使用。
+而 Vgrant 是使用 Virtualbox 进行虚拟化，因此性能上不及 Docker，
+不过它可以在32/64位的 Linux、Windows 等系统上运行。
+
+我觉得 Vgrant 比较适合用于在开发环境中使用，而 Docker 比较适合用于生产环境。
+
+## 安装
+首先安装 virtualbox，然后再安装 Vgrant。
+
+1.通过源代码安装
+
+```
+git clone https://github.com/mitchellh/vagrant
+cd vagrant
+bundle install
+rake install
+```
+
+2.通过安装包安装  
+根据情况选择下载对应的安装包： http://www.vagrantup.com/downloads.html
+
+注意：如果是 Windows 系统，可能还需要将 Vgrant 的路径添加到环境变量中，以便使用 vgrant 命令。
+
+
+## 使用
+Vagrant 的使用方法也很简单，基本如下：
+
+```
+# 这里我先添加一个 ArchLinux 的镜像
+vagrant box add archlinux http://vagrant.srijn.net/archlinux-x64-2014-01-07.box
+# 进行初始化
+vagrant init archlinux
+# 运行虚拟机
+vagrant up
+# 如果需要进行ssh连接到虚拟机中进行一些操作，可以执行该命令
+vagrant ssh
+```
+
+其他的一些命令：
+
+```
+# 关闭虚拟机
+vagrant halt
+# 删除创建的虚拟机
+vagrant destroy
+```
+
+vagrant的一些镜像： http://www.vagrantbox.es/
