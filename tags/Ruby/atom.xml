@@ -4,7 +4,7 @@
   <title><![CDATA[Tag: Ruby | 龍昌博客]]></title>
   <link href="http://www.xefan.com/tags/Ruby/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2015-02-25T10:09:21+08:00</updated>
+  <updated>2015-04-05T21:08:25+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -14,58 +14,75 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Vagrant使用笔记]]></title>
+    <title type="html"><![CDATA[使用Unicorn部署rails应用]]></title>
     <link href="http://www.xefan.com/archives/84141.html"/>
-    <updated>2015-02-24T19:17:43+08:00</updated>
-    <id>http://www.xefan.com/archives/84141-Vagrant使用笔记</id>
-    <content type="html"><![CDATA[<p>Vgrant是一个基于 Ruby 使用 Virtualbox 进行创建和部署虚拟化环境的工具。
-类似的工具之前有使用过 Docker。就我个人而言这两款工具之间，Docker是轻量级的VM，
-因此性能应该会比较好，但是只能在64位的系统下使用。
-而 Vgrant 是使用 Virtualbox 进行虚拟化，因此性能上不及 Docker，
-不过它可以在32/64位的 Linux、Windows 等系统上运行。</p>
+    <updated>2015-04-05T20:47:15+08:00</updated>
+    <id>http://www.xefan.com/archives/84141-使用Unicorn部署rails应用</id>
+    <content type="html"><![CDATA[<p>玩 rails 也有段时间了，最近研究下怎么部署一个 rails 应用。在几年前的话要部署 rails 应用是件很麻烦的事，
+但是近几年出现了一些比较好的工具可以方便的进行 rails 部署。如： Unicorn、thin、Passenger等。</p>
 
-<p>我觉得 Vgrant 比较适合用于在开发环境中使用，而 Docker 比较适合用于生产环境。</p>
+<p>Unicorn 是一个 Rack 应用的HTTP服务器。之前玩 Python 的时候也有一个 Gunicorn ，使用它来部署 Python 的 Web 应用
+也很方便，可以参考我之前的那篇文件 <a href="84138.html">《使用gunicorn部署Django》</a> 。</p>
+
+<p>接下来简单分享下使用 Nginx + Unicorn 来部署 rails 的配置。</p>
 
 <h2>安装</h2>
 
-<p>首先安装 virtualbox，然后再安装 Vgrant。</p>
+<p>首先安装 unicorn 包： <code>$ gem install unicorn</code></p>
 
-<p>1.通过源代码安装</p>
+<p>然后编译一下静态文件：</p>
 
-<pre><code>git clone https://github.com/mitchellh/vagrant
-cd vagrant
-bundle install
-rake install
+<pre><code>$ RAILS_ENV=production rake assets:clean
+$ RAILS_ENV=production rake assets:precompile
 </code></pre>
 
-<p>2.通过安装包安装<br/>
-根据情况选择下载对应的安装包： <a href="http://www.vagrantup.com/downloads.html">http://www.vagrantup.com/downloads.html</a></p>
+<p>下载配置文件： <code>$ curl -o config/unicorn.rb https://raw.github.com/defunkt/unicorn/master/examples/unicorn.conf.rb</code></p>
 
-<p>注意：如果是 Windows 系统，可能还需要将 Vgrant 的路径添加到环境变量中，以便使用 vgrant 命令。</p>
+<p>接着根据情况修改相关配置，如： working_directory、listen 等。
+例如我的是需要同时监听网络端口和 sock 文件，那么我的 listen 设置如下：</p>
 
-<h2>使用</h2>
-
-<p>Vagrant 的使用方法也很简单，基本如下：</p>
-
-<pre><code># 这里我先添加一个 ArchLinux 的镜像
-vagrant box add archlinux http://vagrant.srijn.net/archlinux-x64-2014-01-07.box
-# 进行初始化
-vagrant init archlinux
-# 运行虚拟机
-vagrant up
-# 如果需要进行ssh连接到虚拟机中进行一些操作，可以执行该命令
-vagrant ssh
+<pre><code>listen "#{root_path}/tmp/sockets/unicorn.sock", :backlog =&gt; 64
+listen 8081, :tcp_nopush =&gt; true
 </code></pre>
 
-<p>其他的一些命令：</p>
+<h2>配置 Nginx</h2>
 
-<pre><code># 关闭虚拟机
-vagrant halt
-# 删除创建的虚拟机
-vagrant destroy
+<p>然后配置 Nginx 的反向代理，以下是我的 Nginx 配置示例：</p>
+
+<pre><code>upstream rails_server {
+  server unix:/app_path/tmp/sockets/unicorn.sock fail_timeout=0;
+}
+
+server {
+  listen 80;
+    server_name webserver localhost;
+
+    root /app_path/public;
+
+  try_files $uri $uri @unicorn;
+
+  location @unicorn {
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header Host $http_host;
+    proxy_redirect off;
+    proxy_pass http://rails_server;
+  }
+
+  location ~ /\.ht {
+    deny  all;
+  }
+}
 </code></pre>
 
-<p>vagrant的一些镜像： <a href="http://www.vagrantbox.es/">http://www.vagrantbox.es/</a></p>
+<h2>启动服务</h2>
+
+<p>配置完成之后，最后启动服务。</p>
+
+<pre><code>$ bundle exec unicorn_rails -c config/unicorn.rb -D -E production
+$ sudo service nginx start
+</code></pre>
+
+<p>然后再在浏览器中访问试试。</p>
 ]]></content>
   </entry>
   
