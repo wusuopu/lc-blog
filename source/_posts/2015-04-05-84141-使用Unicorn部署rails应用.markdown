@@ -1,0 +1,77 @@
+---
+layout: post
+title: "使用Unicorn部署rails应用"
+date: 2015-04-05 12:47:15 +0000
+comments: true
+post_id: 84141
+permalink: /archives/84141.html
+categories: ["Ruby栏目", "Web开发"]
+tags: ["Ruby", "Web开发"]
+---
+
+玩 rails 也有段时间了，最近研究下怎么部署一个 rails 应用。在几年前的话要部署 rails 应用是件很麻烦的事，
+但是近几年出现了一些比较好的工具可以方便的进行 rails 部署。如： Unicorn、thin、Passenger等。
+
+Unicorn 是一个 Rack 应用的HTTP服务器。之前玩 Python 的时候也有一个 Gunicorn ，使用它来部署 Python 的 Web 应用
+也很方便，可以参考我之前的那篇文件 [《使用gunicorn部署Django》](84138.html) 。
+
+接下来简单分享下使用 Nginx + Unicorn 来部署 rails 的配置。
+
+## 安装
+首先安装 unicorn 包： `$ gem install unicorn`
+
+然后编译一下静态文件：
+
+```
+$ RAILS_ENV=production rake assets:clean
+$ RAILS_ENV=production rake assets:precompile
+```
+
+下载配置文件： `$ curl -o config/unicorn.rb https://raw.github.com/defunkt/unicorn/master/examples/unicorn.conf.rb`
+
+接着根据情况修改相关配置，如： working_directory、listen 等。
+例如我的是需要同时监听网络端口和 sock 文件，那么我的 listen 设置如下：
+
+```
+listen "#{root_path}/tmp/sockets/unicorn.sock", :backlog => 64
+listen 8081, :tcp_nopush => true
+```
+
+## 配置 Nginx
+然后配置 Nginx 的反向代理，以下是我的 Nginx 配置示例：
+
+```
+upstream rails_server {
+  server unix:/app_path/tmp/sockets/unicorn.sock fail_timeout=0;
+}
+
+server {
+  listen 80;
+	server_name webserver localhost;
+
+	root /app_path/public;
+
+  try_files $uri $uri @unicorn;
+
+  location @unicorn {
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header Host $http_host;
+    proxy_redirect off;
+    proxy_pass http://rails_server;
+  }
+ 
+  location ~ /\.ht {
+    deny  all;
+  }
+}
+```
+
+## 启动服务
+配置完成之后，最后启动服务。
+
+```
+$ bundle exec unicorn_rails -c config/unicorn.rb -D -E production
+$ sudo service nginx start
+```
+
+然后再在浏览器中访问试试。

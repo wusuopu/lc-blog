@@ -131,7 +131,7 @@ pidfile = "/tmp/gunicorn.pid"
 运行：
 
 ```
-$ gunicorn -c gunicorn.ini webui.wsgi:application
+$ gunicorn -c gunicorn.ini myproject.wsgi:application
 $ service nginx start
 ```
 
