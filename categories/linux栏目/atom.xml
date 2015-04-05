@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Linux栏目 | 龍昌博客]]></title>
   <link href="http://www.xefan.com/categories/linux栏目/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2015-04-05T21:08:25+08:00</updated>
+  <updated>2015-04-05T21:18:11+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -12,6 +12,62 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Vagrant使用笔记]]></title>
+    <link href="http://www.xefan.com/archives/84141.html"/>
+    <updated>2015-02-24T19:17:43+08:00</updated>
+    <id>http://www.xefan.com/archives/84141-Vagrant使用笔记</id>
+    <content type="html"><![CDATA[<p>Vgrant是一个基于 Ruby 使用 Virtualbox 进行创建和部署虚拟化环境的工具。
+类似的工具之前有使用过 Docker。就我个人而言这两款工具之间，Docker是轻量级的VM，
+因此性能应该会比较好，但是只能在64位的系统下使用。
+而 Vgrant 是使用 Virtualbox 进行虚拟化，因此性能上不及 Docker，
+不过它可以在32/64位的 Linux、Windows 等系统上运行。</p>
+
+<p>我觉得 Vgrant 比较适合用于在开发环境中使用，而 Docker 比较适合用于生产环境。</p>
+
+<h2>安装</h2>
+
+<p>首先安装 virtualbox，然后再安装 Vgrant。</p>
+
+<p>1.通过源代码安装</p>
+
+<pre><code>git clone https://github.com/mitchellh/vagrant
+cd vagrant
+bundle install
+rake install
+</code></pre>
+
+<p>2.通过安装包安装<br/>
+根据情况选择下载对应的安装包： <a href="http://www.vagrantup.com/downloads.html">http://www.vagrantup.com/downloads.html</a></p>
+
+<p>注意：如果是 Windows 系统，可能还需要将 Vgrant 的路径添加到环境变量中，以便使用 vgrant 命令。</p>
+
+<h2>使用</h2>
+
+<p>Vagrant 的使用方法也很简单，基本如下：</p>
+
+<pre><code># 这里我先添加一个 ArchLinux 的镜像
+vagrant box add archlinux http://vagrant.srijn.net/archlinux-x64-2014-01-07.box
+# 进行初始化
+vagrant init archlinux
+# 运行虚拟机
+vagrant up
+# 如果需要进行ssh连接到虚拟机中进行一些操作，可以执行该命令
+vagrant ssh
+</code></pre>
+
+<p>其他的一些命令：</p>
+
+<pre><code># 关闭虚拟机
+vagrant halt
+# 删除创建的虚拟机
+vagrant destroy
+</code></pre>
+
+<p>vagrant的一些镜像： <a href="http://www.vagrantbox.es/">http://www.vagrantbox.es/</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Docker使用笔记]]></title>
@@ -355,75 +411,6 @@ Server = http://repo.archlinux.fr/$arch
 <code># pacman -S xorg-twm xorg-xclock xterm</code><br/>
 然后启动X会话，如果能够看到一个终端和一个时钟就表示已经安装成功了：<br/>
 <code>$ startx</code></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Bash常用快捷键]]></title>
-    <link href="http://www.xefan.com/archives/83783.html"/>
-    <updated>2012-08-23T00:00:00+08:00</updated>
-    <id>http://www.xefan.com/archives/83783-Bash常用快捷键</id>
-    <content type="html"><![CDATA[<p><strong>编辑命令</strong></p>
-
-<pre><code>Ctrl + a ：移到命令行首
-Ctrl + e ：移到命令行尾
-Ctrl + f ：按字符前移（右向）
-Ctrl + b ：按字符后移（左向）
-Alt + f ：按单词前移（右向）
-Alt + b ：按单词后移（左向）
-Ctrl + xx：在命令行首和光标之间移动
-Ctrl + u ：从光标处删除至命令行首
-Ctrl + k ：从光标处删除至命令行尾
-Ctrl + w ：从光标处删除至字首
-Alt + d ：从光标处删除至字尾
-Ctrl + d ：删除光标处的字符
-Ctrl + h ：删除光标前的字符
-Ctrl + y ：粘贴至光标后
-Alt + c ：从光标处更改为首字母大写的单词
-Alt + u ：从光标处更改为全部大写的单词
-Alt + l ：从光标处更改为全部小写的单词
-Ctrl + t ：交换光标处和之前的字符
-Alt + t ：交换光标处和之前的单词
-Alt + Backspace：与 Ctrl + w 相同类似，分隔符有些差别 [感谢 rezilla 指正]
-</code></pre>
-
-<p><strong>重新执行命令</strong></p>
-
-<pre><code>Ctrl + r：逆向搜索命令历史
-Ctrl + g：从历史搜索模式退出
-Ctrl + p：历史中的上一条命令
-Ctrl + n：历史中的下一条命令
-Alt + .：使用上一条命令的最后一个参数
-</code></pre>
-
-<p><strong>控制命令</strong></p>
-
-<pre><code>Ctrl + l：清屏
-Ctrl + o：执行当前命令，并选择上一条命令
-Ctrl + s：阻止屏幕输出
-Ctrl + q：允许屏幕输出
-Ctrl + c：终止命令
-Ctrl + z：挂起命令
-</code></pre>
-
-<p><strong>Bang (!) 命令</strong></p>
-
-<pre><code>!!：执行上一条命令
-!blah：执行最近的以 blah 开头的命令，如 !ls
-!blah:p：仅打印输出，而不执行
-!$：上一条命令的最后一个参数，与 Alt + . 相同
-!$:p：打印输出 !$ 的内容
-!*：上一条命令的所有参数
-!*:p：打印输出 !* 的内容
-^blah：删除上一条命令中的 blah
-^blah^foo：将上一条命令中的 blah 替换为 foo
-^blah^foo^：将上一条命令中所有的 blah 都替换为 foo
-</code></pre>
-
-<p>以上介绍的大多数 Bash 快捷键仅当在 emacs 编辑模式时有效，若你将 Bash 配置为 vi 编辑模式，那将遵循 vi 的按键绑定。通过 set -o emacs 将Bash设置为emacs模式，通过set -o vi 奖Bash设置为vi模式。Bash 默认为 emacs 编辑模式。<br/>
-更多可以参考以下网址：<br/>
-<a href="http://www.bigsmoke.us/readline/shortcuts  ">http://www.bigsmoke.us/readline/shortcuts  </a>
-<a href="http://www.huangwei.me/bash_emacs.html">http://www.huangwei.me/bash_emacs.html</a></p>
 ]]></content>
   </entry>
   
