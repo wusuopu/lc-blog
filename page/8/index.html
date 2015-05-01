@@ -9,7 +9,7 @@
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="字符串 在这部分的教程将详细的介绍字符串。 字符串是计算机语言中最重要的数据类型之一，这就是为什么我们决定要用一整章来介绍字符串。 字符串是序列化的unicode字符。它是一种数据类型存储了序列化的值，它的元素通常代表的是根据字符编码的字符。当一个字符串在代码中以字面量出现，它也称为字符串文本。 &hellip;">
+  <meta name="description" content="表达式 在这章的教程将介绍Ruby的表达式。 表达式是由操作数和操作符构成的。表达式的操作符表明了对操作数应用什么操作。表达式中操作符的求值顺序由操作符的优先级和结合律决定的。 操作符是一个特殊的符号表明了要执行的确切操作。编程语言中的操作符取自数学运算。程序员使用数据，操作符用于处理数据。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -66,6 +66,1288 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83926.html">[翻译]Ruby教程8——表达式</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-11-10T00:00:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83926.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83926.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h1>表达式</h1>
+
+
+<p>在这章的教程将介绍Ruby的表达式。</p>
+
+
+<p>表达式是由操作数和操作符构成的。表达式的操作符表明了对操作数应用什么操作。表达式中操作符的求值顺序由操作符的优先级和结合律决定的。</p>
+
+
+<p>操作符是一个特殊的符号表明了要执行的确切操作。编程语言中的操作符取自数学运算。程序员使用数据，操作符用于处理数据。操作数是操作符的参数。</p>
+
+
+<p>以下表格中按优先级展示Ruby的操作符（高优先级在前）：</p>
+
+
+<table>
+    <thead>
+        <tr>
+            <td>分类</td>
+            <td>符号</td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>解析，访问操作符</td>
+            <td>:: .</td>
+        </tr>
+        <tr>
+            <td>数组操作符</td>
+            <td>[] []=</td>
+        </tr>
+        <tr>
+            <td>求幂</td>
+            <td>**</td>
+        </tr>
+        <tr>
+            <td>非，反，一元加、减</td>
+            <td>! ~ + -</td>
+        </tr>
+        <tr>
+            <td>乘、除、模</td>
+            <td>* / %</td>
+        </tr>
+        <tr>
+            <td>加、减</td>
+            <td>+ -</td>
+        </tr>
+        <tr>
+            <td>移位</td>
+            <td><< >></td>
+        </tr>
+        <tr>
+            <td>位与</td>
+            <td>&</td>
+        </tr>
+        <tr>
+            <td>位或、逻辑或</td>
+            <td>^ |</td>
+        </tr>
+        <tr>
+            <td>关系运算</td>
+            <td>> >= < <=</td>
+        </tr>
+        <tr>
+            <td>相等、模式匹配</td>
+            <td><=> == === != =~ !~</td>
+        </tr>
+        <tr>
+            <td>逻辑与</td>
+            <td>&&</td>
+        </tr>
+        <tr>
+            <td>逻辑或</td>
+            <td>||</td>
+        </tr>
+        <tr>
+            <td>范围操作符</td>
+            <td>.. &#8230;</td>
+        </tr>
+        <tr>
+            <td>三目运算</td>
+            <td>?:</td>
+        </tr>
+        <tr>
+            <td>分配操作</td>
+            <td>= += -= *= **= /= %= &= |= ^= <<= >>= ||= &&=</td>
+        </tr>
+        <tr>
+            <td>否定</td>
+            <td>not</td>
+        </tr>
+        <tr>
+            <td>逻辑或、与</td>
+            <td>or and</td>
+        </tr>
+    </tbody>
+</table>
+
+
+
+
+<p>同一行的操作符具有相同的优先级。</p>
+
+
+<p>一个操作符通常有两个操作数。那些只有一个操作数的操作符称为一元操作符。有两个操作数的称为二元操作符。有一个三元操作符(?:)有三个操作数。</p>
+
+
+<p>操作符可能用于不同的上下文。例如+操作符，从上面的表格可知它能用于不同情况。数字求和、连接字符串、作为数字的符号。我们称这个操作符被重载了。</p>
+
+
+<h2>正负号操作符</h2>
+
+
+<p>有两个正负号操作符，+和-，用于指定或者修改值的符号。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+puts +2
+puts -2
+</code></pre>
+
+
+<p>+和-指明了值的符号。加号表明是正数，通常可省略。</p>
+
+
+<hr>
+
+
+<p>接下来的例子我们使用减号。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+a = 1
+
+puts a
+puts -(a)
+puts -(-(a))
+</code></pre>
+
+
+<p>减号改变了值的符号。</p>
+
+
+<p>$ ./sign.rb<br>
+1<br>
+-1<br>
+1  </p>
+
+
+<p>输出结果。</p>
+
+
+<h2>分配操作符</h2>
+
+
+<p>分配操作符<em>=</em>将一个值分配给一个变量。变量是这个值的点位符。数学运算中<em>=</em>操作符有不同的意义。在方程式中<em>=</em>是相等操作，左边的值等于右边的值。</p>
+
+
+<pre><code>x = 1
+puts x # prints 1
+</code></pre>
+
+
+<p>这里分配的一个数字给<em>x</em>变量。</p>
+
+
+<pre><code>x = x + 1
+puts x # prints 2
+</code></pre>
+
+
+<p>前一个表达式中数学运算中是行不通的。但是在程序中是合法的。这个表达式是将<em>x</em>变量加1，右边等于2,并把2赋值给x。</p>
+
+
+<pre><code>3 = x;
+</code></pre>
+
+
+<p>这个语法是错误的，我们不能组值分配字面符。</p>
+
+
+<h2>解析，成员访问操作符</h2>
+
+
+<p>有两个操作符具有最高的优先级，这意味着它们总是先求解。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class MyMath
+    Pi = 3.1415926535    
+end
+
+module People
+    Name = "People"
+end
+
+puts MyMath::Pi
+puts People::Name
+</code></pre>
+
+
+<p>第一个例子展示了<em>::</em>命名空间解析操作符。它可以访问一个定义在其它类或模块里的常量、模块或者类。它用于提供命名空间，这样方法和类的名字就不会与其他作者的类冲突了。</p>
+
+
+<pre><code>class MyMath
+    Pi = 3.1415926535    
+end
+
+module People
+    Name = "People"
+end
+</code></pre>
+
+
+<p>这里创建了一个模块的一个类，分别定义了一个常量。</p>
+
+
+<pre><code>puts MyMath::Pi
+puts People::Name
+</code></pre>
+
+
+<p>我们使用<em>::</em>操作符访问它们的常量。</p>
+
+
+<p>$ ./resolution.rb<br>
+3.1415926535<br>
+People  </p>
+
+
+<p><em>resolution.rb</em>脚本的输出结果。</p>
+
+
+<hr>
+
+
+<p>点(.)操作符是成员访问，用于调用对象的方法。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Person
+
+   def initialize name, age
+       @name = name
+       @age = age       
+   end
+
+   def info
+       "#{@name} is #{@age} years old"
+   end
+
+end
+
+p = Person.new "Jane", 17
+puts p.info
+
+puts "ZetCode".reverse
+</code></pre>
+
+
+<p>这个例子中我们创建了两个对象，一个是用户定义的，一个是预定义的。我们对这些对象使用点操作符。</p>
+
+
+<pre><code>p = Person.new "Jane", 17
+puts p.info
+</code></pre>
+
+
+<p>在这行使用点操作符调用了两个方法：new和info。</p>
+
+
+<pre><code>puts "ZetCode".reverse
+</code></pre>
+
+
+<p>字符串是内建对象，具有一个<em>reverse</em>方法。</p>
+
+
+<p>$ ./memberaccess.rb<br>
+Jane is 17 years old<br>
+edoCteZ  </p>
+
+
+<p>输出结果。</p>
+
+
+<h2>字符串连接</h2>
+
+
+<p>Ruby中<em>+</em>操作符同样可以用于字符串连接。在不同上下文中操作符作用不同，我们称这个为重载。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+puts "Return " + "of " + "the " + "King"
+puts "Return ".+"of ".+ "the ".+"King"
+</code></pre>
+
+
+<p>我们将三个字符串连接在一起。</p>
+
+
+<pre><code>puts "Return " + "of " + "the " + "King"
+</code></pre>
+
+
+<p>我们使用<em>+</em>操作符连接字符串。</p>
+
+
+<pre><code>puts "Return ".+"of ".+ "the ".+"King"
+</code></pre>
+
+
+<p><em>+</em>操作符也是Ruby的一个方法。我们可以使用访问操作符(.)来调用它。</p>
+
+
+<p>$ ./catstrings.rb <br>
+Return of the King<br>
+Return of the King  </p>
+
+
+<p><em>catstrings.rb</em>程序的运行结果。</p>
+
+
+<h2>增、减操作符</h2>
+
+
+<p>Ruby中没有如下操作。<br>
+x++;<br>
+&#8230;<br>
+y&#8211;;  </p>
+
+
+<p>这些是C语言的增、减操作。</p>
+
+
+<p>如果你熟悉Java、C、C++，你可能了解这些操作符。但是这些在Ruby中无效的。同样在Python中也没有。</p>
+
+
+<h2>算术操作符</h2>
+
+
+<p>下面的表格是Ruby中的算术操作符。  </p>
+
+
+<table>
+<thead>
+<tr>
+<th align="left">符号</th>
+<th align="left">名字</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">+</td>
+<td align="left">加</td>
+</tr>
+<tr>
+<td align="left">-</td>
+<td align="left">减</td>
+</tr>
+<tr>
+<td align="left">*</td>
+<td align="left">乘</td>
+</tr>
+<tr>
+<td align="left">/</td>
+<td align="left">除</td>
+</tr>
+<tr>
+<td align="left">%</td>
+<td align="left">模</td>
+</tr>
+<tr>
+<td align="left">**</td>
+<td align="left">幂</td>
+</tr>
+</tbody>
+</table>
+
+
+<p>下面的例子中我们使用了算术操作符。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+a = 10
+b = 11
+c = 12
+
+puts a + b + c
+puts c - a
+puts a * b
+puts c / 3
+puts c % a
+puts c ** a
+</code></pre>
+
+
+<p>在前面的例子我们使用了加、减、乘、除和取余操作。这些与数学上的是相同的。</p>
+
+
+<pre><code>puts c % a
+</code></pre>
+
+
+<p><em>%</em>操作符是取余或者求模。</p>
+
+
+<p>$ ./arithmetic.rb<br>
+33<br>
+2<br>
+110<br>
+4<br>
+2<br>
+61917364224  </p>
+
+
+<p>输出结果。</p>
+
+
+<hr>
+
+
+<p>接下来展示整数和浮点数除法的区别。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+puts 5 / 2
+
+puts 5 / 2.0
+puts 5.0 / 2
+puts 5.to_f / 2
+</code></pre>
+
+
+<p>上面的例子我们将两个数相除。</p>
+
+
+<pre><code>puts 5 / 2
+</code></pre>
+
+
+<p>这个表达式中的操作数都是整数，我们进行的是整数相除。结果返回的也是整数。</p>
+
+
+<pre><code>puts 5 / 2.0
+puts 5.0 / 2
+puts 5.to_f / 2
+</code></pre>
+
+
+<p>如果其中一个或两个是浮点数，我们进行的是浮点数相除。</p>
+
+
+<p>$ ./division.rb<br>
+2<br>
+2.5<br>
+2.5<br>
+2.5  </p>
+
+
+<p><em>division.rb</em>程序的运行结果。</p>
+
+
+<hr>
+
+
+<p>Ruby有其他方式进行除运算。这些都是有效的方法调用。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+puts 5.div 2.0
+puts 5.fdiv 2
+puts 5.quo 2
+puts 5.0.quo 2.0
+</code></pre>
+
+
+<p>上面例子中我们使用了<em>div</em>、<em>fdiv</em>和<em>quo</em>方法。</p>
+
+
+<pre><code>puts 5.div 2.0
+</code></pre>
+
+
+<p><em>div</em>总是进行整数除，即使操作数是浮点数。</p>
+
+
+<pre><code>puts 5.fdiv 2
+</code></pre>
+
+
+<p><em>fdiv</em>总是进行浮点数除法。</p>
+
+
+<pre><code>puts 5.quo 2
+puts 5.0.quo 2.0
+</code></pre>
+
+
+<p><em>quo</em>方法进行精确的除法。如果操作数是浮点数则返回浮点数，否则是有理数。</p>
+
+
+<p>$ ./otherdivision.rb<br>
+2<br>
+2.5<br>
+5/2<br>
+2.5  </p>
+
+
+<h2>布尔操作符</h2>
+
+
+<p>Ruby中有以下布尔操作符。</p>
+
+
+<table>
+    <thead>
+        <tr>
+            <td>符号</td>
+            <td>名字</td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>&&</td>
+            <td>逻辑与</td>
+        </tr>
+        <tr>
+            <td>||</td>
+            <td>逻辑或</td>
+        </tr>
+        <tr>
+            <td>!</td>
+            <td>否</td>
+        </tr>
+    </tbody>
+</table>
+
+
+
+
+<p>布尔操作符处理真假值。Ruby中有额外的布尔操作符，<em>and</em>、<em>or</em>、<em>&amp;</em>、<em>not</em>。它们操作是相同的，只是优先级低一些。与Perl语言不同，这需要一个低优先级的布尔操作符。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+x = 3
+y = 8
+
+puts x == y
+puts y &gt; x
+
+if y &gt; x then
+    puts "y is greater than x"
+end
+</code></pre>
+
+
+<p>许多表达式的结果都是一个布尔值。布尔值用于条件语句。</p>
+
+
+<pre><code>puts x == y
+puts y &gt; x
+</code></pre>
+
+
+<p>返回布尔值的相关操作符。这两行打印为false和true。</p>
+
+
+<pre><code>if y &gt; x then
+    puts "y is greater than x"
+end
+</code></pre>
+
+
+<p>仅当月<em>if</em>条件为真时<em>if</em>里的语句才会执行。x &gt; y返回true，因此&#8221;y is greater than x&#8221;会在终端上打印。</p>
+
+
+<hr>
+
+
+<p>下面的例子展示逻辑与操作符。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+puts true &amp;&amp; true
+puts true &amp;&amp; false
+puts false &amp;&amp; true
+puts false &amp;&amp; false
+</code></pre>
+
+
+<p>与操作只有在操作数都为true才返回true。</p>
+
+
+<p>$ ./andoperator.rb<br>
+true<br>
+false<br>
+false<br>
+false  </p>
+
+
+<p>只有一个表达式的结果为true。</p>
+
+
+<hr>
+
+
+<p>逻辑或操作符当有一个操作数为true则返回true。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+puts true || true
+puts true || false
+puts false || true
+puts false || false
+</code></pre>
+
+
+<p>如果有一边是true，操作的结果就是true。</p>
+
+
+<p>$ ./oroperator.rb<br>
+true<br>
+true<br>
+true<br>
+false  </p>
+
+
+<p>三个表达式结果为true。</p>
+
+
+<hr>
+
+
+<p>非操作进行真假反转。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+puts !0
+puts !1
+puts !true
+puts !false
+
+puts ! (4&lt;3)
+puts ! "Ruby".include?("a")
+</code></pre>
+
+
+<p>这个例子展示了非操作符的用法。</p>
+
+
+<p>$ ./not.rb<br>
+false<br>
+false<br>
+false<br>
+true<br>
+true<br>
+true  </p>
+
+
+<p>输出结果。</p>
+
+
+<hr>
+
+
+<p><em>||</em>和<em>&amp;&amp;</em>操作符是短路求值（short circuit evaluated）。短路求值意味着只有在第一个参数不足以确定表达式的值时第二个参数才会进行求值。短求值主要用于提高执行效率。</p>
+
+
+<p>用一个例子解释。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+def one
+    puts "Inside one"
+    false
+end
+
+def two
+    puts "Inside two"
+    true
+end
+
+puts "Short circuit"
+
+if one &amp;&amp; two
+    puts "Pass"
+end
+
+puts "##############################"
+
+if two || one
+    puts "Pass"
+end
+</code></pre>
+
+
+<p>在例子中定义了两个方法，用于在布尔操作中作为操作数。我们将看到它们是否被调用了。</p>
+
+
+<pre><code>if one &amp;&amp; two
+    puts "Pass"
+end
+</code></pre>
+
+
+<p>第一个方法返回false，短路求值不会计算第二个方法。一旦一个操作数是false，那么这个逻辑的结果总是false。</p>
+
+
+<pre><code>puts "##############################"
+
+if two || one
+    puts "Pass"
+end
+</code></pre>
+
+
+<p>第二种情况我们使用<em>||</em>操作符，并且第一个操作数为<em>tow</em>方法。这里同样没有必要对第二个操作数求值，只要第一个操作数为true，那么逻辑或总是为true。</p>
+
+
+<pre><code>$ ./shortcircuit.rb
+Short circuit
+Inside one
+##############################
+Inside two
+Pass
+</code></pre>
+
+
+<p><em>shortcircuit.rb</em>程序的运行结果。</p>
+
+
+<h2>关系操作符</h2>
+
+
+<p>关系操作符用于值的比较，其总是返回布尔值。</p>
+
+
+<table>
+<thead>
+<tr>
+<th align="left">符号</th>
+<th align="left">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">&lt;</td>
+<td align="left">小于</td>
+</tr>
+<tr>
+<td align="left">&lt;=</td>
+<td align="left">小于等于</td>
+</tr>
+<tr>
+<td align="left">&gt;</td>
+<td align="left">大于</td>
+</tr>
+<tr>
+<td align="left">&gt;=</td>
+<td align="left">大于等于</td>
+</tr>
+</tbody>
+</table>
+
+
+<p>关系操作符又称为比较操作符。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+p 3 &lt; 4
+p 3 &gt; 5
+p 3 &gt;= 3
+</code></pre>
+
+
+<p>表达式<em>3 &lt; 4</em>返回true，因为3小于4。表达式<em>3 &gt; 5</em>返回false，因为3不大于5。</p>
+
+
+<h2>位操作符</h2>
+
+
+<p>人类用的是十进制数字，计算机原生的是二进制数。二进制、八进制、十进制和十六进制只是数字的符号。位操作符针对的是二进制数。</p>
+
+
+<table>
+    <thead>
+        <tr>
+            <td>符号</td>
+            <td>含义</td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>~</td>
+            <td>按位取反</td>
+        </tr>
+        <tr>
+            <td>^</td>
+            <td>按位异或</td>
+        </tr>
+        <tr>
+            <td>&</td>
+            <td>按位与</td>
+        </tr>
+        <tr>
+            <td>|</td>
+            <td>按位与或</td>
+        </tr>
+        <tr>
+            <td>&lt;&lt;</td>
+            <td>左移位</td>
+        </tr>
+        <tr>
+            <td>&gt;&gt;</td>
+            <td>右移位</td>
+        </tr>
+    </tbody>
+</table>
+
+
+
+
+<p>位操作在高级语言中很少使用。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+puts ~ 7   # prints -8 
+puts ~ -8  # prints 7
+
+puts 6 &amp; 3  # prints 2
+puts 3 &amp; 6  # prints 2
+
+puts 6 ^ 3  # prints 5
+puts 3 ^ 6  # prints 5
+
+puts 6 | 3  # prints 7
+puts 3 | 6  # prints 7
+
+puts 6 &lt;&lt; 1  # prints 12
+puts 1 &lt;&lt; 6  # prints 64
+
+puts 6 &gt;&gt; 1  # prints 3
+puts 1 &gt;&gt; 6  # prints 0
+</code></pre>
+
+
+<p>上面的例子中展示了这6个位操作符。</p>
+
+
+<pre><code>puts ~ 7   # prints -8 
+puts ~ -8  # prints 7
+</code></pre>
+
+
+<p>按位取反是将1变为0，0变为1。将操作会将数字7所有的位都反转，同样包括符号位。如果再次反转所有的位即会得到数字7。</p>
+
+
+<pre><code>puts 6 &amp; 3  # prints 2
+puts 3 &amp; 6  # prints 2
+</code></pre>
+
+
+<p>按位与是将两个数进行逐位与操作，只有两个数对应位的都为1结果才为1。</p>
+
+
+<pre><code>puts 6 ^ 3  # prints 5
+puts 3 ^ 6  # prints 5
+</code></pre>
+
+
+<p>按位异或是将两个数进行逐位异或操作，只要其中一个数（但不是全部）对应位的为1结果就为1。</p>
+
+
+<pre><code>puts 6 | 3  # prints 7
+puts 3 | 6  # prints 7
+</code></pre>
+
+
+<p>按位或是将两个数进行逐位或操作，只要其中一个数对应位的为1结果就为1。</p>
+
+
+<pre><code>puts 6 &lt;&lt; 1  # prints 12
+puts 1 &lt;&lt; 6  # prints 64
+
+puts 6 &gt;&gt; 1  # prints 3
+puts 1 &gt;&gt; 6  # prints 0
+</code></pre>
+
+
+<p>移位操作符是按位进行右移或左移，也称为算术移位。</p>
+
+
+<h2>复合分配操作符</h2>
+
+
+<p>复合分配操作符是由两个操作符构成。它们是简写操作符。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+a = 0
+
+a = a + 1
+a += 1
+puts a
+
+
+b = 0
+
+b = b - 8
+b -= 8
+puts b
+</code></pre>
+
+
+<p><em>+=</em>和<em>-=</em>操作符是一个简写的操作符。它们的可读性没有全写的好，但是有经验的程序员经常使用它们。</p>
+
+
+<pre><code>a = a + 1
+a += 1
+</code></pre>
+
+
+<p>这两行的操作是一样的，都是将变量<em>a</em>加1。</p>
+
+
+<p>其他的一些复合操作符。</p>
+
+
+<pre><code>-=   *=  **=  /=   %=   &amp;=   |=   &lt;&lt;=   &gt;&gt;=
+</code></pre>
+
+
+<h2>操作符优先级</h2>
+
+
+<p>操作符的优先级表明了先对哪个操作符进行求值。优先级避免了表达式的二义性。</p>
+
+
+<p>这个表达式的结果是多少？28还是40？</p>
+
+
+<p>3 + 5 * 5  </p>
+
+
+<p>跟数学相同，乘法优先级高于加法，加些结果为28。</p>
+
+
+<p>(3 + 5) * 5  </p>
+
+
+<p>我们可以使用括号来改变优先级。括号里的表达式总是最先求值。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+puts 3 + 5 * 5
+puts (3 + 5) * 5
+
+puts ! true | true
+puts ! (true | true)
+</code></pre>
+
+
+<p>这个例子展示了一些表达式，其结果依赖于操作符优先级。</p>
+
+
+<pre><code>puts 3 + 5 * 5
+</code></pre>
+
+
+<p>这行打印28，因为乘法操作优先级高于加法。</p>
+
+
+<pre><code>puts ! true | true
+</code></pre>
+
+
+<p>这里非操作优先级更高。最后返回为true。</p>
+
+
+<p>$ ./precedence.rb<br>
+28<br>
+40<br>
+true<br>
+false  </p>
+
+
+<h2>结合律</h2>
+
+
+<p>有时优先级不能决定表达式的结果。还有另一条规则称为结合律。它决定相同优先级的求值顺序。</p>
+
+
+<p>9 / 3 * 3  </p>
+
+
+<p>这个的结果是多少？9还是1？乘、除和取模操作是从左到右结合的。因此结果为9。</p>
+
+
+<p>数学运算、布尔、关系和位操作都是从左向右结合的。</p>
+
+
+<p>另外赋值操作是右结合。</p>
+
+
+<pre><code>a = b = c = d = 0
+print a, b, c, d # prints 0000
+</code></pre>
+
+
+<p>复合分配操作是从右向左结合的。</p>
+
+
+<pre><code>j = 0
+j *= 3 + 1
+puts j
+</code></pre>
+
+
+<p>你可能期望结果为1,但是实际上结果为0。由于结合律，右边表达式先求值再应用复合分配操作。</p>
+
+
+<h2>范围操作符</h2>
+
+
+<p>Ruby有两个范围操作符，用于创建一个范围对象。通常是数字或者字母的范围。</p>
+
+
+<p><em>..</em>范围操作符（两个点）创建一个包含的范围。<em>&#8230;</em>操作符（三个点）创建一个非包含的范围，较大的值不包含在其中。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+p (1..3).to_a
+p (1...3).to_a
+
+p ('a' .. 'l').to_a
+</code></pre>
+
+
+<p>这个例子中我们使用范围操作符创建了数字范围和字母范围。</p>
+
+
+<pre><code>p (1..3).to_a
+p (1...3).to_a
+</code></pre>
+
+
+<p>这两行都是使用范围操作符创建了两个范围，然后转换为数据。第一个范围的值为1,2,3；第二个为1和2.</p>
+
+
+<pre><code>p ('a' .. 'l').to_a
+</code></pre>
+
+
+<p>这里使用<em>..</em>操作符创建一个&#8217;a&#8217;到&#8217;l&#8217;的数组。</p>
+
+
+<p>$ ./range.rb<br>
+[1, 2, 3]<br>
+[1, 2]<br>
+[&#8220;a&#8221;, &#8220;b&#8221;, &#8220;c&#8221;, &#8220;d&#8221;, &#8220;e&#8221;, &#8220;f&#8221;, &#8220;g&#8221;, &#8220;h&#8221;, &#8220;i&#8221;, &#8220;j&#8221;, &#8220;k&#8221;, &#8220;l&#8221;]  </p>
+
+
+<p>输出结果。</p>
+
+
+<h2>三元运算术</h2>
+
+
+<p>三元运算术是一个条件操作。如果我们需要根据条件表达式从两个值选择一个时这是一个方便的操作。</p>
+
+
+<p>cond-exp ? exp1 : exp2  </p>
+
+
+<p>如果<em>cond-exp</em>为真则返回<em>exp1</em>，否则返回<em>exp2</em>。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+age = 32
+
+adult = age &gt;= 18 ? true : false
+
+if adult then
+    puts "Adult"
+else
+    puts "Not adult"
+end
+</code></pre>
+
+
+<p>许多国家成年是基于你的年龄。是否成年即为是否超过了一定年龄。这种情况适合于三元操作。</p>
+
+
+<pre><code>adult = age &gt;= 18 ? true : false
+</code></pre>
+
+
+<p>首先对赋值符右转进行求值，它的值将赋给<em>adult</em>变量。</p>
+
+
+<p>$ ./ternary.rb<br>
+Adult  </p>
+
+
+<p>32年已经成年了。</p>
+
+
+<h2>计算素数</h2>
+
+
+<p>我们将计算素数。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+nums = (4..50).to_a
+
+puts "Prime numbers:"
+
+print "2 3 "
+
+nums.each do |i|
+
+    not_prime = false
+
+    (2..Math.sqrt(i).ceil).each do |j|
+        not_prime = true if i % j == 0    
+    end
+
+    print i, " " unless not_prime
+
+end
+
+puts
+</code></pre>
+
+
+<p>上面的例子中我们用到了一些操作符。</p>
+
+
+<pre><code>nums = (4..50).to_a
+</code></pre>
+
+
+<p>我们将从这些数中计算哪些是素数。</p>
+
+
+<pre><code>print "2 3 "
+</code></pre>
+
+
+<p>我们路过2和3,因为它们都是素数。</p>
+
+
+<pre><code>not_prime = false
+</code></pre>
+
+
+<p><em>not_prime</em>标志表明选择的数不是素数。我们假设选择的数是素数，直到被证明不是为止。</p>
+
+
+<pre><code>(2..Math.sqrt(i).ceil).each do |j|
+    not_prime = true if i % j == 0    
+end
+</code></pre>
+
+
+<p>当取模的结果为0表示这个数不是素数。</p>
+
+
+<pre><code>print i, " " unless not_prime
+</code></pre>
+
+
+<p>如果<em>not_prime</em>标志没有设置则打印这个数。</p>
+
+
+<hr>
+
+
+<p>上面例子展示了一些操作符。实际上有更简单方法计算素数。Ruby中有一个计算素数的模块。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+require 'prime'
+
+Prime.each(50) do |i|
+    print i, " "
+end
+
+puts
+</code></pre>
+
+
+<p>使用Ruby的<em>prime</em>模块计算素数。</p>
+
+
+<pre><code>require 'prime'
+</code></pre>
+
+
+<p>导入<em>prime</em>模块。</p>
+
+
+<pre><code>Prime.each(50) do |i|
+    print i, " "
+end
+</code></pre>
+
+
+<p>计算到50的素数。</p>
+
+
+<p>$ ./primes.rb<br>
+2 3 5 7 11 13 17 19 23 29 31 37 41 43 47   </p>
+
+
+<p>结果输出了2到50之间的素数。</p>
+
+
+<p>这章的教程介绍了表达式。</p>
+
+
+<hr>
+
+
+<p>原文地址： <a href="http://zetcode.com/lang/rubytutorial/expressions/">http://zetcode.com/lang/rubytutorial/expressions/</a><br>
+翻译：龙昌  admin@longchangjin.cn<br>
+完整教程：<a href="https://github.com/wusuopu/Ruby-tutorial">https://github.com/wusuopu/Ruby-tutorial</a>  </p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -5876,113 +7158,6 @@ scrapy的Item与dict相似，而mongodb中的数据是心bson格式保存的。�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83883.html">Scrapy框架学习笔记1——概括</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2013-10-07T00:00:00+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
-        
-           | <a href="http://www.xefan.com/archives/83883.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/83883.html">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Scrapy是一个python的web爬虫框架，其设计思想与Django非常相似。如果事先用过Django的话那么理解Scrapy应该不难。</p>
-
-<h3>0.安装Scrapy</h3>
-
-
-<p>当前Scrapy的稳定版本是0.18<br/>
-使用pip进行安装：  <code>pip install Scrapy</code><br/>
-使用easy_install进行安装：  <code>easy_install Scrapy</code></p>
-
-<p>初次使用可以按照它的官方教程操作，先熟悉一下：<br/>
-<a href="http://doc.scrapy.org/en/0.18/intro/tutorial.html">http://doc.scrapy.org/en/0.18/intro/tutorial.html</a></p>
-
-<h3>1.一个项目的基本流程</h3>
-
-
-<p>  创建新项目  scrapy startproject &lt;name&gt;</p>
-
-<p>  然后在&lt;name&gt;/spiders目录下新建一个python文件。<br/>
-  编写一个新的class继承自 scrapy.spider.BaseSpider，并且需要设置如下属性：<br/>
-    * name: 该爬虫的名字，不能与其它的相同<br/>
-    * start_urls: 开始的url入口<br/>
-    * parse(): 对从start_urls的获取的内容进行处理的函数，需要一个Response参数<br/>
-    * allowed_domains: 一个列表，表示该爬虫允许爬取的网站域名。可选</p>
-
-<p>  爬虫运行流程：<br/>
-    * 首先调用 start_requests()方法访问start_urls的链接（默认的），然后由parse回调方法对请求的响应进行处理。<br/>
-    * 在回调中处理Response，并返回Item或者Request，再或者是由这两种对象组成的一个可迭代的对象。<br/>
-      Request对象对应的callback可以与parse相同，也可以不同。</p>
-
-<p>  最后运行这个爬虫脚本：  scrapy crawl name</p>
-
-<p>  也可以直接在终端运行一个选择器： scrapy shell &lt;url&gt;</p>
-
-<h3>2.使用Item</h3>
-
-
-<pre><code>scrapy.item.Item的调用接口类似于python的dict，Item包含多个scrapy.item.Field。  
-这跟django的Model与Field有点相似。  
-Item通常是在Spider的parse方法里使用，它用来保存解析到的数据。
-</code></pre>
-
-<h3>3.使用Item Pipeline</h3>
-
-
-<p>  在settings.py中设置ITEM_PIPELINES，其默认为[]，与django的MIDDLEWARE_CLASSES等相似。<br/>
-  从Spider的parse返回的Item数据将依次被ITEM_PIPELINES列表中的Pipeline类处理。</p>
-
-<p>  一个Item Pipeline类必须实现以下方法：</p>
-
-<blockquote><p> process_item(item, spider)</p>
-
-<blockquote><p>为每个item pipeline组件调用，并且需要返回一个scrapy.item.Item实例对象或者抛出一个scrapy.exceptions.DropItem异常。<br/>
-当抛出异常后该item将不会被之后的pipeline处理。<br/>
-参数:<br/>
-        item (Item object) – 由parse方法返回的Item对象<br/>
-        spider (BaseSpider object) – 抓取到这个Item对象对应的爬虫对象</p></blockquote>
-
-<p> 也可额外的实现以下两个方法：<br/>
- open_spider(spider)</p>
-
-<blockquote><p>当爬虫打开之后被调用。<br/>
-参数: spider (BaseSpider object) – 已经运行的爬虫</p></blockquote>
-
-<p> close_spider(spider)</p>
-
-<blockquote><p>当爬虫关闭之后被调用。<br/>
-参数: spider (BaseSpider object) – 已经关闭的爬虫</p></blockquote></blockquote>
-
-<h3>4.保存数据</h3>
-
-
-<p>  想要保存抓取到的数据，最简单的方法是使用Feed exports。 参考官方文档：<a href="http://doc.scrapy.org/en/0.18/topics/feed-exports.html#topics-feed-exports">http://doc.scrapy.org/en/0.18/topics/feed-exports.html#topics-feed-exports</a></p>
-
-<p>  例如将抓取的数据导出为json:  scrapy crawl dmoz -o items.json -t json</p>
-
-<p>  对于小项目用这种方法也足够了。如果是比较复杂的数据的话可能就需要编写一个Item Pipeline进行处理了。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/page/9">&larr; Older</a>
@@ -6004,6 +7179,10 @@ Item通常是在Spider的parse方法里使用，它用来保存解析到的数�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="http://www.xefan.com/archives/84143.html">Ruby中一些重要的钩子方法</a>
+      </li>
+    
+      <li class="post">
         <a href="http://www.xefan.com/archives/84142.html">使用Unicorn部署rails应用</a>
       </li>
     
@@ -6019,19 +7198,15 @@ Item通常是在Spider的parse方法里使用，它用来保存解析到的数�
         <a href="http://www.xefan.com/archives/84139.html">Mongodb分片配置实例</a>
       </li>
     
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84138.html">使用gunicorn部署Django</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (27)</a></li><li><a href='/categories/web开发/index.html'>web开发 (19)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (23)</a></li></ul>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (28)</a></li><li><a href='/categories/web开发/index.html'>web开发 (19)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (23)</a></li></ul>
 </section>
 <section>
   <h1>Tag Cloud</h1>
-    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.7910447761194%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.8955223880597%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 125.07462686567165%'>Ruby(28)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 120.59701492537313%'>翻译(23)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.7910447761194%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.8955223880597%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 125.97014925373134%'>Ruby(29)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 120.59701492537313%'>翻译(23)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
 </section>
 <section>
   <h1>Link</h1>
