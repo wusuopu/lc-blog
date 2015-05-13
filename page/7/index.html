@@ -9,7 +9,7 @@
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="控件 在这部分的Ruby GTK编程教程中我们将提到一些控件。 控件是GUI应用程序的基本构成。这些年来一些控件成为了所有平台所有套件的标准。如按钮、复选框或者滚动条。GTK套件的理念是保持控件的数量为最小的数量级，一些特殊的控件需要创建为自定义GTK控件。 复选按钮（CheckButton） &hellip;">
+  <meta name="description" content="菜单&amp;工具条 这部分的Ruby GTK教程我们将使用菜单和工具条。 菜单栏是GUI应用中最常用的部分之一。它是位于各个菜单的一组命令。在命令行应用程序中我们需要记住这些所有神秘的命令，而现在我们将这些大部分的命令按照逻辑归合在一起。接受这些标准将进一步减少在学习新应用上花费的时间。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -38,7 +38,7 @@
   <header role="banner"><hgroup>
   <h1><a href="/">龍昌博客</a></h1>
   
-    <h2>从Pythoner转向Rubist</h2>
+    <h2>从Pythoneer转向Rubist</h2>
   
 </hgroup>
 
@@ -66,6 +66,680 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83963.html">[翻译]Ruby GTK教程4——菜单&工具条</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-11-23T00:00:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>23</span><span class='date-suffix'>rd</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83963.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83963.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h1>菜单&amp;工具条</h1>
+
+
+<p>这部分的Ruby GTK教程我们将使用菜单和工具条。</p>
+
+
+<p>菜单栏是GUI应用中最常用的部分之一。它是位于各个菜单的一组命令。在命令行应用程序中我们需要记住这些所有神秘的命令，而现在我们将这些大部分的命令按照逻辑归合在一起。接受这些标准将进一步减少在学习新应用上花费的时间。</p>
+
+
+<h2>简单的菜单</h2>
+
+
+<p>我们的第一个例子将创建一个有文件菜单的菜单栏。这个菜单只有一个菜单项，选择这一项将退出应用。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# This example shows a simple menu
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "Simple menu"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 250, 200
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        modify_bg Gtk::STATE_NORMAL, Gdk::Color.new(6400, 6400, 6440)
+
+        mb = Gtk::MenuBar.new
+
+        filemenu = Gtk::Menu.new
+        filem = Gtk::MenuItem.new "File"
+        filem.set_submenu filemenu
+
+        exit = Gtk::MenuItem.new "Exit"
+        exit.signal_connect "activate" do
+            Gtk.main_quit
+        end
+
+        filemenu.append exit
+
+        mb.append filem
+
+        vbox = Gtk::VBox.new false, 2
+        vbox.pack_start mb, false, false, 0
+
+        add vbox
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+
+
+<p>这是一个最小功能的菜单栏的例子。</p>
+
+
+<pre><code>mb = Gtk::MenuBar.new
+</code></pre>
+
+
+<p>创建<em>MenuBar</em>控件，这是菜单的容器。</p>
+
+
+<pre><code>filemenu = Gtk::Menu.new
+filem = Gtk::MenuItem.new "File"
+filem.set_submenu filemenu
+</code></pre>
+
+
+<p>创建顶级菜单项。</p>
+
+
+<pre><code>exit = Gtk::MenuItem.new "Exit"
+exit.signal_connect "activate" do
+    Gtk.main_quit
+end
+
+filemenu.append exit
+</code></pre>
+
+
+<p>创建退出菜单项并添加到文件菜单项中。</p>
+
+
+<pre><code>mb.append filem
+</code></pre>
+
+
+<p>将顶级菜单项添加到菜单栏控件中。</p>
+
+
+<pre><code>vbox = Gtk::VBox.new false, 2
+vbox.pack_start mb, false, false, 0
+</code></pre>
+
+
+<p>与其他套件不同，我们必须要自己处理菜单栏的布局。我们将菜单栏放入竖直盒子中。</p>
+
+
+<p><img alt="image1" src="http://zetcode.com/img/gui/rubygtk/simplemenu.png"> <br>
+<em>图片：简单的菜单</em></p>
+
+
+<h2>子菜单</h2>
+
+
+<p>最后展示如何创建一个子菜单。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# This example shows a submenu
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "Submenu"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 250, 200
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        modify_bg Gtk::STATE_NORMAL, Gdk::Color.new(6400, 6400, 6440)
+
+        mb = Gtk::MenuBar.new
+
+        filemenu = Gtk::Menu.new
+        filem = Gtk::MenuItem.new "File"
+        filem.set_submenu filemenu
+
+        mb.append filem
+
+        imenu = Gtk::Menu.new
+
+        importm = Gtk::MenuItem.new "Import"
+        importm.set_submenu imenu
+
+        inews = Gtk::MenuItem.new "Import news feed..."
+        ibookmarks = Gtk::MenuItem.new "Import bookmarks..."
+        imail = Gtk::MenuItem.new "Import mail..."
+
+        imenu.append inews
+        imenu.append ibookmarks
+        imenu.append imail
+
+        filemenu.append importm
+
+        exit = Gtk::MenuItem.new "Exit"
+        exit.signal_connect "activate" do
+            Gtk.main_quit
+        end
+
+        filemenu.append exit
+
+        vbox = Gtk::VBox.new false, 2
+        vbox.pack_start mb, false, false, 0
+
+        add vbox
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+
+
+<p>创建子菜单。</p>
+
+
+<pre><code>imenu = Gtk::Menu.new
+</code></pre>
+
+
+<p>子菜单也是Menu控件。</p>
+
+
+<pre><code>importm = Gtk::MenuItem.new "Import"
+importm.set_submenu imenu
+</code></pre>
+
+
+<p>这是属于文件顶级菜单的菜单项的子菜单。</p>
+
+
+<pre><code>inews = Gtk::MenuItem.new "Import news feed..."
+ibookmarks = Gtk::MenuItem.new "Import bookmarks..."
+imail = Gtk::MenuItem.new "Import mail..."
+
+imenu.append inews
+imenu.append ibookmarks
+imenu.append imail
+</code></pre>
+
+
+<p>子菜单有自己的菜单项。</p>
+
+
+<p><img alt="image2" src="http://zetcode.com/img/gui/rubygtk/submenu.png"><br>
+<em>图片：子菜单</em></p>
+
+
+<h2>图片菜单</h2>
+
+
+<p>接下来的例子我们将进一步探索菜单。我们将在菜单项上添加图片和快捷键（accelerators）。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# This example shows a menu with
+# images, accelerators and a separator
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "Image menu"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 250, 200
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        modify_bg Gtk::STATE_NORMAL, Gdk::Color.new(6400, 6400, 6440)
+
+        mb = Gtk::MenuBar.new
+
+        filemenu = Gtk::Menu.new
+        filem = Gtk::MenuItem.new "File"
+        filem.set_submenu filemenu
+
+        agr = Gtk::AccelGroup.new
+        add_accel_group agr
+
+        newi = Gtk::ImageMenuItem.new Gtk::Stock::NEW, agr
+        key, mod = Gtk::Accelerator.parse "N"
+        newi.add_accelerator("activate", agr, key, 
+            mod, Gtk::ACCEL_VISIBLE)
+        filemenu.append newi
+
+        openm = Gtk::ImageMenuItem.new Gtk::Stock::OPEN, agr
+        key, mod = Gtk::Accelerator.parse "O"
+        openm.add_accelerator("activate", agr, key, 
+            mod, Gtk::ACCEL_VISIBLE)
+        filemenu.append openm
+
+        sep = Gtk::SeparatorMenuItem.new
+        filemenu.append sep
+
+        exit = Gtk::ImageMenuItem.new Gtk::Stock::QUIT, agr
+        key, mod = Gtk::Accelerator.parse "Q"
+        exit.add_accelerator("activate", agr, key, 
+            mod, Gtk::ACCEL_VISIBLE)
+
+        exit.signal_connect "activate" do
+            Gtk.main_quit
+        end
+        filemenu.append exit
+
+        mb.append filem
+
+        vbox = Gtk::VBox.new false, 2
+        vbox.pack_start mb, false, false, 0
+
+        add vbox
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+
+
+<p>这个例子显示了一个有子菜单的顶级菜单，每个菜单项都有一个图像和一个快捷键。退出菜单的快捷键是激活的。</p>
+
+
+<pre><code>agr = Gtk::AccelGroup.new
+add_accel_group agr
+</code></pre>
+
+
+<p>为了使用快捷键，我们创建了一个全局的<em>AccelGroup</em>对象。它稍后被用到。</p>
+
+
+<pre><code>newi = Gtk::ImageMenuItem.new Gtk::Stock::NEW, agr
+key, mod = Gtk::Accelerator.parse "N"
+newi.add_accelerator("activate", agr, key, 
+    mod, Gtk::ACCEL_VISIBLE)
+filemenu.append newi
+</code></pre>
+
+
+<p>创建图片菜单项。图片来自图片库中。我们也创建了<em>Ctrl+N</em>快捷键。</p>
+
+
+<pre><code>sep = Gtk::SeparatorMenuItem.new
+filemenu.append sep
+</code></pre>
+
+
+<p>这行创建一条分隔线。它用于将菜单项按照逻辑分组。</p>
+
+
+<p><img alt="image3" src="http://zetcode.com/img/gui/rubygtk/imagemenu.png"><br>
+<em>图片：图片菜单</em></p>
+
+
+<p>菜单将我们使用的命令进行分组。工具条提供了一个快速访问最常用命令的方式。</p>
+
+
+<h2>简单的工具条</h2>
+
+
+<p>接下来我们创建一个简单的工具条。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# This example shows a toolbar
+# widget
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+    def initialize
+        super
+
+        set_title "Toolbar"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        init_ui
+
+        set_default_size 250, 200
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        toolbar = Gtk::Toolbar.new
+        toolbar.set_toolbar_style Gtk::Toolbar::Style::ICONS
+
+        newtb = Gtk::ToolButton.new Gtk::Stock::NEW
+        opentb = Gtk::ToolButton.new Gtk::Stock::OPEN
+        savetb = Gtk::ToolButton.new Gtk::Stock::SAVE
+        sep = Gtk::SeparatorToolItem.new
+        quittb = Gtk::ToolButton.new Gtk::Stock::QUIT
+
+        toolbar.insert 0, newtb
+        toolbar.insert 1, opentb
+        toolbar.insert 2, savetb
+        toolbar.insert 3, sep
+        toolbar.insert 4, quittb
+
+        quittb.signal_connect "clicked" do
+            Gtk.main_quit
+        end
+
+        vbox = Gtk::VBox.new false, 2
+        vbox.pack_start toolbar, false, false, 0
+
+        add(vbox)
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+
+
+<p>这个例子显示了有四个工具按钮的工具栏。</p>
+
+
+<pre><code>toolbar = Gtk::Toolbar.new
+</code></pre>
+
+
+<p>创建<em>Toolbar</em>控件。</p>
+
+
+<pre><code>toolbar.set_toolbar_style Gtk::Toolbar::Style::ICONS
+</code></pre>
+
+
+<p>工具栏上我们只显示图标，没有文字。</p>
+
+
+<pre><code>newtb = Gtk::ToolButton.new Gtk::Stock::NEW
+</code></pre>
+
+
+<p>创建了一个包含图片的ToolButton控件。图片来自内建的图片库。</p>
+
+
+<pre><code>sep = Gtk::SeparatorToolItem.new
+</code></pre>
+
+
+<p>这是一个分隔符，用于将按钮按照逻辑分组。</p>
+
+
+<pre><code>toolbar.insert 0, newtb
+toolbar.insert 1, opentb
+...
+</code></pre>
+
+
+<p>将按钮添加到工具栏。</p>
+
+
+<p><img alt="image4" src="http://zetcode.com/img/gui/rubygtk/toolbar.png"><br>
+<em>图片：工具栏</em></p>
+
+
+<h2>撤消重做</h2>
+
+
+<p>接下来的例子展示了如何停用工具栏上的按钮。这是GUI编程中的常见练习。例如对于保存按钮，在大多数编辑器中如果我们将文档的修改保存到磁盘中了，那么保存按钮会被停用。这是应用程序给用户的提示，所有修改都已保存。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+# ZetCode Ruby GTK tutorial
+#
+# This example shows how to 
+# activate/deactivate a ToolButton
+#
+# author: jan bodnar
+# website: www.zetcode.com
+# last modified: June 2009
+
+require 'gtk2'
+
+
+class RubyApp &lt; Gtk::Window
+
+
+    def initialize
+        super
+
+        set_title "Undo redo"
+        signal_connect "destroy" do 
+            Gtk.main_quit 
+        end
+
+        @count = 2
+
+        init_ui
+
+        set_default_size 250, 200
+        set_window_position Gtk::Window::POS_CENTER
+
+        show_all
+    end
+
+    def init_ui
+
+        toolbar = Gtk::Toolbar.new
+        toolbar.set_toolbar_style Gtk::Toolbar::Style::ICONS
+
+        @undo = Gtk::ToolButton.new Gtk::Stock::UNDO
+        @redo = Gtk::ToolButton.new Gtk::Stock::REDO
+        sep = Gtk::SeparatorToolItem.new
+        quit = Gtk::ToolButton.new Gtk::Stock::QUIT
+
+        toolbar.insert 0, @undo
+        toolbar.insert 1, @redo
+        toolbar.insert 2, sep
+        toolbar.insert 3, quit
+
+        @undo.signal_connect "clicked" do
+            on_undo
+        end
+
+        @redo.signal_connect "clicked" do
+            on_redo
+        end
+
+        quit.signal_connect "clicked" do
+            Gtk.main_quit
+        end
+
+        vbox = Gtk::VBox.new false, 2
+        vbox.pack_start toolbar, false, false, 0
+
+        self.add vbox
+
+    end
+
+    def on_undo
+
+        @count = @count - 1
+
+        if @count &lt;= 0
+            @undo.set_sensitive false
+            @redo.set_sensitive true
+        end
+    end
+
+
+    def on_redo
+        @count = @count + 1
+
+        if @count &gt;= 5
+            @redo.set_sensitive false
+            @undo.set_sensitive true
+        end
+    end
+end
+
+Gtk.init
+    window = RubyApp.new
+Gtk.main
+</code></pre>
+
+
+<p>我们例子从GTK资源中创建了撤消和重做按钮。每个按钮点击多次后会被禁用，变为灰色。</p>
+
+
+<pre><code>@count = 2
+</code></pre>
+
+
+<p><em>@count</em>变量用于描述按钮是禁用还是激活。</p>
+
+
+<pre><code>@undo = Gtk::ToolButton.new Gtk::Stock::UNDO
+@redo = Gtk::ToolButton.new Gtk::Stock::REDO
+</code></pre>
+
+
+<p>创建两个工具按钮，图片来自资源库。</p>
+
+
+<pre><code>@undo.signal_connect "clicked" do
+    on_undo
+end
+</code></pre>
+
+
+<p>点击undo按钮触发<em>on_undo</em>方法。</p>
+
+
+<pre><code>if @count &lt;= 0
+    @undo.set_sensitive false
+    @redo.set_sensitive true
+end
+</code></pre>
+
+
+<p>我们使用<em>set_sensitive</em>方法激活或者禁用控件。</p>
+
+
+<p><img alt="image5" src="http://zetcode.com/img/gui/rubygtk/undoredo.png"><br>
+<em>图片：撤消重做</em></p>
+
+
+<p>这章的Ruby GTK教程我们展示了如何使用菜单和工具栏。</p>
+
+
+<hr>
+
+
+<p>原文地址： <a href="http://zetcode.com/gui/rubygtk/menustoolbars/">http://zetcode.com/gui/rubygtk/menustoolbars/</a><br>
+翻译：龙昌  admin@longchangjin.cn  </p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -7697,702 +8371,6 @@ puts "#{planets.shuffle}"
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83929.html">[翻译]Ruby教程9——控制流</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2013-11-12T00:00:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>12</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
-        
-           | <a href="http://www.xefan.com/archives/83929.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/83929.html">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h1>控制流</h1>
-
-
-<p>这章的教程我们将讨论控制流。</p>
-
-
-<p>条件和循环改变了Ruby程序的流程。条件式是执行条件语句下面的特定语句。循环是执行多次的代码块。程序开始后，语句从源文件顶部到底部一行一行的执行。</p>
-
-
-<h2>if语句</h2>
-
-
-<p>if关键字用于检查一个表达式是否为真。如果为真则执行语句。这个语句可以是单一的语句，也可以是复合语句。复合语句是由多条语句构成的闭合代码块。代码块用<em>end</em>关键字闭合，<em>then</em>关键字是可选的。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-num = gets.to_i
-
-if num &gt; 0 then
-
-    puts "num variable is positive"
-    puts "num variable equals to #{num}"
-end
-</code></pre>
-
-
-<p>输入一个数字，如果这个数字大于0则打印两条消息，否则什么也不做。</p>
-
-
-<p>$ ./simpleif.rb <br>
-4<br>
-num variable is positive<br>
-num variable equals to 4  </p>
-
-
-<p>条件为真并且消息在终端上打印了。</p>
-
-
-<hr>
-
-
-<p>我们可以使用<em>else</em>关键字不创建一个简单的分支。如果<em>if</em>关键字后的表达式求值为假，那么<em>else</em>后面的语句将自动执行。这些代码使用<em>end</em>关键字闭合起来。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-age = 17
-
-if age &gt; 18
-
-    puts "Driving licence issued"
-else
-
-    puts "Driving licence not permitted"
-end
-</code></pre>
-
-
-<p>这里创建了一个<em>age</em>变量，布尔表达式求值为假，因此在终端上打印&#8221;Driving licence not permitted&#8221;。</p>
-
-
-<p>$ ./licence.rb <br>
-Driving licence not permitted  </p>
-
-
-<p>我们可以使用<em>elsif</em>关键字创建多个分支。仅当前一个条件不为真时<em>elsif</em>关键字才会测试另一个条件。注意我们可以使用多个<em>elsif</em>关键字。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-print "Enter a number: "
-
-num = gets.to_i
-
-if num &lt; 0
-
-    puts "#{num} is negative"
-elsif num == 0
-
-   puts "#{num} is zero"
-elsif num &gt; 0
-
-   puts "#{num} is positive"
-end
-</code></pre>
-
-
-<p>创建一个数字变量判断它是正数、负数还是0。根据输入值的不同将打印不同的消息。</p>
-
-
-<h2>case语句</h2>
-
-
-<p><em>case</em>语句是一个程序控制流语句。它允许一个变量或者表达式的值控制程序的执行流程。相比<em>if</em>、<em>elsif</em>它创建多分支更简单。</p>
-
-
-<p>我们创建一个变量或者表达式。<em>case</em>关键字用于针对一个列表的值测试这个变量或者表达式的值。这个列表的值是使用<em>when</em>关键字呈现出来。如果值匹配，那么<em>when</em>关键字后面的语句将执行。有一个可选的<em>else</em>语句，如果没有匹配的它将执行。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-print "Enter top level domain: "
-
-domain = gets.chomp
-
-case domain
-    when "us"
-        puts "United States"
-    when "de" 
-        puts "Germany"
-    when "sk" 
-        puts "Slovakia"
-    when "hu" 
-        puts "Hungary"
-    else
-        puts "Unknown"
-end
-</code></pre>
-
-
-<p>这个程序中我们创建了一个<em>domain</em>变量，它的值从命令行读取。使用<em>when</em>语句测试这个变量的值。这有些选项。如果值等于&#8221;us&#8221;则打印&#8221;United States&#8221;字符串。</p>
-
-
-<pre><code>domain = gets.chomp
-</code></pre>
-
-
-<p>我们使用<em>gets</em>方法获取一个输入值。使用<em>chomp</em>方法去掉换行符。</p>
-
-
-<p>$ ./domains.rb <br>
-Enter top level domain: hu<br>
-Hungary  </p>
-
-
-<p>我们输入&#8221;hu&#8221;，程序返回&#8221;Hungary&#8221;。</p>
-
-
-<h2>while、until语句</h2>
-
-
-<p><em>while</em>语句是一个控制流语句允许代码多次执行。当的条件为真时代码将执行。</p>
-
-
-<p><em>while</em>关键字执行使用<em>end</em>闭合的代码块语句。每次表达式为真时这些语句将执行。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-i = 0
-sum = 0
-
-while i &lt; 10  do
-   i = i + 1
-   sum = sum + i
-end
-
-puts "The sum of 0..9 values is #{sum}"
-</code></pre>
-
-
-<p>这个例子计算了一个范围数的和。</p>
-
-
-<p>while循环有三部分：初始化、测试和更新。每次执行语句称为周期。</p>
-
-
-<pre><code>i = 0
-sum = 0
-</code></pre>
-
-
-<p>初始化变量<em>i</em>和<em>sum</em>。<em>i</em>用于计数。</p>
-
-
-<pre><code>while i &lt; 10  do
-   ...
-end
-</code></pre>
-
-
-<p><em>while</em>和<em>do</em>之间的表达式是第二阶段，测试。注意<em>do</em>关键字是可选的。，内部的语句将会执行直到表达式的值为假。</p>
-
-
-<pre><code>i = i + 1
-</code></pre>
-
-
-<p>这是循环的第三阶段——更新。我们增加计数值。注意不当的处理会导致死循环。</p>
-
-
-<p>$ ./while.rb <br>
-The sum of 0..9 values is 55  </p>
-
-
-<p>This is the output of the example. </p>
-
-
-<hr>
-
-
-<p>当条件为假时<em>until</em>控制流语句将执行。当条件为真时循环停止。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-hours_left = 12
-
-until hours_left == 0
-
-    if hours_left == 1
-        puts "There is #{hours_left} hour left"
-    else
-        puts "There are #{hours_left} hours left"
-    end
-
-    hours_left -= 1
-end
-</code></pre>
-
-
-<p>这个例子中创建了一个变量<em>hours_left</em>。我们开始计数，每次循环打印还有几个小时。当变量值等于0时循环停止。</p>
-
-
-<p>$ ./until.rb <br>
-There are 12 hours left<br>
-There are 11 hours left<br>
-There are 10 hours left<br>
-There are 9 hours left<br>
-There are 8 hours left<br>
-There are 7 hours left<br>
-There are 6 hours left<br>
-There are 5 hours left<br>
-There are 4 hours left<br>
-There are 3 hours left<br>
-There are 2 hours left<br>
-There is 1 hour left  </p>
-
-
-<p>程序运行的结果。</p>
-
-
-<h2>for语句</h2>
-
-
-<p>当循环次数是已知时，我们可以使用<em>for</em>语句。<em>for</em>循环使用<em>in</em>接着一个范围。对这个范围的每个元素都执行代码块的语句。这些语句使用<em>end</em>关键字闭合。<em>do</em>关键字是可选的。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-for i in 0..9 do
-
-    puts "#{i}"
-end
-</code></pre>
-
-
-<p>这个例子中我们打印了0到9的数。每次循环<em>i</em>变量保存了这个范围的一个数，这个数将在终端上打印。</p>
-
-
-<p>$ ./forloop.rb <br>
-0<br>
-1<br>
-2<br>
-3<br>
-4<br>
-5<br>
-6<br>
-7<br>
-8<br>
-9  </p>
-
-
-<p>例子运行结果。</p>
-
-
-<hr>
-
-
-<p>要遍历一个数组的元素可以使用数组的<em>length</em>方法。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-planets = ["Mercury", "Venus", "Earth", "Mars", "Jupiter",
-    "Saturn", "Uranus", "Neptune"]
-
-for i in 0...planets.length
-
-    puts planets[i]
-end
-</code></pre>
-
-
-<p>这个例子中我们创建了一个数组<em>planets</em>，我们遍历这个数组打印这个数组的每个元素。</p>
-
-
-<pre><code>planets = ["Mercury", "Venus", "Earth", "Mars", "Jupiter",
-    "Saturn", "Uranus", "Neptune"]
-</code></pre>
-
-
-<p><em>planets</em>数组。</p>
-
-
-<pre><code>for i in 0...planets.length
-</code></pre>
-
-
-<p><em>length</em>方法返回数组的长度。数组从0开始，最后一个索引是n-1。</p>
-
-
-<pre><code>puts planets[i]
-</code></pre>
-
-
-<p>打印数组指定的一个元素。</p>
-
-
-<p>$ ./planets2.rb <br>
-Mercury<br>
-Venus<br>
-Earth<br>
-Mars<br>
-Jupiter<br>
-Saturn<br>
-Uranus<br>
-Neptune  </p>
-
-
-<p>程序的运行结果。</p>
-
-
-<h2>each方法</h2>
-
-
-<p>在Ruby中我们可以使用<em>each</em>方法遍历数组的每个元素。它接受两个参数。一个元素和一个代码块。元素放在管道之间，它保存了当前循环的数据项。代码块是每次要执行的内容。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-planets = ["Mercury", "Venus", "Earth", "Mars", "Jupiter",
-    "Saturn", "Uranus", "Neptune"]
-
-planets.each do |planet|
-
-    puts planet
-end
-</code></pre>
-
-
-<p>这个例子我们使用<em>each</em>迭代器遍历<em>planets</em>数组。</p>
-
-
-<pre><code>planets.each do |planet|
-
-    puts planet
-end
-</code></pre>
-
-
-<p><em>each</em>迭代器是<em>planets</em>数组的一个方法。<em>planet</em>保存了此次迭代的数据项。我们可以使用任何我们想使用的字符。我们可以使用{}代替<em>do</em>和<em>end</em>关键字。</p>
-
-
-<h2>break、next语句</h2>
-
-
-<p><em>break</em>语句用于终止<em>while</em>、<em>for</em>或者<em>case</em>的代码块语句。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-while true
-
-    r = 1 + rand(30)
-    print "#{r} "
-
-    if r == 22
-        break
-    end
-end
-
-puts
-</code></pre>
-
-
-<p>我们定义了一个无限循环，使用<em>break</em>语句退出这个循环。我们选择1到30的数，打印它。如果等于22则结束<em>while</em>循环。</p>
-
-
-<pre><code>while true
-   ...
-end
-</code></pre>
-
-
-<p>这是一个无限循环，<em>while</em>的条件总是为真。退出无限循环的唯一方法是使用<em>break</em>。</p>
-
-
-<pre><code>r = 1 + rand(30)
-print "#{r} "
-</code></pre>
-
-
-<p>计算从1到30的随机数，并将其打印。</p>
-
-
-<pre><code>if r == 22
-    break
-end
-</code></pre>
-
-
-<p>如果数等于22,结束循环。</p>
-
-
-<p>$ ./break.rb <br>
-20 14 6 26 30 12 2 10 18 29 28 11 30 26 20 22   </p>
-
-
-<p>可能的输出结果。</p>
-
-
-<hr>
-
-
-<p><em>next</em>语句用于跳过此次循环，继续下次循环。它可与<em>for</em>和<em>while</em>联合使用。</p>
-
-
-<p>接下来的例子我们打印不能被2整除的数一列表。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-num = 0
-
-while num &lt; 100
-
-    num += 1
-
-    if (num % 2 == 0)
-        next
-    end
-
-    print "#{num} " 
-end
-
-puts
-</code></pre>
-
-
-<p>我们使用<em>while</em>循环迭代1到99的数。</p>
-
-
-<pre><code>if (num % 2 == 0)
-    next
-end
-</code></pre>
-
-
-<p>如果这个数可以被2整除，<em>next</em>语句将执行，循环的其余将跳过。</p>
-
-
-<p>$ ./next.rb <br>
-1 3 5 7 9 11 13 15 17 19 21 23 25 27 29 31 33 35 37 39 <br>
-41 43 45 47 49 51 53 55 57 59 61 63 65 67 69 71 73 75 77 <br>
-79 81 83 85 87 89 91 93 95 97 99   </p>
-
-
-<p>程序的输出结果。</p>
-
-
-<h2>redo语句</h2>
-
-
-<p><em>redo</em>语句重新开始循环而不检查循环的条件式。下面的例子有点复杂，它展示了<em>redo</em>语句和其它的一些特性。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-options = ["rock", "scissors", "paper"]
-
-while true
-
-    print &lt;&lt;TEXT
-1 - rock
-2 - scissors
-3 - paper
-9 - end game
-TEXT
-
-    val = gets.to_i
-
-    r = rand(3) + 1
-
-    if val == 9 
-        puts "End"
-        exit
-    end
-
-    if ![1, 2, 3, 9].include?(val)
-        puts "Invalid option"
-        redo
-    end
-
-    computer = options[r-1]
-    human = options[val-1]
-
-    puts "I have #{computer}, you have #{human}"
-
-    if val == r
-        puts "Tie, next throw"
-        redo
-    end
-
-
-    if val == 1 and r == 2
-        puts "Rock blunts scissors, you win"
-
-    elsif val == 2 and r == 1
-        puts "Rock blunts scissors, you loose"
-
-    elsif val == 2 and r == 3
-        puts "Scissors cut paper, you win"
-
-    elsif val == 3 and r == 2
-        puts "Scissors cut paper, you loose"
-
-    elsif val == 3 and r == 1
-        puts "Paper covers rock, you win"
-
-    elsif val == 1 and r == 3
-        puts "Paper covers rock, you loose"
-
-    end    
-end
-</code></pre>
-
-
-<p>这是一个简单的Rock-paper-scissors游戏。这个例子中我们用到了<em>redo</em>语句、条件式、随机数、数组和输入。</p>
-
-
-<pre><code>options = ["rock", "scissors", "paper"]
-</code></pre>
-
-
-<p>定义了游戏可能用到的选项数组。这三个词在打印消息时会用到。</p>
-
-
-<pre><code>    print &lt;&lt;TEXT
-1 - rock
-2 - scissors
-3 - paper
-9 - end game
-TEXT
-</code></pre>
-
-
-<p>使用定界符在终端上打印一个菜单。菜单在每次游戏循环时都打印。</p>
-
-
-<pre><code>val = gets.to_i
-
-r = rand(3) + 1
-</code></pre>
-
-
-<p>这几行代码从终端输入一个值，然后选择一个1、2、3的随机数。</p>
-
-
-<pre><code>if val == 9 
-    puts "End"
-    exit
-end
-</code></pre>
-
-
-<p>如果输入为9，打印&#8217;End&#8217;并退出程序。</p>
-
-
-<pre><code>if ![1, 2, 3, 9].include?(val)
-    puts "Invalid option"
-    redo
-end
-</code></pre>
-
-
-<p>如果用户选择了一个不是菜单的值，我们提示无效选项并重新循环。</p>
-
-
-<pre><code>computer = options[r-1]
-human = options[val-1]
-
-puts "I have #{computer}, you have #{human}"
-</code></pre>
-
-
-<p>将数字转化为字符串，并同时打印用户的选择和计算机的选择。</p>
-
-
-<pre><code>if val == r
-    puts "Tie, next throw"
-    redo
-end
-</code></pre>
-
-
-<p>如果选择相同则是平局，开始新的游戏循环。</p>
-
-
-<pre><code>if val == 1 and r == 2
-    puts "Rock blunts scissors, you win"
-
-elsif val == 2 and r == 1
-    puts "Rock blunts scissors, you loose"
-...
-</code></pre>
-
-
-<p>使用多个<em>if</em>、<em>elsif</em>分支，比较用户和计算机的选择以决定谁是赢家。</p>
-
-
-<p>$ ./redo.rb <br>
-1 - rock<br>
-2 - scissors<br>
-3 - paper<br>
-9 - end game<br>
-3<br>
-I have paper, you have paper<br>
-Tie, next throw<br>
-1 - rock<br>
-2 - scissors<br>
-3 - paper<br>
-9 - end game<br>
-2<br>
-I have rock, you have scissors<br>
-Rock blunts scissors, you loose<br>
-1 - rock<br>
-2 - scissors<br>
-3 - paper<br>
-9 - end game<br>
-1<br>
-I have scissors, you have rock<br>
-Rock blunts scissors, you win<br>
-1 - rock<br>
-2 - scissors<br>
-3 - paper<br>
-9 - end game<br>
-9<br>
-End  </p>
-
-
-<p>程序输出结果。</p>
-
-
-<p>这部分的Ruby教程我们谈论了结构控制流。</p>
-
-
-<hr>
-
-
-<p>原文地址： <a href="http://zetcode.com/lang/rubytutorial/flowcontrol/">http://zetcode.com/lang/rubytutorial/flowcontrol/</a><br>
-翻译：龙昌  admin@longchangjin.cn<br>
-完整教程：<a href="https://github.com/wusuopu/Ruby-tutorial">https://github.com/wusuopu/Ruby-tutorial</a> </p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/page/8">&larr; Older</a>
@@ -8414,6 +8392,10 @@ End  </p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="http://www.xefan.com/archives/84144.html">Ruby 3.0的未来</a>
+      </li>
+    
+      <li class="post">
         <a href="http://www.xefan.com/archives/84143.html">Ruby中一些重要的钩子方法</a>
       </li>
     
@@ -8429,19 +8411,15 @@ End  </p>
         <a href="http://www.xefan.com/archives/84140.html">Redis集群配置实例</a>
       </li>
     
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84139.html">Mongodb分片配置实例</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (28)</a></li><li><a href='/categories/web开发/index.html'>web开发 (19)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (23)</a></li></ul>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (29)</a></li><li><a href='/categories/web开发/index.html'>web开发 (19)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (23)</a></li></ul>
 </section>
 <section>
   <h1>Tag Cloud</h1>
-    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.7910447761194%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.8955223880597%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 125.97014925373134%'>Ruby(29)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 120.59701492537313%'>翻译(23)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.7910447761194%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.8955223880597%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 126.86567164179104%'>Ruby(30)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 120.59701492537313%'>翻译(23)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
 </section>
 <section>
   <h1>Link</h1>

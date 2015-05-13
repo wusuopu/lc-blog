@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ruby栏目 | 龍昌博客]]></title>
   <link href="http://www.xefan.com/categories/ruby栏目/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2015-05-01T11:53:33+08:00</updated>
+  <updated>2015-05-13T23:10:33+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -12,6 +12,50 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Ruby 3.0的未来]]></title>
+    <link href="http://www.xefan.com/archives/84144.html"/>
+    <updated>2015-05-13T21:33:08+08:00</updated>
+    <id>http://www.xefan.com/archives/84144-Ruby 3.0的未来</id>
+    <content type="html"><![CDATA[<p>原文地址：<a href="http://hrnabi.com/2015/05/12/7035/  ">http://hrnabi.com/2015/05/12/7035/  </a>
+谁日语好的为大家做下贡献，把原文翻译一下吧。</p>
+
+<p>反正我不会日语，根据文中的一些汉字连蒙带猜的，大致看了一遍，现在简单总结一下。
+如果有总结得不对的，本人不负责哦。</p>
+
+<p>看来要玩好Ruby不仅需要学英语，也还得学日语啊。</p>
+
+<hr />
+
+<p>在2014年9月举行的 RubyKaigi 2014 大会上，Matz在演讲过程中首次提到了 Ruby 3.0。<br/>
+文中说的Ruby 3.0的三个工作方向：</p>
+
+<ul>
+<li>Concurrency (并行性)</li>
+<li>JIT (即时编译)</li>
+<li>Static typing (静态类型)</li>
+</ul>
+
+
+<p>Ruby要引入静态类型检查？<br/>
+Matz说，在20世纪出生的语言大多是脚本语言，如：Ruby、PHP和Perl、JavaScript，这些都不是静态类型的。
+另一方面，最近推出的如Scala和Dart、Go是属于静态类型的。
+在Ruby中可以考虑引入Python这种通过注释来进行检查的方法。</p>
+
+<p>Ruby要引入并行计算？<br/>
+Matz详细讨论了静态类型，但没有提到并行计算。详细的内容是由笹田氏来说的。<br/>
+（这部分内容我没看懂，只是大概知道这位笹田氏的博士论文与这个相关。）<br/>
+关于并行计算，Matz提到了Erlang和Scala的actor模型。</p>
+
+<p>最后期待下一个Ruby开发者大会。</p>
+
+<hr />
+
+<p>好了，我只看懂了这么多。其余的各位感兴趣的自己去看原文吧。
+(怎么感觉好坑啊，这总结得跟没总结一样啊。没办法了我的日语水平有限。)</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Ruby中一些重要的钩子方法]]></title>
@@ -808,78 +852,6 @@ command! -nargs=1 -rang DemoFun2 call DemoFun2(&lt;f-args&gt;)
 
 
 <p>更多内容请参考官方文档： https://rvm.io/#docindex</p>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Rack开发简介]]></title>
-    <link href="http://www.xefan.com/archives/84103.html"/>
-    <updated>2014-05-02T00:00:00+08:00</updated>
-    <id>http://www.xefan.com/archives/84103-Rack开发简介</id>
-    <content type="html"><![CDATA[<p>Rack是Ruby应用与web服务器之间的一个接口，它在服务器与应用程序之间作为中间件，可以对用户的请求和程序的返回数据进行处理。现在几乎所有主流的Ruby web框架都是支持Rack接口的。</p>
-
-
-<p>Rack与Python的wsgi很相似，在它的规格书（http://rack.rubyforge.org/doc/SPEC.html）中也说道它采用了WSGI的一些内容。</p>
-
-
-<h2>开始</h2>
-
-
-<p>首先安装Rack:</p>
-
-
-<pre><code>[sudo] gem install rack
-</code></pre>
-
-
-<p>然后通过一个简单的例子来讲解。</p>
-
-
-<pre><code>require "rack"
-rack_app = lambda{|env| [200, {}, ["Hello World!"]]}
-Rack::Handler::WEBrick.run rack_app, :Port =&gt; 3000
-</code></pre>
-
-
-<p>执行上述代码，然后访问 http://127.0.0.1:3000 会看到 &#8220;Hello World!&#8221;。</p>
-
-
-<p>上面代码中的rack_app即是一个Rack应用。Rack应用除了lambda之外也还可以使用其他对象，只要满足以下条件即可：<br>
-  * 可响应call方法的对象；<br>
-  * 接收一个参数rack环境 environment 。它是一个散列表，包含了CGI的信息和rack的一些变量；<br>
-  * 返回一个有三个值的数组，第一个值为返回状态 status；第二个值为返回头 headers，也是一个散列表；第三个值为返回正文 body，它必须是一个可响应each方法并生成字符串的对象，例如字符串数组。</p>
-
-
-<p>WEBrick是Handler的一种。Handler用于将web服务器与Rack连接。使用 Rack::Handler.constants 可以查看Rack包含的所有Handler。</p>
-
-
-<h2>请求/Request</h2>
-
-
-<p>在Rack应用中可以直接操作env参数来访问请求信息，但是这种方法不太方便。对于这种操作Rack::Request对象提供了方便的接口。</p>
-
-
-<pre><code>request = Rack::Request.new env
-</code></pre>
-
-
-<p>创建request对象时传入env参数。</p>
-
-
-<h2>响应/Response</h2>
-
-
-<p>Rack应用的返回值是一个有三个值的数组，包含了返回状态、返回头和返回正文。对于简单的程序手动构建数组还行，如果是复杂的程序则要考虑自动构建了。<br>
-同样的可以使用Rack::Request对象来创建返回数据。</p>
-
-
-<pre><code>response = Rack::Response.new
-response.finish
-</code></pre>
-
-
-<p>内容填充完之后调用response对象的finish方法生成符合Rack规范的数组对象。</p>
 
 ]]></content>
   </entry>
