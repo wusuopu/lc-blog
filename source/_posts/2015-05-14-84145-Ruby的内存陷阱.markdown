@@ -1,0 +1,85 @@
+---
+layout: post
+title: "Ruby的内存陷阱"
+date: 2015-05-14 13:24:21 +0000
+comments: true
+post_id: 84145
+permalink: /archives/84145.html
+categories: ["Ruby栏目"]
+tags: ["Ruby", "翻译"]
+---
+
+Ruby有一套自动的内存管理机制。这在大多数情况下是不错的，但是有时它却是个麻烦。
+
+Ruby的内存管理既简洁又笨重。它将对象（名为 `RVALUE`）存储在大约有16KB大小的堆中。
+从底层上，`RVALUE` 是一个 `C` 的结构体，它包含了一个共同体表示不同的标准ruby对象。
+
+因此在堆中存储着大小不超过40字节的 `RVALUE` 对象，如 `String`、`Array`、`Hash`等。
+这意味着小的对象在堆中很合适，但是一旦它们达到到阈值，那么就需要在Ruby的堆之外再分配一片额外的内存。
+
+**这块额外的内存空间是灵活的。一旦对象被垃圾回收了它就会被释放掉。但是堆本身的内存是不会被释放给操作系统的。**
+
+让我们来看一个简单的例子：
+
+```ruby
+def report
+  puts 'Memory ' + `ps ax -o pid,rss | grep -E "^[[:space:]]*#{$$}"`
+          .strip.split.map(&:to_i)[1].to_s + 'KB'
+end
+
+report
+big_var = " " * 10_000_000
+report
+big_var = nil
+report
+ObjectSpace.garbage_collect
+sleep 1
+report
+
+# ⇒ Memory 11788KB
+# ⇒ Memory 65188KB
+# ⇒ Memory 65188KB
+# ⇒ Memory 11788KB
+```
+
+这里我们分配了大量的内存，使用完后又释放给操作系统。这一切看起来似乎没有问题。现在让我们稍微修改一下代码：
+
+```ruby
+-  big_var = " " * 10_000_000
++  big_var = 1_000_000.times.map(&:to_s)
+```
+
+这只是一个简单的修改，不是吗。但是结果：
+
+```
+# ⇒ Memory 11788KB
+# ⇒ Memory 65188KB
+# ⇒ Memory 65188KB
+# ⇒ Memory 57448KB
+```
+
+怎么回事？内存没有释放归还给操作系统。这是因为数组中的每个元素符合 `RVALUE` 的大小并存储在ruby的堆中。
+
+在大多情况下这是正常的。现在ruby堆中多了许多空的位置，再次运行代码将不会再消耗额外的内存了。
+每次我们处理 `big_var` 和一些空的堆时， `GC[:heap_used]`的值果然减小了。
+对于这些操作Ruby是早有准备，注意这里是Ruby而不是操作系统。
+
+因此，对于创建大量的符合40个字节的临时变量就要注意了：
+
+```
+big_var = " " * 10_000_000
+big_var.gsub(/\s/) { |c| '-' }
+```
+
+结果同样是Ruby的内存疯狂增长，并且这部分内存在程序运行期间是不会归还给操作系统的：
+
+```
+# ⇒ Memory 10156KB
+# ⇒ Memory 13788KB
+# ⇒ Memory 13788KB
+# ⇒ Memory 12808KB
+```
+
+这个问题不是太重要，稍微注意一下即可。
+
+原文地址：http://rocket-science.ru/hacking/2013/12/17/ruby-memory-pitfalls/
