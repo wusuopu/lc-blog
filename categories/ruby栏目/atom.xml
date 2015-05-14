@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ruby栏目 | 龍昌博客]]></title>
   <link href="http://www.xefan.com/categories/ruby栏目/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2015-05-13T23:31:59+08:00</updated>
+  <updated>2015-05-14T23:08:46+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -12,6 +12,83 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Ruby的内存陷阱]]></title>
+    <link href="http://www.xefan.com/archives/84145.html"/>
+    <updated>2015-05-14T21:24:21+08:00</updated>
+    <id>http://www.xefan.com/archives/84145-Ruby的内存陷阱</id>
+    <content type="html"><![CDATA[<p>Ruby有一套自动的内存管理机制。这在大多数情况下是不错的，但是有时它却是个麻烦。</p>
+
+<p>Ruby的内存管理既简洁又笨重。它将对象（名为 <code>RVALUE</code>）存储在大约有16KB大小的堆中。
+从底层上，<code>RVALUE</code> 是一个 <code>C</code> 的结构体，它包含了一个共同体表示不同的标准ruby对象。</p>
+
+<p>因此在堆中存储着大小不超过40字节的 <code>RVALUE</code> 对象，如 <code>String</code>、<code>Array</code>、<code>Hash</code>等。
+这意味着小的对象在堆中很合适，但是一旦它们达到到阈值，那么就需要在Ruby的堆之外再分配一片额外的内存。</p>
+
+<p><strong>这块额外的内存空间是灵活的。一旦对象被垃圾回收了它就会被释放掉。但是堆本身的内存是不会被释放给操作系统的。</strong></p>
+
+<p>让我们来看一个简单的例子：</p>
+
+<pre><code class="ruby">def report
+  puts 'Memory ' + `ps ax -o pid,rss | grep -E "^[[:space:]]*#{$$}"`
+          .strip.split.map(&amp;:to_i)[1].to_s + 'KB'
+end
+
+report
+big_var = " " * 10_000_000
+report
+big_var = nil
+report
+ObjectSpace.garbage_collect
+sleep 1
+report
+
+# ⇒ Memory 11788KB
+# ⇒ Memory 65188KB
+# ⇒ Memory 65188KB
+# ⇒ Memory 11788KB
+</code></pre>
+
+<p>这里我们分配了大量的内存，使用完后又释放给操作系统。这一切看起来似乎没有问题。现在让我们稍微修改一下代码：</p>
+
+<pre><code class="ruby">-  big_var = " " * 10_000_000
++  big_var = 1_000_000.times.map(&amp;:to_s)
+</code></pre>
+
+<p>这只是一个简单的修改，不是吗。但是结果：</p>
+
+<pre><code># ⇒ Memory 11788KB
+# ⇒ Memory 65188KB
+# ⇒ Memory 65188KB
+# ⇒ Memory 57448KB
+</code></pre>
+
+<p>怎么回事？内存没有释放归还给操作系统。这是因为数组中的每个元素符合 <code>RVALUE</code> 的大小并存储在ruby的堆中。</p>
+
+<p>在大多情况下这是正常的。现在ruby堆中多了许多空的位置，再次运行代码将不会再消耗额外的内存了。
+每次我们处理 <code>big_var</code> 和一些空的堆时， <code>GC[:heap_used]</code>的值果然减小了。
+对于这些操作Ruby是早有准备，注意这里是Ruby而不是操作系统。</p>
+
+<p>因此，对于创建大量的符合40个字节的临时变量就要注意了：</p>
+
+<pre><code>big_var = " " * 10_000_000
+big_var.gsub(/\s/) { |c| '-' }
+</code></pre>
+
+<p>结果同样是Ruby的内存疯狂增长，并且这部分内存在程序运行期间是不会归还给操作系统的：</p>
+
+<pre><code># ⇒ Memory 10156KB
+# ⇒ Memory 13788KB
+# ⇒ Memory 13788KB
+# ⇒ Memory 12808KB
+</code></pre>
+
+<p>这个问题不是太重要，稍微注意一下即可。</p>
+
+<p>原文地址：<a href="http://rocket-science.ru/hacking/2013/12/17/ruby-memory-pitfalls/">http://rocket-science.ru/hacking/2013/12/17/ruby-memory-pitfalls/</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[未来的Ruby 3.0]]></title>
@@ -759,99 +836,6 @@ command! -nargs=1 -rang DemoFun2 call DemoFun2(&lt;f-args&gt;)
 
 
 <p>好了，先写这么多吧，其余的自己去尝试吧。</p>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[使用rvm进行ruby多版本管理]]></title>
-    <link href="http://www.xefan.com/archives/84105.html"/>
-    <updated>2014-06-16T00:00:00+08:00</updated>
-    <id>http://www.xefan.com/archives/84105-使用rvm进行ruby多版本管理</id>
-    <content type="html"><![CDATA[<p>rvm与Python的virtualenv和Node的nvm类似。使用它可以很方便的在你的系统中安装多个Ruby环境。类似的工具还有rbenv、ry、rbfu等。  </p>
-
-
-<h3>安装rvm</h3>
-
-
-<p>以下的命令都是在当前用户权限下执行的，最好不要使用sudo。<br>
-下载安装rvm:</p>
-
-
-<pre><code>$ curl -sSL https://get.rvm.io | bash -s stable
-</code></pre>
-
-
-<p>安装完成之后再加载配置：</p>
-
-
-<pre><code>$ source ~/.profile
-</code></pre>
-
-
-<p>为了下次能直接使用，建议将该命令添加到 ~/.bash_profile 或者 ~/.zshrc 中。  </p>
-
-
-<p>使用rvm安装Ruby时会默认从官方网站上进行下载，为了提高下载速度这里建议将安装源修改为淘宝的镜像。</p>
-
-
-<pre><code>$ sed -i -e 's/ftp\.ruby-lang\.org\/pub\/ruby/ruby\.taobao\.org\/mirrors\/ruby/g' ~/.rvm/config/db
-</code></pre>
-
-
-<h3>使用</h3>
-
-
-<p>安装完成之后就可以使用了，以下介绍几条常用的命令。<br>
-列出已知的ruby版本:  </p>
-
-
-<pre><code>$ rvm list known
-</code></pre>
-
-
-<p>列出已经安装的ruby：  </p>
-
-
-<pre><code>$ rvm list
-</code></pre>
-
-
-<p>安装一个ruby版本：  </p>
-
-
-<pre><code>$ rvm install 2.1.0
-</code></pre>
-
-
-<p>这里安装最新的2.1.0版本的Ruby。</p>
-
-
-<p>如果安装了多个版本，想使用其中一个版本：  </p>
-
-
-<pre><code>$ rvm use 2.1.0
-</code></pre>
-
-
-<p>设置为默认版本：  </p>
-
-
-<pre><code>$ rvm use 2.1.0 --default
-</code></pre>
-
-
-<p>use了某个版本之后，可以使用 which ruby 命令查看当前的ruby命令信息。  </p>
-
-
-<p>删除一个已安装的版本：  </p>
-
-
-<pre><code>$ rvm remove 2.1.0
-</code></pre>
-
-
-<p>更多内容请参考官方文档： https://rvm.io/#docindex</p>
 
 ]]></content>
   </entry>

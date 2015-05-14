@@ -9,10 +9,7 @@
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="安装ibus # pacman -S ibus
-# pacman -S ibus-qt 安装输入法 ibus-pinyin:拼音输入法
-ibus-table:一个框架，五笔信赖于它 # pacman -S ibus-{pinyin,table}
-# yaourt -S ibus-table- &hellip;">
+  <meta name="description" content="这几天终于把Arch Linux + Xfce + slim配置好了，做个笔记备忘。 安装Xfce https://wiki.archlinux.org/index.php/Xfce_(简体中文) 安装准备 请在安装与使用xfce前确认已经安装有xorg以及hal。 # pacman -S &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -69,6 +66,170 @@ ibus-table:一个框架，五笔信赖于它 # pacman -S ibus-{pinyin,table}
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83637.html">Arch Linux安装xfce和slim</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2011-10-16T00:00:00+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>16</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83637.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83637.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>这几天终于把Arch Linux + Xfce + slim配置好了，做个笔记备忘。</p>
+
+<h1>安装Xfce</h1>
+
+
+<p><a href="https://wiki.archlinux.org/index.php/Xfce_">https://wiki.archlinux.org/index.php/Xfce_</a>(简体中文)</p>
+
+<p><strong>安装准备</strong></p>
+
+<p>请在安装与使用xfce前确认已经安装有xorg以及hal。</p>
+
+<p><code># pacman -S xorg hal</code></p>
+
+<p>默认安装的archlinux是不包含xorg以及hal的。如果不安装两者，将造成xfce无法启动。HAL 已经被诸如udev,udisks,upower这些程序替代 。</p>
+
+<p><strong>安装XFCE系统(Xfce 4.8)</strong></p>
+
+<p><code># pacman -S xfce4 xfce4-goodies</code><br/>
+<code># pacman -S $(pacman -Sgq xfce4-goodies | grep -v xfce4-xfapplet-plugin)</code></p>
+
+<p>默认安装的xfce4，首次启动出现的小提示窗口里面是没有任何东西的。如果你想看到刚启动时候的技巧和小提示，那么就需要安装fortune-mod</p>
+
+<p><code># pacman -S fortune-mod</code></p>
+
+<p>安装好xfce4之后可能会发现xfce4-mixer通过ALSA并不能控制音量，需要安装gstreamer0.10-base-plugins：</p>
+
+<p><code># pacman -S gstreamer0.10-base-plugins</code></p>
+
+<p>对于笔记本用户，Xfce4-mixer如果不能同时控制外放与耳机，请尝试安装全部Plugins：</p>
+
+<p><code># pacman -S gstreamer0.10-plugins</code></p>
+
+<p><strong>安装和配置Daemons</strong></p>
+
+<p><strong>安装dbus：</strong></p>
+
+<p><code># pacman -S dbus</code></p>
+
+<p>需要在开机的时候自动运行，应该将dbus添加到/etc/rc.conf文件中的DAEMONS：
+DAEMONS=(syslog-ng dbus network crond)</p>
+
+<p>如果不想重启开始dbus服务： <code># /etc/rc.d/dbus start</code></p>
+
+<p>安装gamin (fam已经是过时的东西)，它会在后台自动运行检查文件改动反应给桌面，并且不需要添加到Daemons。</p>
+
+<p><code># pacman -S gamin</code></p>
+
+<h1>运行XFCE</h1>
+
+
+<p><strong>手动启动</strong></p>
+
+<p>你只需要运行： <code>$ startxfce4</code></p>
+
+<p>从终端启动，例如使用xinit/startx 需要配置Xinitrc (简体中文)。
+如果还没有~/.xinitrc 文件，系统里有一份实例文件供参考：<code>$ cp /etc/skel/.xinitrc ~/.xinitrc</code></p>
+
+<p>在最后添加（因为权限的问题推荐在启动xfce之前添加ck-launch-session dbus-launch启）：
+<em>exec ck-launch-session dbus-launch &ndash;exit-with-session startxfce4</em></p>
+
+<p><strong>在XFCE中关机和重启</strong></p>
+
+<p>在/etc/sudoers文件末尾添加如下一行：
+<em>%users ALL=(root) NOPASSWD: /usr/lib/xfce4/session/xfsm-shutdown-helper</em></p>
+
+<p><code># gpasswd -a 你的用户名 users</code></p>
+
+<p><strong>声音</strong><br/>
+<strong>安装ALSA</strong>
+<a href="https://wiki.archlinux.org/index.php/Advanced_Linux_Sound_Architecture_">https://wiki.archlinux.org/index.php/Advanced_Linux_Sound_Architecture_</a>(简体中文)</p>
+
+<p>要求有本地化的ALSA程序和管理</p>
+
+<p><code># pacman -S alsa-lib alsa-utils</code><br/>
+<code># pacman -S alsa-oss</code></p>
+
+<p>所有ALSA程序都很可能需要依赖alsa-lib。</p>
+
+<p><strong>使用ALSA驱动如何让xfce4-mixer来控制音量</strong></p>
+
+<p>新版的xfce4-mixer使用了gstreamer作为后端，这样就不用直接与驱动交流，更加统一。与驱动打交道的工作交给了gstreamer。因此如果你xfce4-mixer无法正常工作，就需要配置好gstreamer。首先当然你得安装xfce4-mixer。</p>
+
+<p><code>pacman -S xfce4-mixer gstreamer0.10-base-plugins</code></p>
+
+<p>你需要至少安装gstreamer0.10-good-plugins,考虑安装gstreamer0.10-bad-plugins</p>
+
+<p><code>pacman -S gstreamer0.10-good-plugins gstreamer0.10-bad-plugins</code></p>
+
+<p>然后删除面板上的mixer插件，然后重新添加一次，或者先登出然后再登录一次，对gstreamer做更改后必须这样做才能让操作生效。</p>
+
+<h1>安装SLiM</h1>
+
+
+<p><a href="https://wiki.archlinux.org/index.php/SLiM_">https://wiki.archlinux.org/index.php/SLiM_</a>(简体中文)</p>
+
+<p><strong>介绍</strong></p>
+
+<p>SLiM是Simple Login Manager（简单登录管理器）的缩写。SLiM是简单、轻量级和容易配置的，相对较易在低端和高端的系统中使用。对于那些希望寻找一个不依赖于GNOME或者KDE，可以在Xfce、Openbox、Fluxbox等环境下使用的登录管理器的人来说，SLiM也是非常合适的。</p>
+
+<p><strong>安装</strong></p>
+
+<p>可以在extra软件仓库中找到SLiM： <code># pacman -S slim</code></p>
+
+<p>同时还可以安装主题包： <code># pacman -S slim-themes archlinux-themes-slim</code></p>
+
+<p><strong>配置</strong></p>
+
+<p>启用SLiM</p>
+
+<p>单用户环境<br/>
+要将SLiM配置为加载某个特定的环境，只需编辑~/.xinitrc如下：<br/>
+将[session-command]替换为适当的会话命令。例如：<br/>
+要启动Xfce:<br/>
+<em>exec ck-launch-session dbus-launch &ndash;exit-with-session startxfce4</em></p>
+
+<p>打开 /etc/rc.conf。<br/>
+<code># vi /etc/rc.conf</code></p>
+
+<p>添加一个服务slim<br/>
+<em>DAEMONS=(syslogd klogd !pcmcia network netfs crond slim)</em></p>
+
+<p>修改默认运行等级<br/>
+1. 切换用户到root.<br/>
+$ su<br/>
+2. 编辑/etc/inittab：<br/>
+<code># vi /etc/inittab</code><br/>
+3. 找到如下这一行：<br/>
+id:3:initdefault:<br/>
+4. 为了启动X11需要把&#8217;3&#8217;修改成&#8217;5&#8217;：<br/>
+id:5:initdefault:<br/>
+5. 保存此文件并退出编辑器，下次启动时你选择的显示管理器就会运行了。</p>
+
+<p>这样就差不多了，细节上的以后再慢慢琢磨。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -985,70 +1146,6 @@ key.name —— 接受键值返回键名</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83599.html">STC89C5XX单片机看门狗说明</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2011-09-17T00:00:00+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
-        
-           | <a href="http://www.xefan.com/archives/83599.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/83599.html">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>下面是关于STC89C5XX-51 单片机看门狗的描述</p>
-
-<p>WDT_CONTR 位置0xE1; [-] [-] [EN_WDT] [CLR_WDT] [IDLE_WDT] [PS2] [PS1] [PS0]</p>
-
-<p>EN_WDT: 看门狗允许位，置 1 启动看门狗，看门狗不能自动启动，需要设置该位后启动，一旦启动不能关闭(只能系统重新上电和看门狗复位可以关闭)</p>
-
-<p>CLR_WDT: 看门狗计数器清零位，置1 清零看门狗计数器，当计数器开始重新计数，硬件清零该位。</p>
-
-<p>IDLE_WDT: 单片机IDLE 模式看门狗允许位，当IDLE_WDT=1时，单片机在 IDLE 模式(空闲模式)依然启用看门狗</p>
-
-<p>PS2~PS0: 看门狗定时器预分频器，下表中 Prescale 表示预分频数</p>
-
-<p>PS2    PS1    PS0    Prescale
-0       0       0       2
-0       0       1       4
-0       1       0       8
-0       1       1       16
-1       0       0       32
-1       0       1       64
-1       1       0       128
-1      1      1      256</p>
-
-<p>看门狗溢出时间：(N<em>Prescale</em>32768)/晶振频率，其中 N 表示指令周期数 N=12 表示 12 时钟周期模式；N=6 表示6时钟周期模式。如N=12，晶振频率为12MHz，PS2~PS0为100时，溢出时间=(12<em>32</em>32768)/12=1048576us，差不多是1s。</p>
-
-<p>例如：给WDT_CONTR写入0×34，即是激活看门狗，同时预分频数设为32。喂狗过程也是一样的。</p>
-
-<p>顺便说一下ATMEL-51单片机的看门狗</p>
-
-<p>下面是关于ATMEL-51单片机看门狗的描述</p>
-
-<p>【看门狗计数器】(watchdog timer)是一个14位的计数器，它以机器周期（晶振频率/12）增加，当计数值计满(16383/0×3FFF)了就使单片机软复位；当启动了【看门狗计数器】之后，我们需要在它计数没有满之前复位计数器强制它不能够溢出，这个过程称作喂狗。</p>
-
-<p>一般设置是给 WDTRST 先写入0×1E 再写入0xE1激活看门狗；喂狗过程也是一样的，给 WDTRST 先写入0×1E 再写入0xE1。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/page/17">&larr; Older</a>
@@ -1070,6 +1167,10 @@ key.name —— 接受键值返回键名</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="http://www.xefan.com/archives/84145.html">Ruby的内存陷阱</a>
+      </li>
+    
+      <li class="post">
         <a href="http://www.xefan.com/archives/84144.html">未来的Ruby 3.0</a>
       </li>
     
@@ -1085,19 +1186,15 @@ key.name —— 接受键值返回键名</p>
         <a href="http://www.xefan.com/archives/84141.html">Vagrant使用笔记</a>
       </li>
     
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84140.html">Redis集群配置实例</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (29)</a></li><li><a href='/categories/web开发/index.html'>web开发 (19)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (23)</a></li></ul>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (30)</a></li><li><a href='/categories/web开发/index.html'>web开发 (19)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (23)</a></li></ul>
 </section>
 <section>
   <h1>Tag Cloud</h1>
-    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.7910447761194%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.8955223880597%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 126.86567164179104%'>Ruby(30)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 120.59701492537313%'>翻译(23)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.7910447761194%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.8955223880597%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 127.76119402985074%'>Ruby(31)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 121.49253731343283%'>翻译(24)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
 </section>
 <section>
   <h1>Link</h1>

@@ -4,7 +4,7 @@
   <title><![CDATA[龍昌博客]]></title>
   <link href="http://www.xefan.com/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2015-05-13T23:31:59+08:00</updated>
+  <updated>2015-05-14T23:08:46+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -12,6 +12,118 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Ruby的内存陷阱]]></title>
+    <link href="http://www.xefan.com/archives/84145.html"/>
+    <updated>2015-05-14T21:24:21+08:00</updated>
+    <id>http://www.xefan.com/archives/84145-Ruby的内存陷阱</id>
+    <content type="html"><![CDATA[<p>Ruby有一套自动的内存管理机制。这在大多数情况下是不错的，但是有时它却是个麻烦。</p>
+
+<p>Ruby的内存管理既简洁又笨重。它将对象（名为 <code>RVALUE</code>）存储在大约有16KB大小的堆中。
+从底层上，<code>RVALUE</code> 是一个 <code>C</code> 的结构体，它包含了一个共同体表示不同的标准ruby对象。</p>
+
+<p>因此在堆中存储着大小不超过40字节的 <code>RVALUE</code> 对象，如 <code>String</code>、<code>Array</code>、<code>Hash</code>等。
+这意味着小的对象在堆中很合适，但是一旦它们达到到阈值，那么就需要在Ruby的堆之外再分配一片额外的内存。</p>
+
+<p><strong>这块额外的内存空间是灵活的。一旦对象被垃圾回收了它就会被释放掉。但是堆本身的内存是不会被释放给操作系统的。</strong></p>
+
+<p>让我们来看一个简单的例子：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">report</span>
+</span><span class='line'>  <span class="nb">puts</span> <span class="s1">&#39;Memory &#39;</span> <span class="o">+</span> <span class="sb">`ps ax -o pid,rss | grep -E &quot;^[[:space:]]*</span><span class="si">#{</span><span class="vg">$$</span><span class="si">}</span><span class="sb">&quot;`</span>
+</span><span class='line'>          <span class="o">.</span><span class="n">strip</span><span class="o">.</span><span class="n">split</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:to_i</span><span class="p">)</span><span class="o">[</span><span class="mi">1</span><span class="o">].</span><span class="n">to_s</span> <span class="o">+</span> <span class="s1">&#39;KB&#39;</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">report</span>
+</span><span class='line'><span class="n">big_var</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="mi">10_000_000</span>
+</span><span class='line'><span class="n">report</span>
+</span><span class='line'><span class="n">big_var</span> <span class="o">=</span> <span class="kp">nil</span>
+</span><span class='line'><span class="n">report</span>
+</span><span class='line'><span class="no">ObjectSpace</span><span class="o">.</span><span class="n">garbage_collect</span>
+</span><span class='line'><span class="nb">sleep</span> <span class="mi">1</span>
+</span><span class='line'><span class="n">report</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># ⇒ Memory 11788KB</span>
+</span><span class='line'><span class="c1"># ⇒ Memory 65188KB</span>
+</span><span class='line'><span class="c1"># ⇒ Memory 65188KB</span>
+</span><span class='line'><span class="c1"># ⇒ Memory 11788KB</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这里我们分配了大量的内存，使用完后又释放给操作系统。这一切看起来似乎没有问题。现在让我们稍微修改一下代码：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">-</span>  <span class="n">big_var</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="mi">10_000_000</span>
+</span><span class='line'><span class="o">+</span>  <span class="n">big_var</span> <span class="o">=</span> <span class="mi">1_000_000</span><span class="o">.</span><span class="n">times</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:to_s</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这只是一个简单的修改，不是吗。但是结果：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># ⇒ Memory 11788KB</span>
+</span><span class='line'><span class="c1"># ⇒ Memory 65188KB</span>
+</span><span class='line'><span class="c1"># ⇒ Memory 65188KB</span>
+</span><span class='line'><span class="c1"># ⇒ Memory 57448KB</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>怎么回事？内存没有释放归还给操作系统。这是因为数组中的每个元素符合 <code>RVALUE</code> 的大小并存储在ruby的堆中。</p>
+
+<p>在大多情况下这是正常的。现在ruby堆中多了许多空的位置，再次运行代码将不会再消耗额外的内存了。
+每次我们处理 <code>big_var</code> 和一些空的堆时， <code>GC[:heap_used]</code>的值果然减小了。
+对于这些操作Ruby是早有准备，注意这里是Ruby而不是操作系统。</p>
+
+<p>因此，对于创建大量的符合40个字节的临时变量就要注意了：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">big_var</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="mi">10_000_000</span>
+</span><span class='line'><span class="n">big_var</span><span class="o">.</span><span class="n">gsub</span><span class="p">(</span><span class="sr">/\s/</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">c</span><span class="o">|</span> <span class="s1">&#39;-&#39;</span> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>结果同样是Ruby的内存疯狂增长，并且这部分内存在程序运行期间是不会归还给操作系统的：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># ⇒ Memory 10156KB</span>
+</span><span class='line'><span class="c1"># ⇒ Memory 13788KB</span>
+</span><span class='line'><span class="c1"># ⇒ Memory 13788KB</span>
+</span><span class='line'><span class="c1"># ⇒ Memory 12808KB</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这个问题不是太重要，稍微注意一下即可。</p>
+
+<p>原文地址：<a href="http://rocket-science.ru/hacking/2013/12/17/ruby-memory-pitfalls/">http://rocket-science.ru/hacking/2013/12/17/ruby-memory-pitfalls/</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[未来的Ruby 3.0]]></title>
@@ -2335,248 +2447,6 @@ let g:phpcomplete_index_composer_command = 'composer.phar'
 
 
 <p><strong>注意：</strong>在使用该插件时需要把自动切换目录功能给禁用掉，添加设置： set autochdir! 。否则会出现无法加载索引，从而补全不了。这个问题在文档中没说，我也是折腾了好久才发现的。</p>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Redis使用笔记]]></title>
-    <link href="http://www.xefan.com/archives/84110.html"/>
-    <updated>2014-06-21T00:00:00+08:00</updated>
-    <id>http://www.xefan.com/archives/84110-Redis使用笔记</id>
-    <content type="html"><![CDATA[<p>Redis是一个键值型数据库，之前花了些时间体验了一下Redis，感觉还是很不错的。而且Redis学习起来也很容易，差不多花几个小时应该就能入门了。当时我是看的<a href="https://github.com/karlseguin/the-little-redis-book">《the little redis book》</a>，初学者可以看看。</p>
-
-
-<h2>安装</h2>
-
-
-<p>下载软件包： http://redis.io/download</p>
-
-
-<p>首先运行服务器程序：</p>
-
-
-<pre><code>$ redis-server
-</code></pre>
-
-
-<p>程序默认是监听6379端口。</p>
-
-
-<p>然后再运行客户端程序：</p>
-
-
-<pre><code>$ redis-cli
-</code></pre>
-
-
-<h2>基本数据类型</h2>
-
-
-<p>运行客户端程序连接上Redis服务之后，所有的操作都可以通过该命令行交互完成。</p>
-
-
-<p>Redis有5种不同的数据类型：字符串、散列表、列表、集合、有序集合。所有的数据在Redis中都是以键值对的形式保存的。</p>
-
-
-<p>以下介绍这几种类型数据的基本操作。</p>
-
-
-<h3>String</h3>
-
-
-<p>设置一个键的值为字符串：  </p>
-
-
-<pre><code>set &lt;key&gt; &lt;value&gt;
-</code></pre>
-
-
-<p>获取该键的值：  </p>
-
-
-<pre><code>get &lt;key&gt;
-</code></pre>
-
-
-<p>字符串相关的命令：  </p>
-
-
-<pre><code>help @string
-</code></pre>
-
-
-<h3>Hashes</h3>
-
-
-<p>设置一个散列值：  </p>
-
-
-<pre><code>hset &lt;key&gt; &lt;k&gt; &lt;v&gt;
-</code></pre>
-
-
-<p>获取该键的值：  </p>
-
-
-<pre><code>hget &lt;key&gt; &lt;k&gt;  
-hgetall &lt;key&gt;
-</code></pre>
-
-
-<p>散列相关的命令：  </p>
-
-
-<pre><code>help @hash
-</code></pre>
-
-
-<h3>Lists</h3>
-
-
-<p>添加值：  </p>
-
-
-<pre><code>lpush &lt;key&gt; &lt;v&gt;
-</code></pre>
-
-
-<p>移除值：  </p>
-
-
-<pre><code>lpop &lt;key&gt;  
-help @list
-</code></pre>
-
-
-<h3>Set</h3>
-
-
-<p>添加值：  </p>
-
-
-<pre><code>sadd &lt;key&gt; &lt;v&gt;[ &lt;v&gt; ..]  
-help set
-</code></pre>
-
-
-<h3>Sorted Sets</h3>
-
-
-<p>类似于集合(Set)，但是提供了排序（sorting）和秩划分（ranking）的功能。</p>
-
-
-<p>添加值：  </p>
-
-
-<pre><code>zadd key score member [score] [member]   
-help @sorted_set
-</code></pre>
-
-
-<h2>其他</h2>
-
-
-<h3>有效期</h3>
-
-
-<p>设置某个值在seconds秒后到期：  </p>
-
-
-<pre><code>expire &lt;key&gt; seconds
-</code></pre>
-
-
-<p>设置某个值在time时刻到期：  </p>
-
-
-<pre><code>expireat &lt;key&gt; time
-</code></pre>
-
-
-<p>查看到期时间：  </p>
-
-
-<pre><code>ttl &lt;key&gt;
-</code></pre>
-
-
-<p>清除到期时间：  </p>
-
-
-<pre><code>persist &lt;key&gt;
-</code></pre>
-
-
-<h3>事务（Transactions）</h3>
-
-
-<pre><code>multi  
-do something  
-exec
-</code></pre>
-
-
-<p>multi和exec之间的命令作为原子操作。</p>
-
-
-<p>在multi之前调用watch可监听值的变化，若该值被其他客户端修改，事务将会运行失败。</p>
-
-
-<h3>杂项</h3>
-
-
-<p>选择数据库：</p>
-
-
-<pre><code>select index
-</code></pre>
-
-
-<p>清除当前数据库所属key:</p>
-
-
-<pre><code>flushdb
-</code></pre>
-
-
-<p>清除所有数据库所属key:</p>
-
-
-<pre><code>flushall
-</code></pre>
-
-
-<p>查看key所储存的值的类型：</p>
-
-
-<pre><code>type key
-</code></pre>
-
-
-<p>Redis相关的命令手册： http://redis.io/commands</p>
-
-
-<h2>在应用程序中使用Redis</h2>
-
-
-<p>Redis提供了多种语言的绑定，以Ruby为例：</p>
-
-
-<pre><code>require 'redis'
-r = Redis.new
-r.set 'key', 1234
-puts r.get 'key'
-puts r.keys
-</code></pre>
-
-
-<p>输出结果应该为：</p>
-
-
-<pre><code>"1234"
-["key"]
-</code></pre>
 
 ]]></content>
   </entry>

@@ -4,7 +4,7 @@
   <title><![CDATA[Tag: Ruby | 龍昌博客]]></title>
   <link href="http://www.xefan.com/tags/Ruby/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2015-05-13T23:31:59+08:00</updated>
+  <updated>2015-05-14T23:08:46+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -12,6 +12,83 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Ruby的内存陷阱]]></title>
+    <link href="http://www.xefan.com/archives/84145.html"/>
+    <updated>2015-05-14T21:24:21+08:00</updated>
+    <id>http://www.xefan.com/archives/84145-Ruby的内存陷阱</id>
+    <content type="html"><![CDATA[<p>Ruby有一套自动的内存管理机制。这在大多数情况下是不错的，但是有时它却是个麻烦。</p>
+
+<p>Ruby的内存管理既简洁又笨重。它将对象（名为 <code>RVALUE</code>）存储在大约有16KB大小的堆中。
+从底层上，<code>RVALUE</code> 是一个 <code>C</code> 的结构体，它包含了一个共同体表示不同的标准ruby对象。</p>
+
+<p>因此在堆中存储着大小不超过40字节的 <code>RVALUE</code> 对象，如 <code>String</code>、<code>Array</code>、<code>Hash</code>等。
+这意味着小的对象在堆中很合适，但是一旦它们达到到阈值，那么就需要在Ruby的堆之外再分配一片额外的内存。</p>
+
+<p><strong>这块额外的内存空间是灵活的。一旦对象被垃圾回收了它就会被释放掉。但是堆本身的内存是不会被释放给操作系统的。</strong></p>
+
+<p>让我们来看一个简单的例子：</p>
+
+<pre><code class="ruby">def report
+  puts 'Memory ' + `ps ax -o pid,rss | grep -E "^[[:space:]]*#{$$}"`
+          .strip.split.map(&amp;:to_i)[1].to_s + 'KB'
+end
+
+report
+big_var = " " * 10_000_000
+report
+big_var = nil
+report
+ObjectSpace.garbage_collect
+sleep 1
+report
+
+# ⇒ Memory 11788KB
+# ⇒ Memory 65188KB
+# ⇒ Memory 65188KB
+# ⇒ Memory 11788KB
+</code></pre>
+
+<p>这里我们分配了大量的内存，使用完后又释放给操作系统。这一切看起来似乎没有问题。现在让我们稍微修改一下代码：</p>
+
+<pre><code class="ruby">-  big_var = " " * 10_000_000
++  big_var = 1_000_000.times.map(&amp;:to_s)
+</code></pre>
+
+<p>这只是一个简单的修改，不是吗。但是结果：</p>
+
+<pre><code># ⇒ Memory 11788KB
+# ⇒ Memory 65188KB
+# ⇒ Memory 65188KB
+# ⇒ Memory 57448KB
+</code></pre>
+
+<p>怎么回事？内存没有释放归还给操作系统。这是因为数组中的每个元素符合 <code>RVALUE</code> 的大小并存储在ruby的堆中。</p>
+
+<p>在大多情况下这是正常的。现在ruby堆中多了许多空的位置，再次运行代码将不会再消耗额外的内存了。
+每次我们处理 <code>big_var</code> 和一些空的堆时， <code>GC[:heap_used]</code>的值果然减小了。
+对于这些操作Ruby是早有准备，注意这里是Ruby而不是操作系统。</p>
+
+<p>因此，对于创建大量的符合40个字节的临时变量就要注意了：</p>
+
+<pre><code>big_var = " " * 10_000_000
+big_var.gsub(/\s/) { |c| '-' }
+</code></pre>
+
+<p>结果同样是Ruby的内存疯狂增长，并且这部分内存在程序运行期间是不会归还给操作系统的：</p>
+
+<pre><code># ⇒ Memory 10156KB
+# ⇒ Memory 13788KB
+# ⇒ Memory 13788KB
+# ⇒ Memory 12808KB
+</code></pre>
+
+<p>这个问题不是太重要，稍微注意一下即可。</p>
+
+<p>原文地址：<a href="http://rocket-science.ru/hacking/2013/12/17/ruby-memory-pitfalls/">http://rocket-science.ru/hacking/2013/12/17/ruby-memory-pitfalls/</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[未来的Ruby 3.0]]></title>
@@ -700,122 +777,6 @@ vagrant destroy
 </code></pre>
 
 <p>vagrant的一些镜像： <a href="http://www.vagrantbox.es/">http://www.vagrantbox.es/</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[使用ruby开发vim插件]]></title>
-    <link href="http://www.xefan.com/archives/84117.html"/>
-    <updated>2014-07-03T00:00:00+08:00</updated>
-    <id>http://www.xefan.com/archives/84117-使用ruby开发vim插件</id>
-    <content type="html"><![CDATA[<p>作为一个Vimmer和Pythoner，之前折腾过用python编写vim插件。现在作为半个Rubist，又开始继续折腾。</p>
-
-
-<p>在开始编写插件之前，你需要确认 Vim 是否支持 Ruby，通过以下命令来判别：</p>
-
-
-<pre><code>$ vim --version | grep +ruby
-</code></pre>
-
-
-<p>如果输出为空，则表示你当前的vim不支持Ruby，需要重新编译一下，并启用对Ruby的支持。</p>
-
-
-<p>顺便说下我当前的环境是：</p>
-
-
-<ul>
-<li>vim 7.4  </li>
-<li>ruby 2.1.0  </li>
-</ul>
-
-
-<p>环境检查没有问题那么就开始吧。<br>
-在~/.vim/plugin目录下创建一个 demo.vim 文件。</p>
-
-
-<p>在开头写上以下代码：</p>
-
-
-<pre><code>if !has('ruby')
-    echo "Error: Required vim compiled with +ruby"
-    finish
-endif
-</code></pre>
-
-
-<p>这段代码就是用 VimL 编写的，它将检查 Vim 是否支持 Ruby。</p>
-
-
-<p>接下来再判断该插件是否已经加载过了，以免重复加载：</p>
-
-
-<pre><code>if exists('g:loaded_ruby_demo_plugin')
-    finish
-endif
-let g:loaded_ruby_demo_plugin = 1
-</code></pre>
-
-
-<p>所有的检查都没有问题，则开始插件的正文了。先定义一个函数。</p>
-
-
-<pre><code>function! DemoFun1()
-ruby&lt;&lt;EOF
-buf = VIM::Buffer.current
-puts "current buffer name: #{buf.name} number: #{buf.number} length: #{buf.length}"
-EOF
-endfunction
-</code></pre>
-
-
-<p>function与endfunction是vim中用于定义函数的，在”ruby&lt;&lt;EOF”和”EOF”之间部分的是Ruby代码。这个例子是输出当前缓冲区的名字、编号以及总行数。<br>
-执行命令:call DemoFun1()，应该就可以看到输出结果了。</p>
-
-
-<p>然后再举个例子说下函数的参数处理。</p>
-
-
-<pre><code>function! DemoFun2(arg1)
-ruby&lt;&lt; EOF
-puts "you input: #{VIM.evaluate('a:arg1')}"
-EOF
-endfunction
-</code></pre>
-
-
-<p>这里定义了一个函数接收一个参数，然后将其输出。使用 VIM.evaluate 将vim的变量转化为Ruby的变量。</p>
-
-
-<p>为了方便我们再定义两个命令，以简化对这两个函数的调用。</p>
-
-
-<pre><code>command! -nargs=0 DemoFun1 call DemoFun1()  
-command! -nargs=1 -rang DemoFun2 call DemoFun2(&lt;f-args&gt;)
-</code></pre>
-
-
-<p>要获取完整的代码可以访问： https://gist.github.com/wusuopu/c1182efefa85d4f6839b</p>
-
-
-<p>接下来再简单说下vim中Ruby的使用。</p>
-
-
-<p>vim为Ruby提供了一个VIM模块，通过它可以在Ruby中访问vim的接口。同时还提供了两个全局变量：$curwin、$curbuf，它们分别代表了当前窗口对象以及当前缓冲区对象。</p>
-
-
-<p>VIM模块中有 Buffer 和 Window 两个对象，分别是用来对缓冲区和窗口进行操作的。同时VIM模块还提供了message、set_option、command和evaluate四个函数。</p>
-
-
-<p>想要查看更多的帮忙信息，可以在vim中执行如下命令：</p>
-
-
-<pre><code>:help ruby
-</code></pre>
-
-
-<p>好了，先写这么多吧，其余的自己去尝试吧。</p>
-
 ]]></content>
   </entry>
   
