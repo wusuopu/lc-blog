@@ -1,0 +1,646 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Unicorn是如何与nginx通讯的——介绍ruby中的unix Socket - 龍昌博客</title>
+  <meta name="author" content="龍昌">
+
+  
+  <meta name="description" content="Ruby 应用服务典型地是与一个 web 服务一同使用的，如 nginx。当用户请求你的 Rails 应用中的页面时，nginx 将请求指派给应用服务。
+然而这个过程是如何完成的呢？nginx 与 unicorn 是如何通讯的呢？ 最有效的一种选择是使用 unix 套接字(sockets)。 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.xefan.com/archives/84146.html">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="龍昌博客" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.useso.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.useso.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.useso.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">龍昌博客</a></h1>
+  
+    <h2>从Pythoneer转向Rubist</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.xefan.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+ <li><a href="/about/">About</a></li>  <li><a href="/gbook/">留言板</a></li> 
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Unicorn是如何与nginx通讯的——介绍ruby中的unix Socket</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-08-03T16:01:52+08:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2015</span></span> <span class='time'>4:01 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Ruby 应用服务典型地是与一个 web 服务一同使用的，如 nginx。当用户请求你的 Rails 应用中的页面时，nginx 将请求指派给应用服务。
+然而这个过程是如何完成的呢？nginx 与 unicorn 是如何通讯的呢？</p>
+
+<p>最有效的一种选择是使用 unix 套接字(sockets)。让我们来看看它们是如何工作的！
+在这篇文章中我们将从一个基本的套接字(sockets)开始，最后将创建一个使用 nginx 代理的简单应用服务。</p>
+
+<p><img src="/wp-content/uploads/2015/07/socket.png" alt="socket" /></p>
+
+<p><em>套接字(sockets)允许进程之间通过对一个文件读或者写进行相互通讯。</em>
+<em>在这个例子中 Unicorn 创建 socket 并监听它的连接。然后 Nginx 就可以连接到这个 socket 并与 Unicorn 通讯了。</em></p>
+
+<h2>什么是 unix socket？</h2>
+
+<p>Unix socket 使得一个进程通过类似文件的方式与另一个进程进行通讯。它是 IPC(Interprocess Communication) 的一种。</p>
+
+<p>要使得可以通过 socket 访问进程，首先需要创建一个 socket 并作为一个文件保存在磁盘中。
+然后监听这个 socket 的连入连接。当接收到一个连接时，就可以使用<a href="http://ruby-doc.org/core-2.2.2/IO.html#method-i-readline">标准 IO 方法</a>进行读写数据。</p>
+
+<p>Ruby 通过以下一组类提供了 unix socket 所需的所有内容：
+- UNIXServer - 创建 socket 并保存到磁盘中，并且让你可以监听新连接。
+- UNIXSocket - 打开已存在的套接字(sockets)。</p>
+
+<p><strong>注意：</strong>还存在着其它类型的 socket，最突出的是 TCP socket。不过这篇文章只处理 unix socket。那么它们之间的区别是什么呢？unix  socket 具有文件名。</p>
+
+<h2>最简单的 Socket</h2>
+
+<p>我们接下来看两个小程序。</p>
+
+<p>第一个是服务端，它创建一个 <code>UnixServer</code> 实例，然后使用 <code>server.accept</code> 等待连接。当收到连接后则相互问候。</p>
+
+<p>需要说明一下，<code>accept</code> 和 <code>readline</code> 方法都会阻塞程序的执行，直到收到内容。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s2">&quot;socket&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">server</span> <span class="o">=</span> <span class="no">UNIXServer</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;/tmp/simple.sock&#39;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">puts</span> <span class="s2">&quot;==== Waiting for connection&quot;</span>
+</span><span class='line'><span class="n">socket</span> <span class="o">=</span> <span class="n">server</span><span class="o">.</span><span class="n">accept</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">puts</span> <span class="s2">&quot;==== Got Request:&quot;</span>
+</span><span class='line'><span class="nb">puts</span> <span class="n">socket</span><span class="o">.</span><span class="n">readline</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">puts</span> <span class="s2">&quot;==== Sending Response&quot;</span>
+</span><span class='line'><span class="n">socket</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;I read you loud and clear, good buddy!&quot;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">socket</span><span class="o">.</span><span class="n">close</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这里我们有了服务端，现在还需要客户端。</p>
+
+<p>在下面这个例子中，我们打开由服务端创建的 socket，然后使用普通的 IO 方法进行发送和接收问候。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s2">&quot;socket&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">socket</span> <span class="o">=</span> <span class="no">UNIXSocket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;/tmp/simple.sock&#39;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">puts</span> <span class="s2">&quot;==== Sending&quot;</span>
+</span><span class='line'><span class="n">socket</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Hello server, can you hear me?</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">puts</span> <span class="s2">&quot;==== Getting Response&quot;</span>
+</span><span class='line'><span class="nb">puts</span> <span class="n">socket</span><span class="o">.</span><span class="n">readline</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">socket</span><span class="o">.</span><span class="n">close</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>演示一下程序，先运行服务端，然后再运行客户端。你可以看到以下结果：</p>
+
+<p><img src="/wp-content/uploads/2015/07/simple_ruby_socket_example.png" alt="simple_ruby_socket_example" />
+<em>简单的 Unix socket 服务端/客户端交互的例子。左边是客户端，右边是服务端。</em></p>
+
+<h2>与 nginx 接合</h2>
+
+<p>现在我们知道如何创建一个 unix socket 的服务端了，我们可以很容易地与 nginx 接合。</p>
+
+<p>不相信我？让我们来做一个快速的概念验证吧。我修改上面的代码使其输出从 socket 接收到的所有内容。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s2">&quot;socket&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># Create the socket and &quot;save it&quot; to the file system</span>
+</span><span class='line'><span class="n">server</span> <span class="o">=</span> <span class="no">UNIXServer</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;/tmp/socktest.sock&#39;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># Wait until for a connection (by nginx)</span>
+</span><span class='line'><span class="n">socket</span> <span class="o">=</span> <span class="n">server</span><span class="o">.</span><span class="n">accept</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># Read everything from the socket</span>
+</span><span class='line'><span class="k">while</span> <span class="n">line</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">readline</span>
+</span><span class='line'>  <span class="nb">puts</span> <span class="n">line</span><span class="o">.</span><span class="n">inspect</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">socket</span><span class="o">.</span><span class="n">close</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>现在如果我修改 nginx 配置，将请求转发到 <code>/tmp/socktest.sock</code> socket 上。
+我就能看到 nginx 发送来的数据了。(别担心，我们稍后会讨论它的配置的)</p>
+
+<p>当我发起一个 web 请求时，nginx 将如下数据发送到我的服务端上：</p>
+
+<p><img src="/wp-content/uploads/2015/07/request_http.png" alt="request_http" /></p>
+
+<p>太酷了！这就是一个包含了额外头信息的 HTTP 请求。现在我们准备来构建一个真正的应用服务。
+但是，首先让我们讨论一个 nginx 的配置吧。</p>
+
+<h2>安装配置 Nginx</h2>
+
+<p>如果你还没有安装 nginx 的话，请先安装。对于 OSX 可以 homebrew 简单完成：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">brew</span> <span class="n">install</span> <span class="n">nginx</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>现在我们配置 nginx 将 localhost:2048 的请求通过名为 <code>/tmp/socktest.sock</code> 的 socket 转发到上游服务端。
+名字可以是任意的，它仅需要与我们 web 服务的 socket 名字匹配即可。</p>
+
+<p>你可以将其保存至 <code>/tmp/nginx.conf</code> 并通过命令 <code>nginx -c /tmp/nginx.conf</code> 运行 nginx。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># Run nginx as a normal console program, not as a daemon</span>
+</span><span class='line'><span class="n">daemon</span> <span class="n">off</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># Log errors to stdout</span>
+</span><span class='line'><span class="n">error_log</span> <span class="sr">/dev/s</span><span class="n">tdout</span> <span class="n">info</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">events</span> <span class="p">{}</span> <span class="c1"># Boilerplate</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">http</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1"># Print the access log to stdout</span>
+</span><span class='line'>  <span class="n">access_log</span> <span class="sr">/dev/s</span><span class="n">tdout</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1"># Tell nginx that there&#39;s an external server called @app living at our socket</span>
+</span><span class='line'>  <span class="n">upstream</span> <span class="n">app</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">server</span> <span class="ss">unix</span><span class="p">:</span><span class="sr">/tmp/so</span><span class="n">cktest</span><span class="o">.</span><span class="n">sock</span> <span class="n">fail_timeout</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">server</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># Accept connections on localhost:2048</span>
+</span><span class='line'>    <span class="n">listen</span> <span class="mi">2048</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">server_name</span> <span class="n">localhost</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># Application root</span>
+</span><span class='line'>    <span class="n">root</span> <span class="sr">/tmp;</span>
+</span><span class='line'><span class="sr"> </span>
+</span><span class='line'><span class="sr">    # If a path doesn&#39;t exist on disk, forward the request to @app</span>
+</span><span class='line'><span class="sr">    try_files $uri/in</span><span class="n">dex</span><span class="o">.</span><span class="n">html</span> <span class="vg">$uri</span> <span class="vi">@app</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># Set some configuration options on requests forwarded to @app</span>
+</span><span class='line'>    <span class="n">location</span> <span class="vi">@app</span> <span class="p">{</span>
+</span><span class='line'>      <span class="n">proxy_set_header</span> <span class="n">X</span><span class="o">-</span><span class="no">Forwarded</span><span class="o">-</span><span class="no">For</span> <span class="vg">$proxy_add_x_forwarded_for</span><span class="p">;</span>
+</span><span class='line'>      <span class="n">proxy_set_header</span> <span class="no">Host</span> <span class="vg">$http_host</span><span class="p">;</span>
+</span><span class='line'>      <span class="n">proxy_redirect</span> <span class="n">off</span><span class="p">;</span>
+</span><span class='line'>      <span class="n">proxy_pass</span> <span class="ss">http</span><span class="p">:</span><span class="sr">//</span><span class="n">app</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>以非后台模式运行 nginx。当你运行 nginx 时它应该看起来像如下这样：</p>
+
+<p><img src="/wp-content/uploads/2015/07/nginx_non_daemon.png" alt="nginx_non_daemon" />
+<em>Nginx 以非后台模式运行</em></p>
+
+<h2>自定义应用服务</h2>
+
+<p>既然我们已经知道了如何将 nginx 与我们程序进行连接，那么我们就来构建一个简单的应用服务。
+当 nginx 将请求转发到我们的 socket 时，它是一个标准的 HTTP 请求。
+经过一些处理后我可以决定 socket 是否会返回一个有效的 HTTP 响应，它会在浏览器中显示。</p>
+
+<p>下面这个应用接受任何请求并显示时间戳。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s2">&quot;socket&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># Connection creates the socket and accepts new connections</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">Connection</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kp">attr_accessor</span> <span class="ss">:path</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="ss">path</span><span class="p">:)</span>
+</span><span class='line'>    <span class="vi">@path</span> <span class="o">=</span> <span class="n">path</span>
+</span><span class='line'>    <span class="no">File</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">if</span> <span class="no">File</span><span class="o">.</span><span class="n">exists?</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">server</span>
+</span><span class='line'>    <span class="vi">@server</span> <span class="o">||=</span> <span class="no">UNIXServer</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="vi">@path</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">on_request</span>
+</span><span class='line'>    <span class="n">socket</span> <span class="o">=</span> <span class="n">server</span><span class="o">.</span><span class="n">accept</span>
+</span><span class='line'>    <span class="k">yield</span><span class="p">(</span><span class="n">socket</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">socket</span><span class="o">.</span><span class="n">close</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># AppServer logs incoming requests and renders a view in response</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">AppServer</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kp">attr_reader</span> <span class="ss">:connection</span>
+</span><span class='line'>  <span class="kp">attr_reader</span> <span class="ss">:view</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="ss">connection</span><span class="p">:,</span> <span class="ss">view</span><span class="p">:)</span>
+</span><span class='line'>    <span class="vi">@connection</span> <span class="o">=</span> <span class="n">connection</span>
+</span><span class='line'>    <span class="vi">@view</span> <span class="o">=</span> <span class="n">view</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">run</span>
+</span><span class='line'>    <span class="k">while</span> <span class="kp">true</span>
+</span><span class='line'>      <span class="n">connection</span><span class="o">.</span><span class="n">on_request</span> <span class="k">do</span> <span class="o">|</span><span class="n">socket</span><span class="o">|</span>
+</span><span class='line'>        <span class="k">while</span> <span class="p">(</span><span class="n">line</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">readline</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">&quot;</span><span class="se">\r\n</span><span class="s2">&quot;</span>
+</span><span class='line'>          <span class="nb">puts</span> <span class="n">line</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>        <span class="n">socket</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">render</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># TimeView simply provides the HTTP response</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">TimeView</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">render</span>
+</span><span class='line'><span class="sx">%[HTTP/1.1 200 OK</span>
+</span><span class='line'><span class="sx"> </span>
+</span><span class='line'><span class="sx"> </span>
+</span><span class='line'><span class="sx">The current timestamp is: </span><span class="si">#{</span> <span class="no">Time</span><span class="o">.</span><span class="n">now</span><span class="o">.</span><span class="n">to_i</span> <span class="si">}</span><span class="sx"></span>
+</span><span class='line'><span class="sx"> </span>
+</span><span class='line'><span class="sx">]</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="no">AppServer</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">connection</span><span class="p">:</span> <span class="no">Connection</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">path</span><span class="p">:</span> <span class="s1">&#39;/tmp/socktest.sock&#39;</span><span class="p">),</span> <span class="ss">view</span><span class="p">:</span> <span class="no">TimeView</span><span class="o">.</span><span class="n">new</span><span class="p">)</span><span class="o">.</span><span class="n">run</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>现在运行 nginx 和脚本，然后访问 localhost:2048。请求会发送到我的应用上，然后响应被浏览器渲染。太酷了！</p>
+
+<p><img src="/wp-content/uploads/2015/07/appserver.png" alt="appserver" />
+<em>HTTP 请求信息由我们的应用服务输出到 STDOUT</em></p>
+
+<p>以下就是我们的劳动成果。</p>
+
+<p><img src="/wp-content/uploads/2015/07/timestamp.png" alt="timestamp" />
+<em>浏览器中显示服务端返回的时间戳</em></p>
+
+<p>原文地址： <a href="http://blog.honeybadger.io/how-unicorn-talks-to-nginx-an-introduction-to-unix-sockets-in-ruby/">http://blog.honeybadger.io/how-unicorn-talks-to-nginx-an-introduction-to-unix-sockets-in-ruby/</a></p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">龍昌</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2015-08-03T16:01:52+08:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2015</span></span> <span class='time'>4:01 pm</span></time>
+    </p>
+    <p class="meta">
+      Categories: 
+
+<span class="categories">
+  
+    <a class='category' href='/categories/ruby栏目/index.html'>ruby栏目</a>
+  
+</span>
+
+
+    </p>
+    <p class="meta">
+      Tags: 
+
+<span class="tags">
+  
+    <a class='tag' href='/tags/Ruby/index.html'>Ruby</a>, <a class='tag' href='/tags/翻译/index.html'>翻译</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/archives/84145.html" title="Previous Post: Ruby的内存陷阱">&laquo; Ruby的内存陷阱</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Subscription</h1>
+  <!--以下是QQ邮件列表订阅嵌入代码--><script >var nId = "e7ee5da6d322dc7157c25cfd8a7700bb23a056dd1fb18cb4",nWidth="auto",sColor="light",sText="请输入邮件地址：" ;</script><script src="http://list.qq.com/zh_CN/htmledition/js/qf/page/qfcode.js" charset="gb18030"></script>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84146.html">Unicorn是如何与nginx通讯的——介绍ruby中的unix Socket</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84145.html">Ruby的内存陷阱</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84144.html">未来的Ruby 3.0</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84143.html">Ruby中一些重要的钩子方法</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84142.html">使用Unicorn部署rails应用</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (31)</a></li><li><a href='/categories/web开发/index.html'>web开发 (19)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (23)</a></li></ul>
+</section>
+<section>
+  <h1>Tag Cloud</h1>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.7910447761194%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.8955223880597%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 128.65671641791045%'>Ruby(32)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 122.38805970149254%'>翻译(25)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
+</section>
+<section>
+  <h1>Link</h1>
+    <ul id="category-list">
+      <li><a target="_blank" title="我的Github" href="https://github.com/wusuopu">@Github</a></li>
+      <li><a target="_blank" title="我的微博" href="http://www.weibo.com/u/1768691343">@Weibo</a></li>
+      <li><a target="_blank" title="我的Twitter" href="https://twitter.com/longchangjin">@Twitter</a></li>
+      <li><a target="_blank" title="我的豆瓣" href="http://www.douban.com/people/lchj/">@Douban</a></li>
+
+      <li><a target="_blank" title="" href="http://www.vimer.cn/">Vimer的程序世界</a></li>
+      <li><a target="_blank" title="" href="http://pythoner.net/">python开发者社区</a></li>
+      <li><a target="_blank" title="" href="http://simple-is-better.com/">python.cn(news, jobs)</a></li>
+      <li><a target="_blank" title="" href="http://gtk.awaysoft.com/">GTK+ 中文社区</a></li>
+    </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - 龍昌 -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+<div style="display:none;"><script src="http://s94.cnzz.com/stat.php?id=1259846&web_id=1259846&show=pic" language="JavaScript"></script></div>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'longchang';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://www.xefan.com/archives/84146.html';
+        var disqus_url = 'http://www.xefan.com/archives/84146.html';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      //dsq.src = '/javascripts/disqus/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
