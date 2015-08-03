@@ -29,6 +29,7 @@ Unix socket 使得一个进程通过类似文件的方式与另一个进程进�
 然后监听这个 socket 的连入连接。当接收到一个连接时，就可以使用[标准 IO 方法](http://ruby-doc.org/core-2.2.2/IO.html#method-i-readline)进行读写数据。
 
 Ruby 通过以下一组类提供了 unix socket 所需的所有内容：
+
 - UNIXServer - 创建 socket 并保存到磁盘中，并且让你可以监听新连接。
 - UNIXSocket - 打开已存在的套接字(sockets)。
 
