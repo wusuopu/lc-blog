@@ -9,37 +9,7 @@
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="环境变量字典包含了类似于CGI的变量，它是在每次请求时被服务器填充。 1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-#! /usr/bin/env python # Our &hellip;">
+  <meta name="description" content="将上一个例子的返回： return [response_body] 改为： return response_body 再次运行会发现速度变慢了。这是因此服务器对发送过来的字符串是按单个字节进行迭代的，所以最好对返回的字符串用一个可迭代对象包装一下。 如果返回的这个可迭代对象生成多个字符串， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -96,6 +66,126 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84010.html">Python Wsgi教程3——响应</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-12-08T00:00:00+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>8</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/84010.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/84010.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>将上一个例子的返回：</p>
+
+
+<pre><code>return [response_body]
+</code></pre>
+
+
+<p>改为：</p>
+
+
+<pre><code>return response_body
+</code></pre>
+
+
+<p>再次运行会发现速度变慢了。这是因此服务器对发送过来的字符串是按单个字节进行迭代的，所以最好对返回的字符串用一个可迭代对象包装一下。</p>
+
+
+<p>如果返回的这个可迭代对象生成多个字符串，那么正文的长度即为这些字符串长度的总和。</p>
+
+
+<p>接下来看一个例子：</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="c">#! /usr/bin/env python</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">from</span> <span class="nn">wsgiref.simple_server</span> <span class="kn">import</span> <span class="n">make_server</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">application</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">):</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="n">response_body</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+</span><span class='line'>                    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">environ</span><span class="o">.</span><span class="n">items</span><span class="p">())]</span>
+</span><span class='line'>   <span class="n">response_body</span> <span class="o">=</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">response_body</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="c"># Response_body has now more than one string</span>
+</span><span class='line'>   <span class="n">response_body</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;The Beggining</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">,</span>
+</span><span class='line'>                    <span class="s">&#39;*&#39;</span> <span class="o">*</span> <span class="mi">30</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">,</span>
+</span><span class='line'>                    <span class="n">response_body</span><span class="p">,</span>
+</span><span class='line'>                    <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">+</span> <span class="s">&#39;*&#39;</span> <span class="o">*</span> <span class="mi">30</span> <span class="p">,</span>
+</span><span class='line'>                    <span class="s">&#39;</span><span class="se">\n</span><span class="s">The End&#39;</span><span class="p">]</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="c"># So the content-lenght is the sum of all string&#39;s lengths</span>
+</span><span class='line'>   <span class="n">content_length</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span class='line'>   <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">response_body</span><span class="p">:</span>
+</span><span class='line'>      <span class="n">content_length</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="n">status</span> <span class="o">=</span> <span class="s">&#39;200 OK&#39;</span>
+</span><span class='line'>   <span class="n">response_headers</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/plain&#39;</span><span class="p">),</span>
+</span><span class='line'>                  <span class="p">(</span><span class="s">&#39;Content-Length&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">content_length</span><span class="p">))]</span>
+</span><span class='line'>   <span class="n">start_response</span><span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="n">response_headers</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="k">return</span> <span class="n">response_body</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">httpd</span> <span class="o">=</span> <span class="n">make_server</span><span class="p">(</span><span class="s">&#39;localhost&#39;</span><span class="p">,</span> <span class="mi">8051</span><span class="p">,</span> <span class="n">application</span><span class="p">)</span>
+</span><span class='line'><span class="n">httpd</span><span class="o">.</span><span class="n">handle_request</span><span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1726,272 +1816,6 @@ end
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83972.html">[翻译]Ruby GTK教程7——自定义控件</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2013-11-24T00:00:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>24</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
-        
-           | <a href="http://www.xefan.com/archives/83972.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/83972.html">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h1>自定义控件</h1>
-
-
-<p>大多数套件通常只提供了最常用的控件，如按钮、文本控件、滑动条等。没有套件可以提供所有可能的控件。程序员必须自己创建这些。这是通过套件提供的绘制工具完成。这有两种可能。程序员可以修改或增强已存在的控件，或者从头开始创建一个自定义控件。</p>
-
-
-<h2>Burning控件</h2>
-
-
-<p>这个例子我们从头开始创建一个控件。这个控件可以在各种媒体烧定应用中看到，如Nero Burning ROM。</p>
-
-
-<p><em>custom.rb</em></p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-# ZetCode Ruby GTK tutorial 
-#
-# This example creates a burning
-# custom widget
-#
-# author: jan bodnar
-# website: zetcode.com 
-# last edited: June 2009
-
-
-require 'gtk2'
-
-class Burning &lt; Gtk::DrawingArea
-
-    def initialize(parent)
-        @parent = parent
-
-        super()
-
-        @num = [ "75", "150", "225", "300", 
-            "375", "450", "525", "600", "675" ]
-
-        set_size_request 1, 30
-        signal_connect "expose-event" do
-            expose
-        end
-    end
-
-
-    def expose
-
-        cr = window.create_cairo_context
-        draw_widget cr
-
-    end
-
-    def draw_widget cr
-
-         cr.set_line_width 0.8
-
-        cr.select_font_face("Courier", 
-            Cairo::FONT_SLANT_NORMAL, Cairo::FONT_WEIGHT_NORMAL)
-        cr.set_font_size 11
-
-        width = allocation.width
-
-        @cur_width = @parent.get_cur_value
-
-        step = (width / 10.0).round
-
-        till = (width / 750.0) * @cur_width
-        full = (width / 750.0) * 700
-
-        if @cur_width &gt;= 700
-
-            cr.set_source_rgb(1.0, 1.0, 0.72)
-            cr.rectangle(0, 0, full, 30)
-            cr.clip
-            cr.paint
-            cr.reset_clip
-
-            cr.set_source_rgb(1.0, 0.68, 0.68)
-            cr.rectangle(full, 0, till-full, 30)
-            cr.clip
-            cr.paint
-            cr.reset_clip
-
-        else
-            cr.set_source_rgb 1.0, 1.0, 0.72
-            cr.rectangle 0, 0, till, 30
-            cr.clip
-            cr.paint
-            cr.reset_clip
-        end
-
-
-        cr.set_source_rgb(0.35, 0.31, 0.24)
-
-        for i in (1..@num.length)
-            cr.move_to i*step, 0
-            cr.line_to i*step, 5
-            cr.stroke
-
-            te = cr.text_extents @num[i-1]
-            cr.move_to i*step-te.width/2, 15
-            cr.text_path @num[i-1]
-            cr.stroke
-        end         
-    end
-end
-
-
-class RubyApp &lt; Gtk::Window
-    def initialize
-        super
-
-        set_title "Burning"
-        signal_connect "destroy" do 
-            Gtk.main_quit 
-        end
-
-        set_size_request 350, 200        
-        set_window_position Gtk::Window::POS_CENTER
-
-        @cur_value = 0
-
-        vbox = Gtk::VBox.new false, 2
-
-        scale = Gtk::HScale.new
-        scale.set_range 0, 750
-        scale.set_digits 0
-        scale.set_size_request 160, 35
-        scale.set_value @cur_value
-
-        scale.signal_connect "value-changed" do |w|
-            on_changed(w)
-        end
-
-        fix = Gtk::Fixed.new
-        fix.put scale, 50, 50
-
-        vbox.pack_start fix
-
-        @burning = Burning.new(self)
-        vbox.pack_start @burning, false, false, 0
-
-        add vbox
-        show_all
-    end
-
-    def on_changed widget
-
-        @cur_value = widget.value
-        @burning.queue_draw
-    end
-
-    def get_cur_value
-        return @cur_value
-    end
-end
-
-Gtk.init
-    window = RubyApp.new
-Gtk.main
-</code></pre>
-
-
-<p>我们将DrawingArea放在窗口的底部，并且手动绘制控件的条目。所有的重要代码放在draw_widget里，通过Burning类的expose方法调用。这个控件生动的显示了媒介的容量和剩余空间。这个控件通过刻度控件来控制。我们自定义控件的最小值为0,最大值为750。如果达到700，我们开始绘制红色。这通常表明超标了。</p>
-
-
-<pre><code>@num = [ "75", "150", "225", "300", 
-    "375", "450", "525", "600", "675" ]
-</code></pre>
-
-
-<p>这些数字显示在控件上。他们显示了媒介的容量。</p>
-
-
-<pre><code>@cur_width = @parent.get_cur_value
-</code></pre>
-
-
-<p>通过父控件我们获得刻度控件的值。</p>
-
-
-<pre><code>till = (width / 750.0) * @cur_width
-full = (width / 750.0) * 700
-</code></pre>
-
-
-<p>我们使用width变量进行刻度值和自定义控件尺寸的转换。注意我们使用了浮点数，得到较大精度的绘制。<em>till</em>参数决定了绘制的总大小，它的值来自刻度控件。它是整个区域的比例。<em>full</em>参数决定了从什么位置开始绘制红色。</p>
-
-
-<pre><code>cr.set_source_rgb(1.0, 1.0, 0.72)
-cr.rectangle(0, 0, full, 30)
-cr.clip
-cr.paint
-cr.reset_clip
-</code></pre>
-
-
-<p>绘制黄色矩形直到<em>full</em>点。</p>
-
-
-<pre><code>te = cr.text_extents @num[i-1]
-cr.move_to i*step-te.width/2, 15
-cr.text_path @num[i-1]
-cr.stroke
-</code></pre>
-
-
-<p>这些代码绘制了burning控件的数字。我们计算了文本恰当的位置。</p>
-
-
-<pre><code>def on_changed widget
-
-    @cur_value = widget.value
-    @burning.queue_draw
-end
-</code></pre>
-
-
-<p>我们获取刻度控件的值保存在<em>cur_value</em>变量中，稍后使用。重绘burning控件。</p>
-
-
-<p><img alt="image" src="http://zetcode.com/img/gui/rubygtk/burning.png"><br>
-<em>图片：Burning widget</em></p>
-
-
-<p>在这一章中，我们创建了一个自定义控件。</p>
-
-
-<hr>
-
-
-<p>原文地址： <a href="http://zetcode.com/gui/rubygtk/customwidget/">http://zetcode.com/gui/rubygtk/customwidget/</a><br>
-翻译：龙昌  admin@longchangjin.cn </p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/page/7">&larr; Older</a>
@@ -2013,6 +1837,10 @@ end
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="http://www.xefan.com/archives/84147.html">AngularJS学习笔记1——基础入门</a>
+      </li>
+    
+      <li class="post">
         <a href="http://www.xefan.com/archives/84146.html">Unicorn是如何与nginx通讯的——介绍ruby中的unix Socket</a>
       </li>
     
@@ -2028,19 +1856,15 @@ end
         <a href="http://www.xefan.com/archives/84143.html">Ruby中一些重要的钩子方法</a>
       </li>
     
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84142.html">使用Unicorn部署rails应用</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (31)</a></li><li><a href='/categories/web开发/index.html'>web开发 (19)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (23)</a></li></ul>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (31)</a></li><li><a href='/categories/web开发/index.html'>web开发 (19)</a></li><li><a href='/categories/前端开发/index.html'>前端开发 (1)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (23)</a></li></ul>
 </section>
 <section>
   <h1>Tag Cloud</h1>
-    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.7910447761194%'>ajax(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 100.8955223880597%'>js(1)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 128.65671641791045%'>Ruby(32)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 122.38805970149254%'>翻译(25)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.7910447761194%'>ajax(2)</a> <a href='/tags/angular/index.html' style='font-size: 100.8955223880597%'>angular(1)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 101.7910447761194%'>js(2)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 128.65671641791045%'>Ruby(32)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 122.38805970149254%'>翻译(25)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
 </section>
 <section>
   <h1>Link</h1>
