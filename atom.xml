@@ -4,7 +4,7 @@
   <title><![CDATA[龍昌博客]]></title>
   <link href="http://www.xefan.com/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2015-08-13T22:56:53+08:00</updated>
+  <updated>2015-08-14T22:01:19+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -12,6 +12,96 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[AngularJS学习笔记2——模板]]></title>
+    <link href="http://www.xefan.com/archives/84148.html"/>
+    <updated>2015-08-14T22:00:21+08:00</updated>
+    <id>http://www.xefan.com/archives/84148-AngularJS学习笔记2——模板</id>
+    <content type="html"><![CDATA[<h2>ngRepeat</h2>
+
+<p>对于一些需要循环遍历的对象可以使用 <code>ngRepeat</code> 指令。 如：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>  &lt;li ng-repeat="msg in messages"&gt; &lt;/li&gt;
+</span><span class='line'>
+</span><span class='line'>  // 对于 messages 数组进行遍历
+</span><span class='line'>  $scope.messages =  [
+</span><span class='line'>    "第一条消息",
+</span><span class='line'>    "第二条消息",
+</span><span class='line'>    "第三条消息",
+</span><span class='line'>    "第四条消息",
+</span><span class='line'>    "第五条消息"
+</span><span class='line'>  ];
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>ngSwitch</h2>
+
+<p>使用 <code>ngSwitch</code> 指令在不同条件下显示不同内容。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;div ng-controller="ExampleController"&gt;
+</span><span class='line'>  &lt;select ng-model="selection" ng-options="item for item in items"&gt;
+</span><span class='line'>  &lt;/select&gt;
+</span><span class='line'>  &lt;code&gt;selection=&lt;/code&gt;
+</span><span class='line'>  &lt;hr/&gt;
+</span><span class='line'>  &lt;div class="animate-switch-container"
+</span><span class='line'>    ng-switch="selection"&gt;
+</span><span class='line'>      &lt;div class="animate-switch" ng-switch-when="settings"&gt;Settings Div&lt;/div&gt;
+</span><span class='line'>      &lt;div class="animate-switch" ng-switch-when="home"&gt;Home Span&lt;/div&gt;
+</span><span class='line'>      &lt;div class="animate-switch" ng-switch-default&gt;default&lt;/div&gt;
+</span><span class='line'>  &lt;/div&gt;
+</span><span class='line'>&lt;/div&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;script type="text/javascript"&gt;
+</span><span class='line'>angular.module('myApp', []).controller('ExampleController', ['$scope', function($scope) {
+</span><span class='line'>  $scope.items = ['settings', 'home', 'other'];
+</span><span class='line'>  $scope.selection = $scope.items[0];
+</span><span class='line'>}]);
+</span><span class='line'>&lt;/script&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Filter</h2>
+
+<p>使用 <code>filter</code> 指令过滤需要的内容，基本形式： &#8220;
+如果有用过其他模板引擎的话（如：Jinja）应该很好理解的。</p>
+
+<p>angularjs 提供了一些内置的过滤器：date, json, lowercase, uppercase 等。</p>
+
+<h2>ngIf</h2>
+
+<p>基本形式： <code>&lt;ANY ng-if="expression"&gt; ... &lt;/ANY&gt;</code>
+当 <code>expression</code> 的值为真时才会输出该标签。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[AngularJS学习笔记1——基础入门]]></title>
@@ -2609,112 +2699,6 @@ docker import URL|- [REPOSITORY[:TAG]]                  # 导入文件为镜像
 docker import http://example.com/exampleimage.tgz
 cat exampleimage.tgz | sudo docker import - exampleimagelocal:new
 </code></pre>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Nginx + Php + FastCGI配置]]></title>
-    <link href="http://www.xefan.com/archives/84121.html"/>
-    <updated>2014-08-01T00:00:00+08:00</updated>
-    <id>http://www.xefan.com/archives/84121-nginx + php + FastCGI配置</id>
-    <content type="html"><![CDATA[<p>最近在弄PHP，于是乎把配置过程作一个笔记以免忘了。</p>
-
-
-<h2>PHP安装、配置</h2>
-
-
-<p>我是通过源代码编译的形式进行安装的，基本步骤如下：</p>
-
-
-<pre><code>$ tar xf php-5.5.12.tar.bz2
-$ cd php-5.5.12
-$ './configure'  '--prefix=/opt/myphp' '--with-mysql' '--enable-safe-mode' '--enable-ftp' '--enable-zip' '--with-jpeg-dir' '--with-bz2' '--with-png-dir' '--with-freetype-dir' '--with-iconv' '--with-libxml-dir' '--with-xmlrpc' '--with-zlib-dir' '--with-gd' '--enable-gd-native-ttf' '--with-curl' '--with-gettext' '--with-pear' '--enable-fpm' '--enable-fastcgi' '--with-ncurses' '--with-mcrypt' '--with-mhash' '--with-openssl' '--with-pcre-dir' '--enable-pdo' '--enable-phar' '--enable-json' '--enable-mbstring' '--with-pdo-mysql' '--with-pdo-sqlite' '--with-readline' '--enable-bcmath'
-$ make
-$ sudo make install
-</code></pre>
-
-
-
-
-<p>安装完成之后进入安装目录修改配置文件 lib/php.ini (没有则创建)，添加时区设置：</p>
-
-
-<pre><code>date.timezone=Asia/Shanghai
-</code></pre>
-
-
-
-
-<p>然后运行PHP的FastCGI服务：</p>
-
-
-<pre><code>./bin/php-cgi -b 9000
-</code></pre>
-
-
-
-
-<h2>nginx配置</h2>
-
-
-<p>nginx可以直接从仓库进行安装：</p>
-
-
-<pre><code>sudo pacman -S nginx
-</code></pre>
-
-
-
-
-<p>或者：</p>
-
-
-<pre><code>sudo apt-get install nginx
-</code></pre>
-
-
-
-
-<p>安装完成之后修改配置，添加一条新的虚拟主机：</p>
-
-
-<pre><code>server {
-    listen 8000;
-    server_name localhost;
-
-    root /var/www;
-
-    location / {
-        index index.php;
-    }
-
-    location ~ \.php$ {
-        fastcgi_pass   127.0.0.1:9000;
-        fastcgi_index  index.php;  
-        fastcgi_split_path_info ^(.+\.php)(/.*)$;
-        include        fastcgi_params;
-        fastcgi_param  SCRIPT_FILENAME  /var/www/$fastcgi_script_name;
-    }
-
-}
-</code></pre>
-
-
-
-
-<p>然后再创建文件 /var/www/index.php</p>
-
-
-<pre><code>&lt;?php
-  phpinfo();
-?&gt;
-</code></pre>
-
-
-
-
-<p>现在通过浏览器访问 http://127.0.0.1:8000/ 应该就可以看到效果了。</p>
 
 ]]></content>
   </entry>

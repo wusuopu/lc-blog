@@ -9,7 +9,7 @@
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="Mongodb的集群有两种，一个是主从复制，另一种是副本集。 主从复制 根据 Mongodb 的官方文档说明，在生产环境中建议使用副本集代替主从复制。 http://docs.mongodb.org/manual/core/master-slave/ 不过对于主从复制还是可以了解一下。 &hellip;">
+  <meta name="description" content="Gunicorn 是 Python的 一个 WSGI HTTP服务器，根据它的介绍说是它来自于 Ruby 的 Unicorn。可以方便的部署 Python 的 Web 程序，而且本身支持多种 Python 的框架，如 Django、Paster等。 通过介绍来看貌似很不错的样子，只可惜我现在不玩 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -66,6 +66,245 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84138.html">使用gunicorn部署Django</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-12-13T21:03:27+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>9:03 pm</span></time>
+        
+           | <a href="http://www.xefan.com/archives/84138.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/84138.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://gunicorn.org/">Gunicorn</a> 是 Python的 一个 WSGI HTTP服务器，根据它的介绍说是它来自于 Ruby 的 Unicorn。可以方便的部署 Python 的 Web 程序，而且本身支持多种 Python 的框架，如 Django、Paster等。</p>
+
+<p>通过介绍来看貌似很不错的样子，只可惜我现在不玩 Python 了，于是就简单体验一下。</p>
+
+<h2>简单应用</h2>
+
+<p>首先是安装，这个可以直接使用 <code>pip</code> 来完成：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ pip install gunicorn</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后再根据官方文档的介绍部署一个简单的例子试试：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ cd examples
+</span><span class='line'>$ cat test.py
+</span><span class='line'># -*- coding: utf-8 -
+</span><span class='line'>#
+</span><span class='line'># This file is part of gunicorn released under the MIT license.
+</span><span class='line'># See the NOTICE for more information.
+</span><span class='line'>
+</span><span class='line'>def app(environ, start_response):
+</span><span class='line'>    """Simplest possible application object"""
+</span><span class='line'>    data = 'Hello, World!\n'
+</span><span class='line'>    status = '200 OK'
+</span><span class='line'>    response_headers = [
+</span><span class='line'>        ('Content-type','text/plain'),
+</span><span class='line'>        ('Content-Length', str(len(data)))
+</span><span class='line'>    ]
+</span><span class='line'>    start_response(status, response_headers)
+</span><span class='line'>    return iter([data])
+</span><span class='line'>
+</span><span class='line'>$ gunicorn -b 0.0.0.0:8000 --workers=2 test:app</span></code></pre></td></tr></table></div></figure>
+
+
+<p>好的，现在程序运行起来了，可以访问 <a href="http://localhost:8000">http://localhost:8000</a> 看下效果。</p>
+
+<p>gunicorn 也可以通过配置文件来设置一些内容， 一个配置文件是一个 python 脚本，格式类似 <code>.ini</code> 。通过 <code>-c</code> 参数指定要使用的配置文件。如：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># config.ini
+</span><span class='line'>bind = ["0.0.0.0:8000", "unix:///tmp/gunicorn.sock"]
+</span><span class='line'>workers = 3 </span></code></pre></td></tr></table></div></figure>
+
+
+<p>gunicorn 还能与 Django 和 Paster 应用集成：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ gunicorn --env DJANGO_SETTINGS_MODULE=myproject.settings myproject.wsgi:application
+</span><span class='line'>$ gunicorn --paste development.ini -b :8080 --chdir /path/to/project</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>与 Nginx 部署</h2>
+
+<p>gunicorn 本身也是一个 WSGI 应用，可以与 Nginx 一同使用。
+以下是 Nginx + Gunicorn 部署 Django 的事例， Nginx 配置如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># nginx.conf
+</span><span class='line'>http {
+</span><span class='line'>    include mime.types;
+</span><span class='line'>    default_type application/octet-stream;
+</span><span class='line'>    access_log /tmp/nginx.access.log combined;
+</span><span class='line'>    sendfile on;
+</span><span class='line'>
+</span><span class='line'>    upstream app_server {
+</span><span class='line'>        server unix:/tmp/gunicorn.sock fail_timeout=0;
+</span><span class='line'>        # For a TCP configuration:
+</span><span class='line'>        # server 192.168.0.7:8000 fail_timeout=0;
+</span><span class='line'>    }
+</span><span class='line'>
+</span><span class='line'>    server {
+</span><span class='line'>        listen 80 default;
+</span><span class='line'>        client_max_body_size 4G;
+</span><span class='line'>        server_name _;
+</span><span class='line'>
+</span><span class='line'>        keepalive_timeout 5;
+</span><span class='line'>
+</span><span class='line'>        # path for static files
+</span><span class='line'>        root /path/to/app/current/public;
+</span><span class='line'>
+</span><span class='line'>        location / {
+</span><span class='line'>            # checks for static file, if not found proxy to app
+</span><span class='line'>            try_files $uri @proxy_to_app;
+</span><span class='line'>        }
+</span><span class='line'>
+</span><span class='line'>        location @proxy_to_app {
+</span><span class='line'>            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+</span><span class='line'>            proxy_set_header Host $http_host;
+</span><span class='line'>            proxy_redirect off;
+</span><span class='line'>
+</span><span class='line'>            proxy_pass   http://app_server;
+</span><span class='line'>        }
+</span><span class='line'>
+</span><span class='line'>        error_page 500 502 503 504 /500.html;
+</span><span class='line'>        location = /500.html {
+</span><span class='line'>            root /path/to/app/current/public;
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Gunicorn 的配置文件：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># gunicorn.ini
+</span><span class='line'>import os
+</span><span class='line'>
+</span><span class='line'>bind = ["0.0.0.0:8000", "unix:///tmp/gunicorn.sock"]
+</span><span class='line'>workers = 3
+</span><span class='line'>chdir = os.path.dirname(os.path.realpath(__file__))
+</span><span class='line'>raw_env = ["DJANGO_SETTINGS_MODULE=app.settings"]
+</span><span class='line'>accesslog = "/tmp/gunicorn-access.log"
+</span><span class='line'>errorlog = "/tmp/gunicorn.log"
+</span><span class='line'>daemon = True
+</span><span class='line'>pidfile = "/tmp/gunicorn.pid"</span></code></pre></td></tr></table></div></figure>
+
+
+<p>运行：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ gunicorn -c gunicorn.ini myproject.wsgi:application
+</span><span class='line'>$ service nginx start</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>其他内容</h2>
+
+<p>与 WSGI 应用一样，如果之后配置有改动可以向 gunicorn 服务进程发送 <code>HUP</code> 信号让其重新加载配置：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ kill -s HUP &lt;pid&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -846,135 +1085,6 @@ cat exampleimage.tgz | sudo docker import - exampleimagelocal:new
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84121.html">Nginx + Php + FastCGI配置</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2014-08-01T00:00:00+08:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2014</span></span> <span class='time'>12:00 am</span></time>
-        
-           | <a href="http://www.xefan.com/archives/84121.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/84121.html">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>最近在弄PHP，于是乎把配置过程作一个笔记以免忘了。</p>
-
-
-<h2>PHP安装、配置</h2>
-
-
-<p>我是通过源代码编译的形式进行安装的，基本步骤如下：</p>
-
-
-<pre><code>$ tar xf php-5.5.12.tar.bz2
-$ cd php-5.5.12
-$ './configure'  '--prefix=/opt/myphp' '--with-mysql' '--enable-safe-mode' '--enable-ftp' '--enable-zip' '--with-jpeg-dir' '--with-bz2' '--with-png-dir' '--with-freetype-dir' '--with-iconv' '--with-libxml-dir' '--with-xmlrpc' '--with-zlib-dir' '--with-gd' '--enable-gd-native-ttf' '--with-curl' '--with-gettext' '--with-pear' '--enable-fpm' '--enable-fastcgi' '--with-ncurses' '--with-mcrypt' '--with-mhash' '--with-openssl' '--with-pcre-dir' '--enable-pdo' '--enable-phar' '--enable-json' '--enable-mbstring' '--with-pdo-mysql' '--with-pdo-sqlite' '--with-readline' '--enable-bcmath'
-$ make
-$ sudo make install
-</code></pre>
-
-
-
-
-<p>安装完成之后进入安装目录修改配置文件 lib/php.ini (没有则创建)，添加时区设置：</p>
-
-
-<pre><code>date.timezone=Asia/Shanghai
-</code></pre>
-
-
-
-
-<p>然后运行PHP的FastCGI服务：</p>
-
-
-<pre><code>./bin/php-cgi -b 9000
-</code></pre>
-
-
-
-
-<h2>nginx配置</h2>
-
-
-<p>nginx可以直接从仓库进行安装：</p>
-
-
-<pre><code>sudo pacman -S nginx
-</code></pre>
-
-
-
-
-<p>或者：</p>
-
-
-<pre><code>sudo apt-get install nginx
-</code></pre>
-
-
-
-
-<p>安装完成之后修改配置，添加一条新的虚拟主机：</p>
-
-
-<pre><code>server {
-    listen 8000;
-    server_name localhost;
-
-    root /var/www;
-
-    location / {
-        index index.php;
-    }
-
-    location ~ \.php$ {
-        fastcgi_pass   127.0.0.1:9000;
-        fastcgi_index  index.php;  
-        fastcgi_split_path_info ^(.+\.php)(/.*)$;
-        include        fastcgi_params;
-        fastcgi_param  SCRIPT_FILENAME  /var/www/$fastcgi_script_name;
-    }
-
-}
-</code></pre>
-
-
-
-
-<p>然后再创建文件 /var/www/index.php</p>
-
-
-<pre><code>&lt;?php
-  phpinfo();
-?&gt;
-</code></pre>
-
-
-
-
-<p>现在通过浏览器访问 http://127.0.0.1:8000/ 应该就可以看到效果了。</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/page/3">&larr; Older</a>
@@ -996,6 +1106,10 @@ $ sudo make install
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="http://www.xefan.com/archives/84148.html">AngularJS学习笔记2——模板</a>
+      </li>
+    
+      <li class="post">
         <a href="http://www.xefan.com/archives/84147.html">AngularJS学习笔记1——基础入门</a>
       </li>
     
@@ -1011,19 +1125,15 @@ $ sudo make install
         <a href="http://www.xefan.com/archives/84144.html">未来的Ruby 3.0</a>
       </li>
     
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84143.html">Ruby中一些重要的钩子方法</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (31)</a></li><li><a href='/categories/web开发/index.html'>web开发 (19)</a></li><li><a href='/categories/前端开发/index.html'>前端开发 (1)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (23)</a></li></ul>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (31)</a></li><li><a href='/categories/web开发/index.html'>web开发 (19)</a></li><li><a href='/categories/前端开发/index.html'>前端开发 (2)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (23)</a></li></ul>
 </section>
 <section>
   <h1>Tag Cloud</h1>
-    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.7910447761194%'>ajax(2)</a> <a href='/tags/angular/index.html' style='font-size: 100.8955223880597%'>angular(1)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 101.7910447761194%'>js(2)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 128.65671641791045%'>Ruby(32)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 122.38805970149254%'>翻译(25)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.7910447761194%'>ajax(2)</a> <a href='/tags/angular/index.html' style='font-size: 101.7910447761194%'>angular(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 102.68656716417911%'>js(3)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 128.65671641791045%'>Ruby(32)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 122.38805970149254%'>翻译(25)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
 </section>
 <section>
   <h1>Link</h1>
