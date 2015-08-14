@@ -1,0 +1,62 @@
+---
+layout: post
+title: "AngularJS学习笔记2——模板"
+date: 2015-08-14 14:00:21 +0000
+comments: true
+post_id: 84148
+permalink: /archives/84148.html
+categories: ["前端开发"]
+tags: ["js", "angular"]
+---
+
+## ngRepeat
+对于一些需要循环遍历的对象可以使用 `ngRepeat` 指令。 如：
+
+```
+  <li ng-repeat="msg in messages">{{$index}} {{msg}}</li>
+
+  // 对于 messages 数组进行遍历
+  $scope.messages =  [
+    "第一条消息",
+    "第二条消息",
+    "第三条消息",
+    "第四条消息",
+    "第五条消息"
+  ];
+
+```
+
+## ngSwitch
+使用 `ngSwitch` 指令在不同条件下显示不同内容。
+
+```
+<div ng-controller="ExampleController">
+  <select ng-model="selection" ng-options="item for item in items">
+  </select>
+  <code>selection={{selection}}</code>
+  <hr/>
+  <div class="animate-switch-container"
+    ng-switch="selection">
+      <div class="animate-switch" ng-switch-when="settings">Settings Div</div>
+      <div class="animate-switch" ng-switch-when="home">Home Span</div>
+      <div class="animate-switch" ng-switch-default>default</div>
+  </div>
+</div>
+
+<script type="text/javascript">
+angular.module('myApp', []).controller('ExampleController', ['$scope', function($scope) {
+  $scope.items = ['settings', 'home', 'other'];
+  $scope.selection = $scope.items[0];
+}]);
+</script>
+```
+
+## Filter
+使用 `filter` 指令过滤需要的内容，基本形式： `{{ expression | filter }}`
+如果有用过其他模板引擎的话（如：Jinja）应该很好理解的。
+
+angularjs 提供了一些内置的过滤器：date, json, lowercase, uppercase 等。
+
+## ngIf
+基本形式： `<ANY ng-if="expression"> ... </ANY>`
+当 `expression` 的值为真时才会输出该标签。
