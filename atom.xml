@@ -4,7 +4,7 @@
   <title><![CDATA[龍昌博客]]></title>
   <link href="http://www.xefan.com/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2015-08-14T22:01:19+08:00</updated>
+  <updated>2015-08-18T18:34:07+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -12,6 +12,66 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[AngularJS学习笔记3——表单]]></title>
+    <link href="http://www.xefan.com/archives/84149.html"/>
+    <updated>2015-08-18T18:32:35+08:00</updated>
+    <id>http://www.xefan.com/archives/84149-AngularJS学习笔记3——表单</id>
+    <content type="html"><![CDATA[<h2>双向绑定</h2>
+
+<p>使用 <code>ngModel</code> 指令将输入框与 model 进行绑定，如： <code>&lt;input type="text" ng-model="text" name="text" /&gt;</code><br/>
+当输入框或者 model 的值其中一方改变都会影响另一方。</p>
+
+<h2>表单验证</h2>
+
+<p>之前表单验证都是用的 jquery-validation 这个插件，这需要编写大量的 js 代码用于逻辑控制，
+现在改用 angularjs 之后方便了许多，不过还是要编写大量的视图代码。</p>
+
+<p>一个简单的例子： <a href="https://github.com/wusuopu/angularjs-practice/blob/master/static/form/validate.html">https://github.com/wusuopu/angularjs-practice/blob/master/static/form/validate.html</a></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;form action="#" name="user_form" ng-submit="submitForm(user_form.$valid, $event)" novalidate&gt;
+</span><span class='line'>
+</span><span class='line'>    &lt;div class="form-group" ng-class="{'has-error' : user_form.name.$invalid && user_form.name.$dirty, 'has-success' : user_form.name.$valid}"&gt;
+</span><span class='line'>        &lt;label&gt;Name&lt;/label&gt;
+</span><span class='line'>        &lt;input type="text" name="name" class="form-control" ng-model="formData.name" required&gt;
+</span><span class='line'>        &lt;p ng-show="user_form.name.$invalid && user_form.name.$dirty" class="help-block"&gt;You name is required.&lt;/p&gt;
+</span><span class='line'>    &lt;/div&gt;
+</span><span class='line'>.....
+</span><span class='line'>&lt;/form&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>首先为 form 表单设置 <code>name</code> 属性，并设置 <code>novalidate</code> 属性禁止浏览器使用 HTML5 自带的验证功能。
+然后对于需要验证的字段添加相应的验证属性，angularjs 内建的验证规则如下：</p>
+
+<ul>
+<li>email</li>
+<li>max</li>
+<li>maxlength</li>
+<li>min</li>
+<li>minlength</li>
+<li>number</li>
+<li>pattern</li>
+<li>required</li>
+<li>url</li>
+<li>date</li>
+<li>datetimelocal</li>
+<li>time</li>
+<li>week</li>
+<li>month</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[AngularJS学习笔记2——模板]]></title>
@@ -2605,100 +2665,6 @@ erp --enable-rubyinterp --enable-netbeans --enable-gui --enable-luainterp --enab
 
 
 <p>我的VIM配置文件： https://github.com/wusuopu/my-vimrc</p>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Docker使用笔记]]></title>
-    <link href="http://www.xefan.com/archives/84124.html"/>
-    <updated>2014-09-21T00:00:00+08:00</updated>
-    <id>http://www.xefan.com/archives/84124-Docker使用笔记</id>
-    <content type="html"><![CDATA[<p>docker是一个Linux下的应用容器引擎。使用它可以很方便地将程序以及依赖都打包到一个可移植的容器中。最后体验了一下，使用docker配置了一个Web开发环境。这样就不用担心每次重装系统之后都要重新配置开发环境。</p>
-
-
-<h3>安装</h3>
-
-
-<p>首先是安装docker应用程序，目前只有64位系统才能使用。</p>
-
-
-<pre><code>$ [sudo] apt-get install apparmor apparmor-profiles apparmor-utils
-$ [sudo] apt-get install aufs-tools
-$ [sudo] apt-get install cgroup-lite
-
-$ wget https://get.docker.io/builds/Linux/x86_64/docker-latest.tgz
-$ [sudo] tar xf docker-latest.tgz -C /
-</code></pre>
-
-
-<h3>基本用法</h3>
-
-
-<p>安装完成之后使用 <code>[sudo] docker -d</code> 命令启动docker的daemon进程。</p>
-
-
-<p>以下是一些常用命令的用法介绍：</p>
-
-
-<pre><code>docker version            # 查看版本
-docker search TERM        # 搜索镜像
-docker pull NAME[:TAG]    # 下载镜像
-</code></pre>
-
-
-
-
-<p>启动镜像：</p>
-
-
-<pre><code>docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
-docker run IMAGE -t -i /bin/bash                        # 进入镜像的shell环境
-docker run IMAGE -p 12345:8000 -t -i /bin/bash          # 进入镜像的shell环境，将主机的12345端口映射到容器的8000端口
-
-</code></pre>
-
-
-
-
-<p>容器与镜像管理：</p>
-
-
-<pre><code>docker ps [OPTIONS]                              # 列出容器
-docker images [OPTIONS] [NAME]                   # 列出镜像
-docker rm [OPTIONS] CONTAINER [CONTAINER...]     # 删除容器
-docker rmi IMAGE [IMAGE...]                      # 删除镜像
-
-docker commit [OPTIONS] CONTAINER [REPOSITORY[:TAG]]    # 根据修改的容器创建一个新的镜像
-docker commit -m &quot;centos&quot; f9ccb5cef3c0 wusuopu/centos6
-docker push NAME[:TAG]                                  # 上传镜像
-</code></pre>
-
-
-
-
-<pre><code>docker inspect CONTAINER|IMAGE [CONTAINER|IMAGE...]     # 查看一个容器或者镜像的详细信息
-docker logs CONTAINER     # 查看日志
-docker start CONTAINER [CONTAINER...]                   # 启动镜像
-docker stop CONTAINER [CONTAINER...]                    # 停止镜像
-docker tag [OPTIONS] IMAGE [REGISTRYHOST/][USERNAME/]NAME[:TAG]   # 给镜像打tag
-docker diff CONTAINER     # 查看容器文件系统的变化
-docker cp CONTAINER:PATH HOSTPATH                       # 将文件从容器复制到主机
-</code></pre>
-
-
-
-
-<p>导入、导出：</p>
-
-
-<pre><code>docker export CONTAINER                                 # 导出容器到标准输出
-docker export red_panda &gt; latest.tar
-
-docker import URL|- [REPOSITORY[:TAG]]                  # 导入文件为镜像
-docker import http://example.com/exampleimage.tgz
-cat exampleimage.tgz | sudo docker import - exampleimagelocal:new
-</code></pre>
 
 ]]></content>
   </entry>

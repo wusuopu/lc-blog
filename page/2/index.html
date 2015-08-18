@@ -9,7 +9,10 @@
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="Gunicorn 是 Python的 一个 WSGI HTTP服务器，根据它的介绍说是它来自于 Ruby 的 Unicorn。可以方便的部署 Python 的 Web 程序，而且本身支持多种 Python 的框架，如 Django、Paster等。 通过介绍来看貌似很不错的样子，只可惜我现在不玩 &hellip;">
+  <meta name="description" content="数据分片即是从一个集合中选择一个片键(shard key)作为数据拆分的依据，原理与索引类似，然后将集合的数据拆分并保存到不同的服务器上。
+以下通过一个例子来介绍一下Mongodb的分片配置。 有四台主机： 172.17.0.6 (配置服务器)
+172.17.0.7 (mongos)
+172.17 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -66,6 +69,184 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84139.html">Mongodb分片配置实例</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-12-29T16:52:37+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>29</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>4:52 pm</span></time>
+        
+           | <a href="http://www.xefan.com/archives/84139.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/84139.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>数据分片即是从一个集合中选择一个片键(shard key)作为数据拆分的依据，原理与索引类似，然后将集合的数据拆分并保存到不同的服务器上。
+以下通过一个例子来介绍一下Mongodb的分片配置。</p>
+
+<p>有四台主机：</p>
+
+<ul>
+<li>172.17.0.6    (配置服务器)</li>
+<li>172.17.0.7    (mongos)</li>
+<li>172.17.0.8    (片服务器)</li>
+<li>172.17.0.9    (片服务器)</li>
+</ul>
+
+
+<p>1.在 172.17.0.6 上启动 mongod 服务作为配置服务器；<br/>
+修改配置，使其作为一个配置服务器，默认监听 27019 端口。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>configsvr = true</span></code></pre></td></tr></table></div></figure>
+
+
+<p>启动服务 <code>$ service mongodb start</code></p>
+
+<p>2.在 172.17.0.7 上启动 mongos 服务作为路由服务;<br/>
+建立mongos进程。(可以有多台配置服务器)，用法如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ mongos --configdb &lt;config server hostnames&gt;[,&lt;config server hostnames&gt;]</span></code></pre></td></tr></table></div></figure>
+
+
+<p>例如： <code>$ mongos --configdb 172.17.0.6:27019</code></p>
+
+<p>注意：在同一个分片集群中的每个 mongos 必须使用相同的 configDB 配置。</p>
+
+<p>3.添加分片<br/>
+一个片服务既可以是单个 mongod 实例，也可以是一个副本集。<br/>
+1).先分别在 172.17.0.8 和 172.17.0.9 上启动片服务器，即就是一个普通的 mongod 服务。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ service mongodb start</span></code></pre></td></tr></table></div></figure>
+
+
+<p>2).使用 mongo 客户端连接到 mongos 服务</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ mongo --host &lt;hostname of machine running mongos&gt; --port &lt;port mongos listens on&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如： <code>$ mongo --host 172.17.0.7 --port 27017</code></p>
+
+<p>3).在 mongo 客户端上执行命令添加分片：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&gt; use admin
+</span><span class='line'>&gt; db.auth(&lt;user&gt;, &lt;pswd&gt;)
+</span><span class='line'>&gt; sh.addShard("172.17.0.8:27017")
+</span><span class='line'>&gt; sh.addShard("172.17.0.9:27017")</span></code></pre></td></tr></table></div></figure>
+
+
+<p>4.切片数据<br/>
+1).首先对数据库进行切片<br/>
+使用 mongo 客户端连接到 mongos ，执行命令打开数据库的分片功能，用法如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&gt; sh.enableSharding("&lt;database&gt;")</span></code></pre></td></tr></table></div></figure>
+
+
+<p>例如要打开 mydb 数据库的分片功能： <code>&gt; sh.enableSharding("mydb")</code></p>
+
+<p>2).然后对数据集合进行切片<br/>
+命令用法如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&gt; sh.shardCollection("&lt;database&gt;.&lt;collection&gt;", shard-key-pattern)</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>shard-key-pattern</code> 与索引的用法一样，例如，要对 mydb 数据库的 test 集合按照 <code>_id</code> 字段进行分片： <code>&gt; sh.shardCollection("mydb.test", {"_id": "hashed"})</code></p>
+
+<p>接下来通过一个程序来测试一下，向数据库中添加10000条数据：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1">#!/usr/bin/env ruby</span>
+</span><span class='line'><span class="c1">#-*- coding:utf-8 -*-</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">require</span> <span class="s2">&quot;mongo&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">begin</span>
+</span><span class='line'>  <span class="n">conn</span> <span class="o">=</span> <span class="no">Mongo</span><span class="o">::</span><span class="no">Connection</span><span class="o">.</span><span class="n">new</span> <span class="s1">&#39;172.17.0.7&#39;</span>
+</span><span class='line'>  <span class="n">db</span> <span class="o">=</span> <span class="n">conn</span><span class="o">[</span><span class="s1">&#39;mydb&#39;</span><span class="o">]</span>
+</span><span class='line'><span class="k">rescue</span> <span class="no">Exception</span><span class="o">=&gt;</span><span class="n">e</span>
+</span><span class='line'>  <span class="nb">p</span> <span class="n">e</span>
+</span><span class='line'>  <span class="nb">exit</span> <span class="mi">1</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span class='line'><span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">10000</span>
+</span><span class='line'>  <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;no&#39;</span> <span class="o">=&gt;</span> <span class="n">i</span><span class="p">}</span>
+</span><span class='line'>  <span class="n">d</span> <span class="o">=</span> <span class="n">db</span><span class="o">[</span><span class="s1">&#39;test&#39;</span><span class="o">].</span><span class="n">insert</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+</span><span class='line'>  <span class="nb">puts</span> <span class="n">d</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后分别查看 172.17.0.8 和 172.17.0.9 的状态：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="mi">172</span><span class="o">.</span><span class="mi">17</span><span class="o">.</span><span class="mi">0</span><span class="o">.</span><span class="mi">8</span><span class="p">:</span>
+</span><span class='line'><span class="o">&gt;</span> <span class="n">db</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+</span><span class='line'><span class="mi">4952</span>
+</span><span class='line'>
+</span><span class='line'><span class="mi">172</span><span class="o">.</span><span class="mi">17</span><span class="o">.</span><span class="mi">0</span><span class="o">.</span><span class="mi">9</span><span class="p">:</span>
+</span><span class='line'><span class="o">&gt;</span> <span class="n">db</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+</span><span class='line'><span class="mi">5048</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>数据基本上是平均的分布在两台服务器上。</p>
+
+<p>参考： <a href="http://docs.mongodb.org/manual/tutorial/deploy-shard-cluster/">http://docs.mongodb.org/manual/tutorial/deploy-shard-cluster/</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -968,123 +1149,6 @@ erp --enable-rubyinterp --enable-netbeans --enable-gui --enable-luainterp --enab
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84124.html">Docker使用笔记</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2014-09-21T00:00:00+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2014</span></span> <span class='time'>12:00 am</span></time>
-        
-           | <a href="http://www.xefan.com/archives/84124.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/84124.html">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>docker是一个Linux下的应用容器引擎。使用它可以很方便地将程序以及依赖都打包到一个可移植的容器中。最后体验了一下，使用docker配置了一个Web开发环境。这样就不用担心每次重装系统之后都要重新配置开发环境。</p>
-
-
-<h3>安装</h3>
-
-
-<p>首先是安装docker应用程序，目前只有64位系统才能使用。</p>
-
-
-<pre><code>$ [sudo] apt-get install apparmor apparmor-profiles apparmor-utils
-$ [sudo] apt-get install aufs-tools
-$ [sudo] apt-get install cgroup-lite
-
-$ wget https://get.docker.io/builds/Linux/x86_64/docker-latest.tgz
-$ [sudo] tar xf docker-latest.tgz -C /
-</code></pre>
-
-
-<h3>基本用法</h3>
-
-
-<p>安装完成之后使用 <code>[sudo] docker -d</code> 命令启动docker的daemon进程。</p>
-
-
-<p>以下是一些常用命令的用法介绍：</p>
-
-
-<pre><code>docker version            # 查看版本
-docker search TERM        # 搜索镜像
-docker pull NAME[:TAG]    # 下载镜像
-</code></pre>
-
-
-
-
-<p>启动镜像：</p>
-
-
-<pre><code>docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
-docker run IMAGE -t -i /bin/bash                        # 进入镜像的shell环境
-docker run IMAGE -p 12345:8000 -t -i /bin/bash          # 进入镜像的shell环境，将主机的12345端口映射到容器的8000端口
-
-</code></pre>
-
-
-
-
-<p>容器与镜像管理：</p>
-
-
-<pre><code>docker ps [OPTIONS]                              # 列出容器
-docker images [OPTIONS] [NAME]                   # 列出镜像
-docker rm [OPTIONS] CONTAINER [CONTAINER...]     # 删除容器
-docker rmi IMAGE [IMAGE...]                      # 删除镜像
-
-docker commit [OPTIONS] CONTAINER [REPOSITORY[:TAG]]    # 根据修改的容器创建一个新的镜像
-docker commit -m &quot;centos&quot; f9ccb5cef3c0 wusuopu/centos6
-docker push NAME[:TAG]                                  # 上传镜像
-</code></pre>
-
-
-
-
-<pre><code>docker inspect CONTAINER|IMAGE [CONTAINER|IMAGE...]     # 查看一个容器或者镜像的详细信息
-docker logs CONTAINER     # 查看日志
-docker start CONTAINER [CONTAINER...]                   # 启动镜像
-docker stop CONTAINER [CONTAINER...]                    # 停止镜像
-docker tag [OPTIONS] IMAGE [REGISTRYHOST/][USERNAME/]NAME[:TAG]   # 给镜像打tag
-docker diff CONTAINER     # 查看容器文件系统的变化
-docker cp CONTAINER:PATH HOSTPATH                       # 将文件从容器复制到主机
-</code></pre>
-
-
-
-
-<p>导入、导出：</p>
-
-
-<pre><code>docker export CONTAINER                                 # 导出容器到标准输出
-docker export red_panda &gt; latest.tar
-
-docker import URL|- [REPOSITORY[:TAG]]                  # 导入文件为镜像
-docker import http://example.com/exampleimage.tgz
-cat exampleimage.tgz | sudo docker import - exampleimagelocal:new
-</code></pre>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/page/3">&larr; Older</a>
@@ -1106,6 +1170,10 @@ cat exampleimage.tgz | sudo docker import - exampleimagelocal:new
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="http://www.xefan.com/archives/84149.html">AngularJS学习笔记3——表单</a>
+      </li>
+    
+      <li class="post">
         <a href="http://www.xefan.com/archives/84148.html">AngularJS学习笔记2——模板</a>
       </li>
     
@@ -1121,19 +1189,15 @@ cat exampleimage.tgz | sudo docker import - exampleimagelocal:new
         <a href="http://www.xefan.com/archives/84145.html">Ruby的内存陷阱</a>
       </li>
     
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84144.html">未来的Ruby 3.0</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (31)</a></li><li><a href='/categories/web开发/index.html'>web开发 (19)</a></li><li><a href='/categories/前端开发/index.html'>前端开发 (2)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (23)</a></li></ul>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (31)</a></li><li><a href='/categories/web开发/index.html'>web开发 (19)</a></li><li><a href='/categories/前端相关/index.html'>前端相关 (3)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (23)</a></li></ul>
 </section>
 <section>
   <h1>Tag Cloud</h1>
-    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.7910447761194%'>ajax(2)</a> <a href='/tags/angular/index.html' style='font-size: 101.7910447761194%'>angular(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 102.68656716417911%'>js(3)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 128.65671641791045%'>Ruby(32)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 122.38805970149254%'>翻译(25)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.7910447761194%'>ajax(2)</a> <a href='/tags/angular/index.html' style='font-size: 102.68656716417911%'>angular(3)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 103.58208955223881%'>js(4)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 128.65671641791045%'>Ruby(32)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 122.38805970149254%'>翻译(25)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
 </section>
 <section>
   <h1>Link</h1>

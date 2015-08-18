@@ -9,9 +9,11 @@
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="无名管道只能用于父子进程通信，而有名管道可以用于任意进程间通信。
-头文件： #include &lt;sys/types.h&gt; #include &lt;sys/stat.h&gt; 函数：
-int mkfifo(const char *filename, mode_t mode); &hellip;">
+  <meta name="description" content="函数：signal 设置某一信号对应的动作
+头文件： #include &lt;signal.h&gt;
+函数原型： void (signal(int signum, void (handler) (int))) (int)；
+signal：信号编号
+handler：信号处理函数， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -68,6 +70,122 @@ int mkfifo(const char *filename, mode_t mode); &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83692.html">Linux进程通信——使用信号</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2012-02-22T00:00:00+08:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2012</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83692.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83692.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>函数：signal 设置某一信号对应的动作<br/>
+头文件： #include &lt;signal.h&gt;<br/>
+函数原型： void (<em>signal(int signum, void (</em>handler) (int))) (int)；<br/>
+signal：信号编号<br/>
+handler：信号处理函数，若该参数不是函数指针则必须为以下两个常数之一：<br/>
+SIG_IGN：忽略信号<br/>
+SIG_DFL：重设为预设的处理方式<br/>
+返回：成功则返回先前的信号处理函数指针，错误则返回SIG_ERR(-1)</p>
+
+<p>函数：pause 让进程暂停直到信号出现<br/>
+头文件：#include &lt;unistd.h&gt;<br/>
+函数原型： int pause(void)；<br/>
+只返回-1</p>
+
+<p>函数： kill 传送信号<br/>
+头文件：<br/>
+  #include &lt;signal.h&gt;<br/>
+  #include &lt;sys/types.h&gt;<br/>
+函数原型： int kill(pid_t pid, int sig)；<br/>
+pid：接收信号的进程号；当pid=0时为相同进程组的所有进程；当pid=-1时为系统内所有进程；当pid&gt;0时为指定进程；当pid&lt;-1时为进程组识别码为pid绝对值的所有进程。<br/>
+sig：要传送的信号<br/>
+返回：成功返回0，错误返回-1</p>
+
+<p>例子：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="cm">/****************************************</span>
+</span><span class='line'><span class="cm"> *</span>
+</span><span class='line'><span class="cm"> *设置信号处理</span>
+</span><span class='line'><span class="cm"> *等待2秒后向进程本身传送一个SIGALRM信号</span>
+</span><span class='line'><span class="cm"> *龙昌博客：http://www.xefan.com</span>
+</span><span class='line'><span class="cm"> *</span>
+</span><span class='line'><span class="cm"> ****************************************/</span>
+</span><span class='line'><span class="cp">#include &lt;signal.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;stdio.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;stdlib.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;unistd.h&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">void</span> <span class="nf">func</span><span class="p">(</span><span class="kt">int</span> <span class="n">sig_no</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">sig_no</span> <span class="o">==</span> <span class="n">SIGALRM</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="n">printf</span><span class="p">(</span><span class="s">&quot;get SIGALRM</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%d waiting for signal..</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">getpid</span><span class="p">());</span>
+</span><span class='line'>    <span class="n">alarm</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">signal</span><span class="p">(</span><span class="n">SIGALRM</span><span class="p">,</span> <span class="n">func</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">raise</span><span class="p">(</span><span class="n">SIGALRM</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">pause</span><span class="p">();</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -988,214 +1106,6 @@ printable = yes
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83650.html">使用Glade进行GTK开发</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2011-11-04T00:00:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
-        
-           | <a href="http://www.xefan.com/archives/83650.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/83650.html">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>在前面的文章介绍了<a title="使用Glade进行PyGTK开发" href="http://www.xefan.com/archives/83642.html" target="_blank">使用Glade进行PyGTK开发</a>，现在再来说一说使用Glade来进行GTK的开发。</p>
-
-<p>首先需要的开发环境：
-Glade3、GTK+2.0、GCC</p>
-
-<p>先用Glade设计一个用户界面，保存为test.glade，内容如下：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;interface&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;requires</span> <span class="na">lib=</span><span class="s">&quot;gtk+&quot;</span> <span class="na">version=</span><span class="s">&quot;2.24&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>  <span class="c">&lt;!-- interface-naming-policy project-wide --&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;object</span> <span class="na">class=</span><span class="s">&quot;GtkWindow&quot;</span> <span class="na">id=</span><span class="s">&quot;window1&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;can_focus&quot;</span><span class="nt">&gt;</span>False<span class="nt">&lt;/property&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;resizable&quot;</span><span class="nt">&gt;</span>False<span class="nt">&lt;/property&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;default_width&quot;</span><span class="nt">&gt;</span>440<span class="nt">&lt;/property&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;default_height&quot;</span><span class="nt">&gt;</span>450<span class="nt">&lt;/property&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;signal</span> <span class="na">name=</span><span class="s">&quot;destroy&quot;</span> <span class="na">handler=</span><span class="s">&quot;on_MainWindow_destroy&quot;</span> <span class="na">swapped=</span><span class="s">&quot;no&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;child&gt;</span>
-</span><span class='line'>      <span class="nt">&lt;object</span> <span class="na">class=</span><span class="s">&quot;GtkAlignment&quot;</span> <span class="na">id=</span><span class="s">&quot;alignment1&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;visible&quot;</span><span class="nt">&gt;</span>True<span class="nt">&lt;/property&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;can_focus&quot;</span><span class="nt">&gt;</span>False<span class="nt">&lt;/property&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;top_padding&quot;</span><span class="nt">&gt;</span>10<span class="nt">&lt;/property&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;bottom_padding&quot;</span><span class="nt">&gt;</span>10<span class="nt">&lt;/property&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;left_padding&quot;</span><span class="nt">&gt;</span>10<span class="nt">&lt;/property&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;right_padding&quot;</span><span class="nt">&gt;</span>10<span class="nt">&lt;/property&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;child&gt;</span>
-</span><span class='line'>          <span class="nt">&lt;object</span> <span class="na">class=</span><span class="s">&quot;GtkVBox&quot;</span> <span class="na">id=</span><span class="s">&quot;vbox1&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;visible&quot;</span><span class="nt">&gt;</span>True<span class="nt">&lt;/property&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;can_focus&quot;</span><span class="nt">&gt;</span>False<span class="nt">&lt;/property&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;child&gt;</span>
-</span><span class='line'>              <span class="nt">&lt;object</span> <span class="na">class=</span><span class="s">&quot;GtkLabel&quot;</span> <span class="na">id=</span><span class="s">&quot;label1&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>                <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;visible&quot;</span><span class="nt">&gt;</span>True<span class="nt">&lt;/property&gt;</span>
-</span><span class='line'>                <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;can_focus&quot;</span><span class="nt">&gt;</span>False<span class="nt">&lt;/property&gt;</span>
-</span><span class='line'>                <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;label&quot;</span> <span class="na">translatable=</span><span class="s">&quot;yes&quot;</span><span class="nt">&gt;</span>龙昌博客： http://www.xefan.com<span class="nt">&lt;/property&gt;</span>
-</span><span class='line'>              <span class="nt">&lt;/object&gt;</span>
-</span><span class='line'>              <span class="nt">&lt;packing&gt;</span>
-</span><span class='line'>                <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;expand&quot;</span><span class="nt">&gt;</span>True<span class="nt">&lt;/property&gt;</span>
-</span><span class='line'>                <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;fill&quot;</span><span class="nt">&gt;</span>True<span class="nt">&lt;/property&gt;</span>
-</span><span class='line'>                <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;position&quot;</span><span class="nt">&gt;</span>0<span class="nt">&lt;/property&gt;</span>
-</span><span class='line'>              <span class="nt">&lt;/packing&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;/child&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;child&gt;</span>
-</span><span class='line'>              <span class="nt">&lt;object</span> <span class="na">class=</span><span class="s">&quot;GtkButton&quot;</span> <span class="na">id=</span><span class="s">&quot;button1&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>                <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;label&quot;</span> <span class="na">translatable=</span><span class="s">&quot;yes&quot;</span><span class="nt">&gt;</span>关闭<span class="nt">&lt;/property&gt;</span>
-</span><span class='line'>                <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;use_action_appearance&quot;</span><span class="nt">&gt;</span>False<span class="nt">&lt;/property&gt;</span>
-</span><span class='line'>                <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;visible&quot;</span><span class="nt">&gt;</span>True<span class="nt">&lt;/property&gt;</span>
-</span><span class='line'>                <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;can_focus&quot;</span><span class="nt">&gt;</span>True<span class="nt">&lt;/property&gt;</span>
-</span><span class='line'>                <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;receives_default&quot;</span><span class="nt">&gt;</span>True<span class="nt">&lt;/property&gt;</span>
-</span><span class='line'>                <span class="nt">&lt;signal</span> <span class="na">name=</span><span class="s">&quot;clicked&quot;</span> <span class="na">handler=</span><span class="s">&quot;on_MainWindow_destroy&quot;</span> <span class="na">swapped=</span><span class="s">&quot;no&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>              <span class="nt">&lt;/object&gt;</span>
-</span><span class='line'>              <span class="nt">&lt;packing&gt;</span>
-</span><span class='line'>                <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;expand&quot;</span><span class="nt">&gt;</span>False<span class="nt">&lt;/property&gt;</span>
-</span><span class='line'>                <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;fill&quot;</span><span class="nt">&gt;</span>False<span class="nt">&lt;/property&gt;</span>
-</span><span class='line'>                <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;position&quot;</span><span class="nt">&gt;</span>1<span class="nt">&lt;/property&gt;</span>
-</span><span class='line'>              <span class="nt">&lt;/packing&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;/child&gt;</span>
-</span><span class='line'>          <span class="nt">&lt;/object&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/child&gt;</span>
-</span><span class='line'>      <span class="nt">&lt;/object&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/child&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;/object&gt;</span>
-</span><span class='line'><span class="nt">&lt;/interface&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>再创建一个C源文件，保存为test.c，内容如下：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="cp">#include &lt;gtk/gtk.h&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kt">void</span> <span class="nf">on_MainWindow_destroy</span><span class="p">(</span><span class="n">GtkObject</span> <span class="o">*</span><span class="n">widget</span><span class="p">,</span> <span class="n">gpointer</span> <span class="n">data</span><span class="p">)</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>    <span class="n">gtk_main_quit</span><span class="p">();</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>    <span class="n">GtkBuilder</span> <span class="o">*</span><span class="n">builder</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">gtk_init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">argc</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">argv</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">GtkWidget</span> <span class="o">*</span><span class="n">window</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">builder</span> <span class="o">=</span> <span class="n">gtk_builder_new</span><span class="p">();</span>
-</span><span class='line'>    <span class="n">gtk_builder_add_from_file</span><span class="p">(</span><span class="n">builder</span><span class="p">,</span> <span class="s">&quot;test.glade&quot;</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">window</span> <span class="o">=</span> <span class="n">GTK_WIDGET</span><span class="p">(</span><span class="n">gtk_builder_get_object</span><span class="p">(</span><span class="n">builder</span><span class="p">,</span> <span class="s">&quot;window1&quot;</span><span class="p">));</span>
-</span><span class='line'>    <span class="n">gtk_builder_connect_signals</span><span class="p">(</span><span class="n">builder</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
-</span><span class='line'>    <span class="c1">// 释放builder的空间</span>
-</span><span class='line'>    <span class="n">g_object_unref</span><span class="p">(</span><span class="n">G_OBJECT</span><span class="p">(</span><span class="n">builder</span><span class="p">));</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">gtk_widget_show_all</span><span class="p">(</span><span class="n">window</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">gtk_main</span><span class="p">();</span>
-</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>然后再编译运行查看效果。
-如果出现类似“Gtk-WARNING **: Could not find signal handler &lsquo;on_MainWindow_destroy&#8217;”的错误请尝试以下方法：<br/>
-方法一：将编译命令改为：gcc -o test test.c `pkg-config &ndash;libs &ndash;cflags gtk+-2.0` <span style="color: #ff0000;">-export-dynamic</span><br/>
-方法二：将编译命令改为：gcc -o test test.c `pkg-config &ndash;libs &ndash;cflags <span style="color: #ff0000;">libglade-2.0 gmodule-export-2.0</span>`</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/page/16">&larr; Older</a>
@@ -1217,6 +1127,10 @@ Glade3、GTK+2.0、GCC</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="http://www.xefan.com/archives/84149.html">AngularJS学习笔记3——表单</a>
+      </li>
+    
+      <li class="post">
         <a href="http://www.xefan.com/archives/84148.html">AngularJS学习笔记2——模板</a>
       </li>
     
@@ -1232,19 +1146,15 @@ Glade3、GTK+2.0、GCC</p>
         <a href="http://www.xefan.com/archives/84145.html">Ruby的内存陷阱</a>
       </li>
     
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84144.html">未来的Ruby 3.0</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (31)</a></li><li><a href='/categories/web开发/index.html'>web开发 (19)</a></li><li><a href='/categories/前端开发/index.html'>前端开发 (2)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (23)</a></li></ul>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (31)</a></li><li><a href='/categories/web开发/index.html'>web开发 (19)</a></li><li><a href='/categories/前端相关/index.html'>前端相关 (3)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (23)</a></li></ul>
 </section>
 <section>
   <h1>Tag Cloud</h1>
-    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.7910447761194%'>ajax(2)</a> <a href='/tags/angular/index.html' style='font-size: 101.7910447761194%'>angular(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 102.68656716417911%'>js(3)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 128.65671641791045%'>Ruby(32)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 122.38805970149254%'>翻译(25)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.7910447761194%'>ajax(2)</a> <a href='/tags/angular/index.html' style='font-size: 102.68656716417911%'>angular(3)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 103.58208955223881%'>js(4)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 128.65671641791045%'>Ruby(32)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 122.38805970149254%'>翻译(25)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
 </section>
 <section>
   <h1>Link</h1>

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: 前端开发 | 龍昌博客]]></title>
-  <link href="http://www.xefan.com/categories/前端开发/atom.xml" rel="self"/>
+  <title><![CDATA[Category: 前端相关 | 龍昌博客]]></title>
+  <link href="http://www.xefan.com/categories/前端相关/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2015-08-14T22:01:19+08:00</updated>
+  <updated>2015-08-18T18:37:00+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -12,6 +12,57 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[AngularJS学习笔记3——表单]]></title>
+    <link href="http://www.xefan.com/archives/84149.html"/>
+    <updated>2015-08-18T18:32:35+08:00</updated>
+    <id>http://www.xefan.com/archives/84149-AngularJS学习笔记3——表单</id>
+    <content type="html"><![CDATA[<h2>双向绑定</h2>
+
+<p>使用 <code>ngModel</code> 指令将输入框与 model 进行绑定，如： <code>&lt;input type="text" ng-model="text" name="text" /&gt;</code><br/>
+当输入框或者 model 的值其中一方改变都会影响另一方。</p>
+
+<h2>表单验证</h2>
+
+<p>之前表单验证都是用的 jquery-validation 这个插件，这需要编写大量的 js 代码用于逻辑控制，
+现在改用 angularjs 之后方便了许多，不过还是要编写大量的视图代码。</p>
+
+<p>一个简单的例子： <a href="https://github.com/wusuopu/angularjs-practice/blob/master/static/form/validate.html">https://github.com/wusuopu/angularjs-practice/blob/master/static/form/validate.html</a></p>
+
+<pre><code>    &lt;form action="#" name="user_form" ng-submit="submitForm(user_form.$valid, $event)" novalidate&gt;
+
+        &lt;div class="form-group" ng-class="{'has-error' : user_form.name.$invalid &amp;&amp; user_form.name.$dirty, 'has-success' : user_form.name.$valid}"&gt;
+            &lt;label&gt;Name&lt;/label&gt;
+            &lt;input type="text" name="name" class="form-control" ng-model="formData.name" required&gt;
+            &lt;p ng-show="user_form.name.$invalid &amp;&amp; user_form.name.$dirty" class="help-block"&gt;You name is required.&lt;/p&gt;
+        &lt;/div&gt;
+    .....
+    &lt;/form&gt;
+</code></pre>
+
+<p>首先为 form 表单设置 <code>name</code> 属性，并设置 <code>novalidate</code> 属性禁止浏览器使用 HTML5 自带的验证功能。
+然后对于需要验证的字段添加相应的验证属性，angularjs 内建的验证规则如下：</p>
+
+<ul>
+<li>email</li>
+<li>max</li>
+<li>maxlength</li>
+<li>min</li>
+<li>minlength</li>
+<li>number</li>
+<li>pattern</li>
+<li>required</li>
+<li>url</li>
+<li>date</li>
+<li>datetimelocal</li>
+<li>time</li>
+<li>week</li>
+<li>month</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[AngularJS学习笔记2——模板]]></title>
@@ -22,7 +73,7 @@
 
 <p>对于一些需要循环遍历的对象可以使用 <code>ngRepeat</code> 指令。 如：</p>
 
-<pre><code>  &lt;li ng-repeat="msg in messages"&gt; &lt;/li&gt;
+<pre><code>  &lt;li ng-repeat="msg in messages"&gt;{{$index}} {{msg}}&lt;/li&gt;
 
   // 对于 messages 数组进行遍历
   $scope.messages =  [
@@ -43,7 +94,7 @@
 <div ng-controller="ExampleController">
   <select ng-model="selection" ng-options="item for item in items">
   </select>
-  <code>selection=</code>
+  <code>selection={{selection}}</code>
   <hr/>
   <div class="animate-switch-container"
     ng-switch="selection">
@@ -68,7 +119,7 @@ angular.module('myApp', []).controller('ExampleController', ['$scope', function(
 
 <h2>Filter</h2>
 
-<p>使用 <code>filter</code> 指令过滤需要的内容，基本形式： <code></code>
+<p>使用 <code>filter</code> 指令过滤需要的内容，基本形式： <code>{{ expression | filter }}</code>
 如果有用过其他模板引擎的话（如：Jinja）应该很好理解的。</p>
 
 <p>angularjs 提供了一些内置的过滤器：date, json, lowercase, uppercase 等。</p>
@@ -102,9 +153,9 @@ angularjs 2.0 的理念又变为了 Web 组件，与 1.x 不兼容。
     <script src="http://www.xefan.com/lib/angular-1.0.4.min.js"></script>
 </head>
 <body>
-  <p>1 + 2 = 1</p>
+  <p>1 + 2 = {{ 1 + 2 }}</p>
   <div ng-controller="DemoController">
-    <p></p>
+    <p>{{content}}</p>
   </div>
 </body></p>
 
@@ -125,13 +176,13 @@ angularjs 2.0 的理念又变为了 Web 组件，与 1.x 不兼容。
 
 <p>html 的 <code>ng-app</code> 属性表明在该页面中启用 angularjs。</p>
 
-<pre><code>  &lt;p&gt;1 + 2 = 1&lt;/p&gt;
+<pre><code>  &lt;p&gt;1 + 2 = {{ 1 + 2 }}&lt;/p&gt;
 </code></pre>
 
 <p>在页面加载完成之后 angularjs 会解析大括号内的表达式，并进行渲染。</p>
 
 <pre><code>  &lt;div ng-controller="DemoController"&gt;
-    &lt;p&gt;&lt;/p&gt;
+    &lt;p&gt;{{content}}&lt;/p&gt;
   &lt;/div&gt;
 </code></pre>
 

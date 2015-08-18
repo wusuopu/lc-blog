@@ -9,7 +9,7 @@
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="手柄 joystick模块管理计算机上的手柄设备（可能多于一个）。手柄设备包括轨迹球、类似电视游戏机的游戏手柄，允许使用多个按钮和’hats’。 pygame.joystick.get_count函数可以获得系统中手柄的个数。比如： count = pygame.joystick. &hellip;">
+  <meta name="description" content="IIC（Inter - Integrated Circuit）总线是菲利浦公司推出的芯片间串行传输总线。它用两根线实现了完善的全双工同步数据传送。 I2C串行总线一般有两根信号线，一根是双向的数据线SDA，另一根是时钟线SCL。所有接到I2C总线设备上的串行数据SDA都接到总线的SDA上， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -66,6 +66,64 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83607.html">I2C协议说明</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2011-09-17T00:00:00+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83607.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83607.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>IIC（Inter - Integrated Circuit）总线是菲利浦公司推出的芯片间串行传输总线。它用两根线实现了完善的全双工同步数据传送。</p>
+
+<p>I2C串行总线一般有两根信号线，一根是双向的数据线SDA，另一根是时钟线SCL。所有接到I2C总线设备上的串行数据SDA都接到总线的SDA上，各设备的时钟线SCL接到总线的SCL上。</p>
+
+<p>I2C总线在传送数据过程中共有三种类型信号，它们分别是：</p>
+
+<p>开始信号、结束信号和应答信号。</p>
+
+<p><strong>开始信号</strong>：SCL为高电平时，SDA由高电平向低电平跳变，开始传送数据。</p>
+
+<p><strong>结束信号</strong>：SCL为高电平时，SDA由低电平向高电平跳变，结束传送数据。</p>
+
+<p><strong>应答信号</strong>：数据接收完后，受控单元向主控单元发送一个应答信号。</p>
+
+<p>开始信号是必需的，结束信号和应答信号可以不要。</p>
+
+<p>数据传输格式如下：</p>
+
+<p>主控写： <span style="text-decoration: underline;">开始</span>| <span style="text-decoration: underline;">寻址字节（写）</span>| 应答| <span style="text-decoration: underline;">数据</span>| 应答| …| <span style="text-decoration: underline;">数据</span>| 应答| <span style="text-decoration: underline;">结束</span></p>
+
+<p>主控读： <span style="text-decoration: underline;">开始</span>| <span style="text-decoration: underline;">寻址字节（读）</span>| 应答| 数据| <span style="text-decoration: underline;">应答</span>| …| 数据| <span style="text-decoration: underline;">非应答</span>| <span style="text-decoration: underline;">结束</span></p>
+
+<p>下划线部分表示主控发送，被控接收；其余为主控接收，被控发送。</p>
+
+<p>时钟脉冲如图所示：</p>
+
+<p><img class="aligncenter" title="I2C" src="http://img2081.poco.cn/mypoco/myphoto/20110829/17/5545129120110829172858024.jpg" alt="" width="700" height="360" /></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -909,142 +967,6 @@ Event对象有各种不同的类型，比如KEYDOWN(键盘键按下)、MOUSEBUTT
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83581.html">Pygame学习笔记3：绘图</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2011-08-15T00:00:00+08:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>15</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
-        
-           | <a href="http://www.xefan.com/archives/83581.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/83581.html">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><strong>绘图</strong></p>
-
-<p>除了可以把事先画好的图片blit到Surface上以外，还可以在Surface上自行在Surface上绘制一些简单的图形，比如点、线、方、圆等。这个功能主要由pygame.draw模块完成。</p>
-
-<p>首先导入pygame.draw模块。</p>
-
-<p><em>import pygame.draw</em></p>
-
-<p>如果已经用了import pygame，则pygame.draw模块也被自动导入了。</p>
-
-<p>然后准备好要在上面绘制图形的Surface，比如</p>
-
-<p><em>surface = pygame.display.set_mode((640, 480))</em></p>
-
-<p>pygame.draw中函数的第一个参数总是一个surface，然后是颜色，再后会是一系列的坐标等。稍有些计算机绘图经验的人就会知道，计算机里的坐标，(0，0)代表左上角。而返回值是一个Rect对象，包含了绘制的领域，这样你就可以很方便的更新那个部分了。</p>
-
-<p>函数<span> </span> 作用</p>
-
-<p>rect<span> </span> 绘制矩形</p>
-
-<p>polygon<span> </span>绘制多边形（三个及三个以上的边）</p>
-
-<p>circle<span> </span> 绘制圆</p>
-
-<p>ellipse<span> </span> 绘制椭圆</p>
-
-<p>arc<span> </span> 绘制圆弧</p>
-
-<p>line<span> </span> 绘制线</p>
-
-<p>lines<span> </span> 绘制一系列的线</p>
-
-<p>aaline<span> </span> 绘制一根平滑的线</p>
-
-<p>aalines<span> </span> 绘制一系列平滑的线</p>
-
-<p><strong>pygame.draw.rect</strong></p>
-
-<p>用法：pygame.draw.rect(Surface, color, Rect, width=0)</p>
-
-<p>pygame.draw.rect在surface上画一个矩形，除了surface和color，rect接受一个矩形的坐标和线宽参数，如果线宽是0或省略，则填充。我们有一个另外的方法来画矩形——fill方法</p>
-
-<p><strong>pygame.draw.polygon</strong></p>
-
-<p>用法：pygame.draw.polygon(Surface, color, pointlist, width=0)</p>
-
-<p>polygon就是多边形，用法类似rect，第一、第二、第四的参数都是相同的，只不过polygon会接受一系列坐标的列表，代表了各个顶点。</p>
-
-<p><strong>pygame.draw.circle</strong></p>
-
-<p>用法：pygame.draw.circle(Surface, color, pos, radius, width=0)</p>
-
-<p>很简单，画一个圆。与其他不同的是，它接收一个圆心坐标和半径参数。</p>
-
-<p><strong>pygame.draw.ellipse</strong></p>
-
-<p>用法：pygame.draw.ellipse(Surface, color, Rect, width=0)</p>
-
-<p>你可以把一个ellipse想象成一个被压扁的圆，事实上，它是可以被一个矩形装起来的。pygame.draw.ellipse的第三个参数就是这个椭圆的外接矩形。</p>
-
-<p><strong>pygame.draw.arc</strong></p>
-
-<p>用法：pygame.draw.arc(Surface, color, Rect, start_angle, stop_angle, width=1)</p>
-
-<p>arc是椭圆的一部分，所以它的参数也就比椭圆多一点。但它是不封闭的，因此没有fill方法。start_angle和stop_angle为开始和结束的角度。</p>
-
-<p><strong>pygame.draw.line</strong></p>
-
-<p>用法：pygame.draw.line(Surface, color, start_pos, end_pos, width=1)</p>
-
-<p>相信所有的人都能看明白。</p>
-
-<p><strong>pygame.draw.lines</strong></p>
-
-<p>用法：pygame.draw.lines(Surface, color, closed, pointlist, width=1)</p>
-
-<p>closed是一个布尔变量，指明是否需要多画一条线来使这些线条闭合（感觉就和polygone一样了），pointlist是一个点的数组。</p>
-
-<p>pygame.draw.aaline画抗锯齿的线段。</p>
-
-<p>pygame.draw.aalines可以画多条连续的抗锯齿线段。</p>
-
-<p>用法跟python.draw.line和pygame.draw.lines相似。</p>
-
-<p><strong>点操作</strong></p>
-
-<p>画点的方法和其它方法不太一样，用Surface.set_at方法完成画点的操作，比如：</p>
-
-<p><em>surface.set_at((100, 100), (255,255,255))</em></p>
-
-<p>第一个参数是点的坐标，第二个参数是颜色。</p>
-
-<p>除了可以在Surface上画点，还可以用Surface.get_at读取Surface上像素的值。比如</p>
-
-<p><em>color = surface.get_at((100, 100))</em></p>
-
-<p>这个函数返回给定点的颜色值。</p>
-
-<p><strong>填充区域</strong></p>
-
-<p>Surface.fill方法可以用一种颜色填充一个矩形区域。比如</p>
-
-<p><em>surface.fill((255,0,0), (100, 200, 100, 100))</em></p>
-
-<p>第一个参数指定要填充的颜色，第二个参数指定填充的矩形区域。如果没有给定第二个参数，整个Surface会被填充。第二个参数会限制备填充的区域。这个函数会返回受影响的Surface区域。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/page/18">&larr; Older</a>
@@ -1066,6 +988,10 @@ Event对象有各种不同的类型，比如KEYDOWN(键盘键按下)、MOUSEBUTT
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="http://www.xefan.com/archives/84149.html">AngularJS学习笔记3——表单</a>
+      </li>
+    
+      <li class="post">
         <a href="http://www.xefan.com/archives/84148.html">AngularJS学习笔记2——模板</a>
       </li>
     
@@ -1081,19 +1007,15 @@ Event对象有各种不同的类型，比如KEYDOWN(键盘键按下)、MOUSEBUTT
         <a href="http://www.xefan.com/archives/84145.html">Ruby的内存陷阱</a>
       </li>
     
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84144.html">未来的Ruby 3.0</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (31)</a></li><li><a href='/categories/web开发/index.html'>web开发 (19)</a></li><li><a href='/categories/前端开发/index.html'>前端开发 (2)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (23)</a></li></ul>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (31)</a></li><li><a href='/categories/web开发/index.html'>web开发 (19)</a></li><li><a href='/categories/前端相关/index.html'>前端相关 (3)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (23)</a></li></ul>
 </section>
 <section>
   <h1>Tag Cloud</h1>
-    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.7910447761194%'>ajax(2)</a> <a href='/tags/angular/index.html' style='font-size: 101.7910447761194%'>angular(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 102.68656716417911%'>js(3)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 128.65671641791045%'>Ruby(32)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 122.38805970149254%'>翻译(25)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.7910447761194%'>ajax(2)</a> <a href='/tags/angular/index.html' style='font-size: 102.68656716417911%'>angular(3)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 103.58208955223881%'>js(4)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 128.65671641791045%'>Ruby(32)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 122.38805970149254%'>翻译(25)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
 </section>
 <section>
   <h1>Link</h1>

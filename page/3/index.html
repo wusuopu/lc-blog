@@ -9,9 +9,7 @@
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="最近在弄PHP，于是乎把配置过程作一个笔记以免忘了。 PHP安装、配置 我是通过源代码编译的形式进行安装的，基本步骤如下： $ tar xf php-5.5.12.tar.bz2
-$ cd php-5.5.12
-$ './configure' '--prefix=/opt/myphp' '-- &hellip;">
+  <meta name="description" content="docker是一个Linux下的应用容器引擎。使用它可以很方便地将程序以及依赖都打包到一个可移植的容器中。最后体验了一下，使用docker配置了一个Web开发环境。这样就不用担心每次重装系统之后都要重新配置开发环境。 安装 首先是安装docker应用程序，目前只有64位系统才能使用。 $ [ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -68,6 +66,123 @@ $ './configure' '--prefix=/opt/myphp' '-- &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84124.html">Docker使用笔记</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-09-21T00:00:00+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2014</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/84124.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/84124.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>docker是一个Linux下的应用容器引擎。使用它可以很方便地将程序以及依赖都打包到一个可移植的容器中。最后体验了一下，使用docker配置了一个Web开发环境。这样就不用担心每次重装系统之后都要重新配置开发环境。</p>
+
+
+<h3>安装</h3>
+
+
+<p>首先是安装docker应用程序，目前只有64位系统才能使用。</p>
+
+
+<pre><code>$ [sudo] apt-get install apparmor apparmor-profiles apparmor-utils
+$ [sudo] apt-get install aufs-tools
+$ [sudo] apt-get install cgroup-lite
+
+$ wget https://get.docker.io/builds/Linux/x86_64/docker-latest.tgz
+$ [sudo] tar xf docker-latest.tgz -C /
+</code></pre>
+
+
+<h3>基本用法</h3>
+
+
+<p>安装完成之后使用 <code>[sudo] docker -d</code> 命令启动docker的daemon进程。</p>
+
+
+<p>以下是一些常用命令的用法介绍：</p>
+
+
+<pre><code>docker version            # 查看版本
+docker search TERM        # 搜索镜像
+docker pull NAME[:TAG]    # 下载镜像
+</code></pre>
+
+
+
+
+<p>启动镜像：</p>
+
+
+<pre><code>docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
+docker run IMAGE -t -i /bin/bash                        # 进入镜像的shell环境
+docker run IMAGE -p 12345:8000 -t -i /bin/bash          # 进入镜像的shell环境，将主机的12345端口映射到容器的8000端口
+
+</code></pre>
+
+
+
+
+<p>容器与镜像管理：</p>
+
+
+<pre><code>docker ps [OPTIONS]                              # 列出容器
+docker images [OPTIONS] [NAME]                   # 列出镜像
+docker rm [OPTIONS] CONTAINER [CONTAINER...]     # 删除容器
+docker rmi IMAGE [IMAGE...]                      # 删除镜像
+
+docker commit [OPTIONS] CONTAINER [REPOSITORY[:TAG]]    # 根据修改的容器创建一个新的镜像
+docker commit -m &quot;centos&quot; f9ccb5cef3c0 wusuopu/centos6
+docker push NAME[:TAG]                                  # 上传镜像
+</code></pre>
+
+
+
+
+<pre><code>docker inspect CONTAINER|IMAGE [CONTAINER|IMAGE...]     # 查看一个容器或者镜像的详细信息
+docker logs CONTAINER     # 查看日志
+docker start CONTAINER [CONTAINER...]                   # 启动镜像
+docker stop CONTAINER [CONTAINER...]                    # 停止镜像
+docker tag [OPTIONS] IMAGE [REGISTRYHOST/][USERNAME/]NAME[:TAG]   # 给镜像打tag
+docker diff CONTAINER     # 查看容器文件系统的变化
+docker cp CONTAINER:PATH HOSTPATH                       # 将文件从容器复制到主机
+</code></pre>
+
+
+
+
+<p>导入、导出：</p>
+
+
+<pre><code>docker export CONTAINER                                 # 导出容器到标准输出
+docker export red_panda &gt; latest.tar
+
+docker import URL|- [REPOSITORY[:TAG]]                  # 导入文件为镜像
+docker import http://example.com/exampleimage.tgz
+cat exampleimage.tgz | sudo docker import - exampleimagelocal:new
+</code></pre>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1606,247 +1721,6 @@ static int Noddy_setlast(noddy_NoddyObject *self, PyObject *value, void *closure
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84091.html">使用C语言编写Python扩展3——创建自定义类型(1)</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2014-04-13T00:00:00+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>12:00 am</span></time>
-        
-           | <a href="http://www.xefan.com/archives/84091.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/84091.html">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>在Python代码中如果要创建一个自定义类使用class关键字即可，但是在C代码中就没那么方便了。<br>
-首先简单介绍下Python中的类型。在python中一切皆对象，python中有两种对象：<br>
-一种是类型对象（class对象）：表示Python定义的类型，例如int, str, object等；<br>
-另一种是实例对象（instance对象）：表示由class对象创建的实例。 
-Python中的所有对象都是直接或者间接继承object，然后object又是typy类型。可以运行下面的例子看看输出结果：  </p>
-
-
-<pre><code>class A(object):
-    pass
-
-a = A()
-
-print(type(a))
-print(isinstance(a, A))
-print(isinstance(a, object))
-print(isinstance(a, type))
-
-print(type(A))
-print(A.__base__)
-print(isinstance(A, object))
-print(isinstance(A, type))
-
-print(type(object))
-print(isinstance(object, type))
-
-print(type(type))
-print(isinstance(type, object))
-</code></pre>
-
-
-<p>python是一门面向对象的编程语言，它是用C写的，而C又是面向过程的编程语言，那么python的类在C中是如何实现的呢？答案就是用结构体来模拟。  </p>
-
-
-<p>在Python的<em>object.h</em>头文件中定义了一个重要的结构体 PyTypeObject 。创建新的类型就是靠的它，该结构体定义如下：  </p>
-
-
-<pre><code>typedef struct _typeobject {
-    PyObject_VAR_HEAD
-    char *tp_name; /* For printing, in format "&lt;module&gt;.&lt;name&gt;" */
-    int tp_basicsize, tp_itemsize; /* For allocation */
-
-    /* Methods to implement standard operations */
-
-    destructor tp_dealloc;
-    printfunc tp_print;
-    getattrfunc tp_getattr;
-    setattrfunc tp_setattr;
-    cmpfunc tp_compare;
-    reprfunc tp_repr;
-
-    /* Method suites for standard classes */
-
-    PyNumberMethods *tp_as_number;
-    PySequenceMethods *tp_as_sequence;
-    PyMappingMethods *tp_as_mapping;
-
-    /* More standard operations (here for binary compatibility) */
-
-    hashfunc tp_hash;
-    ternaryfunc tp_call;
-    reprfunc tp_str;
-    getattrofunc tp_getattro;
-    setattrofunc tp_setattro;
-
-    /* Functions to access object as input/output buffer */
-    PyBufferProcs *tp_as_buffer;
-
-    /* Flags to define presence of optional/expanded features */
-    long tp_flags;
-
-    char *tp_doc; /* Documentation string */
-
-    /* Assigned meaning in release 2.0 */
-    /* call function for all accessible objects */
-    traverseproc tp_traverse;
-
-    /* delete references to contained objects */
-    inquiry tp_clear;
-
-    /* Assigned meaning in release 2.1 */
-    /* rich comparisons */
-    richcmpfunc tp_richcompare;
-
-    /* weak reference enabler */
-    long tp_weaklistoffset;
-
-    /* Added in release 2.2 */
-    /* Iterators */
-    getiterfunc tp_iter;
-    iternextfunc tp_iternext;
-
-    /* Attribute descriptor and subclassing stuff */
-    struct PyMethodDef *tp_methods;
-    struct PyMemberDef *tp_members;
-    struct PyGetSetDef *tp_getset;
-    struct _typeobject *tp_base;
-    PyObject *tp_dict;
-    descrgetfunc tp_descr_get;
-    descrsetfunc tp_descr_set;
-    long tp_dictoffset;
-    initproc tp_init;
-    allocfunc tp_alloc;
-    newfunc tp_new;
-    freefunc tp_free; /* Low-level free-memory routine */
-    inquiry tp_is_gc; /* For PyObject_IS_GC */
-    PyObject *tp_bases;
-    PyObject *tp_mro; /* method resolution order */
-    PyObject *tp_cache;
-    PyObject *tp_subclasses;
-    PyObject *tp_weaklist;
-} PyTypeObject;
-</code></pre>
-
-
-<p>这个比较庞大，里面包含的数据比较多，大部分都是一些函数指针而且可以为空，至于每个字段是什么意思请查看Python文档。  </p>
-
-
-<h2>创建自定义类型</h2>
-
-
-<p>创建一个新的C代码文件 <em>noddy.c</em> ，然后我们编写一个名为 noddy 的扩展模块，该模块包含了一个名为 Noddy 的类。  </p>
-
-
-<p>首先创建一个新的 PyTypeObject 类型的变量：</p>
-
-
-<pre><code>typedef struct {
-    PyObject_HEAD
-    /* Type-specific fields go here. */
-} noddy_NoddyObject;
-static PyTypeObject noddy_NoddyType = {
-    PyVarObject_HEAD_INIT(NULL, 0)
-    "noddy.Noddy",             /*tp_name*/
-    sizeof(noddy_NoddyObject), /*tp_basicsize*/
-    0,                         /*tp_itemsize*/
-    0,                         /*tp_dealloc*/
-    0,                         /*tp_print*/
-    0,                         /*tp_getattr*/
-    0,                         /*tp_setattr*/
-    0,                         /*tp_compare*/
-    0,                         /*tp_repr*/
-    0,                         /*tp_as_number*/
-    0,                         /*tp_as_sequence*/
-    0,                         /*tp_as_mapping*/
-    0,                         /*tp_hash */
-    0,                         /*tp_call*/
-    0,                         /*tp_str*/
-    0,                         /*tp_getattro*/
-    0,                         /*tp_setattro*/
-    0,                         /*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT,        /*tp_flags*/
-    "Noddy objects",           /*tp_doc*/
-};
-</code></pre>
-
-
-<p>这里是定义了一个noddy_NoddyObject结构体，它的第一个字段为 PyObject_HEAD ，因此相当于一个PyObject类型；然后还有一个 noddy_NoddyType 变量，它的第一个字段为 <em>PyVarObject_HEAD_INIT(NULL, 0)</em> ，这个很很重要，按理说这个应该写成 <em>PyVarObject_HEAD_INIT(&amp;PyType_Type, 0)</em> ，即表示Noddy这个类是一个type类型的对象。不过有的C编译器会对这个报错，因此这一项将在后面调用PyType_Ready函数来填充。<br>
-noddy_NoddyType 即是 Noddy 类，它保存了该类的元信息；noddy_NoddyObject结构体用于保存该类的实例对象的数据。<br>
-<em>只要是定义的结构体以PyObject_HEAD开始就属于是一个PyObject类型。PyObject_VAR_HEAD与PyObject_HEAD相似，只是PyObject_HEAD表示的是该类型占用内存大小是固定的如int、float；而PyObject_VAR_HEAD表示该类型占用的内存是可变的如list、dict。</em>   </p>
-
-
-<p>然后创建一个新扩展模块，并完成初始化：</p>
-
-
-<pre><code>static PyMethodDef noddy_methods[] = {
-    {NULL}  /* Sentinel */
-};
-PyMODINIT_FUNC
-initnoddy(void) 
-{
-    PyObject* m;
-
-    noddy_NoddyType.tp_new = PyType_GenericNew;
-    if (PyType_Ready(&amp;noddy_NoddyType) &lt; 0)
-        return;
-
-    m = Py_InitModule3("noddy", noddy_methods,
-                       "Example module that creates an extension type.");
-
-    Py_INCREF(&amp;noddy_NoddyType);
-    PyModule_AddObject(m, "Noddy", (PyObject *)&amp;noddy_NoddyType);
-}
-</code></pre>
-
-
-<p><strong><em>注意</em></strong>：以上是针对Python2的，在Python3中模块的初始化操作略有不同。请参考第一节的内容。  </p>
-
-
-<p>noddy_NoddyType即是我们要创建的 Noddy 类，它是 PyTypeObject 类型的结构变量。为了创建新的类型，我们需要指明 tp_new 方法，它相当于Python中的 __new__，这里我们使用默认的 PyType_GenericNew 即可。<br>
-然后调用 PyType_Ready 完成新类型的创建。<br>
-最后调用 PyModule_AddObject 在该模块中添加刚刚创建的新类型。  </p>
-
-
-<h2>测试</h2>
-
-
-<p>最后就是编写一个小程序来测试刚刚的模块是否可用。</p>
-
-
-<pre><code>import noddy
-
-o = noddy.Noddy()
-print(o)
-print(type(o), type(noddy.Noddy))
-
-# 这个会报错，noddy.Noddy 类不能被继承
-class A(noddy.Noddy):
-    pass
-</code></pre>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/page/4">&larr; Older</a>
@@ -1868,6 +1742,10 @@ class A(noddy.Noddy):
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="http://www.xefan.com/archives/84149.html">AngularJS学习笔记3——表单</a>
+      </li>
+    
+      <li class="post">
         <a href="http://www.xefan.com/archives/84148.html">AngularJS学习笔记2——模板</a>
       </li>
     
@@ -1883,19 +1761,15 @@ class A(noddy.Noddy):
         <a href="http://www.xefan.com/archives/84145.html">Ruby的内存陷阱</a>
       </li>
     
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84144.html">未来的Ruby 3.0</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (31)</a></li><li><a href='/categories/web开发/index.html'>web开发 (19)</a></li><li><a href='/categories/前端开发/index.html'>前端开发 (2)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (23)</a></li></ul>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (31)</a></li><li><a href='/categories/web开发/index.html'>web开发 (19)</a></li><li><a href='/categories/前端相关/index.html'>前端相关 (3)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (23)</a></li></ul>
 </section>
 <section>
   <h1>Tag Cloud</h1>
-    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.7910447761194%'>ajax(2)</a> <a href='/tags/angular/index.html' style='font-size: 101.7910447761194%'>angular(2)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 102.68656716417911%'>js(3)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 128.65671641791045%'>Ruby(32)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 122.38805970149254%'>翻译(25)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.7910447761194%'>ajax(2)</a> <a href='/tags/angular/index.html' style='font-size: 102.68656716417911%'>angular(3)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 103.58208955223881%'>js(4)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 128.65671641791045%'>Ruby(32)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 122.38805970149254%'>翻译(25)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
 </section>
 <section>
   <h1>Link</h1>
