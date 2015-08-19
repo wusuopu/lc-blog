@@ -4,7 +4,7 @@
   <title><![CDATA[Tag: Js | 龍昌博客]]></title>
   <link href="http://www.xefan.com/tags/js/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2015-08-18T18:37:00+08:00</updated>
+  <updated>2015-08-19T13:35:55+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -12,6 +12,45 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[AngularJS学习笔记4——依赖注入]]></title>
+    <link href="http://www.xefan.com/archives/84150.html"/>
+    <updated>2015-08-19T13:33:33+08:00</updated>
+    <id>http://www.xefan.com/archives/84150-AngularJS学习笔记4——依赖注入</id>
+    <content type="html"><![CDATA[<h2>依赖注入</h2>
+
+<p>之前有遇到过 angularjs 的代码压缩之后就报错了，通过查文档得知是因为 angularjs 是通过变量名来查找相应服务的。
+而 js 代码压缩之后变量名就变化了，从而无法找到相应的服务而报错。因此就需要指明依赖服务。</p>
+
+<pre><code>function SomeController($scope, $http) { ... }
+</code></pre>
+
+<p>例如以上代码就是定义了 <code>SomeController</code> 这个一个控制器，并依赖 <code>$scope</code> 和 <code>$http</code> 两个服务。
+但是当该代码压缩之后，这两个参数名都变化了。因此还需要使用以下代码来指明所需的依赖。</p>
+
+<pre><code>SomeController.$inject = ['$scope', '$http'];
+</code></pre>
+
+<p>或者另一个写法：</p>
+
+<pre><code>angular.module('app', [])
+       .controller('SomeController', ['$scope', '$http', function($scope, $http){
+
+}]);
+</code></pre>
+
+<p>这样就可以保证我们的代码压缩之后也能正常运行了。</p>
+
+<h2>自定义服务</h2>
+
+<p>上面的 <code>$http</code> 服务为我们提供了 ajax 的功能。</p>
+
+<p>需要自定义服务的可以使用 <code>module.factory</code> 方法或者 <code>module.service</code> 方法进行注册服务。
+这两个方法稍微有些不同，一般我习惯使用 <code>module.factory</code> 。
+然后在需要使用自定义服务的地方，将其添加到依赖列表中即可。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[AngularJS学习笔记3——表单]]></title>

@@ -9,7 +9,7 @@
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="变量 在这章的教程中我们将详细介绍变量。 变量是保存数据的地址。每个变量都有唯一的一个名字，变量命名存在着一些约定。变量保存着数据对象，更确切的说变量是对数据所在的计算机内存地址的引用。每一个对象都具有一定的数据类型，内置的类型或者自定义的类型。Ruby属于动态语言，与Java、 &hellip;">
+  <meta name="description" content="Ruby中的对象 在这章的教程中我们将简要的介绍下Ruby语言对象的概念。更多的内容将会在面向对象的章节中学习。由于Ruby的许多特性可以会使新手们迷惑，尤其是已经学习过其他编程语言的，因此才编写了这个关于对象的预备章节。 Ruby是一门面向对象的编程语言。这意味着我们可以在Ruby语言中使用对象 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -66,6 +66,721 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83909.html">[翻译]Ruby教程5——对象</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-11-06T00:00:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>6</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83909.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83909.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h1>Ruby中的对象</h1>
+
+
+<p>在这章的教程中我们将简要的介绍下Ruby语言对象的概念。更多的内容将会在面向对象的章节中学习。由于Ruby的许多特性可以会使新手们迷惑，尤其是已经学习过其他编程语言的，因此才编写了这个关于对象的预备章节。</p>
+
+
+<p>Ruby是一门面向对象的编程语言。这意味着我们可以在Ruby语言中使用对象。对于语言程序员来说Ruby程序就是一些字符流。这些符号就是Ruby的关键字、操作符、变量符号和字面量。从语言的角度来看Ruby程序是由对象组成的。这些对象在Ruby脚本程序执行进程来创建和修改。</p>
+
+
+<p>有两种类型的对象：内置对象和自定义对象。内置对象是所有程序员都可以使用的预定义对象。它们由Ruby语言的内核或者变量库提示。自定义对象是由应用程序开发者在他们的应用程序域中创建的。</p>
+
+
+<p>所有的对象都必须在使用之前创建。我们把创建对象叫做对象实例化。对象是由数据和方法组成，数据是对象静态的部分，方法是动态的形式。对象的修改以及与其他对象通信都是通过方法进行的。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+puts "Ruby language"
+</code></pre>
+
+
+<p>以上是一个简单的Ruby脚本。如果我们熟悉Pascal或者C之类的程序语言，我们可以看到一个名为<em>puts</em>的关键字或者是一个函数和一个字符串参数<em>&#8220;Ruby language&#8221;</em>。</p>
+
+
+<p>看起来有点不同，Ruby是一门纯面向对象语言。<em>&#8220;Ruby language&#8221;</em>确实是一个字符串，常见的一种数据类型。但是它也是一个对象。与所有的对象一样，我们可以调用它们的方法。这与其他的语言有点不同。<em>puts</em>是一个方法。方法是定义在一个对象中的函数。方法是不能独自存在的。实际上<em>puts</em>方法是<em>Kernel</em>模块的一部分。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+Kernel.puts "Ruby language"
+Kernel.puts "Ruby language".size
+</code></pre>
+
+
+<p>在以上的脚本中我们写了两行代码。</p>
+
+
+<pre><code>Kernel.puts "Ruby language"
+</code></pre>
+
+
+<p><em>Kernel</em>是可以省略的，在第一个例子中我们调用<em>puts</em>方法就没有使用<em>Kernel</em>。这样可以少打些字节约时间。实际上它是对于<em>Kernel.puts</em>这个正式调用的简写。正如在C#中的Console.writeln和Java中的System.println。因此方法必须与一个对象相关联，或者如果是类方法就必须与类相关联。</p>
+
+
+<pre><code>Kernel.puts "Ruby language".size
+</code></pre>
+
+
+<p>在这行代码中我们在终端上打印了<em>&#8220;Ruby language&#8221;</em>这个字符串的长度。对于有其他编程语言经验的程序员来说可能会困惑。在其他语言中字符串是一个原始数据类型，不能修改，并且没有自己的方法。在Ruby中字符串是一个完整的对象，有自己的方法。<em>size</em>方法其中一个，用于返回这个字符串的长度。</p>
+
+
+<p>$ ./simple2.rb<br>
+Ruby language<br>
+13  </p>
+
+
+<p>以上是这个例子的输出。</p>
+
+
+<hr>
+
+
+<p>接下来的例子我们看看整数。与字符串相似一个数字也是一个对象。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+puts 6.object_id
+puts 6.even?
+puts 6.zero?
+puts 6.class
+</code></pre>
+
+
+<p>这个例子中我们定义了一个数字<em>6</em>。然后调用了一些这个数字的方法。</p>
+
+
+<pre><code>puts 6.object_id
+</code></pre>
+
+
+<p>这里<em>6</em>是一个对象，<em>object_id</em>是一个方法。这个方法返回了与这个对象相关联的id号。每个对象都拥有一个id号。如果我们要在对象上调用一个方法，就必须在他们之间加点号。</p>
+
+
+<pre><code>puts 6.even?
+puts 6.zero?
+</code></pre>
+
+
+<p>这里我们对<em>6</em>这个对象调用了两个方法。如果一个数是偶数，那么<em>even?</em>返回<em>true</em>；如果一个数等于0,那么<em>zero?</em>返回<em>true</em>。注意这两个方法都是以问号能结尾的。在Ruby中约定了如果一个方法返回值是布尔类型，那么方法名以问号结尾。</p>
+
+
+<pre><code>puts 6.class
+</code></pre>
+
+
+<p><em>class</em>方法告诉我们当前正在处理的这个对象是什么类型的。在这里<em>6</em>是一个<em>Fixnum</em>类型。</p>
+
+
+<p>$ ./objectnumber.rb<br>
+13<br>
+true<br>
+false<br>
+Fixnum  </p>
+
+
+<p>以上是这个例子的输出结果。</p>
+
+
+<h2>创建对象</h2>
+
+
+<p>我们之前提到了在Ruby是对象使用之前必须先创建。对象可以被隐式创建或者显式创建。使用字面量符号创建对象是隐式创建；使用<em>new</em>关键字创建对象是显式创建。自定义对象都是显式创建的。自定义对象必须是从某个特定的类创建的。类是对象的模块，一个类可以创建多个对象。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+class Being
+end
+
+puts 67
+puts "ZetCode"
+
+s = String.new "ZetCode"
+puts s
+
+# n1 = Fixnum.new 67
+# puts n1
+
+b = Being.new
+puts b
+</code></pre>
+
+
+<p>这个例子演示了Ruby中的对象创建。</p>
+
+
+<pre><code>class Being
+end
+</code></pre>
+
+
+<p>这里是一个名为<em>Being</em>的对象模块。对象模块使用<em>class</em>关键字创建。自定义对象模块通常放在代码文件的顶部，或者分开放在另外的文件中。</p>
+
+
+<pre><code>puts 67
+puts "ZetCode"
+</code></pre>
+
+
+<p>这两行代码我们用到了两个对象。<em>Fixnum</em>类型的<em>67</em>和<em>String</em>类型的<em>&#8220;ZetCode&#8221;</em>。<em>67</em>和<em>&#8220;ZetCode&#8221;</em>是使用字面符号创建了。字面符号是一个文本，表示了一个类型的特定值。这两个对象是Ruby解释器幕后创建的。在源代码中Ruby的一些对象是使用他们特定的字面符号创建的。</p>
+
+
+<pre><code>s = String.new "ZetCode"
+puts s
+</code></pre>
+
+
+<p>这是正式的方法创建字符串对象。它与之前的隐式创建是等价的。</p>
+
+
+<pre><code># n1 = Fixnum.new 67
+# puts n1
+</code></pre>
+
+
+<p>不是所有的内置对象都可以使用<em>new</em>方法来创建。以上代码就不能编译通过。<em>Fixnum</em>对象只能通过字面符号来创建。</p>
+
+
+<pre><code>b = Being.new
+puts b
+</code></pre>
+
+
+<p>这里我们创建了自定义对象的一个实例。<em>puts</em>方法输出了这个对象的简短描述。</p>
+
+
+<p>$ ./ocreation.rb<br>
+67<br>
+ZetCode<br>
+ZetCode<br>
+#&lt;Being:0x9944d9c>  </p>
+
+
+<p>以上是输出结果。</p>
+
+
+<hr>
+
+
+<p>继续介绍一些正式的对象创建。  </p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+s1 = String.new "Ruby"
+puts s1.size
+puts s1.downcase
+
+a1 = Array.new 
+a1.push 1, 2, 3
+puts a1.include? 3
+puts a1.empty?
+
+r1 = Range.new 1, 6
+puts r1.class
+puts r1.include? 4
+</code></pre>
+
+
+<p>在这个例子中，我们创建三个内建对象并且调用了几个它们的方法。</p>
+
+
+<pre><code>s1 = String.new "Ruby"
+puts s1.size
+puts s1.downcase
+</code></pre>
+
+
+<p>创建一个字符串对象，并且调用了它的两个方法。<em>size</em>方法返回这个字符串的长度。<em>downcase</em>方法将这个字符串转为小写。</p>
+
+
+<pre><code>a1 = Array.new 
+a1.push 1, 2, 3
+puts a1.include? 3
+puts a1.empty?
+</code></pre>
+
+
+<p>这里创建了一个数组，并往其中添加了三个数字。然后调用了两个数组的方法。<em>include?</em>方法用于检查一个特定的值（在这个例子中是3）是否在数组内。<em>empty?</em>方法返回一个布尔类型的值表明这个数组是否为空。</p>
+
+
+<pre><code>r1 = Range.new 1, 6
+puts r1.class
+puts r1.include? 4
+</code></pre>
+
+
+<p>创建了一个<em>Range</em>类型的实例对象。它包含了1到6的数字。<em>class</em>方法返回这个对象的类型名称。在这个例子中<em>include?</em>方法检查数字<em>4</em>是否在这个范围内。</p>
+
+
+<p>$ ./formal.rb<br>
+4<br>
+ruby<br>
+true<br>
+false<br>
+Range<br>
+true  </p>
+
+
+<p>这个例子的运行输出结果。</p>
+
+
+<h2>对象字面符</h2>
+
+
+<p>前面提到了一些内建对象可以使用对象字面符创建。接下来的例子展示了一些对象字面符。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+4.times { puts "Ruby" }
+
+puts "Ruby".size
+puts "Ruby".downcase
+
+puts [1, 2, 3].include? 3
+puts [1, 2, 3].empty?
+
+puts :name.class
+puts :name.frozen?
+
+puts (1..6).class
+puts (1..6).include? 4
+</code></pre>
+
+
+<p>在这个例子中我们使用字面符创建了<em>Fixnum</em>、<em>Strings</em>、<em>Arrays</em>、 <em>Symbols</em>和<em>Ranges</em>对象。</p>
+
+
+<pre><code>4.times { puts "Ruby" }
+</code></pre>
+
+
+<p>我们可以直接对一个整数字面符号调用方法。这行代码将在终端上打印4次&#8221;Ruby&#8221;字符串。</p>
+
+
+<pre><code>puts "Ruby".size
+puts "Ruby".downcase
+</code></pre>
+
+
+<p>我们对使用字面符号创建的字符串调用了两个方法。</p>
+
+
+<pre><code>puts [1, 2, 3].include? 3
+puts [1, 2, 3].empty?
+</code></pre>
+
+
+<p>这里我们使用字面符号创建了两个数组。然后使用<em>include?</em>方法检查一个特定的数字是否是这个数组里；使用<em>empty?</em>方法检查这个数组是否为空。</p>
+
+
+<pre><code>puts :name.class
+puts :name.frozen?
+</code></pre>
+
+
+<p>使用以冒号开头的字面符号创建了符号对象，并且调用的它的两个方法。</p>
+
+
+<pre><code>puts (1..6).class
+puts (1..6).include? 4
+</code></pre>
+
+
+<p>使用字面符号创建了两个范围对象，并且调用了他们的两个方法。<em>class</em>方法返回这个类的名称，<em>include?</em>方法检查给定的数字是否是这个范围内。</p>
+
+
+<p>$ ./literals.rb<br>
+Ruby<br>
+Ruby<br>
+Ruby<br>
+Ruby<br>
+4<br>
+ruby<br>
+true<br>
+false<br>
+Symbol<br>
+false<br>
+Range<br>
+true  </p>
+
+
+<p>以上是例子的输出结果。</p>
+
+
+<h2>对象层级</h2>
+
+
+<p>在许多面向对象语言中对象是层级形式的。Ruby中也有对象层级。与树形层级相似，我们也有父对象和子对象。对象从它的父对象中继承数据和行为。层级的顶级是根对象，称为<em>Object</em>。在Ruby中每个对象都至少有一个父对象。也就是就每个对象都继承至<em>Object</em>对象的基类。</p>
+
+
+<p>根据Ruby的官方文档，<em>Object</em>是Ruby的类层级的根。它的所有方法在所有的类中都是一样的，除非显示的覆盖了。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+puts 4.is_a? Object
+puts "Ruby".is_a? Object
+puts [2, 3].is_a? Object
+puts :name.is_a? Object
+puts (1..2).is_a? Object
+</code></pre>
+
+
+<p>以上例子的代码展示了所有对象都是继承至根对象<em>Object</em>。</p>
+
+
+<pre><code>puts 4.is_a? Object
+</code></pre>
+
+
+<p>使用<em>is_a?</em>方法检查一个数字是否为特定的类型，也就是说它是否继承至给定的对象类型。</p>
+
+
+<p>$ ./mother.rb <br>
+true<br>
+true<br>
+true<br>
+true<br>
+true  </p>
+
+
+<p>所有方法都返回<em>true</em>，意味着所有的对象都继承至母类。</p>
+
+
+<hr>
+
+
+<p>即使是基本的Ruby对象，它们的继承层级也可能是很复杂的。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+puts 6.class
+
+puts 6.is_a? BasicObject
+puts 6.is_a? Object
+puts 6.is_a? Numeric
+puts 6.is_a? Integer
+puts 6.is_a? Fixnum
+
+puts 6.is_a? Bignum
+puts 6.is_a? String
+</code></pre>
+
+
+<p>这个例子展示了小数字的继承层级。</p>
+
+
+<pre><code>puts 6.class
+</code></pre>
+
+
+<p>我们发现数字6的类型是<em>Fixnum</em>。</p>
+
+
+<pre><code>puts 6.is_a? BasicObject
+puts 6.is_a? Object
+puts 6.is_a? Numeric
+puts 6.is_a? Integer
+puts 6.is_a? Fixnum
+</code></pre>
+
+
+<p>以上这些代码全都返回<em>true</em>。数字6是<em>Fixnum</em>类型。从Ruby文档中我们发现另外四个对象是<em>Fuxnum</em>对象的父类。</p>
+
+
+<pre><code>puts 6.is_a? Bignum
+puts 6.is_a? String
+</code></pre>
+
+
+<p>$ ./inheritance.rb<br>
+Fixnum<br>
+true<br>
+true<br>
+true<br>
+true<br>
+true<br>
+false<br>
+false  </p>
+
+
+<p>以上是输出结果。</p>
+
+
+<hr>
+
+
+<p>这节的最后再举个例子展示下自定义对象的继承。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Being
+
+    def to_s
+        "This is Being"
+    end
+
+    def get_id
+        9
+    end
+end
+
+class Living &lt; Being
+
+    def to_s
+        "This is Living"
+    end
+end
+
+l = Living.new
+
+puts l
+puts l.get_id
+puts l.is_a? Being
+puts l.is_a? Object
+puts l.is_a? BasicObject
+</code></pre>
+
+
+<p>在这个例子中我们创建了两个对象。<em>Being</em>和<em>Living</em>。<em>Living</em>对象继承至<em>Being</em>。第一个是父对象，第二介是子对象。</p>
+
+
+<pre><code>class Being
+
+    def to_s
+        "This is Being"
+    end
+
+    def get_id
+        9
+    end
+end
+</code></pre>
+
+
+<p>这里定义了一个Ruby的自定义对象。定义内容是<em>class</em>和<em>end</em>关键字之间。在定义里我们创建了两个方法。当<em>puts</em>方法接了一个对象作为参数时，会调用它的<em>to_s</em>方法。它通常返回这个对象的字符串描述。</p>
+
+
+<pre><code>class Living &lt; Being
+
+    def to_s
+        "This is Living"
+    end
+end
+</code></pre>
+
+
+<p>定义了一个<em>Living</em>对象，这个对象继承至<em>Being</em>对象。<em>&lt;</em>操作符用于创建继承关系。<em>to_s</em>方法被覆盖了。</p>
+
+
+<pre><code>l = Living.new
+</code></pre>
+
+
+<p>我们创建了一个Living实例对象。自定义对象使用<em>new</em>关键字创建。</p>
+
+
+<pre><code>puts l
+</code></pre>
+
+
+<p><em>puts</em>方法调用<em>Living</em>对象的<em>to_s</em>方法。只有当<em>Living</em>类没有定义<em>to_s</em>方法时，<em>Being</em>类的<em>to_s</em>方法才会被调用。</p>
+
+
+<pre><code>puts l.get_id
+</code></pre>
+
+
+<p><em>Living</em>对象没有定义<em>get_id</em>方法。在这种情况下就检查它的父类是否有此方法。在这里<em>Being</em>有这个方法，并且被调用。</p>
+
+
+<pre><code>puts l.is_a? Being
+</code></pre>
+
+
+<p>这行将返回<em>true</em>。<em>Living</em>对象是<em>Being</em>类型的，因为它继承至<em>Being</em>类。</p>
+
+
+<pre><code>puts l.is_a? Object
+puts l.is_a? BasicObject
+</code></pre>
+
+
+<p>我们的<em>Living</em>自定义对象中，没有特别显示的指定与<em>Object</em>或者<em>BasicObject</em>的关系。然而这两行也返回<em>true</em>。这是因为在Ruby中所有对象都是自动设置为这两个对象的后代。这是Ruby解释器在幕后完成的。</p>
+
+
+<p>$ ./custominher.rb<br>
+This is Living<br>
+9<br>
+true<br>
+true<br>
+true  </p>
+
+
+<p>以上是输出结果。</p>
+
+
+<h2>Ruby的顶级环境</h2>
+
+
+<p>Ruby中有一个特殊的对象引用到Ruby的顶级环境，这是定义在其他上下文之外的默认执行环境。顶级环境名字是<em>main</em>。它是一个<em>Object</em>类型的实例对象。以下<em>main</em>分配了一个局部空间，所有的局部变量有属于它。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+n1 = 3
+n2 = 5
+
+puts local_variables
+
+Kernel.puts self
+puts self.class
+</code></pre>
+
+
+<p>这是描述Ruby顶级环境的第一个例子。</p>
+
+
+<pre><code>n1 = 3
+n2 = 5
+</code></pre>
+
+
+<p>我们定义了两个数字类型的变量，这些变量是顶级环境的局部变量。</p>
+
+
+<pre><code>puts local_variables
+</code></pre>
+
+
+<p>这里我们输出所有的局部变量。<em>local_variables</em>是<em>Kernel</em>模块的一个方法，它包含了每个顶级环境的对象。</p>
+
+
+<pre><code>Kernel.puts self
+</code></pre>
+
+
+<p><em>self</em>是Ruby的伪变量。它返回当前对象的接收者。这行将在终端打印<em>&#8220;main&#8221;</em>。这是顶级环境的名字。<em>Kernel.puts</em>代码部分的<em>Kernel</em>可以省略。完整的名字表示的<em>puts</em>方法属于<em>Kernel</em>模块。</p>
+
+
+<pre><code>puts self.class
+</code></pre>
+
+
+<p>这行打印了顶级环境的类型。我们得到顶级环境的对象类型。它是<em>Object</em>类型，Ruby类层级的根。</p>
+
+
+<p>$ ./toplevel.rb<br>
+n1<br>
+n2 <br>
+main <br>
+Object  </p>
+
+
+<p>这是这个例子的输出结果。<em>n1</em>、<em>n2</em>是顶级环境所分配的局部变量。<em>main</em>是Ruby顶级执行环境的名字。最后<em>Object</em>是顶级环境的类型。</p>
+
+
+<hr>
+
+
+<p>我们再展示另一个关于Ruby顶级环境的例子。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+@name = "Jane"
+@age = 17
+
+def info
+   "#{@name} is #{@age} years old" 
+end
+
+puts self.instance_variables
+puts self.private_methods.include? :info
+
+puts info
+</code></pre>
+
+
+<p>我们展示的属于顶级环境的实例变量和方法。</p>
+
+
+<pre><code>@name = "Jane"
+@age = 17
+</code></pre>
+
+
+<p>我们定义了两个实例变量。在Ruby中实例变量以<em>@</em>符号开头。实例变量属于指定的对象实例。在这里是属于Ruby的顶级环境。</p>
+
+
+<pre><code>def info
+   "#{@name} is #{@age} years old" 
+end
+</code></pre>
+
+
+<p>这里定义了一个方法。每个方法都必须属于一个对象。这个方法是属于顶级环境的。所有顶级环境的方法都是私有的。私有方法的访问是受制的。</p>
+
+
+<pre><code>puts self.instance_variables
+</code></pre>
+
+
+<p><em>instance_variables</em>方法打印<em>self</em>的所有实例变量。</p>
+
+
+<pre><code>puts self.private_methods.include? :info
+</code></pre>
+
+
+<p>所有的顶级环境的方法都自动设为私有。<em>private_methods</em>返回该对象所有的私有方法。由于内容太多，我们就调用<em>include?</em>方法来检查<em>info</em>方法是否是其中一个。注意我们是通过符号名来引用<em>info</em>的。</p>
+
+
+<p>$ ./toplevel2.rb<br>
+@name<br>
+@age<br>
+true<br>
+Jane is 17 years old  </p>
+
+
+<p>以上是例子的输出结果。</p>
+
+
+<p>这章包含了Ruby对象的基本内容。</p>
+
+
+<hr>
+
+
+<p>原文地址： <a href="http://zetcode.com/lang/rubytutorial/objects/">http://zetcode.com/lang/rubytutorial/objects/</a><br>
+翻译：龙昌  admin@longchangjin.cn<br>
+完整教程：<a href="https://github.com/wusuopu/Ruby-tutorial">https://github.com/wusuopu/Ruby-tutorial</a>  </p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -2605,72 +3320,6 @@ luakit也是基于gtk和webkit的，只不过它是用lua语言开发的。它�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83875.html">Md5的一个碰撞例子</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2013-07-20T00:00:00+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
-        
-           | <a href="http://www.xefan.com/archives/83875.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/83875.html">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>md5作为计算机安全领域广泛使用的一种散列函数，被用于检测信息是否完整一致。</p>
-
-<p>然而在2004年8月17日的美国加州圣巴巴拉，正在召开的国际密码学会议（Crypto’2004）上来自山东大学的王小云教授做了破译MD5、HAVAL-128、 MD4和RIPEMD算法的报告。她公布了MD系列算法的破解结果。</p>
-
-<p>各位好奇的可以在网上搜索王小云老师的那篇论文，反正我是看不懂的。不过倒是找到了一个md5碰撞的例子，于是就拿来分享一下。</p>
-
-<p>比如有两个文件test1、test2，文件的十六进制内容分别如下：</p>
-
-<pre>
-% xxd test1            
-0000000: 0e30 6561 559a a787 d00b c6f7 0bbd fe34  .0eaU..........4
-0000010: 04cf 0365 9e70 4f85 34c0 0ffb 659c 4c87  ...e.pO.4...e.L.
-0000020: 40cc 942f eb2d a115 a3f4 155c bb86 0749  @../.-.....\...I
-0000030: 7386 656d 7d1f 34a4 2059 d78f 5a8d d1ef  s.em}.4. Y..Z...
-
-% xxd test2
-0000000: 0e30 6561 559a a787 d00b c6f7 0bbd fe34  .0eaU..........4
-0000010: 04cf 0365 9e74 4f85 34c0 0ffb 659c 4c87  ...e.tO.4...e.L.
-0000020: 40cc 942f eb2d a115 a3f4 15dc bb86 0749  @../.-.........I
-0000030: 7386 656d 7d1f 34a4 2059 d78f 5a8d d1ef  s.em}.4. Y..Z...
-</pre>
-
-
-<p>如果想得到文件的原始内容，可以把上面的输出信息保存为一个文本文件（如test.txt），然后再执行命令 xxd -r test1.txt > test 即可。
-从上面可以看到这两个文件的内容明显是不一样的，那么现在就来计算一下这两个文件的md5值吧。</p>
-
-<pre>
-% md5sum test1
-cee9a457e790cf20d4bdaa6d69f01e41  test1
-% md5sum test2
-cee9a457e790cf20d4bdaa6d69f01e41  test2
-</pre>
-
-
-<p>从计算结果可以看到，虽然这两个文件内容不同，但是它们的md5值却是相同的。这个就是所谓的碰撞。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/page/10">&larr; Older</a>
@@ -2692,6 +3341,10 @@ cee9a457e790cf20d4bdaa6d69f01e41  test2
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="http://www.xefan.com/archives/84150.html">AngularJS学习笔记4——依赖注入</a>
+      </li>
+    
+      <li class="post">
         <a href="http://www.xefan.com/archives/84149.html">AngularJS学习笔记3——表单</a>
       </li>
     
@@ -2707,19 +3360,15 @@ cee9a457e790cf20d4bdaa6d69f01e41  test2
         <a href="http://www.xefan.com/archives/84146.html">Unicorn是如何与nginx通讯的——介绍ruby中的unix Socket</a>
       </li>
     
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84145.html">Ruby的内存陷阱</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (31)</a></li><li><a href='/categories/web开发/index.html'>web开发 (19)</a></li><li><a href='/categories/前端相关/index.html'>前端相关 (3)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (23)</a></li></ul>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (31)</a></li><li><a href='/categories/web开发/index.html'>web开发 (19)</a></li><li><a href='/categories/前端相关/index.html'>前端相关 (4)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (15)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (23)</a></li></ul>
 </section>
 <section>
   <h1>Tag Cloud</h1>
-    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.7910447761194%'>ajax(2)</a> <a href='/tags/angular/index.html' style='font-size: 102.68656716417911%'>angular(3)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 103.58208955223881%'>js(4)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 128.65671641791045%'>Ruby(32)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 122.38805970149254%'>翻译(25)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.7910447761194%'>ajax(2)</a> <a href='/tags/angular/index.html' style='font-size: 103.58208955223881%'>angular(4)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 104.4776119402985%'>js(5)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 128.65671641791045%'>Ruby(32)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 122.38805970149254%'>翻译(25)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
 </section>
 <section>
   <h1>Link</h1>

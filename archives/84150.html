@@ -5,11 +5,13 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Ubuntu 10.10 Crosstool ARM交叉编译 - 龍昌博客</title>
+  <title>AngularJS学习笔记4——依赖注入 - 龍昌博客</title>
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="弄了两天，经过了N次失败后现在终于编译成功了，赶紧做个笔记。 1、下载crosstool(http://www.kegel.com/crosstool/crosstool-0.43.tar.gz) 2、下载编译过程中需要用到的源代码，虽然crosstool也会自动下载不过速度很慢， &hellip;">
+  <meta name="description" content="依赖注入 之前有遇到过 angularjs 的代码压缩之后就报错了，通过查文档得知是因为 angularjs 是通过变量名来查找相应服务的。
+而 js 代码压缩之后变量名就变化了，从而无法找到相应的服务而报错。因此就需要指明依赖服务。 1
+function SomeController($ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +20,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://www.xefan.com/archives/83613.html">
+  <link rel="canonical" href="http://www.xefan.com/archives/84150.html">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="龍昌博客" type="application/atom+xml">
@@ -69,7 +71,7 @@
   
   <header>
     
-      <h1 class="entry-title">Ubuntu 10.10 Crosstool ARM交叉编译</h1>
+      <h1 class="entry-title">AngularJS学习笔记4——依赖注入</h1>
     
     
       <p class="meta">
@@ -78,7 +80,7 @@
 
 
 
-<time class='entry-date' datetime='2011-09-17T00:00:00+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
+<time class='entry-date' datetime='2015-08-19T13:33:33+08:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>19</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>1:33 pm</span></time>
         
            | <a href="#disqus_thread"
              data-disqus-identifier="http://www.xefan.com">Comments</a>
@@ -88,103 +90,43 @@
   </header>
 
 
-<div class="entry-content"><p>弄了两天，经过了N次失败后现在终于编译成功了，赶紧做个笔记。</p>
+<div class="entry-content"><h2>依赖注入</h2>
 
-<p>1、下载crosstool(<a href="http://www.kegel.com/crosstool/crosstool-0.43.tar.gz">http://www.kegel.com/crosstool/crosstool-0.43.tar.gz</a>)</p>
+<p>之前有遇到过 angularjs 的代码压缩之后就报错了，通过查文档得知是因为 angularjs 是通过变量名来查找相应服务的。
+而 js 代码压缩之后变量名就变化了，从而无法找到相应的服务而报错。因此就需要指明依赖服务。</p>
 
-<p>2、下载编译过程中需要用到的源代码，虽然crosstool也会自动下载不过速度很慢，建议还是自己先下载好，源代码的版本根据自己的情况选择：<br/>
-binutils-2.15 <a href="http://ftp.gnu.org/gnu/binutils/  ">http://ftp.gnu.org/gnu/binutils/  </a>
-gcc-3.4.5 <a href="http://ftp.gnu.org/gnu/gcc/  ">http://ftp.gnu.org/gnu/gcc/  </a>
-glibc-2.3.6 <a href="ftp://ftp.gnu.org/gnu/glibc/">ftp://ftp.gnu.org/gnu/glibc/</a>
-glibc-linuxthreads-2.3.6 <a href="ftp://ftp.gnu.org/gnu/glibc/">ftp://ftp.gnu.org/gnu/glibc/</a></p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>function SomeController($scope, $http) { ... }</span></code></pre></td></tr></table></div></figure>
 
-<p>linux-2.6.10 <a href="http://ftp.cc.uoc.gr/mirrors/ftp.kernel.org/pub/linux/kernel/v2.6/linux-2.6.10.tar.gz  ">http://ftp.cc.uoc.gr/mirrors/ftp.kernel.org/pub/linux/kernel/v2.6/linux-2.6.10.tar.gz  </a>
-linux-libc-headers-2.6.12.0 <a href="http://ep09.pld-linux.org/~mmazur/linux-libc-headers/linux-libc-headers-2.6.12.0.tar.bz2">http://ep09.pld-linux.org/~mmazur/linux-libc-headers/linux-libc-headers-2.6.12.0.tar.bz2</a></p>
 
-<p>将以上七个压缩包放在同一个目录下。</p>
+<p>例如以上代码就是定义了 <code>SomeController</code> 这个一个控制器，并依赖 <code>$scope</code> 和 <code>$http</code> 两个服务。
+但是当该代码压缩之后，这两个参数名都变化了。因此还需要使用以下代码来指明所需的依赖。</p>
 
-<p>3、编译过程依赖这几个软件，没有的请自行安装。Bison、flex 、build-essential、patch 、libncurses5-de<br/>
-还有gcc的编译依赖于gmp、mpfr、mpc这几个软件，没有的请先安装。<br/>
-mpc-0.9.tar.gz <a href="http://www.multiprecision.org/mpc/download/mpc-0.9.tar.gz  ">http://www.multiprecision.org/mpc/download/mpc-0.9.tar.gz  </a>
-mpfr-3.0.1.tar.bz2 <a href="http://www.mpfr.org/mpfr-current/mpfr-3.0.1.tar.bz2  ">http://www.mpfr.org/mpfr-current/mpfr-3.0.1.tar.bz2  </a>
-gmp-5.0.2.tar.bz2 <a href="ftp://ftp.gmplib.org/pub/gmp-5.0.2/gmp-5.0.2.tar.bz2  ">ftp://ftp.gmplib.org/pub/gmp-5.0.2/gmp-5.0.2.tar.bz2  </a>
-这几个软件之间也存在依赖关系，请按顺序依次安装gmp、mpfr、mpc</p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>SomeController.$inject = ['$scope', '$http'];</span></code></pre></td></tr></table></div></figure>
 
-<p>4、修改配置<br/>
-1)、ubuntu10.10自己的GCC是4.4版本，使用这个版本的进行编译会出错，建议使用gcc-4.1。<br/>
-sudo apt-get install gcc-4.1<br/>
-sudo rm /usr/bin/gcc<br/>
-sudo ln -s /usr/bin/gcc-4.1 /usr/bin/gcc</p>
 
-<p>2)、修改sh，ubuntu10.10默认的sh是用的dash<br/>
-如果运行 ls -la /bin/sh 看到链接是dash，则需要修改一下。不改的话编译会出错。<br/>
-我是直接运行命令 sudo ln -sf /bin/bash /bin/sh 修改。改完后重启下，或者切换工作台以使其生效。</p>
+<p>或者另一个写法：</p>
 
-<p>3)、修改编译脚本<br/>
-解压crosstool然后进入解压目录，这里我选择demo-arm.sh这个脚本。<br/>
-cp demo-arm.sh arm.sh</p>
-
-<p>修改arm.sh<br/>
-vi arm.sh</p>
-
-<pre><code>TARBALLS_DIR=(刚刚下载的源码存放目录)  
-RESULT_TOP=(生成工具链要安装到的目录)  
-eval `cat arm.dat gcc-3.4.5-glibc-2.3.6.dat` sh all.sh –notest #这个根据自己的情况选择
-</code></pre>
-
-<p>然后修改gcc-3.4.5-glibc-2.3.6.dat这个文件<br/>
-BINUTILS_DIR=binutils-2.15<br/>
-GCC_DIR=gcc-3.4.5<br/>
-GLIBC_DIR=glibc-2.3.6<br/>
-LINUX_DIR=linux-2.6.10<br/>
-LINUX_SANITIZED_HEADER_DIR=linux-libc-headers-2.6.12.0<br/>
-GLIBCTHREADS_FILENAME=glibc-linuxthreads-2.3.6</p>
-
-<p>再修改arm.dat这个文件</p>
-
-<pre><code>KERNELCONFIG=`pwd`/arm.config  
-TARGET=arm-linux #生成的工具链名称  
-TARGET_CFLAGS=”-O”  
-</code></pre>
-
-<p>还有ubuntu10.10自带的ar、ld是2.20版本的，而这个编译时需要的是2.13~2.19版本的，所以会出错。<br/>
-解决方法：<br/>
-(1)、像上面的gcc一样，再安装个低版本的ls、ar。<br/>
-(2)、如果不想再另外安装就可以用这个方法。修改glibc-2.3.6.tar.bz2这个压缩包内的configure文件。将3920行和3981行处的”2.1[3-9])<em>”改为”2.[1-2][0-9]</em>)”。</p>
-
-<p>5、开始编译<br/>
-都配置好了之后就可以开始了<br/>
-./arm.sh<br/>
-漫长的等待开始了……，我的是奔腾双核处理器，整个过程花了半个多小时</p>
-
-<p>6、测试<br/>
-现在用刚刚编译安装好的arm-linux-gcc来编译一个C程序试试。<br/>
-先将arm-linux-gcc的安装目录添加到环境变量中。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="c1">//文件名:hello.c</span>
-</span><span class='line'> <span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
-</span><span class='line'> <span class="p">{</span>
-</span><span class='line'> <span class="n">printf</span><span class="p">(</span><span class="o">&amp;</span><span class="n">quot</span><span class="p">;</span><span class="n">www</span><span class="p">.</span><span class="n">xefam</span><span class="p">.</span><span class="n">com</span><span class="o">&amp;</span><span class="n">quot</span><span class="p">;);</span>
-</span><span class='line'> <span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
+</pre></td><td class='code'><pre><code class=''><span class='line'>angular.module('app', [])
+</span><span class='line'>       .controller('SomeController', ['$scope', '$http', function($scope, $http){
+</span><span class='line'>
+</span><span class='line'>}]);</span></code></pre></td></tr></table></div></figure>
 
 
-<p>$ arm-linux-gcc -o hello hello.c<br/>
-$ file hello<br/>
-hello: ELF 32-bit LSB executable, ARM, version 1, dynamically linked (uses shared libs), for GNU/Linux 2.4.3, not stripped<br/>
-这就说明这个已经成功了！</p>
+<p>这样就可以保证我们的代码压缩之后也能正常运行了。</p>
 
-<p>7、现在可以恢复之前的系统配置了<br/>
-将gcc修为gcc-4.4<br/>
-将sh修改dash</p>
+<h2>自定义服务</h2>
 
-<p>如果嫌麻烦不想自己编译的可以直接下载已经编译好的来用，下面这个就是我编译好：
-gcc-3.4.5-glibc-2.3.6.tar.gz <a href="http://115.com/file/e65akpi1">http://115.com/file/e65akpi1</a></p>
+<p>上面的 <code>$http</code> 服务为我们提供了 ajax 的功能。</p>
+
+<p>需要自定义服务的可以使用 <code>module.factory</code> 方法或者 <code>module.service</code> 方法进行注册服务。
+这两个方法稍微有些不同，一般我习惯使用 <code>module.factory</code> 。
+然后在需要使用自定义服务的地方，将其添加到依赖列表中即可。</p>
 </div>
 
 
@@ -200,14 +142,14 @@ gcc-3.4.5-glibc-2.3.6.tar.gz <a href="http://115.com/file/e65akpi1">http://115.c
 
 
 
-<time class='entry-date' datetime='2011-09-17T00:00:00+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
+<time class='entry-date' datetime='2015-08-19T13:33:33+08:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>19</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>1:33 pm</span></time>
     </p>
     <p class="meta">
       Categories: 
 
 <span class="categories">
   
-    <a class='category' href='/categories/嵌入式栏目/index.html'>嵌入式栏目</a>
+    <a class='category' href='/categories/前端相关/index.html'>前端相关</a>
   
 </span>
 
@@ -218,7 +160,7 @@ gcc-3.4.5-glibc-2.3.6.tar.gz <a href="http://115.com/file/e65akpi1">http://115.c
 
 <span class="tags">
   
-    <a class='tag' href='/tags/ARM/index.html'>ARM</a>, <a class='tag' href='/tags/gcc/index.html'>gcc</a>
+    <a class='tag' href='/tags/angular/index.html'>angular</a>, <a class='tag' href='/tags/js/index.html'>js</a>
   
 </span>
 
@@ -234,10 +176,8 @@ gcc-3.4.5-glibc-2.3.6.tar.gz <a href="http://115.com/file/e65akpi1">http://115.c
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/archives/83610.html" title="Previous Post: I2C串口总线驱动程序(汇编语言)">&laquo; I2C串口总线驱动程序(汇编语言)</a>
+        <a class="basic-alignment left" href="/archives/84149.html" title="Previous Post: AngularJS学习笔记3——表单">&laquo; AngularJS学习笔记3——表单</a>
       
-      
-        <a class="basic-alignment right" href="/archives/83624.html" title="Next Post: arm9-2440 linux下烧写">arm9-2440 linux下烧写 &raquo;</a>
       
     </p>
   </footer>
@@ -326,8 +266,8 @@ gcc-3.4.5-glibc-2.3.6.tar.gz <a href="http://115.com/file/e65akpi1">http://115.c
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://www.xefan.com/archives/83613.html';
-        var disqus_url = 'http://www.xefan.com/archives/83613.html';
+        var disqus_identifier = 'http://www.xefan.com/archives/84150.html';
+        var disqus_url = 'http://www.xefan.com/archives/84150.html';
         var disqus_script = 'embed.js';
       
     (function () {
