@@ -1,0 +1,43 @@
+---
+layout: post
+title: "AngularJS学习笔记4——依赖注入"
+date: 2015-08-19 05:33:33 +0000
+comments: true
+post_id: 84150
+permalink: /archives/84150.html
+categories: ["前端相关"]
+tags: ["js", "angular"]
+---
+
+## 依赖注入
+之前有遇到过 angularjs 的代码压缩之后就报错了，通过查文档得知是因为 angularjs 是通过变量名来查找相应服务的。
+而 js 代码压缩之后变量名就变化了，从而无法找到相应的服务而报错。因此就需要指明依赖服务。
+
+```
+function SomeController($scope, $http) { ... }
+```
+
+例如以上代码就是定义了 `SomeController` 这个一个控制器，并依赖 `$scope` 和 `$http` 两个服务。
+但是当该代码压缩之后，这两个参数名都变化了。因此还需要使用以下代码来指明所需的依赖。
+
+```
+SomeController.$inject = ['$scope', '$http'];
+```
+
+或者另一个写法：
+
+```
+angular.module('app', [])
+       .controller('SomeController', ['$scope', '$http', function($scope, $http){
+
+}]);
+```
+
+这样就可以保证我们的代码压缩之后也能正常运行了。
+
+## 自定义服务
+上面的 `$http` 服务为我们提供了 ajax 的功能。
+
+需要自定义服务的可以使用 `module.factory` 方法或者 `module.service` 方法进行注册服务。
+这两个方法稍微有些不同，一般我习惯使用 `module.factory` 。
+然后在需要使用自定义服务的地方，将其添加到依赖列表中即可。
