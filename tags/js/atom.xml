@@ -4,7 +4,7 @@
   <title><![CDATA[Tag: Js | 龍昌博客]]></title>
   <link href="http://www.xefan.com/tags/js/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2015-08-19T13:35:55+08:00</updated>
+  <updated>2015-08-20T21:03:30+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -12,6 +12,49 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[AngularJS学习笔记5——路由]]></title>
+    <link href="http://www.xefan.com/archives/84151.html"/>
+    <updated>2015-08-20T20:58:53+08:00</updated>
+    <id>http://www.xefan.com/archives/84151-AngularJS学习笔记5——路由</id>
+    <content type="html"><![CDATA[<p>angularjs 的 <code>ngRoute</code> 模块提供了前端路由的功能。
+在 angularjs 1.3 中 route 模块被单独提取了出来，要使用其功能需要将引用进来。</p>
+
+<pre><code>  &lt;script src="http://www.xefan.com/lib/angular-1.3.15.min.js"&gt;&lt;/script&gt;
+  &lt;script src="http://www.xefan.com/lib/angular-route-1.3.15.min.js"&gt;&lt;/script&gt;
+</code></pre>
+
+<pre><code>var routeApp = angular.module('routeApp', ['ngRoute']);
+routeApp.config(['$routeProvider',function ($routeProvider) {
+    $routeProvider
+    .when('/list', {
+      templateUrl: 'list.html',
+      controller: 'RouteListCtl'
+    })
+    .when('/list/:id', {
+        templateUrl: 'detail.html',
+        controller: 'RouteDetailCtl'
+    })
+    .otherwise({
+      redirectTo: '/list'
+    });
+}]);
+</code></pre>
+
+<p>这里定义了两条路由规则，对应的视图模板分别为 list.html 和 detail.html</p>
+
+<p>视图模板有三种定义方式：<br/>
+方法1：编写在单独的文件中，然后 angularjs 通过 ajax 获取其内容；<br/>
+方法2：直接在页面中使用 script 标签定义，如： <code>&lt;script type="text/ng-template" id="list.html"&gt; .... &lt;/script&gt;</code>；<br/>
+方法3：使用 <code>$templateCache</code> 进行定义，如:<br/>
+<code>
+routeApp.run(function($templateCache) {
+  $templateCache.put('list.html', '...');
+});
+</code></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[AngularJS学习笔记4——依赖注入]]></title>
@@ -112,7 +155,7 @@
 
 <p>对于一些需要循环遍历的对象可以使用 <code>ngRepeat</code> 指令。 如：</p>
 
-<pre><code>  &lt;li ng-repeat="msg in messages"&gt;{{$index}} {{msg}}&lt;/li&gt;
+<pre><code>  &lt;li ng-repeat="msg in messages"&gt; &lt;/li&gt;
 
   // 对于 messages 数组进行遍历
   $scope.messages =  [
@@ -133,7 +176,7 @@
 <div ng-controller="ExampleController">
   <select ng-model="selection" ng-options="item for item in items">
   </select>
-  <code>selection={{selection}}</code>
+  <code>selection=</code>
   <hr/>
   <div class="animate-switch-container"
     ng-switch="selection">
@@ -158,7 +201,7 @@ angular.module('myApp', []).controller('ExampleController', ['$scope', function(
 
 <h2>Filter</h2>
 
-<p>使用 <code>filter</code> 指令过滤需要的内容，基本形式： <code>{{ expression | filter }}</code>
+<p>使用 <code>filter</code> 指令过滤需要的内容，基本形式： <code></code>
 如果有用过其他模板引擎的话（如：Jinja）应该很好理解的。</p>
 
 <p>angularjs 提供了一些内置的过滤器：date, json, lowercase, uppercase 等。</p>
@@ -192,9 +235,9 @@ angularjs 2.0 的理念又变为了 Web 组件，与 1.x 不兼容。
     <script src="http://www.xefan.com/lib/angular-1.0.4.min.js"></script>
 </head>
 <body>
-  <p>1 + 2 = {{ 1 + 2 }}</p>
+  <p>1 + 2 = 1</p>
   <div ng-controller="DemoController">
-    <p>{{content}}</p>
+    <p></p>
   </div>
 </body></p>
 
@@ -215,13 +258,13 @@ angularjs 2.0 的理念又变为了 Web 组件，与 1.x 不兼容。
 
 <p>html 的 <code>ng-app</code> 属性表明在该页面中启用 angularjs。</p>
 
-<pre><code>  &lt;p&gt;1 + 2 = {{ 1 + 2 }}&lt;/p&gt;
+<pre><code>  &lt;p&gt;1 + 2 = 1&lt;/p&gt;
 </code></pre>
 
 <p>在页面加载完成之后 angularjs 会解析大括号内的表达式，并进行渲染。</p>
 
 <pre><code>  &lt;div ng-controller="DemoController"&gt;
-    &lt;p&gt;{{content}}&lt;/p&gt;
+    &lt;p&gt;&lt;/p&gt;
   &lt;/div&gt;
 </code></pre>
 
@@ -239,123 +282,6 @@ angularjs 2.0 的理念又变为了 Web 组件，与 1.x 不兼容。
 <p>&#8220;`</p>
 
 <p>这里定义 <code>DemoController</code> 控制器函数，并传入一个 <code>$scope</code> 参数，它是用于表示该控制器的上下文。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[使用nvm进行node多版本管理]]></title>
-    <link href="http://www.xefan.com/archives/84039.html"/>
-    <updated>2014-01-23T00:00:00+08:00</updated>
-    <id>http://www.xefan.com/archives/84039-使用nvm进行node多版本管理</id>
-    <content type="html"><![CDATA[<p>nvm与Python的virtualenv和Ruby的rvm类似。<br>
-NVM (Node Version Manager，Node多版本管理器)是一个通用的叫法,它目前有许多不同的实现。通常我们说的 nvm 是指 https://github.com/creationix/nvm 或者 https://github.com/visionmedia/n 。这两个工具都是使用shell编写的。</p>
-
-
-<h2>n</h2>
-
-
-<p>个人感觉 n 比较简洁些，它就只有一个脚本文件。  </p>
-
-
-<h3>安装</h3>
-
-
-<p>如果已经安装了npm的话，可以直接执行命令进行安装n :</p>
-
-
-<pre><code>$ npm install -g n
-</code></pre>
-
-
-<p>或者是直接获取源代码安装：</p>
-
-
-<pre><code>$ git clone https://github.com/visionmedia/n.git
-$ cd n
-$ [sudo] make install
-</code></pre>
-
-
-<h3>使用</h3>
-
-
-<p>直接运行 n 命令查看所有已安装的版本。</p>
-
-
-<pre><code>$ n
-</code></pre>
-
-
-<p>运行命令 n <version> 进行安装指定版本的node。 version 可以是 stable(最新稳定版)、latest(最新版)或者具体的版本数字。</p>
-
-
-<pre><code>$ n stable
-install : v0.10.24
-mkdir : /usr/local/n/versions/0.10.24
-fetch : http://nodejs.org/dist/v0.10.24/node-v0.10.24-linux-x64.tar.gz
-</code></pre>
-
-
-<p>指定的版本将会安装在 /usr/local/n/versions 目录下。</p>
-
-
-<p>运行命令 n rm <version> 删除已安装指定版本的node。</p>
-
-
-<p>运行命令 n use <version> 选择使用指定版本的node。</p>
-
-
-<h2>nvm</h2>
-
-
-<h3>安装</h3>
-
-
-<pre><code>$ git clone https://github.com/creationix/nvm.git ~/.nvm
-$ source ~/.nvm/nvm.sh
-</code></pre>
-
-
-<h3>使用</h3>
-
-
-<p>查看已安装的版本：</p>
-
-
-<pre><code>$ nvm ls
-</code></pre>
-
-
-<p>查看可以安装的版本：</p>
-
-
-<pre><code>$ nvm ls-remote
-</code></pre>
-
-
-<p>安装指定的版本：</p>
-
-
-<pre><code>$ nvm install &lt;version&gt;
-</code></pre>
-
-
-<p>指定的版本将会直接安装在 nvm 程序所在的目录下。</p>
-
-
-<p>删除指定的版本：</p>
-
-
-<pre><code>$ nvm uninstall &lt;version&gt;
-</code></pre>
-
-
-<p>使用选定的版本：</p>
-
-
-<pre><code>$ nvm use &lt;version&gt;
-</code></pre>
-
 ]]></content>
   </entry>
   
