@@ -1,0 +1,110 @@
+---
+layout: post
+title: "Riot.js之初体验"
+date: 2015-08-21 01:55:14 +0000
+comments: true
+post_id: 84152
+permalink: /archives/84152.html
+categories: ["前端相关"]
+tags: ["js"]
+---
+
+Riot(http://riotjs.com/)按照官方的介绍，它是一个类似于 React 的微型框架。
+压缩之后的文件只有差不多 15K 的大小，相比其他基本上都是上百K大小的框架来说确实是很微型的。
+
+同时它的官方还给出了与 React 和 Polymer 的对比，各位感兴趣可以看看： http://riotjs.com/compare/
+
+下面通过一个例子来体验一下。
+
+先下载 Riot 库文件： https://raw.githubusercontent.com/riot/riot/master/riot+compiler.min.js  
+然后新建一个文件 `index.html`，内容如下：
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Tabs exampe</title>
+    <style type="text/css" media="screen">
+      .tabContent__item{
+        display:none;
+      }
+      .tabContent__item.is-active{
+        display:block;
+      }
+    </style>
+  </head>
+  <body>
+    <riot-tabs></riot-tabs>
+
+    <script src="tabs.tag" type="riot/tag"></script>
+    <script src="riot+compiler.min.js"></script>
+    <script type="text/javascript" charset="utf-8">
+      riot.mount('riot-tabs');
+    </script>
+  </body>
+</html>
+```
+
+接着再创建文件 `tabs.tag`：
+
+```
+<riot-tabs>
+  <h2>Tabs</h2>
+  <ul>
+    <li each={ tab, i in tabs } class="tabItem { is-active: parent.isActiveTab(tab.ref) }" onclick={ parent.toggleTab }>{tab.title}</li>
+  </ul>
+  <div class="tabContent">
+    <div each={ tab, i in tabs } class="tabContent__item { is-active: parent.isActiveTab(tab.ref) }">{tab.content}</div>
+  </div>
+
+  this.tabs = [
+    { title: 'Tab 1', ref: 'tab1', content: "(1) Lorem ipsum dolor" },
+    { title: 'Tab 2', ref: 'tab2', content: "(2) Lorem ipsum dolor" },
+    { title: 'Tab 3', ref: 'tab3', content: "(3) Lorem ipsum dolor" }
+  ]
+
+  this.activeTab = 'tab1'
+
+  isActiveTab(tab) {
+    return this.activeTab === tab
+  }
+
+  toggleTab(e) {
+    this.activeTab = e.item.tab.ref
+    return true
+  }
+</riot-tabs>
+```
+
+这个是 javascript 与 html 的混合。当然还可以使用纯 js 的写法，将 `tabs.tag` 改为 `tabs.js`：
+
+```
+riot.tag('riot-tabs', '<h2>Tabs</h2> <ul> <li each="{ tab, i in tabs }" class="tabItem { is-active: parent.isActiveTab(tab.ref) }" onclick="{ parent.toggleTab }">{tab.title}</li> </ul> <div class="tabContent"> <div each="{ tab, i in tabs }" class="tabContent__item { is-active: parent.isActiveTab(tab.ref) }">{tab.content}</div> </div>', function(opts) {
+
+  this.tabs = [
+    { title: 'Tab 1', ref: 'tab1', content: "(1) Lorem ipsum dolor" },
+    { title: 'Tab 2', ref: 'tab2', content: "(2) Lorem ipsum dolor" },
+    { title: 'Tab 3', ref: 'tab3', content: "(3) Lorem ipsum dolor" }
+  ];
+
+  this.activeTab = 'tab1';
+
+  this.isActiveTab = function(tab) {
+    return this.activeTab === tab;
+  }.bind(this);
+
+  this.toggleTab = function(e) {
+    this.activeTab = e.item.tab.ref;
+    return true;
+  }.bind(this);
+
+});
+```
+
+同时将 `index.html` 中的 `<script src="tabs.tag" type="riot/tag"></script>` 修改为 `<script src="tabs.js" type="riot/tag"></script>` 。
+
+好了，现在打开浏览器看下效果吧。
+
+体验了一下，感觉它比 angular 之类的框架的学习成本要低。
