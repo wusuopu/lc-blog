@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Tag: Mac | 龍昌博客]]></title>
+  <link href="http://www.xefan.com/tags/Mac/atom.xml" rel="self"/>
+  <link href="http://www.xefan.com/"/>
+  <updated>2015-08-22T17:56:18+08:00</updated>
+  <id>http://www.xefan.com/</id>
+  <author>
+    <name><![CDATA[龍昌]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Mac下使用supervisor进行服务管理]]></title>
+    <link href="http://www.xefan.com/archives/84153.html"/>
+    <updated>2015-08-22T17:32:32+08:00</updated>
+    <id>http://www.xefan.com/archives/84153-Mac下使用supervisor进行服务管理</id>
+    <content type="html"><![CDATA[<p>最近刚切换到 Mac 平台上，感觉各种不适应。之前使用 Ubuntu 时，有 service 命令可以对服务进行管理，
+但是在 Mac 系统下没有对应的工具。也许有人说可以用 launchctl 啊。但是 launchctl 的服务是开机自动启动的，
+而我又不想要开机自动启动，只想在需要时启动，使用完后就停止。</p>
+
+<p>由于没有相应的工具，因此我只得在终端下通过命令来启动服务，但是这个又得一直打开着一个新的终端标签。
+对于有洁癖的我来说，表示很不爽。本来想自己写个脚本来管理的，但是这个又得针对每个服务写个脚本，也很麻烦。
+正在纠结的时候想起了还有 supervisor 可以用。</p>
+
+<p>supervisor 是使用 python 开发的一个后台服务管理程序。</p>
+
+<p>首先使用 brew 安装 python 工具： <code>brew install python</code>，并覆盖掉系统自带的 python。
+因为我有洁癖不想将软件安装在系统目录中，因此就再单独安装一个 python。
+若对此不在意的可跳过此步。</p>
+
+<p>然后再安装 supervisor： <code>pip install supervisor</code>。
+supervisor 不支持 python3，并且如果你使用的是系统自带的 python ，可能需要在命令前加上 sudo。</p>
+
+<p>安装完成之后默认是不会创建配置文件的，因此再手动创建配置文件 <code>/usr/local/etc/supervisord.conf</code>，我的配置如下：</p>
+
+<pre><code>[unix_http_server]
+file=/tmp/supervisor.sock                                 ; path to your socket file
+
+[supervisord]
+logfile=/usr/local/var/log/supervisord/supervisord.log    ; supervisord log file
+logfile_maxbytes=50MB                                     ; maximum size of logfile before rotation
+logfile_backups=10                                        ; number of backed up logfiles
+loglevel=error                                            ; info, debug, warn, trace
+pidfile=/usr/local/var/run/supervisord.pid                ; pidfile location
+nodaemon=false                                            ; run supervisord as a daemon
+minfds=1024                                               ; number of startup file descriptors
+minprocs=200                                              ; number of process descriptors
+user=root                                                 ; default user
+childlogdir=/usr/local/var/log/supervisord/               ; where child log files will live
+
+[rpcinterface:supervisor]
+supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
+
+[supervisorctl]
+serverurl=unix:///tmp/supervisor.sock                     ; use a unix:// URL  for a unix socket
+
+[program:mongod]
+command=/usr/local/bin/mongod --config /usr/local/etc/mongod.conf
+autostart=false
+autorestart=true
+
+[program:redis]
+command=/usr/local/bin/redis-server /usr/local/etc/redis.conf
+autostart=false
+autorestart=true
+
+[program:nginx]
+command=/usr/local/bin/nginx -c /usr/local/etc/nginx/nginx.conf
+autostart=false
+autorestart=true
+</code></pre>
+
+<p>这里我的这几个服务都没有设置为自动启动，如有需要可自行将 <code>autostart</code> 设置为 true。</p>
+
+<p>最后执行 <code>supervisord</code> 命令启动 supervisor 服务。之后就可以通过 <code>supervisorctl</code> 命令来进行服务管理了。</p>
+]]></content>
+  </entry>
+  
+</feed>

@@ -4,7 +4,7 @@
   <title><![CDATA[龍昌博客]]></title>
   <link href="http://www.xefan.com/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2015-08-20T21:03:30+08:00</updated>
+  <updated>2015-08-22T17:56:18+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -12,6 +12,286 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Mac下使用supervisor进行服务管理]]></title>
+    <link href="http://www.xefan.com/archives/84153.html"/>
+    <updated>2015-08-22T17:32:32+08:00</updated>
+    <id>http://www.xefan.com/archives/84153-Mac下使用supervisor进行服务管理</id>
+    <content type="html"><![CDATA[<p>最近刚切换到 Mac 平台上，感觉各种不适应。之前使用 Ubuntu 时，有 service 命令可以对服务进行管理，
+但是在 Mac 系统下没有对应的工具。也许有人说可以用 launchctl 啊。但是 launchctl 的服务是开机自动启动的，
+而我又不想要开机自动启动，只想在需要时启动，使用完后就停止。</p>
+
+<p>由于没有相应的工具，因此我只得在终端下通过命令来启动服务，但是这个又得一直打开着一个新的终端标签。
+对于有洁癖的我来说，表示很不爽。本来想自己写个脚本来管理的，但是这个又得针对每个服务写个脚本，也很麻烦。
+正在纠结的时候想起了还有 supervisor 可以用。</p>
+
+<p>supervisor 是使用 python 开发的一个后台服务管理程序。</p>
+
+<p>首先使用 brew 安装 python 工具： <code>brew install python</code>，并覆盖掉系统自带的 python。
+因为我有洁癖不想将软件安装在系统目录中，因此就再单独安装一个 python。
+若对此不在意的可跳过此步。</p>
+
+<p>然后再安装 supervisor： <code>pip install supervisor</code>。
+supervisor 不支持 python3，并且如果你使用的是系统自带的 python ，可能需要在命令前加上 sudo。</p>
+
+<p>安装完成之后默认是不会创建配置文件的，因此再手动创建配置文件 <code>/usr/local/etc/supervisord.conf</code>，我的配置如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[unix_http_server]
+</span><span class='line'>file=/tmp/supervisor.sock                                 ; path to your socket file
+</span><span class='line'>
+</span><span class='line'>[supervisord]
+</span><span class='line'>logfile=/usr/local/var/log/supervisord/supervisord.log    ; supervisord log file
+</span><span class='line'>logfile_maxbytes=50MB                                     ; maximum size of logfile before rotation
+</span><span class='line'>logfile_backups=10                                        ; number of backed up logfiles
+</span><span class='line'>loglevel=error                                            ; info, debug, warn, trace
+</span><span class='line'>pidfile=/usr/local/var/run/supervisord.pid                ; pidfile location
+</span><span class='line'>nodaemon=false                                            ; run supervisord as a daemon
+</span><span class='line'>minfds=1024                                               ; number of startup file descriptors
+</span><span class='line'>minprocs=200                                              ; number of process descriptors
+</span><span class='line'>user=root                                                 ; default user
+</span><span class='line'>childlogdir=/usr/local/var/log/supervisord/               ; where child log files will live
+</span><span class='line'>
+</span><span class='line'>[rpcinterface:supervisor]
+</span><span class='line'>supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
+</span><span class='line'>
+</span><span class='line'>[supervisorctl]
+</span><span class='line'>serverurl=unix:///tmp/supervisor.sock                     ; use a unix:// URL  for a unix socket
+</span><span class='line'>
+</span><span class='line'>[program:mongod]
+</span><span class='line'>command=/usr/local/bin/mongod --config /usr/local/etc/mongod.conf
+</span><span class='line'>autostart=false
+</span><span class='line'>autorestart=true
+</span><span class='line'>
+</span><span class='line'>[program:redis]
+</span><span class='line'>command=/usr/local/bin/redis-server /usr/local/etc/redis.conf
+</span><span class='line'>autostart=false
+</span><span class='line'>autorestart=true
+</span><span class='line'>
+</span><span class='line'>[program:nginx]
+</span><span class='line'>command=/usr/local/bin/nginx -c /usr/local/etc/nginx/nginx.conf
+</span><span class='line'>autostart=false
+</span><span class='line'>autorestart=true</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这里我的这几个服务都没有设置为自动启动，如有需要可自行将 <code>autostart</code> 设置为 true。</p>
+
+<p>最后执行 <code>supervisord</code> 命令启动 supervisor 服务。之后就可以通过 <code>supervisorctl</code> 命令来进行服务管理了。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Riot.js之初体验]]></title>
+    <link href="http://www.xefan.com/archives/84152.html"/>
+    <updated>2015-08-21T09:55:14+08:00</updated>
+    <id>http://www.xefan.com/archives/84152-Riot.js之初体验</id>
+    <content type="html"><![CDATA[<p>Riot(<a href="http://riotjs.com/">http://riotjs.com/</a>)按照官方的介绍，它是一个类似于 React 的微型框架。
+压缩之后的文件只有差不多 15K 的大小，相比其他基本上都是上百K大小的框架来说确实是很微型的。</p>
+
+<p>同时它的官方还给出了与 React 和 Polymer 的对比，各位感兴趣可以看看： <a href="http://riotjs.com/compare/">http://riotjs.com/compare/</a></p>
+
+<p>下面通过一个例子来体验一下。</p>
+
+<p>先下载 Riot 库文件： <a href="https://raw.githubusercontent.com/riot/riot/master/riot+compiler.min.js  ">https://raw.githubusercontent.com/riot/riot/master/riot+compiler.min.js  </a>
+然后新建一个文件 <code>index.html</code>，内容如下：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="cp">&lt;!DOCTYPE html&gt;</span>
+</span><span class='line'><span class="nt">&lt;html&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;head&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;meta</span> <span class="na">name=</span><span class="s">&quot;viewport&quot;</span> <span class="na">content=</span><span class="s">&quot;width=device-width&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;title&gt;</span>Tabs exampe<span class="nt">&lt;/title&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;style </span><span class="na">type=</span><span class="s">&quot;text/css&quot;</span> <span class="na">media=</span><span class="s">&quot;screen&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>      <span class="nc">.tabContent__item</span><span class="p">{</span>
+</span><span class='line'>        <span class="k">display</span><span class="o">:</span><span class="k">none</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>      <span class="nc">.tabContent__item.is-active</span><span class="p">{</span>
+</span><span class='line'>        <span class="k">display</span><span class="o">:</span><span class="k">block</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>    <span class="nt">&lt;/style&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/head&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;body&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;riot-tabs&gt;&lt;/riot-tabs&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;tabs.tag&quot;</span> <span class="na">type=</span><span class="s">&quot;riot/tag&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;riot+compiler.min.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span> <span class="na">charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>      <span class="nx">riot</span><span class="p">.</span><span class="nx">mount</span><span class="p">(</span><span class="s1">&#39;riot-tabs&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="nt">&lt;/script&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/body&gt;</span>
+</span><span class='line'><span class="nt">&lt;/html&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>接着再创建文件 <code>tabs.tag</code>：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;riot-tabs&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;h2&gt;</span>Tabs<span class="nt">&lt;/h2&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;ul&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;li</span> <span class="na">each=</span><span class="s">{</span> <span class="na">tab</span><span class="err">,</span> <span class="na">i</span> <span class="na">in</span> <span class="na">tabs</span> <span class="err">}</span> <span class="na">class=</span><span class="s">&quot;tabItem { is-active: parent.isActiveTab(tab.ref) }&quot;</span> <span class="na">onclick=</span><span class="s">{</span> <span class="na">parent</span><span class="err">.</span><span class="na">toggleTab</span> <span class="err">}</span><span class="nt">&gt;</span>{tab.title}<span class="nt">&lt;/li&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/ul&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;tabContent&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">each=</span><span class="s">{</span> <span class="na">tab</span><span class="err">,</span> <span class="na">i</span> <span class="na">in</span> <span class="na">tabs</span> <span class="err">}</span> <span class="na">class=</span><span class="s">&quot;tabContent__item { is-active: parent.isActiveTab(tab.ref) }&quot;</span><span class="nt">&gt;</span>{tab.content}<span class="nt">&lt;/div&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/div&gt;</span>
+</span><span class='line'>
+</span><span class='line'>  this.tabs = [
+</span><span class='line'>    { title: &#39;Tab 1&#39;, ref: &#39;tab1&#39;, content: &quot;(1) Lorem ipsum dolor&quot; },
+</span><span class='line'>    { title: &#39;Tab 2&#39;, ref: &#39;tab2&#39;, content: &quot;(2) Lorem ipsum dolor&quot; },
+</span><span class='line'>    { title: &#39;Tab 3&#39;, ref: &#39;tab3&#39;, content: &quot;(3) Lorem ipsum dolor&quot; }
+</span><span class='line'>  ]
+</span><span class='line'>
+</span><span class='line'>  this.activeTab = &#39;tab1&#39;
+</span><span class='line'>
+</span><span class='line'>  isActiveTab(tab) {
+</span><span class='line'>    return this.activeTab === tab
+</span><span class='line'>  }
+</span><span class='line'>
+</span><span class='line'>  toggleTab(e) {
+</span><span class='line'>    this.activeTab = e.item.tab.ref
+</span><span class='line'>    return true
+</span><span class='line'>  }
+</span><span class='line'><span class="nt">&lt;/riot-tabs&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这个是 javascript 与 html 的混合。当然还可以使用纯 js 的写法，将 <code>tabs.tag</code> 改为 <code>tabs.js</code>：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'>riot.tag(&#39;riot-tabs&#39;, &#39;<span class="nt">&lt;h2&gt;</span>Tabs<span class="nt">&lt;/h2&gt;</span> <span class="nt">&lt;ul&gt;</span> <span class="nt">&lt;li</span> <span class="na">each=</span><span class="s">&quot;{ tab, i in tabs }&quot;</span> <span class="na">class=</span><span class="s">&quot;tabItem { is-active: parent.isActiveTab(tab.ref) }&quot;</span> <span class="na">onclick=</span><span class="s">&quot;{ parent.toggleTab }&quot;</span><span class="nt">&gt;</span>{tab.title}<span class="nt">&lt;/li&gt;</span> <span class="nt">&lt;/ul&gt;</span> <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;tabContent&quot;</span><span class="nt">&gt;</span> <span class="nt">&lt;div</span> <span class="na">each=</span><span class="s">&quot;{ tab, i in tabs }&quot;</span> <span class="na">class=</span><span class="s">&quot;tabContent__item { is-active: parent.isActiveTab(tab.ref) }&quot;</span><span class="nt">&gt;</span>{tab.content}<span class="nt">&lt;/div&gt;</span> <span class="nt">&lt;/div&gt;</span>&#39;, function(opts) {
+</span><span class='line'>
+</span><span class='line'>  this.tabs = [
+</span><span class='line'>    { title: &#39;Tab 1&#39;, ref: &#39;tab1&#39;, content: &quot;(1) Lorem ipsum dolor&quot; },
+</span><span class='line'>    { title: &#39;Tab 2&#39;, ref: &#39;tab2&#39;, content: &quot;(2) Lorem ipsum dolor&quot; },
+</span><span class='line'>    { title: &#39;Tab 3&#39;, ref: &#39;tab3&#39;, content: &quot;(3) Lorem ipsum dolor&quot; }
+</span><span class='line'>  ];
+</span><span class='line'>
+</span><span class='line'>  this.activeTab = &#39;tab1&#39;;
+</span><span class='line'>
+</span><span class='line'>  this.isActiveTab = function(tab) {
+</span><span class='line'>    return this.activeTab === tab;
+</span><span class='line'>  }.bind(this);
+</span><span class='line'>
+</span><span class='line'>  this.toggleTab = function(e) {
+</span><span class='line'>    this.activeTab = e.item.tab.ref;
+</span><span class='line'>    return true;
+</span><span class='line'>  }.bind(this);
+</span><span class='line'>
+</span><span class='line'>});
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>同时将 <code>index.html</code> 中的 <code>&lt;script src="tabs.tag" type="riot/tag"&gt;&lt;/script&gt;</code> 修改为 <code>&lt;script src="tabs.js" type="riot/tag"&gt;&lt;/script&gt;</code> 。</p>
+
+<p>好了，现在打开浏览器看下效果吧。</p>
+
+<p>体验了一下，感觉它比 angular 之类的框架的学习成本要低。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[AngularJS学习笔记5——路由]]></title>
@@ -2677,57 +2957,6 @@ Devise是利用了 <code>included</code> 钩子来实现这些的。非常的优
 
 
 <p>然后再在vim执行命令 :BundleInstall 即可。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[博客终于迁移完成了！]]></title>
-    <link href="http://www.xefan.com/archives/84133.html"/>
-    <updated>2014-11-04T21:04:32+08:00</updated>
-    <id>http://www.xefan.com/archives/84133-博客终于迁移完成了！</id>
-    <content type="html"><![CDATA[<p>折腾了两天，终于将博客从之前的WordPress迁移到Jekyll上来了。</p>
-
-<p>我的博客是从2009年开始使用WordPress的，至今也有5年多了。最近感觉WordPress提供的文章编辑功能不是很方便，本来是想着改用别的博客系统的。但是一直纠结着始终没换。一是由于懒，感觉能用就行了，不想折腾了。二是由于找不到比较好的系统。</p>
-
-<p>这样就纠结了一年多。最近突然发现了Octopress，感觉很不错。于是果断地选择迁移过来。</p>
-
-<p>环境搭建好了之后，接下来就是数据的迁移了。原打算之前的数据都不要了，准备从头再来的。毕竟之前的文章也写得不咋滴。
-也许是自己比较怀旧吧，最终还是写了一个脚本将WordPress的数据输出为Markdown文件。<br/>
-程序地址： <a href="https://github.com/wusuopu/wordpress-to-octopress">https://github.com/wusuopu/wordpress-to-octopress</a></p>
-
-<p>数据输出之后发现布局全乱了，又得重新调整一下格式。唉~~~~~，只是麻烦啊！</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[配置elixir的vim环境]]></title>
-    <link href="http://www.xefan.com/archives/84132.html"/>
-    <updated>2014-10-29T00:00:00+08:00</updated>
-    <id>http://www.xefan.com/archives/84132-配置elixir的vim环境</id>
-    <content type="html"><![CDATA[<p>elixir是建立在Erlang虚拟机之上的一种函数式编程语言。下面介绍elixir的两个vim插件。</p>
-
-
-<p>首先是语法高亮支持： https://github.com/elixir-lang/vim-elixir</p>
-
-
-<p>其次是snippets支持： https://github.com/carlosgaldino/elixir-snippets
-这个需要先安装 snipMate 插件。</p>
-
-
-<p>如果也是用的 vundle 进行插件管理的话，可以直接在 .vimrc 配置中添加如下内容即可：</p>
-
-
-<pre><code>Bundle 'elixir-lang/vim-elixir'
-Bundle 'carlosgaldino/elixir-snippets'
-
-au BufNewFile,BufRead *.exs set ft=elixir
-</code></pre>
-
-
-
-
-<p>然后再在vim执行命令 :BundleInstall 即可。</p>
-
 ]]></content>
   </entry>
   

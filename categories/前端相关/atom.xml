@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 前端相关 | 龍昌博客]]></title>
   <link href="http://www.xefan.com/categories/前端相关/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2015-08-20T21:03:30+08:00</updated>
+  <updated>2015-08-22T17:56:18+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -12,6 +12,110 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Riot.js之初体验]]></title>
+    <link href="http://www.xefan.com/archives/84152.html"/>
+    <updated>2015-08-21T09:55:14+08:00</updated>
+    <id>http://www.xefan.com/archives/84152-Riot.js之初体验</id>
+    <content type="html"><![CDATA[<p>Riot(<a href="http://riotjs.com/">http://riotjs.com/</a>)按照官方的介绍，它是一个类似于 React 的微型框架。
+压缩之后的文件只有差不多 15K 的大小，相比其他基本上都是上百K大小的框架来说确实是很微型的。</p>
+
+<p>同时它的官方还给出了与 React 和 Polymer 的对比，各位感兴趣可以看看： <a href="http://riotjs.com/compare/">http://riotjs.com/compare/</a></p>
+
+<p>下面通过一个例子来体验一下。</p>
+
+<p>先下载 Riot 库文件： <a href="https://raw.githubusercontent.com/riot/riot/master/riot+compiler.min.js  ">https://raw.githubusercontent.com/riot/riot/master/riot+compiler.min.js  </a>
+然后新建一个文件 <code>index.html</code>，内容如下：</p>
+
+<pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;meta name="viewport" content="width=device-width"&gt;
+    &lt;title&gt;Tabs exampe&lt;/title&gt;
+    &lt;style type="text/css" media="screen"&gt;
+      .tabContent__item{
+        display:none;
+      }
+      .tabContent__item.is-active{
+        display:block;
+      }
+    &lt;/style&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;riot-tabs&gt;&lt;/riot-tabs&gt;
+
+    &lt;script src="tabs.tag" type="riot/tag"&gt;&lt;/script&gt;
+    &lt;script src="riot+compiler.min.js"&gt;&lt;/script&gt;
+    &lt;script type="text/javascript" charset="utf-8"&gt;
+      riot.mount('riot-tabs');
+    &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>接着再创建文件 <code>tabs.tag</code>：</p>
+
+<pre><code>&lt;riot-tabs&gt;
+  &lt;h2&gt;Tabs&lt;/h2&gt;
+  &lt;ul&gt;
+    &lt;li each={ tab, i in tabs } class="tabItem { is-active: parent.isActiveTab(tab.ref) }" onclick={ parent.toggleTab }&gt;{tab.title}&lt;/li&gt;
+  &lt;/ul&gt;
+  &lt;div class="tabContent"&gt;
+    &lt;div each={ tab, i in tabs } class="tabContent__item { is-active: parent.isActiveTab(tab.ref) }"&gt;{tab.content}&lt;/div&gt;
+  &lt;/div&gt;
+
+  this.tabs = [
+    { title: 'Tab 1', ref: 'tab1', content: "(1) Lorem ipsum dolor" },
+    { title: 'Tab 2', ref: 'tab2', content: "(2) Lorem ipsum dolor" },
+    { title: 'Tab 3', ref: 'tab3', content: "(3) Lorem ipsum dolor" }
+  ]
+
+  this.activeTab = 'tab1'
+
+  isActiveTab(tab) {
+    return this.activeTab === tab
+  }
+
+  toggleTab(e) {
+    this.activeTab = e.item.tab.ref
+    return true
+  }
+&lt;/riot-tabs&gt;
+</code></pre>
+
+<p>这个是 javascript 与 html 的混合。当然还可以使用纯 js 的写法，将 <code>tabs.tag</code> 改为 <code>tabs.js</code>：</p>
+
+<pre><code>riot.tag('riot-tabs', '&lt;h2&gt;Tabs&lt;/h2&gt; &lt;ul&gt; &lt;li each="{ tab, i in tabs }" class="tabItem { is-active: parent.isActiveTab(tab.ref) }" onclick="{ parent.toggleTab }"&gt;{tab.title}&lt;/li&gt; &lt;/ul&gt; &lt;div class="tabContent"&gt; &lt;div each="{ tab, i in tabs }" class="tabContent__item { is-active: parent.isActiveTab(tab.ref) }"&gt;{tab.content}&lt;/div&gt; &lt;/div&gt;', function(opts) {
+
+  this.tabs = [
+    { title: 'Tab 1', ref: 'tab1', content: "(1) Lorem ipsum dolor" },
+    { title: 'Tab 2', ref: 'tab2', content: "(2) Lorem ipsum dolor" },
+    { title: 'Tab 3', ref: 'tab3', content: "(3) Lorem ipsum dolor" }
+  ];
+
+  this.activeTab = 'tab1';
+
+  this.isActiveTab = function(tab) {
+    return this.activeTab === tab;
+  }.bind(this);
+
+  this.toggleTab = function(e) {
+    this.activeTab = e.item.tab.ref;
+    return true;
+  }.bind(this);
+
+});
+</code></pre>
+
+<p>同时将 <code>index.html</code> 中的 <code>&lt;script src="tabs.tag" type="riot/tag"&gt;&lt;/script&gt;</code> 修改为 <code>&lt;script src="tabs.js" type="riot/tag"&gt;&lt;/script&gt;</code> 。</p>
+
+<p>好了，现在打开浏览器看下效果吧。</p>
+
+<p>体验了一下，感觉它比 angular 之类的框架的学习成本要低。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[AngularJS学习笔记5——路由]]></title>
@@ -210,78 +314,6 @@ angular.module('myApp', []).controller('ExampleController', ['$scope', function(
 
 <p>基本形式： <code>&lt;ANY ng-if="expression"&gt; ... &lt;/ANY&gt;</code>
 当 <code>expression</code> 的值为真时才会输出该标签。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[AngularJS学习笔记1——基础入门]]></title>
-    <link href="http://www.xefan.com/archives/84147.html"/>
-    <updated>2015-08-13T22:54:04+08:00</updated>
-    <id>http://www.xefan.com/archives/84147-AngularJS学习笔记1——基础入门</id>
-    <content type="html"><![CDATA[<p>angularjs 是一款前端的 MVVM 框架，目前 2.0 好像也快要发布了。
-angularjs 2.0 的理念又变为了 Web 组件，与 1.x 不兼容。
-于是这里就把之前 angularjs 1.x 的学习笔记整理一下，作为以后回顾吧。</p>
-
-<p>相关的事例代码可以从 <a href="https://github.com/wusuopu/angularjs-practice">https://github.com/wusuopu/angularjs-practice</a> 获取。</p>
-
-<h2>简单事例</h2>
-
-<p>&#8220;`
-&lt;!doctype html>
-<html lang="en" ng-app>
-<head>
-    <meta charset="utf-8">
-    <title>基本例子</title>
-    <script src="http://www.xefan.com/lib/angular-1.0.4.min.js"></script>
-</head>
-<body>
-  <p>1 + 2 = 1</p>
-  <div ng-controller="DemoController">
-    <p></p>
-  </div>
-</body></p>
-
-<script type="text/javascript" charset="utf-8">
-  function DemoController($scope){
-    $scope.content = "简单的控制器例子";
-  }
-</script>
-
-
-<p></html>
-&#8220;`</p>
-
-<p>以上是一个最简单的例子。</p>
-
-<pre><code>&lt;html lang="en" ng-app&gt;
-</code></pre>
-
-<p>html 的 <code>ng-app</code> 属性表明在该页面中启用 angularjs。</p>
-
-<pre><code>  &lt;p&gt;1 + 2 = 1&lt;/p&gt;
-</code></pre>
-
-<p>在页面加载完成之后 angularjs 会解析大括号内的表达式，并进行渲染。</p>
-
-<pre><code>  &lt;div ng-controller="DemoController"&gt;
-    &lt;p&gt;&lt;/p&gt;
-  &lt;/div&gt;
-</code></pre>
-
-<p><code>ng-controller</code> 表示在该标签下定义一个控制器。一个控制器就是一个普通的 js 函数。</p>
-
-<p>&#8220;`</p>
-
-<script type="text/javascript" charset="utf-8">
-  function DemoController($scope){
-    $scope.content = "简单的控制器例子";
-  }
-</script>
-
-
-<p>&#8220;`</p>
-
-<p>这里定义 <code>DemoController</code> 控制器函数，并传入一个 <code>$scope</code> 参数，它是用于表示该控制器的上下文。</p>
 ]]></content>
   </entry>
   
