@@ -5,12 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Riot.js之初体验 - 龍昌博客</title>
+  <title>在Ruby中使用DATA和__END__将代码和数据混合 - 龍昌博客</title>
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="Riot(http://riotjs.com/)按照官方的介绍，它是一个类似于 React 的微型框架。
-压缩之后的文件只有差不多 15K 的大小，相比其他基本上都是上百K大小的框架来说确实是很微型的。 同时它的官方还给出了与 React 和 Polymer 的对比，各位感兴趣可以看看： http &hellip;">
+  <meta name="description" content="之前一直不理解 __END__ 的用法，现在看了这篇文章后才算是了解了，于是便翻译之。
+《Mixing code and data in Ruby with DATA and __END__》: http://blog.honeybadger.io/data-and-end-in-ruby/ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +19,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://www.xefan.com/archives/84152.html">
+  <link rel="canonical" href="http://www.xefan.com/archives/84154.html">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="龍昌博客" type="application/atom+xml">
@@ -70,7 +70,7 @@
   
   <header>
     
-      <h1 class="entry-title">Riot.js之初体验</h1>
+      <h1 class="entry-title">在Ruby中使用DATA和__END__将代码和数据混合</h1>
     
     
       <p class="meta">
@@ -79,7 +79,7 @@
 
 
 
-<time class='entry-date' datetime='2015-08-21T09:55:14+08:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>9:55 am</span></time>
+<time class='entry-date' datetime='2015-08-23T10:12:08+08:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>23</span><span class='date-suffix'>rd</span>, <span class='date-year'>2015</span></span> <span class='time'>10:12 am</span></time>
         
            | <a href="#disqus_thread"
              data-disqus-identifier="http://www.xefan.com">Comments</a>
@@ -89,15 +89,150 @@
   </header>
 
 
-<div class="entry-content"><p>Riot(<a href="http://riotjs.com/">http://riotjs.com/</a>)按照官方的介绍，它是一个类似于 React 的微型框架。
-压缩之后的文件只有差不多 15K 的大小，相比其他基本上都是上百K大小的框架来说确实是很微型的。</p>
+<div class="entry-content"><p>之前一直不理解 <code>__END__</code> 的用法，现在看了这篇文章后才算是了解了，于是便翻译之。<br/>
+《Mixing code and data in Ruby with DATA and __END__》: <a href="http://blog.honeybadger.io/data-and-end-in-ruby/">http://blog.honeybadger.io/data-and-end-in-ruby/</a></p>
 
-<p>同时它的官方还给出了与 React 和 Polymer 的对比，各位感兴趣可以看看： <a href="http://riotjs.com/compare/">http://riotjs.com/compare/</a></p>
+<hr />
 
-<p>下面通过一个例子来体验一下。</p>
+<p>你知道 Ruby 提供了一种方法在你的脚本中可以将源文件作为数据源来使用吗？当你在写一些一次性的脚本用于验证概念时这个小技巧会为你节约一些时间。让我们来看看吧。</p>
 
-<p>先下载 Riot 库文件： <a href="https://raw.githubusercontent.com/riot/riot/master/riot+compiler.min.js  ">https://raw.githubusercontent.com/riot/riot/master/riot+compiler.min.js  </a>
-然后新建一个文件 <code>index.html</code>，内容如下：</p>
+<h2>DATA 和 __END__</h2>
+
+<p>在下面这个例子中，我使用了一个有趣的关键字 <code>__END__</code>。所有在 <code>__END__</code> 下面的内容将会被 Ruby 解释器所忽略。但是有趣的是 ruby 为你提供了一个称为 <code>DATA</code> 的 IO 对象，就像你可以读取其他任何文件一样，它能让你读取到 <code>__END__</code> 以下的所有内容。</p>
+
+<p>下面这个例子中，我们遍历每一行并进行输出。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">DATA</span><span class="o">.</span><span class="n">each_line</span> <span class="k">do</span> <span class="o">|</span><span class="n">line</span><span class="o">|</span>
+</span><span class='line'>  <span class="nb">puts</span> <span class="n">line</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">__END__</span>
+</span><span class='line'><span class="cp">Doom</span>
+</span><span class='line'><span class="cp">Quake</span>
+</span><span class='line'><span class="cp">Diablo</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>关于这个技术我最喜欢的实例是使用 <code>DATA</code> 来包含一个 ERB 模板。它同样也可用于 YAML、CSV等等。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;erb&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">time</span> <span class="o">=</span> <span class="no">Time</span><span class="o">.</span><span class="n">now</span>
+</span><span class='line'><span class="n">renderer</span> <span class="o">=</span> <span class="no">ERB</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="no">DATA</span><span class="o">.</span><span class="n">read</span><span class="p">)</span>
+</span><span class='line'><span class="nb">puts</span> <span class="n">renderer</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">__END__</span>
+</span><span class='line'><span class="cp">The current time is &lt;%= time %&gt;.</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>实际上你也可以使用 <code>DATA</code> 来读取 <code>__END__</code> 关键字以上的内容。那是因为 <code>DATA</code> 实际上是一个指向了整个源文件，并定位到 <code>__END__</code> 关键字的位置。你可以试试看在输出之前将 IO 对象反转。下面这个例子将会输出整个源文件。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">DATA</span><span class="o">.</span><span class="n">rewind</span>
+</span><span class='line'><span class="nb">puts</span> <span class="no">DATA</span><span class="o">.</span><span class="n">read</span> <span class="c1"># prints the entire source file</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">__END__</span>
+</span><span class='line'><span class="cp">meh</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>多文件问题</h2>
+
+<p>这个技术最大的缺点是它只能用于单个文件的脚本，直接运行该文件，不能在其他文件进行导入。</p>
+
+<p>下面这个例子，我们有两个文件，并且每个都有它们自己的 <code>__END__</code> 部分。然而却只有一个全局 <code>DATA</code> 对象。因此第二个文件的 <code>__END__</code> 部分刚访问不到了。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># first.rb</span>
+</span><span class='line'><span class="nb">require</span> <span class="s2">&quot;./second&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">puts</span> <span class="s2">&quot;First file</span><span class="se">\n</span><span class="s2">----------------------&quot;</span>
+</span><span class='line'><span class="nb">puts</span> <span class="no">DATA</span><span class="o">.</span><span class="n">read</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">print_second_data</span><span class="p">()</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">__END__</span>
+</span><span class='line'><span class="cp">First end clause</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># second.rb</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">print_second_data</span>
+</span><span class='line'>  <span class="nb">puts</span> <span class="s2">&quot;Second file</span><span class="se">\n</span><span class="s2">----------------------&quot;</span>
+</span><span class='line'>  <span class="nb">puts</span> <span class="no">DATA</span><span class="o">.</span><span class="n">read</span> <span class="c1"># Won&#39;t output anything, since first.rb read the entire file</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">__END__</span>
+</span><span class='line'><span class="cp"> </span>
+</span><span class='line'><span class="cp">Second end clause</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">snhorne</span> <span class="o">~</span><span class="sr">/tmp $ ruby first.rb</span>
+</span><span class='line'><span class="sr">First file</span>
+</span><span class='line'><span class="sr">----------------------</span>
+</span><span class='line'><span class="sr">First end clause</span>
+</span><span class='line'><span class="sr"> </span>
+</span><span class='line'><span class="sr">Second file</span>
+</span><span class='line'><span class="sr">----------------------</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>对于多文件的一个解决方案</h2>
+
+<p>在 Sinatra 中有一个很酷的特性是它允许你在你应用的 <code>__END__</code> 部分添加多个内联模板。它看起来像下面这样：</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -115,150 +250,69 @@
 <span class='line-number'>14</span>
 <span class='line-number'>15</span>
 <span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="cp">&lt;!DOCTYPE html&gt;</span>
-</span><span class='line'><span class="nt">&lt;html&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;head&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;meta</span> <span class="na">name=</span><span class="s">&quot;viewport&quot;</span> <span class="na">content=</span><span class="s">&quot;width=device-width&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;title&gt;</span>Tabs exampe<span class="nt">&lt;/title&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;style </span><span class="na">type=</span><span class="s">&quot;text/css&quot;</span> <span class="na">media=</span><span class="s">&quot;screen&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>      <span class="nc">.tabContent__item</span><span class="p">{</span>
-</span><span class='line'>        <span class="k">display</span><span class="o">:</span><span class="k">none</span><span class="p">;</span>
-</span><span class='line'>      <span class="p">}</span>
-</span><span class='line'>      <span class="nc">.tabContent__item.is-active</span><span class="p">{</span>
-</span><span class='line'>        <span class="k">display</span><span class="o">:</span><span class="k">block</span><span class="p">;</span>
-</span><span class='line'>      <span class="p">}</span>
-</span><span class='line'>    <span class="nt">&lt;/style&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;/head&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;body&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;riot-tabs&gt;&lt;/riot-tabs&gt;</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># This code is from the Sinatra docs at http://www.sinatrarb.com/intro.html</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;sinatra&#39;</span>
 </span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;tabs.tag&quot;</span> <span class="na">type=</span><span class="s">&quot;riot/tag&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;riot+compiler.min.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span> <span class="na">charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>      <span class="nx">riot</span><span class="p">.</span><span class="nx">mount</span><span class="p">(</span><span class="s1">&#39;riot-tabs&#39;</span><span class="p">);</span>
-</span><span class='line'>    <span class="nt">&lt;/script&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;/body&gt;</span>
-</span><span class='line'><span class="nt">&lt;/html&gt;</span>
+</span><span class='line'><span class="n">get</span> <span class="s1">&#39;/&#39;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">haml</span> <span class="ss">:index</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">__END__</span>
+</span><span class='line'><span class="cp"> </span>
+</span><span class='line'><span class="cp">@@ layout</span>
+</span><span class='line'><span class="cp">%html</span>
+</span><span class='line'><span class="cp"> </span>
+</span><span class='line'><span class="cp">  = yield</span>
+</span><span class='line'><span class="cp"> </span>
+</span><span class='line'><span class="cp">@@ index</span>
+</span><span class='line'><span class="cp">%div.title Hello world.</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>接着再创建文件 <code>tabs.tag</code>：</p>
+<p>sinatra 是如何实现的呢？毕竟你的应用可能是运行在 rack 上。在生产环境中你不能再通过 <code>ruby myapp.rb</code> 来运行！他们必须有一种在多文件中使用 <code>DATA</code> 的解决方案。</p>
+
+<p>因此如果你稍微深入一下 Sinatra 的源代码，你会发现它们并没有使用 <code>DATA</code>。而是使用了跟下面这段代码类似的方案。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># I&#39;m paraphrasing. See the original at https://github.com/sinatra/sinatra/blob/master/lib/sinatra/base.rb#L1284</span>
+</span><span class='line'><span class="n">app</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="no">File</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">__FILE__</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sr">/^__END__$/</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>实际上它比这个要更复杂一些，因为它们不想读取 <code>__FILE__</code>，它只是 <code>sinatra/base.rb</code> 文件。它们其实是需要获取调用了该方法的文件的内容。它们通过解析 <code>caller</code> 的结果来获取。</p>
+
+<p><code>caller</code> 方法将会告诉你当前运行的方法是从哪调用的。这里是个简单的例子：</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;riot-tabs&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;h2&gt;</span>Tabs<span class="nt">&lt;/h2&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;ul&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;li</span> <span class="na">each=</span><span class="s">{</span> <span class="na">tab</span><span class="err">,</span> <span class="na">i</span> <span class="na">in</span> <span class="na">tabs</span> <span class="err">}</span> <span class="na">class=</span><span class="s">&quot;tabItem { is-active: parent.isActiveTab(tab.ref) }&quot;</span> <span class="na">onclick=</span><span class="s">{</span> <span class="na">parent</span><span class="err">.</span><span class="na">toggleTab</span> <span class="err">}</span><span class="nt">&gt;</span>{tab.title}<span class="nt">&lt;/li&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;/ul&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;tabContent&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">each=</span><span class="s">{</span> <span class="na">tab</span><span class="err">,</span> <span class="na">i</span> <span class="na">in</span> <span class="na">tabs</span> <span class="err">}</span> <span class="na">class=</span><span class="s">&quot;tabContent__item { is-active: parent.isActiveTab(tab.ref) }&quot;</span><span class="nt">&gt;</span>{tab.content}<span class="nt">&lt;/div&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;/div&gt;</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">some_method</span>
+</span><span class='line'>  <span class="nb">puts</span> <span class="nb">caller</span>
+</span><span class='line'><span class="k">end</span>
 </span><span class='line'>
-</span><span class='line'>  this.tabs = [
-</span><span class='line'>    { title: &#39;Tab 1&#39;, ref: &#39;tab1&#39;, content: &quot;(1) Lorem ipsum dolor&quot; },
-</span><span class='line'>    { title: &#39;Tab 2&#39;, ref: &#39;tab2&#39;, content: &quot;(2) Lorem ipsum dolor&quot; },
-</span><span class='line'>    { title: &#39;Tab 3&#39;, ref: &#39;tab3&#39;, content: &quot;(3) Lorem ipsum dolor&quot; }
-</span><span class='line'>  ]
-</span><span class='line'>
-</span><span class='line'>  this.activeTab = &#39;tab1&#39;
-</span><span class='line'>
-</span><span class='line'>  isActiveTab(tab) {
-</span><span class='line'>    return this.activeTab === tab
-</span><span class='line'>  }
-</span><span class='line'>
-</span><span class='line'>  toggleTab(e) {
-</span><span class='line'>    this.activeTab = e.item.tab.ref
-</span><span class='line'>    return true
-</span><span class='line'>  }
-</span><span class='line'><span class="nt">&lt;/riot-tabs&gt;</span>
+</span><span class='line'><span class="n">some_method</span> <span class="c1"># =&gt; caller.rb:5:in `&lt;main&gt;&#39;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>这个是 javascript 与 html 的混合。当然还可以使用纯 js 的写法，将 <code>tabs.tag</code> 改为 <code>tabs.js</code>：</p>
+<p>现在可以简单地获取到文件名了，然后从该文件中再提取出与 <code>DATA</code> 等价的内容。</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'>riot.tag(&#39;riot-tabs&#39;, &#39;<span class="nt">&lt;h2&gt;</span>Tabs<span class="nt">&lt;/h2&gt;</span> <span class="nt">&lt;ul&gt;</span> <span class="nt">&lt;li</span> <span class="na">each=</span><span class="s">&quot;{ tab, i in tabs }&quot;</span> <span class="na">class=</span><span class="s">&quot;tabItem { is-active: parent.isActiveTab(tab.ref) }&quot;</span> <span class="na">onclick=</span><span class="s">&quot;{ parent.toggleTab }&quot;</span><span class="nt">&gt;</span>{tab.title}<span class="nt">&lt;/li&gt;</span> <span class="nt">&lt;/ul&gt;</span> <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;tabContent&quot;</span><span class="nt">&gt;</span> <span class="nt">&lt;div</span> <span class="na">each=</span><span class="s">&quot;{ tab, i in tabs }&quot;</span> <span class="na">class=</span><span class="s">&quot;tabContent__item { is-active: parent.isActiveTab(tab.ref) }&quot;</span><span class="nt">&gt;</span>{tab.content}<span class="nt">&lt;/div&gt;</span> <span class="nt">&lt;/div&gt;</span>&#39;, function(opts) {
-</span><span class='line'>
-</span><span class='line'>  this.tabs = [
-</span><span class='line'>    { title: &#39;Tab 1&#39;, ref: &#39;tab1&#39;, content: &quot;(1) Lorem ipsum dolor&quot; },
-</span><span class='line'>    { title: &#39;Tab 2&#39;, ref: &#39;tab2&#39;, content: &quot;(2) Lorem ipsum dolor&quot; },
-</span><span class='line'>    { title: &#39;Tab 3&#39;, ref: &#39;tab3&#39;, content: &quot;(3) Lorem ipsum dolor&quot; }
-</span><span class='line'>  ];
-</span><span class='line'>
-</span><span class='line'>  this.activeTab = &#39;tab1&#39;;
-</span><span class='line'>
-</span><span class='line'>  this.isActiveTab = function(tab) {
-</span><span class='line'>    return this.activeTab === tab;
-</span><span class='line'>  }.bind(this);
-</span><span class='line'>
-</span><span class='line'>  this.toggleTab = function(e) {
-</span><span class='line'>    this.activeTab = e.item.tab.ref;
-</span><span class='line'>    return true;
-</span><span class='line'>  }.bind(this);
-</span><span class='line'>
-</span><span class='line'>});
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">get_caller_data</span>
+</span><span class='line'>  <span class="nb">puts</span> <span class="no">File</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="nb">caller</span><span class="o">.</span><span class="n">first</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;__END__&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">last</span>
+</span><span class='line'><span class="k">end</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>同时将 <code>index.html</code> 中的 <code>&lt;script src="tabs.tag" type="riot/tag"&gt;&lt;/script&gt;</code> 修改为 <code>&lt;script src="tabs.js" type="riot/tag"&gt;&lt;/script&gt;</code> 。</p>
+<h2>请善用它，不要作恶</h2>
 
-<p>好了，现在打开浏览器看下效果吧。</p>
+<p>希望对于这些技巧你不要经常使用。它们不会使得代码干净、可维护。</p>
 
-<p>体验了一下，感觉它比 angular 之类的框架的学习成本要低。</p>
+<p>然后，你偶尔需要一些又快又脏的实现一个一次性的脚本或者验证一些概念。此时 <code>DATA</code> 和 <code>__END__</code> 就非常有用了。</p>
 </div>
 
 
@@ -274,14 +328,14 @@
 
 
 
-<time class='entry-date' datetime='2015-08-21T09:55:14+08:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>9:55 am</span></time>
+<time class='entry-date' datetime='2015-08-23T10:12:08+08:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>23</span><span class='date-suffix'>rd</span>, <span class='date-year'>2015</span></span> <span class='time'>10:12 am</span></time>
     </p>
     <p class="meta">
       Categories: 
 
 <span class="categories">
   
-    <a class='category' href='/categories/前端相关/index.html'>前端相关</a>
+    <a class='category' href='/categories/ruby栏目/index.html'>ruby栏目</a>
   
 </span>
 
@@ -292,7 +346,7 @@
 
 <span class="tags">
   
-    <a class='tag' href='/tags/js/index.html'>js</a>
+    <a class='tag' href='/tags/Ruby/index.html'>Ruby</a>, <a class='tag' href='/tags/翻译/index.html'>翻译</a>
   
 </span>
 
@@ -308,10 +362,8 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/archives/84151.html" title="Previous Post: AngularJS学习笔记5——路由">&laquo; AngularJS学习笔记5——路由</a>
+        <a class="basic-alignment left" href="/archives/84153.html" title="Previous Post: Mac下使用supervisor进行服务管理">&laquo; Mac下使用supervisor进行服务管理</a>
       
-      
-        <a class="basic-alignment right" href="/archives/84153.html" title="Next Post: Mac下使用supervisor进行服务管理">Mac下使用supervisor进行服务管理 &raquo;</a>
       
     </p>
   </footer>
@@ -400,8 +452,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://www.xefan.com/archives/84152.html';
-        var disqus_url = 'http://www.xefan.com/archives/84152.html';
+        var disqus_identifier = 'http://www.xefan.com/archives/84154.html';
+        var disqus_url = 'http://www.xefan.com/archives/84154.html';
         var disqus_script = 'embed.js';
       
     (function () {

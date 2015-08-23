@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ruby栏目 | 龍昌博客]]></title>
   <link href="http://www.xefan.com/categories/ruby栏目/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2015-08-22T17:56:18+08:00</updated>
+  <updated>2015-08-23T11:53:17+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -12,6 +12,150 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[在Ruby中使用DATA和__END__将代码和数据混合]]></title>
+    <link href="http://www.xefan.com/archives/84154.html"/>
+    <updated>2015-08-23T10:12:08+08:00</updated>
+    <id>http://www.xefan.com/archives/84154-在Ruby中使用DATA和__END__将代码和数据混合</id>
+    <content type="html"><![CDATA[<p>之前一直不理解 <code>__END__</code> 的用法，现在看了这篇文章后才算是了解了，于是便翻译之。<br/>
+《Mixing code and data in Ruby with DATA and __END__》: <a href="http://blog.honeybadger.io/data-and-end-in-ruby/">http://blog.honeybadger.io/data-and-end-in-ruby/</a></p>
+
+<hr />
+
+<p>你知道 Ruby 提供了一种方法在你的脚本中可以将源文件作为数据源来使用吗？当你在写一些一次性的脚本用于验证概念时这个小技巧会为你节约一些时间。让我们来看看吧。</p>
+
+<h2>DATA 和 __END__</h2>
+
+<p>在下面这个例子中，我使用了一个有趣的关键字 <code>__END__</code>。所有在 <code>__END__</code> 下面的内容将会被 Ruby 解释器所忽略。但是有趣的是 ruby 为你提供了一个称为 <code>DATA</code> 的 IO 对象，就像你可以读取其他任何文件一样，它能让你读取到 <code>__END__</code> 以下的所有内容。</p>
+
+<p>下面这个例子中，我们遍历每一行并进行输出。</p>
+
+<pre><code class="ruby">DATA.each_line do |line|
+  puts line
+end
+
+__END__
+Doom
+Quake
+Diablo
+</code></pre>
+
+<p>关于这个技术我最喜欢的实例是使用 <code>DATA</code> 来包含一个 ERB 模板。它同样也可用于 YAML、CSV等等。</p>
+
+<pre><code class="ruby">require 'erb'
+
+time = Time.now
+renderer = ERB.new(DATA.read)
+puts renderer.result()
+
+__END__
+The current time is &lt;%= time %&gt;.
+</code></pre>
+
+<p>实际上你也可以使用 <code>DATA</code> 来读取 <code>__END__</code> 关键字以上的内容。那是因为 <code>DATA</code> 实际上是一个指向了整个源文件，并定位到 <code>__END__</code> 关键字的位置。你可以试试看在输出之前将 IO 对象反转。下面这个例子将会输出整个源文件。</p>
+
+<pre><code class="ruby">DATA.rewind
+puts DATA.read # prints the entire source file
+
+__END__
+meh
+</code></pre>
+
+<h2>多文件问题</h2>
+
+<p>这个技术最大的缺点是它只能用于单个文件的脚本，直接运行该文件，不能在其他文件进行导入。</p>
+
+<p>下面这个例子，我们有两个文件，并且每个都有它们自己的 <code>__END__</code> 部分。然而却只有一个全局 <code>DATA</code> 对象。因此第二个文件的 <code>__END__</code> 部分刚访问不到了。</p>
+
+<pre><code class="ruby"># first.rb
+require "./second"
+
+puts "First file\n----------------------"
+puts DATA.read
+
+print_second_data()
+
+__END__
+First end clause
+</code></pre>
+
+<pre><code class="ruby"># second.rb
+
+def print_second_data
+  puts "Second file\n----------------------"
+  puts DATA.read # Won't output anything, since first.rb read the entire file
+end
+
+__END__
+
+Second end clause
+</code></pre>
+
+<pre><code>snhorne ~/tmp $ ruby first.rb
+First file
+----------------------
+First end clause
+
+Second file
+----------------------
+</code></pre>
+
+<h2>对于多文件的一个解决方案</h2>
+
+<p>在 Sinatra 中有一个很酷的特性是它允许你在你应用的 <code>__END__</code> 部分添加多个内联模板。它看起来像下面这样：</p>
+
+<pre><code class="ruby"># This code is from the Sinatra docs at http://www.sinatrarb.com/intro.html
+require 'sinatra'
+
+get '/' do
+  haml :index
+end
+
+__END__
+
+@@ layout
+%html
+
+  = yield
+
+@@ index
+%div.title Hello world.
+</code></pre>
+
+<p>sinatra 是如何实现的呢？毕竟你的应用可能是运行在 rack 上。在生产环境中你不能再通过 <code>ruby myapp.rb</code> 来运行！他们必须有一种在多文件中使用 <code>DATA</code> 的解决方案。</p>
+
+<p>因此如果你稍微深入一下 Sinatra 的源代码，你会发现它们并没有使用 <code>DATA</code>。而是使用了跟下面这段代码类似的方案。</p>
+
+<pre><code class="ruby"># I'm paraphrasing. See the original at https://github.com/sinatra/sinatra/blob/master/lib/sinatra/base.rb#L1284
+app, data = File.read(__FILE__).split(/^__END__$/, 2)
+</code></pre>
+
+<p>实际上它比这个要更复杂一些，因为它们不想读取 <code>__FILE__</code>，它只是 <code>sinatra/base.rb</code> 文件。它们其实是需要获取调用了该方法的文件的内容。它们通过解析 <code>caller</code> 的结果来获取。</p>
+
+<p><code>caller</code> 方法将会告诉你当前运行的方法是从哪调用的。这里是个简单的例子：</p>
+
+<pre><code class="ruby">def some_method
+  puts caller
+end
+
+some_method # =&gt; caller.rb:5:in `&lt;main&gt;'
+</code></pre>
+
+<p>现在可以简单地获取到文件名了，然后从该文件中再提取出与 <code>DATA</code> 等价的内容。</p>
+
+<pre><code class="ruby">def get_caller_data
+  puts File.read(caller.first.split(":").first).split("__END__", 2).last
+end
+</code></pre>
+
+<h2>请善用它，不要作恶</h2>
+
+<p>希望对于这些技巧你不要经常使用。它们不会使得代码干净、可维护。</p>
+
+<p>然后，你偶尔需要一些又快又脏的实现一个一次性的脚本或者验证一些概念。此时 <code>DATA</code> 和 <code>__END__</code> 就非常有用了。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Unicorn是如何与nginx通讯的——介绍ruby中的unix Socket]]></title>
@@ -904,79 +1048,6 @@ end
 我希望你能喜欢这篇文章。请在评论中告诉我们你所喜欢的Ruby钩子，以及你使用它们所解决的问题。</p>
 
 <p>原文地址： <a href="http://www.sitepoint.com/rubys-important-hook-methods/">http://www.sitepoint.com/rubys-important-hook-methods/</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[使用Unicorn部署rails应用]]></title>
-    <link href="http://www.xefan.com/archives/84142.html"/>
-    <updated>2015-04-05T20:47:15+08:00</updated>
-    <id>http://www.xefan.com/archives/84142-使用Unicorn部署rails应用</id>
-    <content type="html"><![CDATA[<p>玩 rails 也有段时间了，最近研究下怎么部署一个 rails 应用。在几年前的话要部署 rails 应用是件很麻烦的事，
-但是近几年出现了一些比较好的工具可以方便的进行 rails 部署。如： Unicorn、thin、Passenger等。</p>
-
-<p>Unicorn 是一个 Rack 应用的HTTP服务器。之前玩 Python 的时候也有一个 Gunicorn ，使用它来部署 Python 的 Web 应用
-也很方便，可以参考我之前的那篇文件 <a href="84138.html">《使用gunicorn部署Django》</a> 。</p>
-
-<p>接下来简单分享下使用 Nginx + Unicorn 来部署 rails 的配置。</p>
-
-<h2>安装</h2>
-
-<p>首先安装 unicorn 包： <code>$ gem install unicorn</code></p>
-
-<p>然后编译一下静态文件：</p>
-
-<pre><code>$ RAILS_ENV=production rake assets:clean
-$ RAILS_ENV=production rake assets:precompile
-</code></pre>
-
-<p>下载配置文件： <code>$ curl -o config/unicorn.rb https://raw.github.com/defunkt/unicorn/master/examples/unicorn.conf.rb</code></p>
-
-<p>接着根据情况修改相关配置，如： working_directory、listen 等。
-例如我的是需要同时监听网络端口和 sock 文件，那么我的 listen 设置如下：</p>
-
-<pre><code>listen "#{root_path}/tmp/sockets/unicorn.sock", :backlog =&gt; 64
-listen 8081, :tcp_nopush =&gt; true
-</code></pre>
-
-<h2>配置 Nginx</h2>
-
-<p>然后配置 Nginx 的反向代理，以下是我的 Nginx 配置示例：</p>
-
-<pre><code>upstream rails_server {
-  server unix:/app_path/tmp/sockets/unicorn.sock fail_timeout=0;
-}
-
-server {
-  listen 80;
-    server_name webserver localhost;
-
-    root /app_path/public;
-
-  try_files $uri $uri @unicorn;
-
-  location @unicorn {
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header Host $http_host;
-    proxy_redirect off;
-    proxy_pass http://rails_server;
-  }
-
-  location ~ /\.ht {
-    deny  all;
-  }
-}
-</code></pre>
-
-<h2>启动服务</h2>
-
-<p>配置完成之后，最后启动服务。</p>
-
-<pre><code>$ bundle exec unicorn_rails -c config/unicorn.rb -D -E production
-$ sudo service nginx start
-</code></pre>
-
-<p>然后再在浏览器中访问试试。</p>
 ]]></content>
   </entry>
   

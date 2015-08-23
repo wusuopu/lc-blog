@@ -9,10 +9,10 @@
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="最近正在看Git，做个笔记，把常用的命令记下。 git init 初始化
-git add &lt;file&gt; 将file添加到跟踪
-git commit -m &ldquo;..&rdquo; 将修改提交到库，备注为"&hellip;&ldquo;
-git commit -a -m & &hellip;">
+  <meta name="description" content="使用nfs根文件系统对于开发非常方便，不用每次编译好后又要烧写到开发板上。 设置方法：
+打开开发板电源后进入u-boot，然后选择“[0] Set the boot parameters”。
+再选择“[1] Set NFS boot parameter ”。
+然后依次输入PC的IP、开发板的IP、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -69,6 +69,69 @@ git commit -a -m & &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83710.html">u-Boot使用nfs根文件系统</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2012-03-16T00:00:00+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>16</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83710.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83710.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>使用nfs根文件系统对于开发非常方便，不用每次编译好后又要烧写到开发板上。</p>
+
+<p>设置方法：<br/>
+打开开发板电源后进入u-boot，然后选择“[0] Set the boot parameters”。<br/>
+再选择“[1] Set NFS boot parameter ”。<br/>
+然后依次输入PC的IP、开发板的IP、子网掩码、NFS目录。<br/>
+例子如下：<br/>
+Enter the PC IP address:(xxx.xxx.xxx.xxx)<br/>
+10.10.10.2<br/>
+Enter the SKY2440/TQ2440 IP address:(xxx.xxx.xxx.xxx)<br/>
+10.10.10.3<br/>
+Enter the Mask IP address:(xxx.xxx.xxx.xxx)<br/>
+255.255.255.0<br/>
+Enter NFS directory:(eg: /opt/EmbedSky/root_nfs)<br/>
+/opt/EmbedSky/root<br/>
+bootargs: console=ttySAC0 root=/dev/nfs nfsroot=10.10.10.2:/opt/EmbedSky/root ip=10.10.10.3:10.10.10.2:10.10.10.3:255.255.255.0:SKY2440.embedsky.net:eth0:off</p>
+
+<p>输入好后再选择“[s] Save the parameters to Nand Flash”保存设置即可。</p>
+
+<p>以上是一般情况，下面再说说我的特殊情况。</p>
+
+<p>=====================分割线===============================</p>
+
+<p>我在PC上安装的是ArchLinux，按照以上方法运行时挂载失败，提示Root-NFS: Server returned error -93 while mounting /opt/EmbedSky/root
+－93的意思好像是没有这个协议。</p>
+
+<p>于是我又在虚拟机里安装了ubuntu，再尝试以上方法结果却成功了。<br/>
+最后我查了资料，原因好像是u-boot使用的nfs3，而ArchLinux的官网上说nfs3太老了所以Arch用的是nfs4。因此就出现了这个问题。<br/>
+解决方法：添加一个&#8221;,v3&#8221;参数。如：<br/>
+Enter NFS directory:(eg: /opt/EmbedSky/root_nfs)<br/>
+/opt/EmbedSky/root<span style="color: #ff0000;">,v3</span><br/>
+bootargs: console=ttySAC0 root=/dev/nfs nfsroot=10.10.10.2:/opt/EmbedSky/root<span style="color: #ff0000;">,v3</span> ip=10.10.10.3:10.10.10.2:10.10.10.3:255.255.255.0:SKY2440.embedsky.net:eth0:off</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1589,105 +1652,6 @@ Qt4.7.4_Win32静态库精简版.rar： <a href="http://115.com/file/bhy7bat6  ">
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83665.html">Linux下静态编译win32的GTK程序</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2011-11-27T00:00:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
-        
-           | <a href="http://www.xefan.com/archives/83665.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/83665.html">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>首先感谢hangyu网友分享的GTK静态库。<br/>
-原帖地址：<a href="http://forum.ubuntu.org.cn/viewtopic.php?f=162&amp;amp;t=354286">http://forum.ubuntu.org.cn/viewtopic.php?f=162&amp;amp;t=354286</a> <br>
-下载地址：<a href="http://code.google.com/p/static-gtk2-mingw32/">http://code.google.com/p/static-gtk2-mingw32/</a></p>
-
-<p>先说一下在Windows下编译的方法。</p>
-
-<p>解压文件，然后进入解压后的bin目录执行命令：<br/>
-<em>pkg-config.exe &ndash;libs &ndash;cflags &ldquo;gtk+-2.0&rdquo;</em><br/>
-如果出现以下错误<br/>
-Package gtk+-2.0 was not found in the pkg-config search path.<br/>
-Perhaps you should add the directory containing `gtk+-2.0.pc&#8217;<br/>
-to the PKG_CONFIG_PATH environment variable<br/>
-No package &lsquo;gtk+-2.0&rsquo; found<br/>
-则先执行命令：<em>set PKG_CONFIG_PATH=你的解压路径\lib\pkgconfig</em> 设置PKG_CONFIG_PATH环境变量</p>
-
-<p>我得到的结果是：<br/>
--mms-bitfields -IE:/Dev-Cpp/gtk+-2.0/include/gtk-2.0 -IE:/Dev-Cpp/gtk+-2.0/lib/gtk-2.0/include -IE:/Dev-Cpp/gtk+-2.0/include/atk-1.0 -IE:/Dev-Cpp/gtk+-2.0/include/cairo -IE:/Dev-Cpp/gtk+-2.0/include/gdk-pixbuf-2.0 -IE:/Dev-Cpp/gtk+-2.0/include/pango-1.0 -IE:/Dev-Cpp/gtk+-2.0/include/glib-2.0 -IE:/Dev-Cpp/gtk+-2.0/lib/glib-2.0/include -IE:/Dev-Cpp/gtk+-2.0/include/pixman-1 -IE:/Dev-Cpp/gtk+-2.0/include -IE:/Dev-Cpp/gtk+-2.0/include/freetype2 -I/gtk-dev/include/libpng14 -LE:/Dev-Cpp/gtk+-2.0/lib -L/gtk-dev/lib -lgtk-win32-2.0 -lgdk-win32-2.0 -limm32 -lshell32 -luuid -latk-1.0 -lpangocairo-1.0 -lgio-2.0 -lshlwapi -ldnsapi -lgdk_pixbuf-2.0 -ltiff -ljpeg -ljasper -lpangoft2-1.0 -lpangowin32-1.0 -lusp10 -lfontconfig -lexpat -lpango-1.0 -lcairo -lpixman-1 -lfreetype -lmsimg32 -lgdi32 -lpng -lz -lm -lgobject-2.0 -lgmodule-2.0 -lgthread-2.0 -lglib-2.0 -lintl -liconv -lws2_32 -lole32</p>
-
-<p>记得保存这个结果，作为编译时的参数在后面要用到。<br/>
-然后编译一个程序试试，将以下代码保存为test.c文件。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="cp">#include &lt;gtk/gtk.h&gt;</span>
-</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span><span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[]){</span>
-</span><span class='line'>    <span class="n">GtkWidget</span> <span class="o">*</span><span class="n">window</span><span class="p">,</span> <span class="o">*</span><span class="n">label</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">gtk_init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">argc</span><span class="p">,</span><span class="o">&amp;</span><span class="n">argv</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">window</span> <span class="o">=</span> <span class="n">gtk_window_new</span><span class="p">(</span><span class="n">GTK_WINDOW_TOPLEVEL</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">gtk_window_set_title</span><span class="p">(</span><span class="n">GTK_WINDOW</span><span class="p">(</span><span class="n">window</span><span class="p">),</span><span class="s">&quot;Hellow World&quot;</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">g_signal_connect</span><span class="p">(</span><span class="n">G_OBJECT</span><span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="s">&quot;destroy&quot;</span><span class="p">,</span> <span class="n">G_CALLBACK</span><span class="p">(</span><span class="n">gtk_main_quit</span><span class="p">),</span> <span class="nb">NULL</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">label</span> <span class="o">=</span> <span class="n">gtk_label_new</span><span class="p">(</span><span class="s">&quot;龙昌博客:http://www.xefan.com&quot;</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">gtk_container_add</span> <span class="p">(</span><span class="n">GTK_CONTAINER</span> <span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="n">label</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">gtk_widget_show_all</span><span class="p">(</span><span class="n">window</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">gtk_main</span><span class="p">();</span>
-</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>执行命令进行编译：<br/>
-gcc -o test.exe test.c -mms-bitfields -IE:/Dev-Cpp/gtk+-2.0/include/gtk-2.0 -IE:/Dev-Cpp/gtk+-2.0/lib/gtk-2.0/include -IE:/Dev-Cpp/gtk+-2.0/include/atk-1.0 -IE:/Dev-Cpp/gtk+-2.0/include/cairo -IE:/Dev-Cpp/gtk+-2.0/include/gdk-pixbuf-2.0 -IE:/Dev-Cpp/gtk+-2.0/include/pango-1.0 -IE:/Dev-Cpp/gtk+-2.0/include/glib-2.0 -IE:/Dev-Cpp/gtk+-2.0/lib/glib-2.0/include -IE:/Dev-Cpp/gtk+-2.0/include/pixman-1 -IE:/Dev-Cpp/gtk+-2.0/include -IE:/Dev-Cpp/gtk+-2.0/include/freetype2 -I/gtk-dev/include/libpng14 -LE:/Dev-Cpp/gtk+-2.0/lib -L/gtk-dev/lib -lgtk-win32-2.0 -lgdk-win32-2.0 -limm32 -lshell32 -luuid -latk-1.0 -lpangocairo-1.0 -lgio-2.0 -lshlwapi -ldnsapi -lgdk_pixbuf-2.0 -ltiff -ljpeg -ljasper -lpangoft2-1.0 -lpangowin32-1.0 -lusp10 -lfontconfig -lexpat -lpango-1.0 -lcairo -lpixman-1 -lfreetype -lmsimg32 -lgdi32 -lpng -lz -lm -lgobject-2.0 -lgmodule-2.0 -lgthread-2.0 -lglib-2.0 -lintl -liconv -lws2_32 -lole32</p>
-
-<p>如果不出错的话则生成一个test.exe的可执行文件。<br/>
-如果没有gcc的话，可以下载安装一个MinGW程序，我之前用MinGW的gcc 4.4.0版本来编译结果出错了，然后换了个4.6版本的才能顺利编译，下载地址：<a href="http://nuwen.net/mingw.html">http://nuwen.net/mingw.html</a></p>
-
-<p>然后再介绍下在Linux下交叉编译的方法。</p>
-
-<p>前一篇文章介绍了在Linux下交叉编译Windows程序的方法。现在只需把上面的参数的路径改下即可。</p>
-
-<p>我的Windows的E盘在Linux下挂载到/mnt/Win_E ，再用上面的程序测试，执行命令：<br/>
-i486-mingw32-gcc -o test.exe test.c -mms-bitfields -I/mnt/Win_E/Dev-Cpp/gtk+-2.0/include/gtk-2.0 -I/mnt/Win_E/Dev-Cpp/gtk+-2.0/lib/gtk-2.0/include -I/mnt/Win_E/Dev-Cpp/gtk+-2.0/include/atk-1.0 -I/mnt/Win_E/Dev-Cpp/gtk+-2.0/include/cairo -I/mnt/Win_E/Dev-Cpp/gtk+-2.0/include/gdk-pixbuf-2.0 -I/mnt/Win_E/Dev-Cpp/gtk+-2.0/include/pango-1.0 -I/mnt/Win_E/Dev-Cpp/gtk+-2.0/include/glib-2.0 -I/mnt/Win_E/Dev-Cpp/gtk+-2.0/lib/glib-2.0/include -I/mnt/Win_E/Dev-Cpp/gtk+-2.0/include/pixman-1 -I/mnt/Win_E/Dev-Cpp/gtk+-2.0/include -I/mnt/Win_E/Dev-Cpp/gtk+-2.0/include/freetype2 -I/gtk-dev/include/libpng14  -L/mnt/Win_E/Dev-Cpp/gtk+-2.0/lib -L/gtk-dev/lib -lgtk-win32-2.0 -lgdk-win32-2.0 -limm32 -lshell32 -luuid -latk-1.0 -lpangocairo-1.0 -lgio-2.0 -lshlwapi -ldnsapi -lgdk_pixbuf-2.0 -ltiff -ljpeg -ljasper -lpangoft2-1.0 -lpangowin32-1.0 -lusp10 -lfontconfig -lexpat -lpango-1.0 -lcairo -lpixman-1 -lfreetype -lmsimg32 -lgdi32 -lpng -lz -lm -lgobject-2.0 -lgmodule-2.0 -lgthread-2.0 -lglib-2.0 -lintl -liconv -lws2_32 -lole32</p>
-
-<p>然后生成 test.exe文件，可以用wine来测试下是否可用。</p>
-
-<p>这个生成的文件好像有点大了，随便一个都是25M以上。使用命令：<br/>
-i486-mingw32-strip hellow.exe<br/>
-一下子可以减到7M左右。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/page/16">&larr; Older</a>
@@ -1709,6 +1673,10 @@ i486-mingw32-strip hellow.exe<br/>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="http://www.xefan.com/archives/84154.html">在Ruby中使用DATA和__END__将代码和数据混合</a>
+      </li>
+    
+      <li class="post">
         <a href="http://www.xefan.com/archives/84153.html">Mac下使用supervisor进行服务管理</a>
       </li>
     
@@ -1724,19 +1692,15 @@ i486-mingw32-strip hellow.exe<br/>
         <a href="http://www.xefan.com/archives/84150.html">AngularJS学习笔记4——依赖注入</a>
       </li>
     
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84149.html">AngularJS学习笔记3——表单</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (31)</a></li><li><a href='/categories/web开发/index.html'>web开发 (19)</a></li><li><a href='/categories/前端相关/index.html'>前端相关 (6)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (16)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (23)</a></li></ul>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (32)</a></li><li><a href='/categories/web开发/index.html'>web开发 (19)</a></li><li><a href='/categories/前端相关/index.html'>前端相关 (6)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (16)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (23)</a></li></ul>
 </section>
 <section>
   <h1>Tag Cloud</h1>
-    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.7910447761194%'>ajax(2)</a> <a href='/tags/angular/index.html' style='font-size: 104.4776119402985%'>angular(5)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 106.26865671641791%'>js(7)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mac/index.html' style='font-size: 100.8955223880597%'>Mac(1)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 128.65671641791045%'>Ruby(32)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 122.38805970149254%'>翻译(25)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.7910447761194%'>ajax(2)</a> <a href='/tags/angular/index.html' style='font-size: 104.4776119402985%'>angular(5)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 106.26865671641791%'>js(7)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mac/index.html' style='font-size: 100.8955223880597%'>Mac(1)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 129.55223880597015%'>Ruby(33)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 123.28358208955224%'>翻译(26)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
 </section>
 <section>
   <h1>Link</h1>

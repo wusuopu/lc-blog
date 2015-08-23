@@ -4,7 +4,7 @@
   <title><![CDATA[龍昌博客]]></title>
   <link href="http://www.xefan.com/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2015-08-22T17:56:18+08:00</updated>
+  <updated>2015-08-23T11:53:17+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -12,6 +12,238 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[在Ruby中使用DATA和__END__将代码和数据混合]]></title>
+    <link href="http://www.xefan.com/archives/84154.html"/>
+    <updated>2015-08-23T10:12:08+08:00</updated>
+    <id>http://www.xefan.com/archives/84154-在Ruby中使用DATA和__END__将代码和数据混合</id>
+    <content type="html"><![CDATA[<p>之前一直不理解 <code>__END__</code> 的用法，现在看了这篇文章后才算是了解了，于是便翻译之。<br/>
+《Mixing code and data in Ruby with DATA and __END__》: <a href="http://blog.honeybadger.io/data-and-end-in-ruby/">http://blog.honeybadger.io/data-and-end-in-ruby/</a></p>
+
+<hr />
+
+<p>你知道 Ruby 提供了一种方法在你的脚本中可以将源文件作为数据源来使用吗？当你在写一些一次性的脚本用于验证概念时这个小技巧会为你节约一些时间。让我们来看看吧。</p>
+
+<h2>DATA 和 __END__</h2>
+
+<p>在下面这个例子中，我使用了一个有趣的关键字 <code>__END__</code>。所有在 <code>__END__</code> 下面的内容将会被 Ruby 解释器所忽略。但是有趣的是 ruby 为你提供了一个称为 <code>DATA</code> 的 IO 对象，就像你可以读取其他任何文件一样，它能让你读取到 <code>__END__</code> 以下的所有内容。</p>
+
+<p>下面这个例子中，我们遍历每一行并进行输出。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">DATA</span><span class="o">.</span><span class="n">each_line</span> <span class="k">do</span> <span class="o">|</span><span class="n">line</span><span class="o">|</span>
+</span><span class='line'>  <span class="nb">puts</span> <span class="n">line</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">__END__</span>
+</span><span class='line'><span class="cp">Doom</span>
+</span><span class='line'><span class="cp">Quake</span>
+</span><span class='line'><span class="cp">Diablo</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>关于这个技术我最喜欢的实例是使用 <code>DATA</code> 来包含一个 ERB 模板。它同样也可用于 YAML、CSV等等。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;erb&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">time</span> <span class="o">=</span> <span class="no">Time</span><span class="o">.</span><span class="n">now</span>
+</span><span class='line'><span class="n">renderer</span> <span class="o">=</span> <span class="no">ERB</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="no">DATA</span><span class="o">.</span><span class="n">read</span><span class="p">)</span>
+</span><span class='line'><span class="nb">puts</span> <span class="n">renderer</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">__END__</span>
+</span><span class='line'><span class="cp">The current time is &lt;%= time %&gt;.</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>实际上你也可以使用 <code>DATA</code> 来读取 <code>__END__</code> 关键字以上的内容。那是因为 <code>DATA</code> 实际上是一个指向了整个源文件，并定位到 <code>__END__</code> 关键字的位置。你可以试试看在输出之前将 IO 对象反转。下面这个例子将会输出整个源文件。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">DATA</span><span class="o">.</span><span class="n">rewind</span>
+</span><span class='line'><span class="nb">puts</span> <span class="no">DATA</span><span class="o">.</span><span class="n">read</span> <span class="c1"># prints the entire source file</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">__END__</span>
+</span><span class='line'><span class="cp">meh</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>多文件问题</h2>
+
+<p>这个技术最大的缺点是它只能用于单个文件的脚本，直接运行该文件，不能在其他文件进行导入。</p>
+
+<p>下面这个例子，我们有两个文件，并且每个都有它们自己的 <code>__END__</code> 部分。然而却只有一个全局 <code>DATA</code> 对象。因此第二个文件的 <code>__END__</code> 部分刚访问不到了。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># first.rb</span>
+</span><span class='line'><span class="nb">require</span> <span class="s2">&quot;./second&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">puts</span> <span class="s2">&quot;First file</span><span class="se">\n</span><span class="s2">----------------------&quot;</span>
+</span><span class='line'><span class="nb">puts</span> <span class="no">DATA</span><span class="o">.</span><span class="n">read</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">print_second_data</span><span class="p">()</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">__END__</span>
+</span><span class='line'><span class="cp">First end clause</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># second.rb</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">print_second_data</span>
+</span><span class='line'>  <span class="nb">puts</span> <span class="s2">&quot;Second file</span><span class="se">\n</span><span class="s2">----------------------&quot;</span>
+</span><span class='line'>  <span class="nb">puts</span> <span class="no">DATA</span><span class="o">.</span><span class="n">read</span> <span class="c1"># Won&#39;t output anything, since first.rb read the entire file</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">__END__</span>
+</span><span class='line'><span class="cp"> </span>
+</span><span class='line'><span class="cp">Second end clause</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">snhorne</span> <span class="o">~</span><span class="sr">/tmp $ ruby first.rb</span>
+</span><span class='line'><span class="sr">First file</span>
+</span><span class='line'><span class="sr">----------------------</span>
+</span><span class='line'><span class="sr">First end clause</span>
+</span><span class='line'><span class="sr"> </span>
+</span><span class='line'><span class="sr">Second file</span>
+</span><span class='line'><span class="sr">----------------------</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>对于多文件的一个解决方案</h2>
+
+<p>在 Sinatra 中有一个很酷的特性是它允许你在你应用的 <code>__END__</code> 部分添加多个内联模板。它看起来像下面这样：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># This code is from the Sinatra docs at http://www.sinatrarb.com/intro.html</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;sinatra&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">get</span> <span class="s1">&#39;/&#39;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">haml</span> <span class="ss">:index</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">__END__</span>
+</span><span class='line'><span class="cp"> </span>
+</span><span class='line'><span class="cp">@@ layout</span>
+</span><span class='line'><span class="cp">%html</span>
+</span><span class='line'><span class="cp"> </span>
+</span><span class='line'><span class="cp">  = yield</span>
+</span><span class='line'><span class="cp"> </span>
+</span><span class='line'><span class="cp">@@ index</span>
+</span><span class='line'><span class="cp">%div.title Hello world.</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>sinatra 是如何实现的呢？毕竟你的应用可能是运行在 rack 上。在生产环境中你不能再通过 <code>ruby myapp.rb</code> 来运行！他们必须有一种在多文件中使用 <code>DATA</code> 的解决方案。</p>
+
+<p>因此如果你稍微深入一下 Sinatra 的源代码，你会发现它们并没有使用 <code>DATA</code>。而是使用了跟下面这段代码类似的方案。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># I&#39;m paraphrasing. See the original at https://github.com/sinatra/sinatra/blob/master/lib/sinatra/base.rb#L1284</span>
+</span><span class='line'><span class="n">app</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="no">File</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">__FILE__</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sr">/^__END__$/</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>实际上它比这个要更复杂一些，因为它们不想读取 <code>__FILE__</code>，它只是 <code>sinatra/base.rb</code> 文件。它们其实是需要获取调用了该方法的文件的内容。它们通过解析 <code>caller</code> 的结果来获取。</p>
+
+<p><code>caller</code> 方法将会告诉你当前运行的方法是从哪调用的。这里是个简单的例子：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">some_method</span>
+</span><span class='line'>  <span class="nb">puts</span> <span class="nb">caller</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">some_method</span> <span class="c1"># =&gt; caller.rb:5:in `&lt;main&gt;&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>现在可以简单地获取到文件名了，然后从该文件中再提取出与 <code>DATA</code> 等价的内容。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">get_caller_data</span>
+</span><span class='line'>  <span class="nb">puts</span> <span class="no">File</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="nb">caller</span><span class="o">.</span><span class="n">first</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;__END__&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">last</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>请善用它，不要作恶</h2>
+
+<p>希望对于这些技巧你不要经常使用。它们不会使得代码干净、可维护。</p>
+
+<p>然后，你偶尔需要一些又快又脏的实现一个一次性的脚本或者验证一些概念。此时 <code>DATA</code> 和 <code>__END__</code> 就非常有用了。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Mac下使用supervisor进行服务管理]]></title>
@@ -2926,37 +3158,6 @@ Devise是利用了 <code>included</code> 钩子来实现这些的。非常的优
 <p>这个内容比较简单， <code>client_max_body_size</code> 项是用于设置 http 请求的 body 最大大小。如果你的程序中有文件上传的，那么就需要根据自身情况来设置允许上传文件的最大值。</p>
 
 <p>最后再启动 nginx 服务。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[配置rails的vim环境]]></title>
-    <link href="http://www.xefan.com/archives/84134.html"/>
-    <updated>2014-11-08T16:02:58+08:00</updated>
-    <id>http://www.xefan.com/archives/84134-配置rails的vim环境</id>
-    <content type="html"><![CDATA[<p>今天分享一款 vim 的 rails 插件： <code>vim-rails</code> 。</p>
-
-<p>使用该插件可以方便的在多个文件之间进行跳转。如在控制器的 action 上按 <code>gf</code> 键会自动跳转到对应的视图文件。</p>
-
-<p>也可以使用 <code>:Emodel</code>, <code>:Eview</code>, <code>:Econtroller</code>, 命令在模型、视图以及控制器之间进行跳转。</p>
-
-<p>该插件还提供了对 rails 的一些关键字的高亮。</p>
-
-<p>并且还可以直接在 vim 中使用 <code>:Rails</code> 命令。</p>
-
-<p>同时还有 <code>vim-rake</code> 和 <code>vim-bundler</code> 两个插件提供了 <code>rake</code> 和 <code>bundle</code> 的 vim 命令接口。</p>
-
-<p>如果是用的 vundle 进行插件管理的话，可以直接在 .vimrc 配置中添加如下内容即可：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>Bundle 'tpope/vim-rails'
-</span><span class='line'>Bundle 'tpope/vim-rake'
-</span><span class='line'>Bundle 'tpope/vim-bundler'</span></code></pre></td></tr></table></div></figure>
-
-
-<p>然后再在vim执行命令 :BundleInstall 即可。</p>
 ]]></content>
   </entry>
   
