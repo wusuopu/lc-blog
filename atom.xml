@@ -4,7 +4,7 @@
   <title><![CDATA[龍昌博客]]></title>
   <link href="http://www.xefan.com/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2015-08-23T11:53:17+08:00</updated>
+  <updated>2015-08-24T10:28:02+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -12,6 +12,50 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[AngularJS学习笔记6——与jQuery、Bootstrap结合]]></title>
+    <link href="http://www.xefan.com/archives/84155.html"/>
+    <updated>2015-08-24T10:25:28+08:00</updated>
+    <id>http://www.xefan.com/archives/84155-AngularJS学习笔记6——与jQuery、Bootstrap结合</id>
+    <content type="html"><![CDATA[<h2>jQuery</h2>
+
+<p>如果想要在 angular 内部调用 jQuery 的函数（如 jQuery 的 ajax 功能）比较简单，直接调用 <code>$.ajax</code> 即可。<br/>
+但是如果想要在 angular 外部调用其函数就稍微麻烦一点，毕竟这也与 angular 的设计理念不符。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;div ng-controller="PageController"&gt;
+</span><span class='line'>  ...
+</span><span class='line'>&lt;/div&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;script&gt;
+</span><span class='line'>  var appModule = angular.module('myApp', []);
+</span><span class='line'>  appModule.controller('PageController', ['$scope', '$http', function($scope, $http){
+</span><span class='line'>      ...
+</span><span class='line'>  }]);</span></code></pre></td></tr></table></div></figure>
+
+
+<p>例如上个这段代码，如果想要从外部访问 <code>PageController</code> 中的某些内容。则可以先获取 <code>PageController</code> 的上下文对象($scope)：<code>angular.element($('[ng-controller="PageController"]')).scope();</code><br/>
+在外部修改了 <code>scope</code> 的某些值时会发现对应的视图并没有更新，这时还需要调用 <code>scope</code> 的 <code>$digest</code> 方法进行同步，或者直接调用 <code>$apply</code> 方法进行操作。</p>
+
+<h2>Bootstrap</h2>
+
+<p>之前使用 angularjs 时遇到了 Bootstrap 的控件不能正常使用了，如 dropdown 组件点击了没有效果。<br/>
+经过分析发现是 angularjs 将 Bootstrap 的组件的事件给截获了。</p>
+
+<p>好在有 angular-bootstrap 这么一个组件可以将它们整合在一起。</p>
+
+<p><a href="http://angular-ui.github.io/bootstrap/">http://angular-ui.github.io/bootstrap/</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[在Ruby中使用DATA和__END__将代码和数据混合]]></title>
@@ -3065,99 +3109,6 @@ Devise是利用了 <code>included</code> 钩子来实现这些的。非常的优
 并加上 <code>XDEBUG_SESSION_START=1</code> 参数，如： <a href="http://127.0.0.1/test.php?XDEBUG_SESSION_START=1">http://127.0.0.1/test.php?XDEBUG_SESSION_START=1</a></p>
 
 <p>现在就可以在 vim 中对 php 程序进行单步调试了。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Nginx + Uwsgi + Django环境配置]]></title>
-    <link href="http://www.xefan.com/archives/84135.html"/>
-    <updated>2014-11-11T21:02:17+08:00</updated>
-    <id>http://www.xefan.com/archives/84135-Nginx+uwsgi+Django环境配置</id>
-    <content type="html"><![CDATA[<p>有段时间没折腾 Django 了，又有点生疏了。最近又部署了一下 Django 的环境，顺便作个笔记以便之后查阅。</p>
-
-<p>首先安装 nginx、uwsgi 以及 uwsgi 的 python 插件。</p>
-
-<p>然后新建一个 uwsgi 的配置文件：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>[uwsgi]
-</span><span class='line'>uid = www-data
-</span><span class='line'>chdir = /repo/django-blog
-</span><span class='line'>virtualenv = /repo/django-blog/pyenv2.7/    # python虚拟环境，没有可以不设置
-</span><span class='line'>env = DJANGO_SETTINGS_MODULE=blog.settings
-</span><span class='line'>module = blog.wsgi:application
-</span><span class='line'>master = true
-</span><span class='line'>plugin = python
-</span><span class='line'>pidfile = /tmp/blog-master.pid
-</span><span class='line'>socket = /tmp/blog.sock
-</span><span class='line'>enable-threads = true
-</span><span class='line'>post-buffering=1024000
-</span><span class='line'>post-buffering-busize=655360</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这里我们的 Django 项目代码位于 <code>/repo/django-blog</code> ，项目的配置文件为： <code>blog/settings.py</code> 。</p>
-
-<p><code>virtualenv</code> 项表明我们使用的是 <code>virtualenv</code> 环境，也可以直接系统的 python 环境。不过还是建议使用虚拟环境，以免软件包版本冲突。</p>
-
-<p><code>post-buffering</code> 和 <code>post-buffering-busize</code> 这两项设置了 POST 请求时缓冲区的大小，该值可根据自己的情况进行调整。之前遇到过由于缓冲区不足导致返回的内容不完整。</p>
-
-<p>再安装对应的 python 依赖包，然后运行 uwsgi 服务。</p>
-
-<p>接着修改 nginx 的配置：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>server {
-</span><span class='line'>  listen 80;
-</span><span class='line'>  server_name localhost;
-</span><span class='line'>
-</span><span class='line'>  client_max_body_size 50m;
-</span><span class='line'>
-</span><span class='line'>  access_log /var/log/nginx/blog-access.log;
-</span><span class='line'>  error_log /var/log/nginx/blog-error.log;
-</span><span class='line'>
-</span><span class='line'>  location / {
-</span><span class='line'>    uwsgi_pass unix:///tmp/blog.sock;
-</span><span class='line'>    include uwsgi_params;
-</span><span class='line'>  }
-</span><span class='line'>
-</span><span class='line'>  location /static {
-</span><span class='line'>    alias /repo/django-blog/static/;
-</span><span class='line'>  }
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这个内容比较简单， <code>client_max_body_size</code> 项是用于设置 http 请求的 body 最大大小。如果你的程序中有文件上传的，那么就需要根据自身情况来设置允许上传文件的最大值。</p>
-
-<p>最后再启动 nginx 服务。</p>
 ]]></content>
   </entry>
   

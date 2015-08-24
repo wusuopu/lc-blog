@@ -9,7 +9,7 @@
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="与Django一样，Document类都有一个 objects 属性。它用于将类与数据库关联起来。objects属性是一个QuerySetManager类型的对象，它的操作会返回一个QuerySet类型的对象。可以通过对QuerySet对象的迭代获取数据库中的数据。 class User( &hellip;">
+  <meta name="description" content="MongoDB的GridFS支持直接在数据库中存储文件。要在MongoEngine中使用GridFS，只要使用 FileField 对象即可。以下是一个例子： class Animal(Document): genus = StringField() family = StringField() &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -66,6 +66,94 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84072.html">Mongoengine教程(4)——文件存储</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-04-05T00:00:00+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>5</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/84072.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/84072.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>MongoDB的GridFS支持直接在数据库中存储文件。要在MongoEngine中使用GridFS，只要使用 FileField 对象即可。以下是一个例子：</p>
+
+
+<pre><code>class Animal(Document):
+    genus = StringField()
+    family = StringField()
+    photo = FileField()
+
+marmot = Animal(genus='Marmota', family='Sciuridae')
+
+marmot_photo = open('gtk.png', 'rb')
+marmot.photo.put(marmot_photo, content_type = 'image/png')
+marmot.save()
+</code></pre>
+
+
+<p>这个例子将 gtk.png 这个图片存入了数据库中。<br>
+文件的读取也很简单：</p>
+
+
+<pre><code>marmot = Animal.objects(genus='Marmota').first()
+photo = marmot.photo.read()
+content_type = marmot.photo.content_type
+</code></pre>
+
+
+<p>FileField不仅可以存储文件，还可以用来存储数据流。只是操作上略微不同。</p>
+
+
+<p>要存储数据流，首先先创建一个新的文件，然后再往里面写入数据。</p>
+
+
+<pre><code>marmot.photo.new_file()
+marmot.photo.write('some_image_data')
+marmot.photo.write('some_more_image_data')
+marmot.photo.close()
+marmot.save()
+</code></pre>
+
+
+<p>如果要删除存储在数据库中的文件，只需要调用该文件对象的 delete 方法：</p>
+
+
+<pre><code>marmot.photo.delete()
+</code></pre>
+
+
+<p>注意：一条文档记录中的FileField字段只保存了对GridFS集合中该文件的ID引用。这意味着如果该文档被删除了，对用的文件不会被删除。因此在删除这类文档时需要小心，以免出现孤立文件。</p>
+
+
+<p>对于已存储的文件可以进行替换修改：</p>
+
+
+<pre><code>another_marmot = open('python.png', 'rb')
+marmot.photo.replace(another_marmot, content_type='image/png')
+</code></pre>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1178,146 +1266,6 @@ test
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84039.html">使用nvm进行node多版本管理</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2014-01-23T00:00:00+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>23</span><span class='date-suffix'>rd</span>, <span class='date-year'>2014</span></span> <span class='time'>12:00 am</span></time>
-        
-           | <a href="http://www.xefan.com/archives/84039.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/84039.html">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>nvm与Python的virtualenv和Ruby的rvm类似。<br>
-NVM (Node Version Manager，Node多版本管理器)是一个通用的叫法,它目前有许多不同的实现。通常我们说的 nvm 是指 https://github.com/creationix/nvm 或者 https://github.com/visionmedia/n 。这两个工具都是使用shell编写的。</p>
-
-
-<h2>n</h2>
-
-
-<p>个人感觉 n 比较简洁些，它就只有一个脚本文件。  </p>
-
-
-<h3>安装</h3>
-
-
-<p>如果已经安装了npm的话，可以直接执行命令进行安装n :</p>
-
-
-<pre><code>$ npm install -g n
-</code></pre>
-
-
-<p>或者是直接获取源代码安装：</p>
-
-
-<pre><code>$ git clone https://github.com/visionmedia/n.git
-$ cd n
-$ [sudo] make install
-</code></pre>
-
-
-<h3>使用</h3>
-
-
-<p>直接运行 n 命令查看所有已安装的版本。</p>
-
-
-<pre><code>$ n
-</code></pre>
-
-
-<p>运行命令 n <version> 进行安装指定版本的node。 version 可以是 stable(最新稳定版)、latest(最新版)或者具体的版本数字。</p>
-
-
-<pre><code>$ n stable
-install : v0.10.24
-mkdir : /usr/local/n/versions/0.10.24
-fetch : http://nodejs.org/dist/v0.10.24/node-v0.10.24-linux-x64.tar.gz
-</code></pre>
-
-
-<p>指定的版本将会安装在 /usr/local/n/versions 目录下。</p>
-
-
-<p>运行命令 n rm <version> 删除已安装指定版本的node。</p>
-
-
-<p>运行命令 n use <version> 选择使用指定版本的node。</p>
-
-
-<h2>nvm</h2>
-
-
-<h3>安装</h3>
-
-
-<pre><code>$ git clone https://github.com/creationix/nvm.git ~/.nvm
-$ source ~/.nvm/nvm.sh
-</code></pre>
-
-
-<h3>使用</h3>
-
-
-<p>查看已安装的版本：</p>
-
-
-<pre><code>$ nvm ls
-</code></pre>
-
-
-<p>查看可以安装的版本：</p>
-
-
-<pre><code>$ nvm ls-remote
-</code></pre>
-
-
-<p>安装指定的版本：</p>
-
-
-<pre><code>$ nvm install &lt;version&gt;
-</code></pre>
-
-
-<p>指定的版本将会直接安装在 nvm 程序所在的目录下。</p>
-
-
-<p>删除指定的版本：</p>
-
-
-<pre><code>$ nvm uninstall &lt;version&gt;
-</code></pre>
-
-
-<p>使用选定的版本：</p>
-
-
-<pre><code>$ nvm use &lt;version&gt;
-</code></pre>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/page/6">&larr; Older</a>
@@ -1339,6 +1287,10 @@ $ source ~/.nvm/nvm.sh
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="http://www.xefan.com/archives/84155.html">AngularJS学习笔记6——与jQuery、Bootstrap结合</a>
+      </li>
+    
+      <li class="post">
         <a href="http://www.xefan.com/archives/84154.html">在Ruby中使用DATA和__END__将代码和数据混合</a>
       </li>
     
@@ -1354,19 +1306,15 @@ $ source ~/.nvm/nvm.sh
         <a href="http://www.xefan.com/archives/84151.html">AngularJS学习笔记5——路由</a>
       </li>
     
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84150.html">AngularJS学习笔记4——依赖注入</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (32)</a></li><li><a href='/categories/web开发/index.html'>web开发 (19)</a></li><li><a href='/categories/前端相关/index.html'>前端相关 (6)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (16)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (23)</a></li></ul>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (32)</a></li><li><a href='/categories/web开发/index.html'>web开发 (19)</a></li><li><a href='/categories/前端相关/index.html'>前端相关 (7)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (16)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (23)</a></li></ul>
 </section>
 <section>
   <h1>Tag Cloud</h1>
-    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.7910447761194%'>ajax(2)</a> <a href='/tags/angular/index.html' style='font-size: 104.4776119402985%'>angular(5)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 106.26865671641791%'>js(7)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mac/index.html' style='font-size: 100.8955223880597%'>Mac(1)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 129.55223880597015%'>Ruby(33)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 123.28358208955224%'>翻译(26)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.7910447761194%'>ajax(2)</a> <a href='/tags/angular/index.html' style='font-size: 105.3731343283582%'>angular(6)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 107.16417910447761%'>js(8)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mac/index.html' style='font-size: 100.8955223880597%'>Mac(1)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 129.55223880597015%'>Ruby(33)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 123.28358208955224%'>翻译(26)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
 </section>
 <section>
   <h1>Link</h1>

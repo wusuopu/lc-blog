@@ -9,8 +9,7 @@
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="Rabin-Karp设计了一个巧妙的hash算法。用到的数学公式为：t(s+1) = (d(t(s)-T[s+1]h)+T[s+m+1]) mod q
-t(s+1)为目标字符串的子字符串T[s+1,s+m+1]的哈希值，因为用到了上一次的结果t(s)，所以可以节省计算时间。 &hellip;">
+  <meta name="description" content="突然对Python中list对象的sort函数比较好奇，想知道它用的是什么算法。正好最近我也在复习算法，于是就随便把Python的sort也研究一下吧。刚开始我猜想可能用是快速排序之类的，最后看了 Python的源代码之后发现其实用的是一个适应性强的、稳定的、自然的归并算法，名为timsort。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -67,6 +66,48 @@ t(s+1)为目标字符串的子字符串T[s+1,s+m+1]的哈希值，因为用到�
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83857.html">Python中的排序算法——Timsort</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-07-13T00:00:00+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83857.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83857.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>突然对Python中list对象的sort函数比较好奇，想知道它用的是什么算法。正好最近我也在复习算法，于是就随便把Python的sort也研究一下吧。刚开始我猜想可能用是快速排序之类的，最后看了 Python的源代码之后发现其实用的是一个适应性强的、稳定的、自然的归并算法，名为timsort。</p>
+
+<p>Timsort是一种混合的算法，它派生自归并排序和插入排序。它是2002年由Tim Peters为Python语言发明的。<br/>
+Timsort的时间复杂度最好情况为O(n)，平均情况为O(nlogn)，最差情况为O(nlogn)；空间复杂度为O(n)。<br/>
+更多关于Timsort的信息： <a href="http://en.wikipedia.org/wiki/Timsort">http://en.wikipedia.org/wiki/Timsort</a></p>
+
+<p>在<a target="_blank" href="http://www.amazon.cn/gp/product/B003LPO4KS/ref=as_li_ss_tl?ie=UTF8&camp=536&creative=3132&creativeASIN=B003LPO4KS&linkCode=as2&tag=wosuopu-23">《Python Cookbook(第2版)中文版》</a>这本书的第5章中由Tim Peters介绍了Python排序算法发展简史。其中说到Timsort算法的实现包括了大约1200行C程序，而且大概有一半是在实现一个技术上的技巧。可见该算法还是很复杂的。</p>
+
+<p>在Python源代码目录下有Objects/listsort.txt这个文件，这是Tim Peters写的一个详细的文档。</p>
+
+<p>有个项目致力于用纯C来实现Timsort算法，如Tim所言代码量超过了1200行。<a href="http://code.google.com/p/timsort/">http://code.google.com/p/timsort/</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1573,132 +1614,6 @@ h等于d<sup>m-1</sup> % q。其实模q运算应该是可有可无的，加入q�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83828.html">常用的排序算法（一）——冒泡排序</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2013-07-06T00:00:00+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>6</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
-        
-           | <a href="http://www.xefan.com/archives/83828.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/83828.html">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><b>前言：</b><br>
-自从毕业了之后就没怎么用到算法，以致于之前学的都忘得差不多了。最近决定抽空再把算法重新学习一下，虽然平时也用不上。<br/>
-这次学习我是把<a href="http://www.amazon.cn/gp/product/B0011BVTRK/ref=as_li_ss_tl?ie=UTF8&camp=536&creative=3132&creativeASIN=B0011BVTRK&linkCode=as2&tag=wosuopu-23" target="_blank">算法导论</a>、<a href="http://www.amazon.cn/gp/product/B003DQPPIU/ref=as_li_ss_tl?ie=UTF8&camp=536&creative=3132&creativeASIN=B003DQPPIU&linkCode=as2&tag=wosuopu-23" target="_blank">算法技术手册</a>和<a href="http://www.amazon.cn/gp/product/B00AX3NSAS/ref=as_li_ss_tl?ie=UTF8&camp=536&creative=3132&creativeASIN=B00AX3NSAS&linkCode=as2&tag=wosuopu-23" target="_blank">数据结构(严蔚敏)</a>这三本书混合着看。</p>
-
-<p> </p>
-
-
-<p><b>正文：</b><br>
-冒泡排序的时间复杂度为O(n*n)，它的原理比较简单。基本思路就是从第1个元素开始，依次的把该元素与后一个元素进行比较，如果比后一个元素大则交换它们的位置；每1次全部比较完成之后，最大的那个元素就放在了最后。重复之前的操作，直到所有元素都排好序。</p>
-
-<p>用C语言实现如下：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="cp">#include &lt;stdio.h&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kt">void</span> <span class="nf">print_list</span><span class="p">(</span><span class="kt">int</span> <span class="o">*</span><span class="n">ar</span><span class="p">,</span> <span class="kt">int</span> <span class="n">n</span><span class="p">)</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;[ &quot;</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">n</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%d &quot;</span><span class="p">,</span> <span class="n">ar</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;]</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="kt">void</span> <span class="nf">bubble_sort</span><span class="p">(</span><span class="kt">int</span> <span class="o">*</span><span class="n">ar</span><span class="p">,</span> <span class="kt">int</span> <span class="n">n</span><span class="p">)</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">;</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">tmp</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">for</span> <span class="p">(</span><span class="n">j</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">j</span><span class="o">&lt;</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="n">ar</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">ar</span><span class="p">[</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span> <span class="p">{</span>
-</span><span class='line'>                <span class="n">tmp</span> <span class="o">=</span> <span class="n">ar</span><span class="p">[</span><span class="n">j</span><span class="p">];</span>
-</span><span class='line'>                <span class="n">ar</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">ar</span><span class="p">[</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">];</span>
-</span><span class='line'>                <span class="n">ar</span><span class="p">[</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">;</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">a</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">14</span><span class="p">};</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">len</span><span class="o">=</span><span class="k">sizeof</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="o">/</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;begin: &quot;</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">print_list</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">len</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">bubble_sort</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">len</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;end: &quot;</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">print_list</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">len</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>冒泡排序演示图片：
-<img src="http://www.linuxeden.com/upimg/allimg/130504/1021142193-4.gif"></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/page/12">&larr; Older</a>
@@ -1720,6 +1635,10 @@ h等于d<sup>m-1</sup> % q。其实模q运算应该是可有可无的，加入q�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="http://www.xefan.com/archives/84155.html">AngularJS学习笔记6——与jQuery、Bootstrap结合</a>
+      </li>
+    
+      <li class="post">
         <a href="http://www.xefan.com/archives/84154.html">在Ruby中使用DATA和__END__将代码和数据混合</a>
       </li>
     
@@ -1735,19 +1654,15 @@ h等于d<sup>m-1</sup> % q。其实模q运算应该是可有可无的，加入q�
         <a href="http://www.xefan.com/archives/84151.html">AngularJS学习笔记5——路由</a>
       </li>
     
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84150.html">AngularJS学习笔记4——依赖注入</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (32)</a></li><li><a href='/categories/web开发/index.html'>web开发 (19)</a></li><li><a href='/categories/前端相关/index.html'>前端相关 (6)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (16)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (23)</a></li></ul>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (32)</a></li><li><a href='/categories/web开发/index.html'>web开发 (19)</a></li><li><a href='/categories/前端相关/index.html'>前端相关 (7)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (16)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (23)</a></li></ul>
 </section>
 <section>
   <h1>Tag Cloud</h1>
-    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.7910447761194%'>ajax(2)</a> <a href='/tags/angular/index.html' style='font-size: 104.4776119402985%'>angular(5)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 106.26865671641791%'>js(7)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mac/index.html' style='font-size: 100.8955223880597%'>Mac(1)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 129.55223880597015%'>Ruby(33)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 123.28358208955224%'>翻译(26)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.7910447761194%'>ajax(2)</a> <a href='/tags/angular/index.html' style='font-size: 105.3731343283582%'>angular(6)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 107.16417910447761%'>js(8)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mac/index.html' style='font-size: 100.8955223880597%'>Mac(1)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 129.55223880597015%'>Ruby(33)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 123.28358208955224%'>翻译(26)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
 </section>
 <section>
   <h1>Link</h1>

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 前端相关 | 龍昌博客]]></title>
   <link href="http://www.xefan.com/categories/前端相关/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2015-08-23T11:53:17+08:00</updated>
+  <updated>2015-08-24T10:28:02+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -12,6 +12,46 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[AngularJS学习笔记6——与jQuery、Bootstrap结合]]></title>
+    <link href="http://www.xefan.com/archives/84155.html"/>
+    <updated>2015-08-24T10:25:28+08:00</updated>
+    <id>http://www.xefan.com/archives/84155-AngularJS学习笔记6——与jQuery、Bootstrap结合</id>
+    <content type="html"><![CDATA[<h2>jQuery</h2>
+
+<p>如果想要在 angular 内部调用 jQuery 的函数（如 jQuery 的 ajax 功能）比较简单，直接调用 <code>$.ajax</code> 即可。<br/>
+但是如果想要在 angular 外部调用其函数就稍微麻烦一点，毕竟这也与 angular 的设计理念不符。</p>
+
+<p>&#8220;`</p>
+
+<div ng-controller="PageController">
+  &#8230;
+</div>
+
+
+
+
+<p><script>
+  var appModule = angular.module(&lsquo;myApp&rsquo;, []);
+  appModule.controller(&lsquo;PageController&rsquo;, [&lsquo;$scope&rsquo;, &lsquo;$http&rsquo;, function($scope, $http){
+      &hellip;
+  }]);
+```</p>
+
+<p>例如上个这段代码，如果想要从外部访问 <code>PageController</code> 中的某些内容。则可以先获取 <code>PageController</code> 的上下文对象($scope)：<code>angular.element($('[ng-controller="PageController"]')).scope();</code><br/>
+在外部修改了 <code>scope</code> 的某些值时会发现对应的视图并没有更新，这时还需要调用 <code>scope</code> 的 <code>$digest</code> 方法进行同步，或者直接调用 <code>$apply</code> 方法进行操作。</p>
+
+<h2>Bootstrap</h2>
+
+<p>之前使用 angularjs 时遇到了 Bootstrap 的控件不能正常使用了，如 dropdown 组件点击了没有效果。<br/>
+经过分析发现是 angularjs 将 Bootstrap 的组件的事件给截获了。</p>
+
+<p>好在有 angular-bootstrap 这么一个组件可以将它们整合在一起。</p>
+
+<p><a href="http://angular-ui.github.io/bootstrap/">http://angular-ui.github.io/bootstrap/</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Riot.js之初体验]]></title>
@@ -247,73 +287,6 @@ routeApp.run(function($templateCache) {
 <li>month</li>
 </ul>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[AngularJS学习笔记2——模板]]></title>
-    <link href="http://www.xefan.com/archives/84148.html"/>
-    <updated>2015-08-14T22:00:21+08:00</updated>
-    <id>http://www.xefan.com/archives/84148-AngularJS学习笔记2——模板</id>
-    <content type="html"><![CDATA[<h2>ngRepeat</h2>
-
-<p>对于一些需要循环遍历的对象可以使用 <code>ngRepeat</code> 指令。 如：</p>
-
-<pre><code>  &lt;li ng-repeat="msg in messages"&gt; &lt;/li&gt;
-
-  // 对于 messages 数组进行遍历
-  $scope.messages =  [
-    "第一条消息",
-    "第二条消息",
-    "第三条消息",
-    "第四条消息",
-    "第五条消息"
-  ];
-</code></pre>
-
-<h2>ngSwitch</h2>
-
-<p>使用 <code>ngSwitch</code> 指令在不同条件下显示不同内容。</p>
-
-<p>&#8220;`</p>
-
-<div ng-controller="ExampleController">
-  <select ng-model="selection" ng-options="item for item in items">
-  </select>
-  <code>selection=</code>
-  <hr/>
-  <div class="animate-switch-container"
-    ng-switch="selection">
-      <div class="animate-switch" ng-switch-when="settings">Settings Div</div>
-      <div class="animate-switch" ng-switch-when="home">Home Span</div>
-      <div class="animate-switch" ng-switch-default>default</div>
-  </div>
-</div>
-
-
-
-
-<script type="text/javascript">
-angular.module('myApp', []).controller('ExampleController', ['$scope', function($scope) {
-  $scope.items = ['settings', 'home', 'other'];
-  $scope.selection = $scope.items[0];
-}]);
-</script>
-
-
-<p>&#8220;`</p>
-
-<h2>Filter</h2>
-
-<p>使用 <code>filter</code> 指令过滤需要的内容，基本形式： <code></code>
-如果有用过其他模板引擎的话（如：Jinja）应该很好理解的。</p>
-
-<p>angularjs 提供了一些内置的过滤器：date, json, lowercase, uppercase 等。</p>
-
-<h2>ngIf</h2>
-
-<p>基本形式： <code>&lt;ANY ng-if="expression"&gt; ... &lt;/ANY&gt;</code>
-当 <code>expression</code> 的值为真时才会输出该标签。</p>
 ]]></content>
   </entry>
   
