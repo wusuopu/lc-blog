@@ -1,0 +1,68 @@
+---
+layout: post
+title: "AngularJS学习笔记7——与rails整合"
+date: 2015-08-27 05:01:33 +0000
+comments: true
+post_id: 84156
+permalink: /archives/84156.html
+categories: ["前端相关"]
+tags: ["js", "angular"]
+---
+
+要在 rails 中使用 angular 直接在页面中引入进行即可，这个倒是不难。
+只是在开发过程中突然发现了一个问题，就是 angular 的模板应该如何组织呢。
+如果全写成内联模板这个不太好维护，如果是写成单个文件放在 public 目录下也不太妥。
+不过好在这个问题已经有人解决了，有 angular-rails-templates 这么一个库：https://github.com/pitr/angular-rails-templates
+
+首先安装该库：`gem 'angular-rails-templates'`
+
+然后创建目录 `app/assets/javascripts/templates`，
+并在 `app/assets/javascripts/application.js` 中加载对应的文件：
+
+```
+//= require angular-rails-templates
+//= require_tree ./templates
+```
+
+该目录下的模板文件命名与 rails 的视图命名类似，如： `foo.html`，`foo.html.erb`，`foo.html.haml`,`foo.html.slim`。
+
+可以参考我的一个例子： https://github.com/wusuopu/rails-billing
+
+这里我是使用 bower 进行安装 angular 的库，首先安装 `gem 'bower-rails'` 。
+
+然后初始化 bower_rails： `rails g bower_rails:initialize`  
+编辑 `Bowerfile`，添加所需要的依赖包：
+
+```
+asset 'angular'
+asset 'angular-route'
+asset 'angular-resource'
+asset 'angular-mocks'
+asset 'angular-flash'
+asset 'angular-loading-bar'
+asset 'angular-flash-messages'
+asset 'angular-translate'
+asset 'angular-bootstrap'
+asset 'bootstrap-sass-official'
+asset 'components-font-awesome'
+```
+
+再执行命令： `rake bower:install` 进行安装。
+
+接着编辑 `config/initializers/assets.rb` 添加配置： `Rails.application.config.assets.paths << Rails.root.join("vendor","assets","bower_components")`
+
+最后加载依赖文件 `app/assets/javascripts/application.js`：
+
+```
+//= require angular/angular
+//= require angular-route/angular-route
+//= require angular-resource/angular-resource
+//= require angular-flash-messages/angular-flash
+//= require angular-loading-bar/build/loading-bar
+//= require angular-translate/angular-translate
+//= require angular-bootstrap/ui-bootstrap-tpls
+//= require angular-rails-templates
+//= require_tree ./templates
+```
+
+
