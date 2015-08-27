@@ -4,7 +4,7 @@
   <title><![CDATA[Tag: Angular | 龍昌博客]]></title>
   <link href="http://www.xefan.com/tags/angular/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2015-08-24T10:28:02+08:00</updated>
+  <updated>2015-08-27T13:50:19+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -12,6 +12,66 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[AngularJS学习笔记6——与rails整合]]></title>
+    <link href="http://www.xefan.com/archives/84156.html"/>
+    <updated>2015-08-27T13:01:33+08:00</updated>
+    <id>http://www.xefan.com/archives/84156-AngularJS学习笔记6——与rails整合</id>
+    <content type="html"><![CDATA[<p>要在 rails 中使用 angular 直接在页面中引入进行即可，这个倒是不难。
+只是在开发过程中突然发现了一个问题，就是 angular 的模板应该如何组织呢。
+如果全写成内联模板这个不太好维护，如果是写成单个文件放在 public 目录下也不太妥。
+不过好在这个问题已经有人解决了，有 angular-rails-templates 这么一个库：<a href="https://github.com/pitr/angular-rails-templates">https://github.com/pitr/angular-rails-templates</a></p>
+
+<p>首先安装该库：<code>gem 'angular-rails-templates'</code></p>
+
+<p>然后创建目录 <code>app/assets/javascripts/templates</code>，
+并在 <code>app/assets/javascripts/application.js</code> 中加载对应的文件：</p>
+
+<pre><code>//= require angular-rails-templates
+//= require_tree ./templates
+</code></pre>
+
+<p>该目录下的模板文件命名与 rails 的视图命名类似，如： <code>foo.html</code>，<code>foo.html.erb</code>，<code>foo.html.haml</code>,<code>foo.html.slim</code>。</p>
+
+<p>可以参考我的一个例子： <a href="https://github.com/wusuopu/rails-billing">https://github.com/wusuopu/rails-billing</a></p>
+
+<p>这里我是使用 bower 进行安装 angular 的库，首先安装 <code>gem 'bower-rails'</code> 。</p>
+
+<p>然后初始化 bower_rails： <code>rails g bower_rails:initialize</code><br/>
+编辑 <code>Bowerfile</code>，添加所需要的依赖包：</p>
+
+<pre><code>asset 'angular'
+asset 'angular-route'
+asset 'angular-resource'
+asset 'angular-mocks'
+asset 'angular-flash'
+asset 'angular-loading-bar'
+asset 'angular-flash-messages'
+asset 'angular-translate'
+asset 'angular-bootstrap'
+asset 'bootstrap-sass-official'
+asset 'components-font-awesome'
+</code></pre>
+
+<p>再执行命令： <code>rake bower:install</code> 进行安装。</p>
+
+<p>接着编辑 <code>config/initializers/assets.rb</code> 添加配置： <code>Rails.application.config.assets.paths &lt;&lt; Rails.root.join("vendor","assets","bower_components")</code></p>
+
+<p>最后加载依赖文件 <code>app/assets/javascripts/application.js</code>：</p>
+
+<pre><code>//= require angular/angular
+//= require angular-route/angular-route
+//= require angular-resource/angular-resource
+//= require angular-flash-messages/angular-flash
+//= require angular-loading-bar/build/loading-bar
+//= require angular-translate/angular-translate
+//= require angular-bootstrap/ui-bootstrap-tpls
+//= require angular-rails-templates
+//= require_tree ./templates
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[AngularJS学习笔记6——与jQuery、Bootstrap结合]]></title>
@@ -183,73 +243,6 @@ routeApp.run(function($templateCache) {
 <li>month</li>
 </ul>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[AngularJS学习笔记2——模板]]></title>
-    <link href="http://www.xefan.com/archives/84148.html"/>
-    <updated>2015-08-14T22:00:21+08:00</updated>
-    <id>http://www.xefan.com/archives/84148-AngularJS学习笔记2——模板</id>
-    <content type="html"><![CDATA[<h2>ngRepeat</h2>
-
-<p>对于一些需要循环遍历的对象可以使用 <code>ngRepeat</code> 指令。 如：</p>
-
-<pre><code>  &lt;li ng-repeat="msg in messages"&gt; &lt;/li&gt;
-
-  // 对于 messages 数组进行遍历
-  $scope.messages =  [
-    "第一条消息",
-    "第二条消息",
-    "第三条消息",
-    "第四条消息",
-    "第五条消息"
-  ];
-</code></pre>
-
-<h2>ngSwitch</h2>
-
-<p>使用 <code>ngSwitch</code> 指令在不同条件下显示不同内容。</p>
-
-<p>&#8220;`</p>
-
-<div ng-controller="ExampleController">
-  <select ng-model="selection" ng-options="item for item in items">
-  </select>
-  <code>selection=</code>
-  <hr/>
-  <div class="animate-switch-container"
-    ng-switch="selection">
-      <div class="animate-switch" ng-switch-when="settings">Settings Div</div>
-      <div class="animate-switch" ng-switch-when="home">Home Span</div>
-      <div class="animate-switch" ng-switch-default>default</div>
-  </div>
-</div>
-
-
-
-
-<script type="text/javascript">
-angular.module('myApp', []).controller('ExampleController', ['$scope', function($scope) {
-  $scope.items = ['settings', 'home', 'other'];
-  $scope.selection = $scope.items[0];
-}]);
-</script>
-
-
-<p>&#8220;`</p>
-
-<h2>Filter</h2>
-
-<p>使用 <code>filter</code> 指令过滤需要的内容，基本形式： <code></code>
-如果有用过其他模板引擎的话（如：Jinja）应该很好理解的。</p>
-
-<p>angularjs 提供了一些内置的过滤器：date, json, lowercase, uppercase 等。</p>
-
-<h2>ngIf</h2>
-
-<p>基本形式： <code>&lt;ANY ng-if="expression"&gt; ... &lt;/ANY&gt;</code>
-当 <code>expression</code> 的值为真时才会输出该标签。</p>
 ]]></content>
   </entry>
   

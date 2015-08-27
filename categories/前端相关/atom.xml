@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 前端相关 | 龍昌博客]]></title>
   <link href="http://www.xefan.com/categories/前端相关/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2015-08-24T10:28:02+08:00</updated>
+  <updated>2015-08-27T13:50:19+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -12,6 +12,66 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[AngularJS学习笔记6——与rails整合]]></title>
+    <link href="http://www.xefan.com/archives/84156.html"/>
+    <updated>2015-08-27T13:01:33+08:00</updated>
+    <id>http://www.xefan.com/archives/84156-AngularJS学习笔记6——与rails整合</id>
+    <content type="html"><![CDATA[<p>要在 rails 中使用 angular 直接在页面中引入进行即可，这个倒是不难。
+只是在开发过程中突然发现了一个问题，就是 angular 的模板应该如何组织呢。
+如果全写成内联模板这个不太好维护，如果是写成单个文件放在 public 目录下也不太妥。
+不过好在这个问题已经有人解决了，有 angular-rails-templates 这么一个库：<a href="https://github.com/pitr/angular-rails-templates">https://github.com/pitr/angular-rails-templates</a></p>
+
+<p>首先安装该库：<code>gem 'angular-rails-templates'</code></p>
+
+<p>然后创建目录 <code>app/assets/javascripts/templates</code>，
+并在 <code>app/assets/javascripts/application.js</code> 中加载对应的文件：</p>
+
+<pre><code>//= require angular-rails-templates
+//= require_tree ./templates
+</code></pre>
+
+<p>该目录下的模板文件命名与 rails 的视图命名类似，如： <code>foo.html</code>，<code>foo.html.erb</code>，<code>foo.html.haml</code>,<code>foo.html.slim</code>。</p>
+
+<p>可以参考我的一个例子： <a href="https://github.com/wusuopu/rails-billing">https://github.com/wusuopu/rails-billing</a></p>
+
+<p>这里我是使用 bower 进行安装 angular 的库，首先安装 <code>gem 'bower-rails'</code> 。</p>
+
+<p>然后初始化 bower_rails： <code>rails g bower_rails:initialize</code><br/>
+编辑 <code>Bowerfile</code>，添加所需要的依赖包：</p>
+
+<pre><code>asset 'angular'
+asset 'angular-route'
+asset 'angular-resource'
+asset 'angular-mocks'
+asset 'angular-flash'
+asset 'angular-loading-bar'
+asset 'angular-flash-messages'
+asset 'angular-translate'
+asset 'angular-bootstrap'
+asset 'bootstrap-sass-official'
+asset 'components-font-awesome'
+</code></pre>
+
+<p>再执行命令： <code>rake bower:install</code> 进行安装。</p>
+
+<p>接着编辑 <code>config/initializers/assets.rb</code> 添加配置： <code>Rails.application.config.assets.paths &lt;&lt; Rails.root.join("vendor","assets","bower_components")</code></p>
+
+<p>最后加载依赖文件 <code>app/assets/javascripts/application.js</code>：</p>
+
+<pre><code>//= require angular/angular
+//= require angular-route/angular-route
+//= require angular-resource/angular-resource
+//= require angular-flash-messages/angular-flash
+//= require angular-loading-bar/build/loading-bar
+//= require angular-translate/angular-translate
+//= require angular-bootstrap/ui-bootstrap-tpls
+//= require angular-rails-templates
+//= require_tree ./templates
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[AngularJS学习笔记6——与jQuery、Bootstrap结合]]></title>
@@ -236,57 +296,6 @@ routeApp.run(function($templateCache) {
 <p>需要自定义服务的可以使用 <code>module.factory</code> 方法或者 <code>module.service</code> 方法进行注册服务。
 这两个方法稍微有些不同，一般我习惯使用 <code>module.factory</code> 。
 然后在需要使用自定义服务的地方，将其添加到依赖列表中即可。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[AngularJS学习笔记3——表单]]></title>
-    <link href="http://www.xefan.com/archives/84149.html"/>
-    <updated>2015-08-18T18:32:35+08:00</updated>
-    <id>http://www.xefan.com/archives/84149-AngularJS学习笔记3——表单</id>
-    <content type="html"><![CDATA[<h2>双向绑定</h2>
-
-<p>使用 <code>ngModel</code> 指令将输入框与 model 进行绑定，如： <code>&lt;input type="text" ng-model="text" name="text" /&gt;</code><br/>
-当输入框或者 model 的值其中一方改变都会影响另一方。</p>
-
-<h2>表单验证</h2>
-
-<p>之前表单验证都是用的 jquery-validation 这个插件，这需要编写大量的 js 代码用于逻辑控制，
-现在改用 angularjs 之后方便了许多，不过还是要编写大量的视图代码。</p>
-
-<p>一个简单的例子： <a href="https://github.com/wusuopu/angularjs-practice/blob/master/static/form/validate.html">https://github.com/wusuopu/angularjs-practice/blob/master/static/form/validate.html</a></p>
-
-<pre><code>    &lt;form action="#" name="user_form" ng-submit="submitForm(user_form.$valid, $event)" novalidate&gt;
-
-        &lt;div class="form-group" ng-class="{'has-error' : user_form.name.$invalid &amp;&amp; user_form.name.$dirty, 'has-success' : user_form.name.$valid}"&gt;
-            &lt;label&gt;Name&lt;/label&gt;
-            &lt;input type="text" name="name" class="form-control" ng-model="formData.name" required&gt;
-            &lt;p ng-show="user_form.name.$invalid &amp;&amp; user_form.name.$dirty" class="help-block"&gt;You name is required.&lt;/p&gt;
-        &lt;/div&gt;
-    .....
-    &lt;/form&gt;
-</code></pre>
-
-<p>首先为 form 表单设置 <code>name</code> 属性，并设置 <code>novalidate</code> 属性禁止浏览器使用 HTML5 自带的验证功能。
-然后对于需要验证的字段添加相应的验证属性，angularjs 内建的验证规则如下：</p>
-
-<ul>
-<li>email</li>
-<li>max</li>
-<li>maxlength</li>
-<li>min</li>
-<li>minlength</li>
-<li>number</li>
-<li>pattern</li>
-<li>required</li>
-<li>url</li>
-<li>date</li>
-<li>datetimelocal</li>
-<li>time</li>
-<li>week</li>
-<li>month</li>
-</ul>
-
 ]]></content>
   </entry>
   

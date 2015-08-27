@@ -9,8 +9,9 @@
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="在写程序时有许多的配对符号如：(), [], {}, &ldquo;&rdquo;, &lsquo;'。vim-surround就是一款插件可以快速处理这些配对符号的。
-下载地址：https://github.com/tpope/vim-surround 下载安装好后就可以使用了，下面是一个示例 &hellip;">
+  <meta name="description" content="doxygen是一个文档生成器，其工作机制是利用注释中的有效信息来自动生成文档。而DoxygenToolkit是vim下一款能够自动生成doxygen可以识别的注释的插件。
+它会根据配置自动生成注释，主要是license注释、文件注释、函数及类注释。
+下载地址：http://www.vim.org &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -67,6 +68,54 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83795.html">在vim下使用DoxygenToolkit进行自动注释</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2012-09-28T00:00:00+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>28</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83795.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83795.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>doxygen是一个文档生成器，其工作机制是利用注释中的有效信息来自动生成文档。而DoxygenToolkit是vim下一款能够自动生成doxygen可以识别的注释的插件。<br/>
+它会根据配置自动生成注释，主要是license注释、文件注释、函数及类注释。<br/>
+下载地址：<a href="http://www.vim.org/scripts/script.php?script_id=987">http://www.vim.org/scripts/script.php?script_id=987</a></p>
+
+<p>修改.vimrc的配置，加入自己对Doxygen的配置<br/>
+let g:DoxygenToolkit_authorName=&ldquo;longchangjin &lt;admin@longchangjin.cn&gt;&rdquo;<br/>
+let g:DoxygenToolkit_briefTag_funcName=&ldquo;yes&rdquo;<br/>
+let g:doxygen_enhanced_color=1</p>
+
+<p>运行vim 在命令行输入命令即可<br/>
+DoxAuthor:将文件名，作者，时间等<br/>
+DoxLic:  license注释<br/>
+Dox：    函数及类注释</p>
+
+<p>也可做一个按键映射，就不用每次都输入命令了。</p>
+
+<p>如果想自定义注释信息，可以修改DoxygenToolkit.vim文件。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -2035,389 +2084,6 @@ GParamSpec 类型是比 GValue 高级一点的变量容器，它不仅可以存�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83767.html">[转载]GObject 学习笔记：GObject 子类对象的私有属性模拟</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2012-05-28T00:00:00+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>28</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>12:00 am</span></time>
-        
-           | <a href="http://www.xefan.com/archives/83767.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/83767.html">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>上一篇文章“使用 GObject 库模拟类的数据封装形式”讲述了 GObject 子类化过程，本文以其为基础，进一步讲述如何对数据进行隐藏，即对面向对象程序设计中的“私有属性”概念进行模拟。</p>
-
-<p><b>非类类型数据的隐藏</b></p>
-
-<p>第一个问题，可以称之为非类类型数据结构的隐藏，因为 PMDListNode 是普通的 C 结构体。隐藏这个结构体成员的方法有多种。</p>
-
-<p>第一种方法尤为简单，如下：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">typedef</span> <span class="k">struct</span> <span class="n">_PMDListNode</span> <span class="n">PMDListNode</span><span class="p">;</span>
-</span><span class='line'><span class="k">struct</span>  <span class="n">_PMDListNode</span> <span class="p">{</span>
-</span><span class='line'><span class="cm">/* private */</span>
-</span><span class='line'>        <span class="n">PMDListNode</span> <span class="o">*</span><span class="n">prev</span><span class="p">;</span>
-</span><span class='line'>        <span class="n">PMDListNode</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
-</span><span class='line'><span class="cm">/* public */</span>
-</span><span class='line'>        <span class="kt">void</span> <span class="o">*</span><span class="n">data</span><span class="p">;</span>
-</span><span class='line'><span class="p">};</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>只需要向结构体中添加一条注释，用于标明哪些成员是私有的，哪些是可以被直接访问的。</p>
-
-<p>也许你会认为这是开玩笑呢吧！但，这是最符合 C 语言设计理念的做法。C 语言认为，程序员应当知道自己正在干什么，而且保证自己的所作所为是正确的。</p>
-
-<p>倘若你真的这么认为这是在开玩笑，那也没什么。我们还可以使用第二种隐藏的方法，即在 pm-dlist.h 文件中保留下面代码：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">typedef</span> <span class="k">struct</span> <span class="n">_PMDListNode</span> <span class="n">PMDListNode</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>并将以下代码：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">struct</span>  <span class="n">_PMDListNode</span> <span class="p">{</span>
-</span><span class='line'>        <span class="n">PMDListNode</span> <span class="o">*</span><span class="n">prev</span><span class="p">;</span>
-</span><span class='line'>        <span class="n">PMDListNode</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
-</span><span class='line'>        <span class="kt">void</span> <span class="o">*</span><span class="n">data</span><span class="p">;</span>
-</span><span class='line'><span class="p">};</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>转移到 pm-dlist.c 文件中。</p>
-
-<p>这下隐藏的非常彻底。当然，这并不能防止用户打开 pm-dlist.c 文件查看 PMDListNode 的定义。不过，我们是自由软件，不怕你看。</p>
-
-<p>如果想半遮半掩，稍微麻烦一些。可以在 pm-dlist.h 中写入以下代码：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">typedef</span> <span class="k">struct</span> <span class="n">_PMDListPriv</span> <span class="n">PMDListPriv</span><span class="p">;</span>
-</span><span class='line'><span class="k">typedef</span> <span class="k">struct</span> <span class="n">_PMDListNode</span> <span class="n">PmdListNode</span><span class="p">;</span>
-</span><span class='line'><span class="k">struct</span> <span class="n">_PMDListNode</span> <span class="p">{</span>
-</span><span class='line'>        <span class="n">PMDListPriv</span> <span class="n">priv</span><span class="p">;</span>
-</span><span class='line'>        <span class="kt">void</span> <span class="o">*</span><span class="n">data</span><span class="p">;</span>
-</span><span class='line'><span class="p">};</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>然后，将 PMDListPriv 的定义放在 pm-dlist.c 文件中，如下：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">struct</span> <span class="n">_PMDListPriv</span> <span class="p">{</span>
-</span><span class='line'>        <span class="n">PMDListNode</span> <span class="o">*</span><span class="n">prev</span><span class="p">;</span>
-</span><span class='line'>        <span class="n">PMDListNode</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
-</span><span class='line'><span class="p">};</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><b>GObject 子类对象的属性隐藏</b></p>
-
-<p>GObject 子类对象的属性即继承 GObject 类的类的实例结构体所包含的属性，这句话说起来还真拗口。</p>
-
-<p>考虑一下如何隐藏 PMDList 类的实例结构体中的成员。先回忆一下这个结构体的定义：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">typedef</span> <span class="k">struct</span> <span class="n">_PMDList</span> <span class="n">PMDList</span><span class="p">;</span>
-</span><span class='line'><span class="k">struct</span>  <span class="n">_PMDList</span> <span class="p">{</span>
-</span><span class='line'>        <span class="n">GObject</span> <span class="n">parent_instance</span><span class="p">;</span>
-</span><span class='line'>        <span class="n">PMDListNode</span> <span class="o">*</span><span class="n">head</span><span class="p">;</span>
-</span><span class='line'>        <span class="n">PMDListNode</span> <span class="o">*</span><span class="n">tail</span><span class="p">;</span>
-</span><span class='line'><span class="p">};</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>我们希望 head 与 tail 指针不容他人窥视，虽然可以使用上一节的方式进行数据隐藏，但是 GObject 库为 GObject 子类提供了一种私有结构体的机制，基于它也可以实现数据隐藏，而且更像是隐藏。</p>
-
-<p>首先，我们将 pm-dlist.h 中 PMDList 结构体的定义修改为：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">typedef</span> <span class="k">struct</span> <span class="n">_PMDList</span> <span class="n">PMDList</span><span class="p">;</span>
-</span><span class='line'><span class="k">struct</span>  <span class="n">_PMDList</span> <span class="p">{</span>
-</span><span class='line'>        <span class="n">GObject</span> <span class="n">parent_instance</span><span class="p">;</span>
-</span><span class='line'><span class="p">};</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>然后，在 pm-dlist.c 文件中，定义一个结构体：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">typedef</span> <span class="k">struct</span> <span class="n">_PMDListPrivate</span> <span class="n">PMDListPrivate</span><span class="p">;</span>
-</span><span class='line'><span class="k">struct</span>  <span class="n">_PMDListPrivate</span> <span class="p">{</span>
-</span><span class='line'>        <span class="n">PMDListNode</span> <span class="o">*</span><span class="n">head</span><span class="p">;</span>
-</span><span class='line'>        <span class="n">PMDListNode</span> <span class="o">*</span><span class="n">tail</span><span class="p">;</span>
-</span><span class='line'><span class="p">};</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>再在 dm-dlist.c 中定义一个宏：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="cp">#define PM_DLIST_GET_PRIVATE(obj) (\</span>
-</span><span class='line'><span class="cp">        G_TYPE_INSTANCE_GET_PRIVATE ((obj), PM_TYPE_DLIST, PMDListPrivate))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这个宏可以帮助我们从对象中获取所隐藏的私有属性。例如，在 PMDList 类的实例结构体初始化函数中，使用 PM_DLIST_GET_PRIVATE 宏获取 PMDList 对象的 head 与 tail 指针，如下：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">static</span> <span class="kt">void</span>
-</span><span class='line'><span class="nf">pm_dlist_init</span> <span class="p">(</span><span class="n">PMDList</span> <span class="o">*</span><span class="n">self</span><span class="p">)</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>        <span class="n">PMDListPrivate</span> <span class="o">*</span><span class="n">priv</span> <span class="o">=</span> <span class="n">PM_DLIST_GET_PRIVATE</span> <span class="p">(</span><span class="n">self</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="n">priv</span><span class="o">-&gt;</span><span class="n">head</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
-</span><span class='line'>        <span class="n">priv</span><span class="o">-&gt;</span><span class="n">tail</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>但是，那个 PMDListPrivate 结构体是怎样被添加到 PMDList 对象中的呢？答案存在于 PMDList 类的类结构体初始化函数之中，如下：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">static</span> <span class="kt">void</span>
-</span><span class='line'><span class="nf">pm_dlist_class_init</span> <span class="p">(</span><span class="n">PMDListClass</span> <span class="o">*</span><span class="n">class</span><span class="p">)</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>        <span class="n">g_type_class_add_private</span> <span class="p">(</span><span class="n">klass</span><span class="p">,</span> <span class="k">sizeof</span> <span class="p">(</span><span class="n">PMDListPrivate</span><span class="p">));</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>由 于 pm_dlist_class_init 函数会先于 pm_dlist_init 函数被 g_object_new 函数调用，GObject 库的类型管理系统可以从 pm_dlist_class_init 函数中获知 PMDListPrivate 结构体所占用的存储空间，从而 g_object_new 函数在为 PMDList 对象的实例分配存储空间时，便会多分出一部分以容纳 PMDListPrivate 结构体，这样便相当于将一个 PMDListPrivate 结构体挂到 PMDList 对象之中。</p>
-
-<p>GObject 库对私有属性所占用的存储空间是由限制的。一个 GObject 子类对象，它的私有属性及其父类对象的私有属性累加起来不能超过 64 KB。
-<b>将一切放到一起</b></p>
-
-<p>将本文的示例代码综合到一起，便可以得到数据隐藏方法的全貌。</p>
-
-<p>完整的 pm-dlist.h 文件，内容如下：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="cp">#ifndef PM_DLIST_H</span>
-</span><span class='line'><span class="cp">#define PM_DLIST_H</span>
-</span><span class='line'>
-</span><span class='line'><span class="cp">#include &lt;glib-object.h&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="cp">#define PM_TYPE_DLIST (pm_dlist_get_type ())</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">typedef</span> <span class="k">struct</span> <span class="n">_PMDList</span> <span class="n">PMDList</span><span class="p">;</span>
-</span><span class='line'><span class="k">struct</span>  <span class="n">_PMDList</span> <span class="p">{</span>
-</span><span class='line'>        <span class="n">GObject</span> <span class="n">parent_instance</span><span class="p">;</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">typedef</span> <span class="k">struct</span> <span class="n">_PMDListClass</span> <span class="n">PMDListClass</span><span class="p">;</span>
-</span><span class='line'><span class="k">struct</span> <span class="n">_PMDListClass</span> <span class="p">{</span>
-</span><span class='line'>        <span class="n">GObjectClass</span> <span class="n">parent_class</span><span class="p">;</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">GType</span> <span class="nf">pm_dlist_get_type</span> <span class="p">(</span><span class="kt">void</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="cp">#endif</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>完整的 pm-dlist.c 文件，内容如下：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="cp">#include &quot;pm-dlist.h&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">G_DEFINE_TYPE</span> <span class="p">(</span><span class="n">PMDList</span><span class="p">,</span> <span class="n">pm_dlist</span><span class="p">,</span> <span class="n">G_TYPE_OBJECT</span><span class="p">);</span>
-</span><span class='line'><span class="cp">#define PM_DLIST_GET_PRIVATE(obj) (\</span>
-</span><span class='line'><span class="cp">        G_TYPE_INSTANCE_GET_PRIVATE ((obj), PM_TYPE_DLIST, PMDListPrivate))</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">typedef</span> <span class="k">struct</span> <span class="n">_PMDListNode</span> <span class="n">PMDListNode</span><span class="p">;</span>
-</span><span class='line'><span class="k">struct</span>  <span class="n">_PMDListNode</span> <span class="p">{</span>
-</span><span class='line'>        <span class="n">PMDListNode</span> <span class="o">*</span><span class="n">prev</span><span class="p">;</span>
-</span><span class='line'>        <span class="n">PMDListNode</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
-</span><span class='line'>        <span class="kt">void</span> <span class="o">*</span><span class="n">data</span><span class="p">;</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">typedef</span> <span class="k">struct</span> <span class="n">_PMDListPrivate</span> <span class="n">PMDListPrivate</span><span class="p">;</span>
-</span><span class='line'><span class="k">struct</span>  <span class="n">_PMDListPrivate</span> <span class="p">{</span>
-</span><span class='line'>        <span class="n">PMDListNode</span> <span class="o">*</span><span class="n">head</span><span class="p">;</span>
-</span><span class='line'>        <span class="n">PMDListNode</span> <span class="o">*</span><span class="n">tail</span><span class="p">;</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">static</span> <span class="kt">void</span>
-</span><span class='line'><span class="nf">pm_dlist_class_init</span> <span class="p">(</span><span class="n">PMDListClass</span> <span class="o">*</span><span class="n">klass</span><span class="p">)</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>        <span class="n">g_type_class_add_private</span> <span class="p">(</span><span class="n">klass</span><span class="p">,</span> <span class="k">sizeof</span> <span class="p">(</span><span class="n">PMDListPrivate</span><span class="p">));</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">static</span> <span class="kt">void</span>
-</span><span class='line'><span class="nf">pm_dlist_init</span> <span class="p">(</span><span class="n">PMDList</span> <span class="o">*</span><span class="n">self</span><span class="p">)</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>        <span class="n">PMDListPrivate</span> <span class="o">*</span><span class="n">priv</span> <span class="o">=</span> <span class="n">PM_DLIST_GET_PRIVATE</span> <span class="p">(</span><span class="n">self</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="n">priv</span><span class="o">-&gt;</span><span class="n">head</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
-</span><span class='line'>        <span class="n">priv</span><span class="o">-&gt;</span><span class="n">tail</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>测试源代码文件 main.c 内容如下：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="cp">#include &quot;pm-dlist.h&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kt">int</span>
-</span><span class='line'><span class="nf">main</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>        <span class="cm">/* GObject 库的类型管理系统的初始化 */</span>
-</span><span class='line'>        <span class="n">g_type_init</span> <span class="p">();</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="n">PMDList</span> <span class="o">*</span><span class="n">list</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="n">list</span> <span class="o">=</span> <span class="n">g_object_new</span> <span class="p">(</span><span class="n">PM_TYPE_DLIST</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
-</span><span class='line'>        <span class="n">g_object_unref</span> <span class="p">(</span><span class="n">list</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><b>总结</b></p>
-
-<p>从上述各源文件来看，经过数据隐藏处理之后，pm-dlist.h 被简化，pm-dlist.c 变得更复杂。</p>
-
-<p>事实上，PMDList 类实现完毕后，第三方（即类的使用者）如果要使用这个类，那么他面对的只是 pm-dlist.h 文件，因此一个简洁的 pm-dlist.h 是他最希望看到的。</p>
-
-<p>pm-dlist.c 变得更加复杂，但是这并不是坏事情。因为我们已经尽力将细节隐藏在类的实现部分，而且这部分代码通常也是第三方并不关注的。</p>
-
-<p>这就是数据隐藏的意义。</p>
-
-<p>原文出处：<a href="http://garfileo.is-programmer.com">http://garfileo.is-programmer.com</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/page/14">&larr; Older</a>
@@ -2439,6 +2105,10 @@ GParamSpec 类型是比 GValue 高级一点的变量容器，它不仅可以存�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="http://www.xefan.com/archives/84156.html">AngularJS学习笔记6——与rails整合</a>
+      </li>
+    
+      <li class="post">
         <a href="http://www.xefan.com/archives/84155.html">AngularJS学习笔记6——与jQuery、Bootstrap结合</a>
       </li>
     
@@ -2454,19 +2124,15 @@ GParamSpec 类型是比 GValue 高级一点的变量容器，它不仅可以存�
         <a href="http://www.xefan.com/archives/84152.html">Riot.js之初体验</a>
       </li>
     
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84151.html">AngularJS学习笔记5——路由</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (32)</a></li><li><a href='/categories/web开发/index.html'>web开发 (19)</a></li><li><a href='/categories/前端相关/index.html'>前端相关 (7)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (16)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (23)</a></li></ul>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (32)</a></li><li><a href='/categories/web开发/index.html'>web开发 (19)</a></li><li><a href='/categories/前端相关/index.html'>前端相关 (8)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (16)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (23)</a></li></ul>
 </section>
 <section>
   <h1>Tag Cloud</h1>
-    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.7910447761194%'>ajax(2)</a> <a href='/tags/angular/index.html' style='font-size: 105.3731343283582%'>angular(6)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 107.16417910447761%'>js(8)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mac/index.html' style='font-size: 100.8955223880597%'>Mac(1)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 129.55223880597015%'>Ruby(33)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 123.28358208955224%'>翻译(26)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.7910447761194%'>ajax(2)</a> <a href='/tags/angular/index.html' style='font-size: 106.26865671641791%'>angular(7)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 108.05970149253731%'>js(9)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mac/index.html' style='font-size: 100.8955223880597%'>Mac(1)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 129.55223880597015%'>Ruby(33)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 123.28358208955224%'>翻译(26)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
 </section>
 <section>
   <h1>Link</h1>

@@ -5,11 +5,14 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>网站终于恢复正常了 - 龍昌博客</title>
+  <title>AngularJS学习笔记6——与rails整合 - 龍昌博客</title>
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="前两天突然发现偶的博客（www.xefan.cn）无法访问，但是空间的FTP可以连接上，数据库也没问题。因此只有一种可能了，空间的IP被墙了。 又要开始痛苦的搬家过程了，这是偶第N次搬家了…………5555555~~~~~~~~~~~~~ 这两天尝试了很多网友推荐的空间， &hellip;">
+  <meta name="description" content="要在 rails 中使用 angular 直接在页面中引入进行即可，这个倒是不难。
+只是在开发过程中突然发现了一个问题，就是 angular 的模板应该如何组织呢。
+如果全写成内联模板这个不太好维护，如果是写成单个文件放在 public 目录下也不太妥。
+不过好在这个问题已经有人解决了，有 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +21,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://www.xefan.com/archives/83454.html">
+  <link rel="canonical" href="http://www.xefan.com/archives/84156.html">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="龍昌博客" type="application/atom+xml">
@@ -69,7 +72,7 @@
   
   <header>
     
-      <h1 class="entry-title">网站终于恢复正常了</h1>
+      <h1 class="entry-title">AngularJS学习笔记6——与rails整合</h1>
     
     
       <p class="meta">
@@ -78,7 +81,7 @@
 
 
 
-<time class='entry-date' datetime='2010-11-03T00:00:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2010</span></span> <span class='time'>12:00 am</span></time>
+<time class='entry-date' datetime='2015-08-27T13:01:33+08:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>1:01 pm</span></time>
         
            | <a href="#disqus_thread"
              data-disqus-identifier="http://www.xefan.com">Comments</a>
@@ -88,13 +91,82 @@
   </header>
 
 
-<div class="entry-content"><p>前两天突然发现偶的博客（www.xefan.cn）无法访问，但是空间的FTP可以连接上，数据库也没问题。因此只有一种可能了，空间的IP被墙了。</p>
+<div class="entry-content"><p>要在 rails 中使用 angular 直接在页面中引入进行即可，这个倒是不难。
+只是在开发过程中突然发现了一个问题，就是 angular 的模板应该如何组织呢。
+如果全写成内联模板这个不太好维护，如果是写成单个文件放在 public 目录下也不太妥。
+不过好在这个问题已经有人解决了，有 angular-rails-templates 这么一个库：<a href="https://github.com/pitr/angular-rails-templates">https://github.com/pitr/angular-rails-templates</a></p>
 
-<p>又要开始痛苦的搬家过程了，这是偶第N次搬家了…………5555555~~~~~~~~~~~~~</p>
+<p>首先安装该库：<code>gem 'angular-rails-templates'</code></p>
 
-<p>这两天尝试了很多网友推荐的空间，但是这些空间不是访问不了就是限制太多，都不尽人意。最后还是选择72pines。尽管72pines有广告，尽管有限制，但是相对于寻找免费空间的漫长过程来说这些还是可以接受的。</p>
+<p>然后创建目录 <code>app/assets/javascripts/templates</code>，
+并在 <code>app/assets/javascripts/application.js</code> 中加载对应的文件：</p>
 
-<p>目前就暂且在这定居了，希望以后别再出问题了。</p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>//= require angular-rails-templates
+</span><span class='line'>//= require_tree ./templates</span></code></pre></td></tr></table></div></figure>
+
+
+<p>该目录下的模板文件命名与 rails 的视图命名类似，如： <code>foo.html</code>，<code>foo.html.erb</code>，<code>foo.html.haml</code>,<code>foo.html.slim</code>。</p>
+
+<p>可以参考我的一个例子： <a href="https://github.com/wusuopu/rails-billing">https://github.com/wusuopu/rails-billing</a></p>
+
+<p>这里我是使用 bower 进行安装 angular 的库，首先安装 <code>gem 'bower-rails'</code> 。</p>
+
+<p>然后初始化 bower_rails： <code>rails g bower_rails:initialize</code><br/>
+编辑 <code>Bowerfile</code>，添加所需要的依赖包：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>asset 'angular'
+</span><span class='line'>asset 'angular-route'
+</span><span class='line'>asset 'angular-resource'
+</span><span class='line'>asset 'angular-mocks'
+</span><span class='line'>asset 'angular-flash'
+</span><span class='line'>asset 'angular-loading-bar'
+</span><span class='line'>asset 'angular-flash-messages'
+</span><span class='line'>asset 'angular-translate'
+</span><span class='line'>asset 'angular-bootstrap'
+</span><span class='line'>asset 'bootstrap-sass-official'
+</span><span class='line'>asset 'components-font-awesome'</span></code></pre></td></tr></table></div></figure>
+
+
+<p>再执行命令： <code>rake bower:install</code> 进行安装。</p>
+
+<p>接着编辑 <code>config/initializers/assets.rb</code> 添加配置： <code>Rails.application.config.assets.paths &lt;&lt; Rails.root.join("vendor","assets","bower_components")</code></p>
+
+<p>最后加载依赖文件 <code>app/assets/javascripts/application.js</code>：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>//= require angular/angular
+</span><span class='line'>//= require angular-route/angular-route
+</span><span class='line'>//= require angular-resource/angular-resource
+</span><span class='line'>//= require angular-flash-messages/angular-flash
+</span><span class='line'>//= require angular-loading-bar/build/loading-bar
+</span><span class='line'>//= require angular-translate/angular-translate
+</span><span class='line'>//= require angular-bootstrap/ui-bootstrap-tpls
+</span><span class='line'>//= require angular-rails-templates
+</span><span class='line'>//= require_tree ./templates</span></code></pre></td></tr></table></div></figure>
+
+
+
 </div>
 
 
@@ -110,14 +182,14 @@
 
 
 
-<time class='entry-date' datetime='2010-11-03T00:00:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2010</span></span> <span class='time'>12:00 am</span></time>
+<time class='entry-date' datetime='2015-08-27T13:01:33+08:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>1:01 pm</span></time>
     </p>
     <p class="meta">
       Categories: 
 
 <span class="categories">
   
-    <a class='category' href='/categories/网络日志/index.html'>网络日志</a>
+    <a class='category' href='/categories/前端相关/index.html'>前端相关</a>
   
 </span>
 
@@ -128,7 +200,7 @@
 
 <span class="tags">
   
-    <a class='tag' href='/tags/网络日志/index.html'>网络日志</a>
+    <a class='tag' href='/tags/angular/index.html'>angular</a>, <a class='tag' href='/tags/js/index.html'>js</a>
   
 </span>
 
@@ -144,10 +216,8 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/archives/83448.html" title="Previous Post: 在Windows下安装GTK">&laquo; 在Windows下安装GTK</a>
+        <a class="basic-alignment left" href="/archives/84155.html" title="Previous Post: AngularJS学习笔记6——与jQuery、Bootstrap结合">&laquo; AngularJS学习笔记6——与jQuery、Bootstrap结合</a>
       
-      
-        <a class="basic-alignment right" href="/archives/83458.html" title="Next Post: FCKeditor——可视化HTML编辑器">FCKeditor——可视化HTML编辑器 &raquo;</a>
       
     </p>
   </footer>
@@ -236,8 +306,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://www.xefan.com/archives/83454.html';
-        var disqus_url = 'http://www.xefan.com/archives/83454.html';
+        var disqus_identifier = 'http://www.xefan.com/archives/84156.html';
+        var disqus_url = 'http://www.xefan.com/archives/84156.html';
         var disqus_script = 'embed.js';
       
     (function () {
