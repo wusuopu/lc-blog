@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 前端相关 | 龍昌博客]]></title>
   <link href="http://www.xefan.com/categories/前端相关/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2015-08-27T13:54:25+08:00</updated>
+  <updated>2015-12-13T23:14:18+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -12,6 +12,116 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Javascript使用async进行流程控制]]></title>
+    <link href="http://www.xefan.com/archives/84157.html"/>
+    <updated>2015-12-13T21:39:26+08:00</updated>
+    <id>http://www.xefan.com/archives/84157-javascript使用async进行流程控制</id>
+    <content type="html"><![CDATA[<h2>前言</h2>
+
+<p>突然发现博客好久没有更新了，主要是因为最近这几个月比较忙。之前由 Python 转向了 Ruby，现在又由后端转向了前端。
+这几个月接触的内容略有点多，信息量有点大，主要都是 js 相关的。准备之后抽时间将这些知识整理整理，沉淀沉淀。</p>
+
+<h2>Async</h2>
+
+<p>由于 js 是异步的，之前在使用 loopback 进行 server 端开发时，很容易就出现了比较深层次的回调嵌套。
+<a href="https://github.com/caolan/async">async.js</a>是 js 的一个工具，可以用来方便的控制 js 中的异步流程的，类似的库还有 Promise、RxJS 等。
+最初它是设计用于 nodejs 的，不过在浏览器端也可以使用。</p>
+
+<h3>安装</h3>
+
+<p>安装方法很简单，直接使用 npm 即可： <code>npm install async</code> 。</p>
+
+<h3>使用方法</h3>
+
+<p>首先是加载 async 库，在 server 端使用 <code>var async = require('async');</code>，
+在浏览器端直接引用即可： <code>&lt;script type="text/javascript" src="async.js"&gt;&lt;/script&gt;</code>。</p>
+
+<p>async 提供一些集合操作方法和流程控制方法，我比较常用的是：<code>each</code>、<code>map</code>、<code>series</code>、<code>waterfall</code> 这些方法。
+其中 <code>each</code>、<code>map</code> 方法与 <code>lodash</code> 的类似，可以用来遍历某个集合并执行一些操作。</p>
+
+<p><code>each</code> 方法定义如下：</p>
+
+<pre><code class="javascript">async.each(collection, iterator, [callback])
+</code></pre>
+
+<p>该方法会对 <code>collection</code> 每个元素都调用 <code>iterator</code> 操作， <code>iterator</code> 函数原型为： <code>iterator(item, callback)</code>。
+当 <code>collection</code> 中的所有元素遍历完成或者执行 <code>iterator</code> 时发生错误就会调用 <code>callback</code> 回调，原型为： <code>callback(err)</code>。</p>
+
+<p><code>each</code> 方法只是对每个元素进行操作，如果还需要获取操作的结果，那么可以使用 <code>map</code> 方法。定义如下：</p>
+
+<pre><code class="javascript">async.map(collection, iterator, [callback])
+</code></pre>
+
+<p><code>map</code> 与 <code>each</code> 类似，只是 <code>callback</code> 定义为： <code>callback(err, results)</code>。
+<code>results</code> 为 <code>iterator</code> 操作的结果集合。</p>
+
+<p>如下是一个例子，一次读取多个文件的内容：</p>
+
+<pre><code class="javascript">async.map(['file1','file2','file3'], fs.readFile, function(err, results){
+    // doSomething();
+});
+</code></pre>
+
+<p><code>series</code> 与 <code>map</code> 类似，不过 <code>series</code> 是遍历一个方法合集并挨个执行，然后返回结果：</p>
+
+<pre><code class="javascript">async.series(tasks, [callback])
+</code></pre>
+
+<p>如：</p>
+
+<pre><code class="javascript">async.series([
+  function fun1(callback){
+    callback(null, 'one');
+  },
+  function fun2(callback){
+    callback(null, 'two');
+  }
+],
+function(err, results){
+  // doSomething();
+});
+</code></pre>
+
+<p>注意，以上这些方法各个任务的完成时间顺序是不确定的。如果有一些操作是需要按照先后顺序执行，可以使用 <code>waterfall</code>。</p>
+
+<pre><code class="javascript">async.waterfall(tasks, [callback])
+</code></pre>
+
+<p>例如在 <code>loopback</code> 的一个 <code>controller</code> 中，提供修改用户密码的功能。原始写法如下：</p>
+
+<pre><code class="javascript">router.post('/user/password', function(req, res) {
+  User.findById(req.body.id, function(err, user){
+    if (err) doSomething();
+    user.password = req.body.password;
+    user.save(function(err){
+      if (err) doSomething();
+      res.status(200).end();
+    });
+  });
+});
+</code></pre>
+
+<p>上面的例子功能还比较简单，回调层级不是很深。不过如果使用 <code>waterfall</code> 来控制就更为简单：</p>
+
+<pre><code class="javascript">router.post('/user/password', function(req, res) {
+  async.waterfall([
+    function(callback){
+      User.findById(req.body.id, callback);
+    },
+    function(user, callback){
+      user.password = req.body.password;
+      user.save(callback);
+    }
+  ], function(err){
+    if (err) doSomething();
+    res.status(200).end();
+  });
+});
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[AngularJS学习笔记7——与rails整合]]></title>
@@ -257,45 +367,6 @@ routeApp.run(function($templateCache) {
   $templateCache.put('list.html', '...');
 });
 </code></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[AngularJS学习笔记4——依赖注入]]></title>
-    <link href="http://www.xefan.com/archives/84150.html"/>
-    <updated>2015-08-19T13:33:33+08:00</updated>
-    <id>http://www.xefan.com/archives/84150-AngularJS学习笔记4——依赖注入</id>
-    <content type="html"><![CDATA[<h2>依赖注入</h2>
-
-<p>之前有遇到过 angularjs 的代码压缩之后就报错了，通过查文档得知是因为 angularjs 是通过变量名来查找相应服务的。
-而 js 代码压缩之后变量名就变化了，从而无法找到相应的服务而报错。因此就需要指明依赖服务。</p>
-
-<pre><code>function SomeController($scope, $http) { ... }
-</code></pre>
-
-<p>例如以上代码就是定义了 <code>SomeController</code> 这个一个控制器，并依赖 <code>$scope</code> 和 <code>$http</code> 两个服务。
-但是当该代码压缩之后，这两个参数名都变化了。因此还需要使用以下代码来指明所需的依赖。</p>
-
-<pre><code>SomeController.$inject = ['$scope', '$http'];
-</code></pre>
-
-<p>或者另一个写法：</p>
-
-<pre><code>angular.module('app', [])
-       .controller('SomeController', ['$scope', '$http', function($scope, $http){
-
-}]);
-</code></pre>
-
-<p>这样就可以保证我们的代码压缩之后也能正常运行了。</p>
-
-<h2>自定义服务</h2>
-
-<p>上面的 <code>$http</code> 服务为我们提供了 ajax 的功能。</p>
-
-<p>需要自定义服务的可以使用 <code>module.factory</code> 方法或者 <code>module.service</code> 方法进行注册服务。
-这两个方法稍微有些不同，一般我习惯使用 <code>module.factory</code> 。
-然后在需要使用自定义服务的地方，将其添加到依赖列表中即可。</p>
 ]]></content>
   </entry>
   

@@ -5,27 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Python cgi教程5——Cookie - 龍昌博客</title>
+  <title>Javascript使用async进行流程控制 - 龍昌博客</title>
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="设置Cookie 有两个与cookie相关的操作，设置cookie和读取cookie。 以下例子展示了cookie的设置。 1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-#!/usr/bin/env python
-import time # This is the &hellip;">
+  <meta name="description" content="前言 突然发现博客好久没有更新了，主要是因为最近这几个月比较忙。之前由 Python 转向了 Ruby，现在又由后端转向了前端。
+这几个月接触的内容略有点多，信息量有点大，主要都是 js 相关的。准备之后抽时间将这些知识整理整理，沉淀沉淀。 Async 由于 js 是异步的，之前在使用 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -34,7 +19,7 @@ import time # This is the &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://www.xefan.com/archives/83998.html">
+  <link rel="canonical" href="http://www.xefan.com/archives/84157.html">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="龍昌博客" type="application/atom+xml">
@@ -85,7 +70,7 @@ import time # This is the &hellip;">
   
   <header>
     
-      <h1 class="entry-title">Python cgi教程5——Cookie</h1>
+      <h1 class="entry-title">Javascript使用async进行流程控制</h1>
     
     
       <p class="meta">
@@ -94,7 +79,7 @@ import time # This is the &hellip;">
 
 
 
-<time class='entry-date' datetime='2013-12-07T00:00:00+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+<time class='entry-date' datetime='2015-12-13T21:39:26+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>9:39 pm</span></time>
         
            | <a href="#disqus_thread"
              data-disqus-identifier="http://www.xefan.com">Comments</a>
@@ -104,16 +89,127 @@ import time # This is the &hellip;">
   </header>
 
 
-<div class="entry-content"><h2>设置Cookie</h2>
+<div class="entry-content"><h2>前言</h2>
+
+<p>突然发现博客好久没有更新了，主要是因为最近这几个月比较忙。之前由 Python 转向了 Ruby，现在又由后端转向了前端。
+这几个月接触的内容略有点多，信息量有点大，主要都是 js 相关的。准备之后抽时间将这些知识整理整理，沉淀沉淀。</p>
+
+<h2>Async</h2>
+
+<p>由于 js 是异步的，之前在使用 loopback 进行 server 端开发时，很容易就出现了比较深层次的回调嵌套。
+<a href="https://github.com/caolan/async">async.js</a>是 js 的一个工具，可以用来方便的控制 js 中的异步流程的，类似的库还有 Promise、RxJS 等。
+最初它是设计用于 nodejs 的，不过在浏览器端也可以使用。</p>
+
+<h3>安装</h3>
+
+<p>安装方法很简单，直接使用 npm 即可： <code>npm install async</code> 。</p>
+
+<h3>使用方法</h3>
+
+<p>首先是加载 async 库，在 server 端使用 <code>var async = require('async');</code>，
+在浏览器端直接引用即可： <code>&lt;script type="text/javascript" src="async.js"&gt;&lt;/script&gt;</code>。</p>
+
+<p>async 提供一些集合操作方法和流程控制方法，我比较常用的是：<code>each</code>、<code>map</code>、<code>series</code>、<code>waterfall</code> 这些方法。
+其中 <code>each</code>、<code>map</code> 方法与 <code>lodash</code> 的类似，可以用来遍历某个集合并执行一些操作。</p>
+
+<p><code>each</code> 方法定义如下：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">async</span><span class="p">.</span><span class="nx">each</span><span class="p">(</span><span class="nx">collection</span><span class="p">,</span> <span class="nx">iterator</span><span class="p">,</span> <span class="p">[</span><span class="nx">callback</span><span class="p">])</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
-<p>有两个与cookie相关的操作，设置cookie和读取cookie。</p>
+<p>该方法会对 <code>collection</code> 每个元素都调用 <code>iterator</code> 操作， <code>iterator</code> 函数原型为： <code>iterator(item, callback)</code>。
+当 <code>collection</code> 中的所有元素遍历完成或者执行 <code>iterator</code> 时发生错误就会调用 <code>callback</code> 回调，原型为： <code>callback(err)</code>。</p>
+
+<p><code>each</code> 方法只是对每个元素进行操作，如果还需要获取操作的结果，那么可以使用 <code>map</code> 方法。定义如下：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">async</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">collection</span><span class="p">,</span> <span class="nx">iterator</span><span class="p">,</span> <span class="p">[</span><span class="nx">callback</span><span class="p">])</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
-<p>以下例子展示了cookie的设置。</p>
+<p><code>map</code> 与 <code>each</code> 类似，只是 <code>callback</code> 定义为： <code>callback(err, results)</code>。
+<code>results</code> 为 <code>iterator</code> 操作的结果集合。</p>
+
+<p>如下是一个例子，一次读取多个文件的内容：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">async</span><span class="p">.</span><span class="nx">map</span><span class="p">([</span><span class="s1">&#39;file1&#39;</span><span class="p">,</span><span class="s1">&#39;file2&#39;</span><span class="p">,</span><span class="s1">&#39;file3&#39;</span><span class="p">],</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">readFile</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">results</span><span class="p">){</span>
+</span><span class='line'>    <span class="c1">// doSomething();</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
+<p><code>series</code> 与 <code>map</code> 类似，不过 <code>series</code> 是遍历一个方法合集并挨个执行，然后返回结果：</p>
 
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">async</span><span class="p">.</span><span class="nx">series</span><span class="p">(</span><span class="nx">tasks</span><span class="p">,</span> <span class="p">[</span><span class="nx">callback</span><span class="p">])</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">async</span><span class="p">.</span><span class="nx">series</span><span class="p">([</span>
+</span><span class='line'>  <span class="kd">function</span> <span class="nx">fun1</span><span class="p">(</span><span class="nx">callback</span><span class="p">){</span>
+</span><span class='line'>    <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="s1">&#39;one&#39;</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>  <span class="kd">function</span> <span class="nx">fun2</span><span class="p">(</span><span class="nx">callback</span><span class="p">){</span>
+</span><span class='line'>    <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="s1">&#39;two&#39;</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">],</span>
+</span><span class='line'><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">results</span><span class="p">){</span>
+</span><span class='line'>  <span class="c1">// doSomething();</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>注意，以上这些方法各个任务的完成时间顺序是不确定的。如果有一些操作是需要按照先后顺序执行，可以使用 <code>waterfall</code>。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">async</span><span class="p">.</span><span class="nx">waterfall</span><span class="p">(</span><span class="nx">tasks</span><span class="p">,</span> <span class="p">[</span><span class="nx">callback</span><span class="p">])</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>例如在 <code>loopback</code> 的一个 <code>controller</code> 中，提供修改用户密码的功能。原始写法如下：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">router</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s1">&#39;/user/password&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">User</span><span class="p">.</span><span class="nx">findById</span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">user</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="nx">doSomething</span><span class="p">();</span>
+</span><span class='line'>    <span class="nx">user</span><span class="p">.</span><span class="nx">password</span> <span class="o">=</span> <span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">password</span><span class="p">;</span>
+</span><span class='line'>    <span class="nx">user</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">){</span>
+</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="nx">doSomething</span><span class="p">();</span>
+</span><span class='line'>      <span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mi">200</span><span class="p">).</span><span class="nx">end</span><span class="p">();</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>上面的例子功能还比较简单，回调层级不是很深。不过如果使用 <code>waterfall</code> 来控制就更为简单：</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -129,106 +225,23 @@ import time # This is the &hellip;">
 <span class='line-number'>12</span>
 <span class='line-number'>13</span>
 <span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="c">#!/usr/bin/env python</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">time</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># This is the message that contains the cookie</span>
-</span><span class='line'><span class="c"># and will be sent in the HTTP header to the client</span>
-</span><span class='line'><span class="k">print</span> <span class="s">&#39;Set-Cookie: lastvisit=&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">());</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># To save one line of code</span>
-</span><span class='line'><span class="c"># we replaced the print command with a &#39;\n&#39;</span>
-</span><span class='line'><span class="k">print</span> <span class="s">&#39;Content-Type: text/html</span><span class="se">\n</span><span class="s">&#39;</span>
-</span><span class='line'><span class="c"># End of HTTP header</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">print</span> <span class="s">&#39;&lt;html&gt;&lt;body&gt;&#39;</span>
-</span><span class='line'><span class="k">print</span> <span class="s">&#39;Server time is&#39;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">asctime</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">localtime</span><span class="p">())</span>
-</span><span class='line'><span class="k">print</span> <span class="s">&#39;&lt;/body&gt;&lt;/html&gt;&#39;</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">router</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s1">&#39;/user/password&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">async</span><span class="p">.</span><span class="nx">waterfall</span><span class="p">([</span>
+</span><span class='line'>    <span class="kd">function</span><span class="p">(</span><span class="nx">callback</span><span class="p">){</span>
+</span><span class='line'>      <span class="nx">User</span><span class="p">.</span><span class="nx">findById</span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="kd">function</span><span class="p">(</span><span class="nx">user</span><span class="p">,</span> <span class="nx">callback</span><span class="p">){</span>
+</span><span class='line'>      <span class="nx">user</span><span class="p">.</span><span class="nx">password</span> <span class="o">=</span> <span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">password</span><span class="p">;</span>
+</span><span class='line'>      <span class="nx">user</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span><span class="nx">callback</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">],</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="nx">doSomething</span><span class="p">();</span>
+</span><span class='line'>    <span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mi">200</span><span class="p">).</span><span class="nx">end</span><span class="p">();</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'><span class="p">});</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-
-
-<p>这是在数据头中使用<em>Set-Cookie</em>进行的操作。</p>
-
-
-<h2>检索Cookie</h2>
-
-
-<p>浏览器返回来的cookie存放于os.environ字典中，对应的字段名为&#8217;HTTP_COOKIE&#8217;。以下是一个例子：</p>
-
-
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="c">#!/usr/bin/env python</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">Cookie</span><span class="o">,</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">time</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">cookie</span> <span class="o">=</span> <span class="n">Cookie</span><span class="o">.</span><span class="n">SimpleCookie</span><span class="p">()</span>
-</span><span class='line'><span class="n">cookie</span><span class="p">[</span><span class="s">&#39;lastvisit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">print</span> <span class="n">cookie</span>
-</span><span class='line'><span class="k">print</span> <span class="s">&#39;Content-Type: text/html</span><span class="se">\n</span><span class="s">&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">print</span> <span class="s">&#39;&lt;html&gt;&lt;body&gt;&#39;</span>
-</span><span class='line'><span class="k">print</span> <span class="s">&#39;&lt;p&gt;Server time is&#39;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">asctime</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">localtime</span><span class="p">()),</span> <span class="s">&#39;&lt;/p&gt;&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># The returned cookie is available in the os.environ dictionary</span>
-</span><span class='line'><span class="n">cookie_string</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;HTTP_COOKIE&#39;</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># The first time the page is run there will be no cookies</span>
-</span><span class='line'><span class="k">if</span> <span class="ow">not</span> <span class="n">cookie_string</span><span class="p">:</span>
-</span><span class='line'>   <span class="k">print</span> <span class="s">&#39;&lt;p&gt;First visit or cookies disabled&lt;/p&gt;&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">else</span><span class="p">:</span> <span class="c"># Run the page twice to retrieve the cookie</span>
-</span><span class='line'>   <span class="k">print</span> <span class="s">&#39;&lt;p&gt;The returned cookie string was &quot;&#39;</span> <span class="o">+</span> <span class="n">cookie_string</span> <span class="o">+</span> <span class="s">&#39;&quot;&lt;/p&gt;&#39;</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="c"># load() parses the cookie string</span>
-</span><span class='line'>   <span class="n">cookie</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">cookie_string</span><span class="p">)</span>
-</span><span class='line'>   <span class="c"># Use the value attribute of the cookie to get it</span>
-</span><span class='line'>   <span class="n">lastvisit</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">cookie</span><span class="p">[</span><span class="s">&#39;lastvisit&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="k">print</span> <span class="s">&#39;&lt;p&gt;Your last visit was at&#39;</span><span class="p">,</span>
-</span><span class='line'>   <span class="k">print</span> <span class="n">time</span><span class="o">.</span><span class="n">asctime</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">localtime</span><span class="p">(</span><span class="n">lastvisit</span><span class="p">)),</span> <span class="s">&#39;&lt;/p&gt;&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">print</span> <span class="s">&#39;&lt;/body&gt;&lt;/html&gt;&#39;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<p>使用SimpleCookie对象的load()方法对字符串进行解析。</p>
 
 </div>
 
@@ -245,14 +258,14 @@ import time # This is the &hellip;">
 
 
 
-<time class='entry-date' datetime='2013-12-07T00:00:00+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+<time class='entry-date' datetime='2015-12-13T21:39:26+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>9:39 pm</span></time>
     </p>
     <p class="meta">
       Categories: 
 
 <span class="categories">
   
-    <a class='category' href='/categories/web开发/index.html'>web开发</a>
+    <a class='category' href='/categories/前端相关/index.html'>前端相关</a>
   
 </span>
 
@@ -263,7 +276,7 @@ import time # This is the &hellip;">
 
 <span class="tags">
   
-    <a class='tag' href='/tags/Web开发/index.html'>Web开发</a>, <a class='tag' href='/tags/python/index.html'>python</a>
+    <a class='tag' href='/tags/js/index.html'>js</a>
   
 </span>
 
@@ -279,10 +292,8 @@ import time # This is the &hellip;">
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/archives/83993.html" title="Previous Post: python cgi教程4——执行Shell命令">&laquo; python cgi教程4——执行Shell命令</a>
+        <a class="basic-alignment left" href="/archives/84156.html" title="Previous Post: AngularJS学习笔记7——与rails整合">&laquo; AngularJS学习笔记7——与rails整合</a>
       
-      
-        <a class="basic-alignment right" href="/archives/84001.html" title="Next Post: python cgi教程6——Session">python cgi教程6——Session &raquo;</a>
       
     </p>
   </footer>
@@ -371,8 +382,8 @@ import time # This is the &hellip;">
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://www.xefan.com/archives/83998.html';
-        var disqus_url = 'http://www.xefan.com/archives/83998.html';
+        var disqus_identifier = 'http://www.xefan.com/archives/84157.html';
+        var disqus_url = 'http://www.xefan.com/archives/84157.html';
         var disqus_script = 'embed.js';
       
     (function () {

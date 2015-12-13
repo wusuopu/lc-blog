@@ -4,7 +4,7 @@
   <title><![CDATA[龍昌博客]]></title>
   <link href="http://www.xefan.com/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2015-08-27T13:54:25+08:00</updated>
+  <updated>2015-12-13T23:14:18+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -12,6 +12,168 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Javascript使用async进行流程控制]]></title>
+    <link href="http://www.xefan.com/archives/84157.html"/>
+    <updated>2015-12-13T21:39:26+08:00</updated>
+    <id>http://www.xefan.com/archives/84157-javascript使用async进行流程控制</id>
+    <content type="html"><![CDATA[<h2>前言</h2>
+
+<p>突然发现博客好久没有更新了，主要是因为最近这几个月比较忙。之前由 Python 转向了 Ruby，现在又由后端转向了前端。
+这几个月接触的内容略有点多，信息量有点大，主要都是 js 相关的。准备之后抽时间将这些知识整理整理，沉淀沉淀。</p>
+
+<h2>Async</h2>
+
+<p>由于 js 是异步的，之前在使用 loopback 进行 server 端开发时，很容易就出现了比较深层次的回调嵌套。
+<a href="https://github.com/caolan/async">async.js</a>是 js 的一个工具，可以用来方便的控制 js 中的异步流程的，类似的库还有 Promise、RxJS 等。
+最初它是设计用于 nodejs 的，不过在浏览器端也可以使用。</p>
+
+<h3>安装</h3>
+
+<p>安装方法很简单，直接使用 npm 即可： <code>npm install async</code> 。</p>
+
+<h3>使用方法</h3>
+
+<p>首先是加载 async 库，在 server 端使用 <code>var async = require('async');</code>，
+在浏览器端直接引用即可： <code>&lt;script type="text/javascript" src="async.js"&gt;&lt;/script&gt;</code>。</p>
+
+<p>async 提供一些集合操作方法和流程控制方法，我比较常用的是：<code>each</code>、<code>map</code>、<code>series</code>、<code>waterfall</code> 这些方法。
+其中 <code>each</code>、<code>map</code> 方法与 <code>lodash</code> 的类似，可以用来遍历某个集合并执行一些操作。</p>
+
+<p><code>each</code> 方法定义如下：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">async</span><span class="p">.</span><span class="nx">each</span><span class="p">(</span><span class="nx">collection</span><span class="p">,</span> <span class="nx">iterator</span><span class="p">,</span> <span class="p">[</span><span class="nx">callback</span><span class="p">])</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>该方法会对 <code>collection</code> 每个元素都调用 <code>iterator</code> 操作， <code>iterator</code> 函数原型为： <code>iterator(item, callback)</code>。
+当 <code>collection</code> 中的所有元素遍历完成或者执行 <code>iterator</code> 时发生错误就会调用 <code>callback</code> 回调，原型为： <code>callback(err)</code>。</p>
+
+<p><code>each</code> 方法只是对每个元素进行操作，如果还需要获取操作的结果，那么可以使用 <code>map</code> 方法。定义如下：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">async</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">collection</span><span class="p">,</span> <span class="nx">iterator</span><span class="p">,</span> <span class="p">[</span><span class="nx">callback</span><span class="p">])</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>map</code> 与 <code>each</code> 类似，只是 <code>callback</code> 定义为： <code>callback(err, results)</code>。
+<code>results</code> 为 <code>iterator</code> 操作的结果集合。</p>
+
+<p>如下是一个例子，一次读取多个文件的内容：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">async</span><span class="p">.</span><span class="nx">map</span><span class="p">([</span><span class="s1">&#39;file1&#39;</span><span class="p">,</span><span class="s1">&#39;file2&#39;</span><span class="p">,</span><span class="s1">&#39;file3&#39;</span><span class="p">],</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">readFile</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">results</span><span class="p">){</span>
+</span><span class='line'>    <span class="c1">// doSomething();</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>series</code> 与 <code>map</code> 类似，不过 <code>series</code> 是遍历一个方法合集并挨个执行，然后返回结果：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">async</span><span class="p">.</span><span class="nx">series</span><span class="p">(</span><span class="nx">tasks</span><span class="p">,</span> <span class="p">[</span><span class="nx">callback</span><span class="p">])</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">async</span><span class="p">.</span><span class="nx">series</span><span class="p">([</span>
+</span><span class='line'>  <span class="kd">function</span> <span class="nx">fun1</span><span class="p">(</span><span class="nx">callback</span><span class="p">){</span>
+</span><span class='line'>    <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="s1">&#39;one&#39;</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>  <span class="kd">function</span> <span class="nx">fun2</span><span class="p">(</span><span class="nx">callback</span><span class="p">){</span>
+</span><span class='line'>    <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="s1">&#39;two&#39;</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">],</span>
+</span><span class='line'><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">results</span><span class="p">){</span>
+</span><span class='line'>  <span class="c1">// doSomething();</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>注意，以上这些方法各个任务的完成时间顺序是不确定的。如果有一些操作是需要按照先后顺序执行，可以使用 <code>waterfall</code>。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">async</span><span class="p">.</span><span class="nx">waterfall</span><span class="p">(</span><span class="nx">tasks</span><span class="p">,</span> <span class="p">[</span><span class="nx">callback</span><span class="p">])</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>例如在 <code>loopback</code> 的一个 <code>controller</code> 中，提供修改用户密码的功能。原始写法如下：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">router</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s1">&#39;/user/password&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">User</span><span class="p">.</span><span class="nx">findById</span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">user</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="nx">doSomething</span><span class="p">();</span>
+</span><span class='line'>    <span class="nx">user</span><span class="p">.</span><span class="nx">password</span> <span class="o">=</span> <span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">password</span><span class="p">;</span>
+</span><span class='line'>    <span class="nx">user</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">){</span>
+</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="nx">doSomething</span><span class="p">();</span>
+</span><span class='line'>      <span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mi">200</span><span class="p">).</span><span class="nx">end</span><span class="p">();</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>上面的例子功能还比较简单，回调层级不是很深。不过如果使用 <code>waterfall</code> 来控制就更为简单：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">router</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s1">&#39;/user/password&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">async</span><span class="p">.</span><span class="nx">waterfall</span><span class="p">([</span>
+</span><span class='line'>    <span class="kd">function</span><span class="p">(</span><span class="nx">callback</span><span class="p">){</span>
+</span><span class='line'>      <span class="nx">User</span><span class="p">.</span><span class="nx">findById</span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="kd">function</span><span class="p">(</span><span class="nx">user</span><span class="p">,</span> <span class="nx">callback</span><span class="p">){</span>
+</span><span class='line'>      <span class="nx">user</span><span class="p">.</span><span class="nx">password</span> <span class="o">=</span> <span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">password</span><span class="p">;</span>
+</span><span class='line'>      <span class="nx">user</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span><span class="nx">callback</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">],</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="nx">doSomething</span><span class="p">();</span>
+</span><span class='line'>    <span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mi">200</span><span class="p">).</span><span class="nx">end</span><span class="p">();</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[AngularJS学习笔记7——与rails整合]]></title>
@@ -2940,220 +3102,6 @@ Devise是利用了 <code>included</code> 钩子来实现这些的。非常的优
 
 
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Mongodb集群配置实例]]></title>
-    <link href="http://www.xefan.com/archives/84137.html"/>
-    <updated>2014-12-10T20:33:02+08:00</updated>
-    <id>http://www.xefan.com/archives/84137-Mongodb集群配置实例</id>
-    <content type="html"><![CDATA[<p>Mongodb的集群有两种，一个是主从复制，另一种是副本集。</p>
-
-<h2>主从复制</h2>
-
-<p>根据 Mongodb 的官方文档说明，在生产环境中建议使用副本集代替主从复制。 <a href="http://docs.mongodb.org/manual/core/master-slave/">http://docs.mongodb.org/manual/core/master-slave/</a></p>
-
-<p>不过对于主从复制还是可以了解一下。假设有如下三台主机：</p>
-
-<ul>
-<li>172.17.0.4    (主)</li>
-<li>172.17.0.5    (从)</li>
-<li>172.17.0.6    (从)</li>
-</ul>
-
-
-<p>要进行主从复制的配置，首先修改主服务器的配置信息：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>master = true         # 以主服务器模式启动
-</span><span class='line'>bind_ip = 0.0.0.0</span></code></pre></td></tr></table></div></figure>
-
-
-<p>然后修改另两台从服务器配置信息：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>slave = true
-</span><span class='line'>source = 172.17.0.4
-</span><span class='line'>bind_ip = 0.0.0.0</span></code></pre></td></tr></table></div></figure>
-
-
-<p>最后启动三台主机上的 Mongodb 服务，再通过一个简单的程序来测试一下。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1">#!/usr/bin/env ruby</span>
-</span><span class='line'><span class="c1">#-*- coding:utf-8 -*-</span>
-</span><span class='line'>
-</span><span class='line'><span class="nb">require</span> <span class="s2">&quot;mongo&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">begin</span>
-</span><span class='line'>  <span class="n">conn</span> <span class="o">=</span> <span class="no">Mongo</span><span class="o">::</span><span class="no">Connection</span><span class="o">.</span><span class="n">new</span> <span class="s1">&#39;172.17.0.4&#39;</span>
-</span><span class='line'>  <span class="n">db</span> <span class="o">=</span> <span class="n">conn</span><span class="o">[</span><span class="s1">&#39;test&#39;</span><span class="o">]</span>
-</span><span class='line'><span class="k">rescue</span> <span class="no">Exception</span><span class="o">=&gt;</span><span class="n">e</span>
-</span><span class='line'>  <span class="nb">p</span> <span class="n">e</span>
-</span><span class='line'>  <span class="nb">exit</span> <span class="mi">1</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span class='line'><span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">100</span>
-</span><span class='line'>  <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;no&#39;</span> <span class="o">=&gt;</span> <span class="n">i</span><span class="p">}</span>
-</span><span class='line'>  <span class="n">d</span> <span class="o">=</span> <span class="n">db</span><span class="o">[</span><span class="s1">&#39;data&#39;</span><span class="o">].</span><span class="n">insert</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
-</span><span class='line'>  <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
-</span><span class='line'>  <span class="nb">puts</span> <span class="n">d</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>执行该脚本，向 <code>172.17.0.4</code> 主机的 Mongodb 中插入一些数据。然后发现数据被同步到了另外两台主机上。</p>
-
-<p>主从之间安全认证：<br/>
-如果启动了 <code>auth</code> 项，那么主从之间的认证需要使用 <code>keyFile</code> 选项。</p>
-
-<p>执行如下命令生成 key 文件，并设置为只有 mongodb 的进程用户可读写：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="err">$</span> <span class="n">openssl</span> <span class="nb">rand</span> <span class="o">-</span><span class="n">base64</span> <span class="mi">741</span> <span class="o">&gt;</span> <span class="sr">/path/mon</span><span class="n">godb_keyFile</span>
-</span><span class='line'><span class="err">$</span> <span class="n">chmow</span> <span class="mi">600</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">mongodb_keyFile</span>
-</span><span class='line'><span class="err">$</span> <span class="n">chown</span> <span class="ss">mongodb</span><span class="p">:</span><span class="n">mongodb</span> <span class="sr">/path/mon</span><span class="n">godb_keyFile</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>将该文件复制到这三台主机中，然后分别修改主从的配置信息：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">keyFile</span> <span class="o">=</span> <span class="sr">/path/mon</span><span class="n">godb_keyFile</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>副本集</h2>
-
-<p>同样的对于这三台主机，我们重新修改配置设置为副本集的形式。</p>
-
-<ul>
-<li>172.17.0.4</li>
-<li>172.17.0.5</li>
-<li>172.17.0.6</li>
-</ul>
-
-
-<p>首先修改配置文件，设置副本集的名字。<br/>
-注意：副本集中所有主机设置的名字需要一样。这里我们设为 <code>myrepl0</code>。<br/>
-注意：设置副本集之前各个 mongodb 的数据目录必须都为空。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">replSet</span> <span class="o">=</span> <span class="n">myrepl0</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>接着启动所有 mongodb 服务，然后对副本集进行初始化。<br/>
-连接任意一台 mongodb 服务，执行如下操作：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">&gt;</span> <span class="n">rs</span><span class="o">.</span><span class="n">initiate</span><span class="p">({</span><span class="s1">&#39;_id&#39;</span><span class="p">:</span> <span class="s1">&#39;myrepl0&#39;</span><span class="p">,</span> <span class="s1">&#39;members&#39;</span><span class="p">:</span> <span class="o">[</span>
-</span><span class='line'>    <span class="p">{</span><span class="s1">&#39;_id&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;host&#39;</span><span class="p">:</span> <span class="s1">&#39;172.17.0.4:27017&#39;</span><span class="p">},</span>
-</span><span class='line'>    <span class="p">{</span><span class="s1">&#39;_id&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;host&#39;</span><span class="p">:</span> <span class="s1">&#39;172.17.0.7:27017&#39;</span><span class="p">},</span>
-</span><span class='line'>    <span class="p">{</span><span class="s1">&#39;_id&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;host&#39;</span><span class="p">:</span> <span class="s1">&#39;172.17.0.8:27017&#39;</span><span class="p">}</span>
-</span><span class='line'><span class="o">]</span><span class="p">})</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>现在副本集的初始化已完成，可以通过如下命令查看状态：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">&gt;</span> <span class="n">rs</span><span class="o">.</span><span class="n">status</span><span class="p">()</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>在运行过程中可以随时添加或移除一个节点，如：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">rs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;172.17.0.8:27017&quot;</span><span class="p">)</span>
-</span><span class='line'><span class="n">rs</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;172.17.0.8:27017&quot;</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>可以再通过上面的程序添加一些数据。然后再连接到任意一台主机进行查询，看看数据是否已同步。</p>
-
-<p>详细内容可参考文档： <a href="http://docs.mongodb.org/manual/core/replication/">http://docs.mongodb.org/manual/core/replication/</a></p>
-
-<p>安全认证：</p>
-
-<p>1.禁用 auth 选项和 replSet 选项再运行 mongodb</p>
-
-<p>2.连接到该 mongodb 服务并创建用户</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">&gt;</span> <span class="n">use</span> <span class="n">admin</span>
-</span><span class='line'><span class="n">switched</span> <span class="n">to</span> <span class="n">db</span> <span class="n">admin</span>
-</span><span class='line'><span class="o">&gt;</span> <span class="n">db</span><span class="o">.</span><span class="n">addUser</span><span class="p">(</span><span class="s1">&#39;root&#39;</span><span class="p">,</span><span class="s1">&#39;root&#39;</span><span class="p">)</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>        <span class="s2">&quot;user&quot;</span> <span class="p">:</span> <span class="s2">&quot;root&quot;</span><span class="p">,</span>
-</span><span class='line'>        <span class="s2">&quot;readOnly&quot;</span> <span class="p">:</span> <span class="kp">false</span><span class="p">,</span>
-</span><span class='line'>        <span class="s2">&quot;pwd&quot;</span> <span class="p">:</span> <span class="s2">&quot;2a8025f0885adad5a8ce0044070032b3&quot;</span><span class="p">,</span>
-</span><span class='line'>        <span class="s2">&quot;_id&quot;</span> <span class="p">:</span> <span class="no">ObjectId</span><span class="p">(</span><span class="s2">&quot;54745351f79804bd44b596fb&quot;</span><span class="p">)</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="o">&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>3.重新以 auth、keyFile 和 replSet 模式启动 mongodb</p>
-
-<p>4.连接到刚刚创建用户的 mongodb 服务</p>
-
-<p>5.跟之前的步骤一样，配置副本集</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">&gt;</span> <span class="n">rs</span><span class="o">.</span><span class="n">initiate</span><span class="p">({</span><span class="s1">&#39;_id&#39;</span><span class="p">:</span> <span class="s1">&#39;myrepl0&#39;</span><span class="p">,</span> <span class="s1">&#39;members&#39;</span><span class="p">:</span> <span class="o">[</span>
-</span><span class='line'>    <span class="p">{</span><span class="s1">&#39;_id&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;host&#39;</span><span class="p">:</span> <span class="s1">&#39;172.17.0.4:27017&#39;</span><span class="p">},</span>
-</span><span class='line'>    <span class="p">{</span><span class="s1">&#39;_id&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;host&#39;</span><span class="p">:</span> <span class="s1">&#39;172.17.0.7:27017&#39;</span><span class="p">},</span>
-</span><span class='line'>    <span class="p">{</span><span class="s1">&#39;_id&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;host&#39;</span><span class="p">:</span> <span class="s1">&#39;172.17.0.8:27017&#39;</span><span class="p">}</span>
-</span><span class='line'><span class="o">]</span><span class="p">})</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>参考： <a href="http://docs.mongodb.org/manual/tutorial/deploy-replica-set-with-auth/">http://docs.mongodb.org/manual/tutorial/deploy-replica-set-with-auth/</a></p>
 ]]></content>
   </entry>
   
