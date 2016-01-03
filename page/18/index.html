@@ -9,7 +9,7 @@
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="鼠标 当显示模式设置后，事件队列就会开始收到鼠标事件。当按下和释放鼠标的按键时，会产生 pygame.MOUSEBUTTONDOWN和pygame.MOUSEBUTTONUP事件。这些事件包含一个button属性表示哪些键被按下。滚动鼠标滚轮会产生pygame.MOUSEBUTTONDOWN事件。 &hellip;">
+  <meta name="description" content="手柄 joystick模块管理计算机上的手柄设备（可能多于一个）。手柄设备包括轨迹球、类似电视游戏机的游戏手柄，允许使用多个按钮和’hats’。 pygame.joystick.get_count函数可以获得系统中手柄的个数。比如： count = pygame.joystick. &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -66,6 +66,101 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83605.html">Pygame学习笔记11：手柄</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2011-09-17T00:00:00+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83605.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83605.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><strong>手柄</strong></p>
+
+<p>joystick模块管理计算机上的手柄设备（可能多于一个）。手柄设备包括轨迹球、类似电视游戏机的游戏手柄，允许使用多个按钮和’hats’。</p>
+
+<p>pygame.joystick.get_count函数可以获得系统中手柄的个数。比如：</p>
+
+<p><em>count = pygame.joystick.get_count()</em></p>
+
+<p>如果系统没有手柄，数量是0。</p>
+
+<p>如果系统有手柄，可以通过pygame.joystick.Joystick来创建手柄对象：</p>
+
+<p><em>j = pygame.joystick.Joystick(0)</em></p>
+
+<p>其中的整数是手柄的id，取值范围从0到count-1。</p>
+
+<p>创建对象后，需要先初始化</p>
+
+<p><em>j.init()</em></p>
+
+<p>初始化后，事件队列中就可以收到来自手柄的事件了。事件类型分为：</p>
+
+<pre><code>JOYAXISMOTION joy, axis, value
+JOYBALLMOTION joy, ball, rel
+JOYHATMOTION joy, hat, value
+JOYBUTTONUP joy, button
+JOYBUTTONDOWN joy, button
+</code></pre>
+
+<p>要注意pygame.JOYAXISMOTION事件的value值在-1.0和1.0之间。值0.0表示轴在正中间。游戏手柄设备一般只有-1、0、1三个值，而没有中间的值。而老的模拟手柄并不一定能完全达到-1到1的区间，中间的值也可能是0附近的一个值。模拟手柄通常会有一点噪声，从而会产生很多很小很快的运动事件。当轨迹球滚动时，pygame.JOYBALLMOTION事件会发生。它会报告轨迹球总共滚动了多少距离。当按钮被按下和释放时，会产生pygame.JOYBUTTONDOWN和pygame.JOYBUTTONUP事件。当hat的位置改变时，pygame.JOYHATMOTION事件会产生。事件的位置属性包括一对值，它们是-1或者0或者1。位置(0,0)表示hat在正中间。</p>
+
+<p>要获得手柄的轴数可以使用</p>
+
+<p><em>j.get_numaxes()</em></p>
+
+<p>要获得手柄上轨迹球的个数，可以使用</p>
+
+<p><em>j.get_numballs()</em></p>
+
+<p>要获得手柄上的按键数，可以使用</p>
+
+<p><em>j.get_numbuttons()</em></p>
+
+<p>要获得手柄上hat控制器的个数，可以使用</p>
+
+<p><em>j.get_numhats()</em></p>
+
+<p>除了通过事件获得手柄的输入外，也可以直接查询手柄的状态。通过</p>
+
+<p><em>j.get_axis(axis_number)</em></p>
+
+<p>可以获得某个轴的位置。通过</p>
+
+<p><em>j.get_ball(ball_number)</em></p>
+
+<p>可以获得某个轨迹球的相对位置。通过</p>
+
+<p><em>j.get_button(button)</em></p>
+
+<p>可以获得某个按键的状态。通过</p>
+
+<p><em>j.get_hat(hat_number)</em></p>
+
+<p>可以获得hat控制器的当前位置。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -950,108 +1045,6 @@ Event对象有各种不同的类型，比如KEYDOWN(键盘键按下)、MOUSEBUTT
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83579.html">Pygame学习笔记2：显示</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2011-08-14T00:00:00+08:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>14</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
-        
-           | <a href="http://www.xefan.com/archives/83579.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/83579.html">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>首先使用了如下的语句创建一个窗口：</p>
-
-<p><em>screen =pygame.display.set_mode((640, 480), 0, 32)</em></p>
-
-<p>这里创建了一个640*480的黑窗口，现在可以往内面画内容。</p>
-
-<p><strong>读取和保存图片</strong></p>
-
-<p>使用pygame.image模块，可以对图像进行读取和保存。</p>
-
-<p>使用pygame.image.load读取图像文件。</p>
-
-<p><em>img = pygame.image.load(filename)</em></p>
-
-<p>可以读取文件名为filename的图像文件，pygame会自动确定文件的类型（比如GIF或者BMP），一般来说支持JPG、PNG、GIF (non animated)、BMP、PCX、TGA (uncompressed)、TIF、LBM (及PBM)、PBM (及PGM, PPM)、XPM等。它返回一个包含图像的Surface，Surface的格式和原来的文件相同（包括颜色格式、透明色和alpha透明）。</p>
-
-<p>使用pygame.image.save可以把图像保存到文件中。</p>
-
-<p><em>pygame.image.save(img, filename)</em></p>
-
-<p>这个函数可以把img这个Surface的内容保存为filename指定的图像文件，文件格式可以是BMP、TGA、PNG或者JPEG。如果文件扩展名不认识，默认保存为TGA格式。TGA和BMP格式都是非压缩的文件。</p>
-
-<p>还有pygame.image.tostring、pygame.image.fromstring、pygame.image.frombuffer函数可以把图像序列化，即把图像保存在字符串中或者从字符串中读取图像。</p>
-
-<p><strong>变换</strong></p>
-
-<p>使用pygame.transform模块中的函数，可以对图像进行简单的变换。所有的这些函数都需要一个Surface参数指明要处理的图像，并生成一个新的图像表示处理后的结果，原来的图像不会被改变。</p>
-
-<p>使用pygame.transform.flip可以上下左右翻转图像</p>
-
-<p>使用pygame.transform.scale可以对图像进行缩放</p>
-
-<p>使用pygame.transform.rotate可以对图像进行旋转</p>
-
-<p>使用pygame.transform.rotozoom可以对图像进行缩放并旋转</p>
-
-<p>使用pygame.transform.scale2x可以对图像进行快速的两倍大小的放大</p>
-
-<p>使用pygame.transform.chop可以对图像进行裁减</p>
-
-<p><strong>转换Surfaces</strong></p>
-
-<p>通常你不用在意surface里的具体内容，不过也许你需要吧这些surface转换一下以获得更高的性能，</p>
-
-<p>img2 =pygame.image.load(image_filename).convert()</p>
-
-<p>mouse_cursor =pygame.image.load(image_filename).convert_alpha()</p>
-
-<p>第一句是普通的转换，相同于display；第二句是带alpha通道的转换。如果你给convert或者conver_alpha一个surface对象作为参数，那么这个会被作为目标来转换。</p>
-
-<p><strong>块复制</strong></p>
-
-<p>一个图像复制到另一个上面</p>
-
-<p>现在要将读取的图片画在屏幕上，可由blit函数来实现</p>
-
-<p>Surface.blit(source, dest, area=None, special_flags = 0): return Rect</p>
-
-<p>画的位置可以由dest参数指定。dest可以是一对坐标值，表示源Surface的左上角在这个Surface上的坐标。dest也可以是一个矩形，矩形的左上角作为blit的位置，而矩形的大小不影响blit。</p>
-
-<p>有一个可选的area矩形参数，可以用来指定只画源Surface的一部分。</p>
-
-<p>一个可选的special_flags参数，可以是BLEND_ADD、BLEND_SUB、BLEND_MULT、BLEND_MIN、BLEND_MAX。将来也可能有其它特殊标记添加进来。</p>
-
-<p>函数返回的矩形表示受影响的像素的区域，不包括目标Surface以外的像素，也不包括剪切区域以外的像素。</p>
-
-<p>例如：</p>
-
-<p><em>screen.blit(img,(0,0))</em></p>
-
-<p>然后使用pygame.display.update()来更新显示。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/page/19">&larr; Older</a>
@@ -1073,6 +1066,10 @@ Event对象有各种不同的类型，比如KEYDOWN(键盘键按下)、MOUSEBUTT
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="http://www.xefan.com/archives/84158.html">Xcode文档离线安装</a>
+      </li>
+    
+      <li class="post">
         <a href="http://www.xefan.com/archives/84157.html">Javascript使用async进行流程控制</a>
       </li>
     
@@ -1088,19 +1085,15 @@ Event对象有各种不同的类型，比如KEYDOWN(键盘键按下)、MOUSEBUTT
         <a href="http://www.xefan.com/archives/84154.html">在Ruby中使用DATA和__END__将代码和数据混合</a>
       </li>
     
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84153.html">Mac下使用supervisor进行服务管理</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (32)</a></li><li><a href='/categories/web开发/index.html'>web开发 (19)</a></li><li><a href='/categories/前端相关/index.html'>前端相关 (9)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (16)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (23)</a></li></ul>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (32)</a></li><li><a href='/categories/web开发/index.html'>web开发 (19)</a></li><li><a href='/categories/前端相关/index.html'>前端相关 (9)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (16)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (24)</a></li></ul>
 </section>
 <section>
   <h1>Tag Cloud</h1>
-    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.7910447761194%'>ajax(2)</a> <a href='/tags/angular/index.html' style='font-size: 106.26865671641791%'>angular(7)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 108.95522388059702%'>js(10)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mac/index.html' style='font-size: 100.8955223880597%'>Mac(1)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 129.55223880597015%'>Ruby(33)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 123.28358208955224%'>翻译(26)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 101.7910447761194%'>ajax(2)</a> <a href='/tags/angular/index.html' style='font-size: 106.26865671641791%'>angular(7)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 108.95522388059702%'>js(10)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mac/index.html' style='font-size: 100.8955223880597%'>Mac(1)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 129.55223880597015%'>Ruby(33)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xcode/index.html' style='font-size: 100.8955223880597%'>Xcode(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 123.28358208955224%'>翻译(26)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
 </section>
 <section>
   <h1>Link</h1>
@@ -1123,7 +1116,7 @@ Event对象有各种不同的类型，比如KEYDOWN(键盘键按下)、MOUSEBUTT
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2015 - 龍昌 -
+  Copyright &copy; 2016 - 龍昌 -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 <div style="display:none;"><script src="http://s94.cnzz.com/stat.php?id=1259846&web_id=1259846&show=pic" language="JavaScript"></script></div>
