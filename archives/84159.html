@@ -5,11 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Tag: 资源分享 - 龍昌博客</title>
+  <title>HTTP Access Control跨域请求 - 龍昌博客</title>
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="Tag: 资源分享">
+  <meta name="description" content="最近在使用 Ajax api 请求时遇到了跨域的问题，现在问题解决了顺便做个笔记。 场景：现在主站域名为 example.org ，需要通过 ajax 请求 hello-world.example 上的资源。 Access-Control-Allow-Origin 如果请求时遇到如下错误：
+No &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +19,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://www.xefan.com/tags/%E8%B5%84%E6%BA%90%E5%88%86%E4%BA%AB/index.html">
+  <link rel="canonical" href="http://www.xefan.com/archives/84159.html">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="龍昌博客" type="application/atom+xml">
@@ -65,196 +66,146 @@
   <div id="main">
     <div id="content">
       <div>
-<article role="article">
+<article class="hentry" role="article">
   
   <header>
-    <h1 class="entry-title">Tag: 资源分享</h1>
+    
+      <h1 class="entry-title">HTTP Access Control跨域请求</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-03-17T16:35:12+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>4:35 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com">Comments</a>
+        
+      </p>
     
   </header>
-  
-  <div id="blog-archives" class="tag">
 
 
+<div class="entry-content"><p>最近在使用 Ajax api 请求时遇到了跨域的问题，现在问题解决了顺便做个笔记。</p>
 
-  
-  <h2>2014</h2>
+<p>场景：现在主站域名为 example.org ，需要通过 ajax 请求 hello-world.example 上的资源。</p>
 
-<article>
-  
-<h1><a href="http://www.xefan.com/archives/84027.html">使用distcc加快编译速度</a></h1>
-<time datetime="2014-01-07T00:00:00+08:00" pubdate><span class='month'>Jan</span> <span class='day'>07</span> <span class='year'>2014</span></time>
+<h2>Access-Control-Allow-Origin</h2>
 
-<footer>
-  <span class="categories">posted in <a class='category' href='/categories/编程开发/index.html'>编程开发</a></span>
-</footer>
+<p>如果请求时遇到如下错误：<br/>
+<code>No 'Access-Control-Allow-Origin' header is present on the requested resource. Origin 'http://example.org' is therefore not allowed access.</code></p>
 
+<p>则需要在 hello-world.example 的 server 端 Response Headers 中设置 <code>Access-Control-Allow-Origin</code> 字段。其值根据情况设置为 <code>http://example.org</code> 或者 <code>https://example.org</code> 。</p>
 
-</article>
+<h2>Access-Control-Allow-Methods</h2>
 
+<p>一般情况下只允许 GET 和 POST 请求，对于 RESTful 的 api 可能会有其他类型的请求。例如：</p>
 
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$.ajax({
+</span><span class='line'>  url: 'http://hello-world.example/sessions/me.json',
+</span><span class='line'>  method: 'DELETE',
+</span><span class='line'>  dataType: 'json'
+</span><span class='line'>});</span></code></pre></td></tr></table></div></figure>
 
-<article>
-  
-<h1><a href="http://www.xefan.com/archives/84024.html">使用ccache加快编译速度</a></h1>
-<time datetime="2014-01-04T00:00:00+08:00" pubdate><span class='month'>Jan</span> <span class='day'>04</span> <span class='year'>2014</span></time>
 
-<footer>
-  <span class="categories">posted in <a class='category' href='/categories/编程开发/index.html'>编程开发</a></span>
-</footer>
+<p>这时如果出现方法不被允许，则需要在 server 端 Response Headers 中设置 <code>Access-Control-Allow-Methods</code> 字段。如： <code>Access-Control-Allow-Methods: GET, POST, DELETE</code> 。</p>
 
+<h2>Access-Control-Allow-Credentials</h2>
 
-</article>
+<p>当在 hello-world.example 站点登录之后，浏览器会保存对应的 Cookies ，但是在 example.org 站点中使用 ajax 时发现 hello-world.example 的 Cookies 并没有附加到 Request Headers 中。</p>
 
+<p>此时就需要设置 XMLHttpRequest 的 <code>withCredentials</code> 属性，例如：</p>
 
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$.ajax({
+</span><span class='line'>  url: 'http://hello-world.example/session/me.json',
+</span><span class='line'>  method: 'GET',
+</span><span class='line'>  dataType: 'json',
+</span><span class='line'>  xhrFields: {
+</span><span class='line'>      withCredentials: true
+</span><span class='line'>  }
+</span><span class='line'>});</span></code></pre></td></tr></table></div></figure>
 
-  
-  <h2>2011</h2>
 
-<article>
-  
-<h1><a href="http://www.xefan.com/archives/83548.html">再推荐一款不错的编辑器——UliPad</a></h1>
-<time datetime="2011-05-15T00:00:00+08:00" pubdate><span class='month'>May</span> <span class='day'>15</span> <span class='year'>2011</span></time>
+<p>同时在 server 端 Response Headers 中设置 <code>Access-Control-Allow-Credentials</code> 字段。说明允许通过跨域修改 Cookies 。如： <code>Access-Control-Allow-Credentials: true</code></p>
 
-<footer>
-  <span class="categories">posted in <a class='category' href='/categories/开源软件/index.html'>开源软件</a></span>
-</footer>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="http://www.xefan.com/archives/83546.html">一些开发手册下载</a></h1>
-<time datetime="2011-04-28T00:00:00+08:00" pubdate><span class='month'>Apr</span> <span class='day'>28</span> <span class='year'>2011</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/categories/资源分享/index.html'>资源分享</a></span>
-</footer>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="http://www.xefan.com/archives/83543.html">推荐一款不错的编辑器——Komodo Edit</a></h1>
-<time datetime="2011-04-24T00:00:00+08:00" pubdate><span class='month'>Apr</span> <span class='day'>24</span> <span class='year'>2011</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/categories/开源软件/index.html'>开源软件</a></span>
-</footer>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="http://www.xefan.com/archives/83531.html">编译原理三大圣经——龙书、虎书、鲸书下载</a></h1>
-<time datetime="2011-03-21T00:00:00+08:00" pubdate><span class='month'>Mar</span> <span class='day'>21</span> <span class='year'>2011</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/categories/资源分享/index.html'>资源分享</a></span>
-</footer>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="http://www.xefan.com/archives/83527.html">Okular——Linux下PDF阅读器</a></h1>
-<time datetime="2011-02-22T00:00:00+08:00" pubdate><span class='month'>Feb</span> <span class='day'>22</span> <span class='year'>2011</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/categories/开源软件/index.html'>开源软件</a></span>
-</footer>
-
-
-</article>
-
-
-
-  
-  <h2>2010</h2>
-
-<article>
-  
-<h1><a href="http://www.xefan.com/archives/83490.html">几款Linux下使用ICQ、MSN的软件</a></h1>
-<time datetime="2010-11-07T00:00:00+08:00" pubdate><span class='month'>Nov</span> <span class='day'>07</span> <span class='year'>2010</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/categories/开源软件/index.html'>开源软件</a></span>
-</footer>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="http://www.xefan.com/archives/83481.html">推荐两款WordPress高亮代码插件</a></h1>
-<time datetime="2010-11-04T00:00:00+08:00" pubdate><span class='month'>Nov</span> <span class='day'>04</span> <span class='year'>2010</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/categories/开源软件/index.html'>开源软件</a></span>
-</footer>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="http://www.xefan.com/archives/83458.html">FCKeditor——可视化HTML编辑器</a></h1>
-<time datetime="2010-11-04T00:00:00+08:00" pubdate><span class='month'>Nov</span> <span class='day'>04</span> <span class='year'>2010</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/categories/开源软件/index.html'>开源软件</a></span>
-</footer>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="http://www.xefan.com/archives/83418.html">飞信 for Linux</a></h1>
-<time datetime="2010-10-02T00:00:00+08:00" pubdate><span class='month'>Oct</span> <span class='day'>02</span> <span class='year'>2010</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/categories/资源分享/index.html'>资源分享</a></span>
-</footer>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="http://www.xefan.com/archives/83411.html">视频播放器 VLC Media Player</a></h1>
-<time datetime="2010-09-18T00:00:00+08:00" pubdate><span class='month'>Sep</span> <span class='day'>18</span> <span class='year'>2010</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/categories/开源软件/index.html'>开源软件</a></span>
-</footer>
-
-
-</article>
-
+<p>以上是常用的几个字段，更多设置参考手册： <a href="https://www.w3.org/TR/access-control/">https://www.w3.org/TR/access-control/</a></p>
 </div>
 
+
+  <footer>
+    <p class="meta">
+      
   
+
+<span class="byline author vcard">Posted by <span class="fn">龍昌</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2016-03-17T16:35:12+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>4:35 pm</span></time>
+    </p>
+    <p class="meta">
+      Categories: 
+
+<span class="categories">
+  
+    <a class='category' href='/categories/web开发/index.html'>web开发</a>
+  
+</span>
+
+
+    </p>
+    <p class="meta">
+      Tags: 
+
+<span class="tags">
+  
+    <a class='tag' href='/tags/ajax/index.html'>ajax</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/archives/84158.html" title="Previous Post: Xcode文档离线安装">&laquo; Xcode文档离线安装</a>
+      
+      
+    </p>
+  </footer>
 </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
 
 </div>
 
@@ -332,7 +283,10 @@
       var disqus_shortname = 'longchang';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://www.xefan.com/archives/84159.html';
+        var disqus_url = 'http://www.xefan.com/archives/84159.html';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

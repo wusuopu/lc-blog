@@ -4,7 +4,7 @@
   <title><![CDATA[龍昌博客]]></title>
   <link href="http://www.xefan.com/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2016-01-03T17:21:43+08:00</updated>
+  <updated>2016-03-17T17:27:04+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -12,6 +12,70 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[HTTP Access Control跨域请求]]></title>
+    <link href="http://www.xefan.com/archives/84159.html"/>
+    <updated>2016-03-17T16:35:12+08:00</updated>
+    <id>http://www.xefan.com/archives/84159-HTTP Access Control跨域请求</id>
+    <content type="html"><![CDATA[<p>最近在使用 Ajax api 请求时遇到了跨域的问题，现在问题解决了顺便做个笔记。</p>
+
+<p>场景：现在主站域名为 example.org ，需要通过 ajax 请求 hello-world.example 上的资源。</p>
+
+<h2>Access-Control-Allow-Origin</h2>
+
+<p>如果请求时遇到如下错误：<br/>
+<code>No 'Access-Control-Allow-Origin' header is present on the requested resource. Origin 'http://example.org' is therefore not allowed access.</code></p>
+
+<p>则需要在 hello-world.example 的 server 端 Response Headers 中设置 <code>Access-Control-Allow-Origin</code> 字段。其值根据情况设置为 <code>http://example.org</code> 或者 <code>https://example.org</code> 。</p>
+
+<h2>Access-Control-Allow-Methods</h2>
+
+<p>一般情况下只允许 GET 和 POST 请求，对于 RESTful 的 api 可能会有其他类型的请求。例如：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$.ajax({
+</span><span class='line'>  url: 'http://hello-world.example/sessions/me.json',
+</span><span class='line'>  method: 'DELETE',
+</span><span class='line'>  dataType: 'json'
+</span><span class='line'>});</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这时如果出现方法不被允许，则需要在 server 端 Response Headers 中设置 <code>Access-Control-Allow-Methods</code> 字段。如： <code>Access-Control-Allow-Methods: GET, POST, DELETE</code> 。</p>
+
+<h2>Access-Control-Allow-Credentials</h2>
+
+<p>当在 hello-world.example 站点登录之后，浏览器会保存对应的 Cookies ，但是在 example.org 站点中使用 ajax 时发现 hello-world.example 的 Cookies 并没有附加到 Request Headers 中。</p>
+
+<p>此时就需要设置 XMLHttpRequest 的 <code>withCredentials</code> 属性，例如：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$.ajax({
+</span><span class='line'>  url: 'http://hello-world.example/session/me.json',
+</span><span class='line'>  method: 'GET',
+</span><span class='line'>  dataType: 'json',
+</span><span class='line'>  xhrFields: {
+</span><span class='line'>      withCredentials: true
+</span><span class='line'>  }
+</span><span class='line'>});</span></code></pre></td></tr></table></div></figure>
+
+
+<p>同时在 server 端 Response Headers 中设置 <code>Access-Control-Allow-Credentials</code> 字段。说明允许通过跨域修改 Cookies 。如： <code>Access-Control-Allow-Credentials: true</code></p>
+
+<p>以上是常用的几个字段，更多设置参考手册： <a href="https://www.w3.org/TR/access-control/">https://www.w3.org/TR/access-control/</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Xcode文档离线安装]]></title>
@@ -2837,161 +2901,6 @@ Devise是利用了 <code>included</code> 钩子来实现这些的。非常的优
 <p>这时发现数据已经同步过来了。</p>
 
 <p>注意：从服务器默认是只读的。如果需要设置为可写，可将 <code>slave-read-only</code> 设置项的值设为 <code>no</code> 即可。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Mongodb分片配置实例]]></title>
-    <link href="http://www.xefan.com/archives/84139.html"/>
-    <updated>2014-12-29T16:52:37+08:00</updated>
-    <id>http://www.xefan.com/archives/84139-Mongodb分片配置实例</id>
-    <content type="html"><![CDATA[<p>数据分片即是从一个集合中选择一个片键(shard key)作为数据拆分的依据，原理与索引类似，然后将集合的数据拆分并保存到不同的服务器上。
-以下通过一个例子来介绍一下Mongodb的分片配置。</p>
-
-<p>有四台主机：</p>
-
-<ul>
-<li>172.17.0.6    (配置服务器)</li>
-<li>172.17.0.7    (mongos)</li>
-<li>172.17.0.8    (片服务器)</li>
-<li>172.17.0.9    (片服务器)</li>
-</ul>
-
-
-<p>1.在 172.17.0.6 上启动 mongod 服务作为配置服务器；<br/>
-修改配置，使其作为一个配置服务器，默认监听 27019 端口。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>configsvr = true</span></code></pre></td></tr></table></div></figure>
-
-
-<p>启动服务 <code>$ service mongodb start</code></p>
-
-<p>2.在 172.17.0.7 上启动 mongos 服务作为路由服务;<br/>
-建立mongos进程。(可以有多台配置服务器)，用法如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ mongos --configdb &lt;config server hostnames&gt;[,&lt;config server hostnames&gt;]</span></code></pre></td></tr></table></div></figure>
-
-
-<p>例如： <code>$ mongos --configdb 172.17.0.6:27019</code></p>
-
-<p>注意：在同一个分片集群中的每个 mongos 必须使用相同的 configDB 配置。</p>
-
-<p>3.添加分片<br/>
-一个片服务既可以是单个 mongod 实例，也可以是一个副本集。<br/>
-1).先分别在 172.17.0.8 和 172.17.0.9 上启动片服务器，即就是一个普通的 mongod 服务。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ service mongodb start</span></code></pre></td></tr></table></div></figure>
-
-
-<p>2).使用 mongo 客户端连接到 mongos 服务</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ mongo --host &lt;hostname of machine running mongos&gt; --port &lt;port mongos listens on&gt;</span></code></pre></td></tr></table></div></figure>
-
-
-<p>如： <code>$ mongo --host 172.17.0.7 --port 27017</code></p>
-
-<p>3).在 mongo 客户端上执行命令添加分片：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>&gt; use admin
-</span><span class='line'>&gt; db.auth(&lt;user&gt;, &lt;pswd&gt;)
-</span><span class='line'>&gt; sh.addShard("172.17.0.8:27017")
-</span><span class='line'>&gt; sh.addShard("172.17.0.9:27017")</span></code></pre></td></tr></table></div></figure>
-
-
-<p>4.切片数据<br/>
-1).首先对数据库进行切片<br/>
-使用 mongo 客户端连接到 mongos ，执行命令打开数据库的分片功能，用法如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>&gt; sh.enableSharding("&lt;database&gt;")</span></code></pre></td></tr></table></div></figure>
-
-
-<p>例如要打开 mydb 数据库的分片功能： <code>&gt; sh.enableSharding("mydb")</code></p>
-
-<p>2).然后对数据集合进行切片<br/>
-命令用法如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>&gt; sh.shardCollection("&lt;database&gt;.&lt;collection&gt;", shard-key-pattern)</span></code></pre></td></tr></table></div></figure>
-
-
-<p><code>shard-key-pattern</code> 与索引的用法一样，例如，要对 mydb 数据库的 test 集合按照 <code>_id</code> 字段进行分片： <code>&gt; sh.shardCollection("mydb.test", {"_id": "hashed"})</code></p>
-
-<p>接下来通过一个程序来测试一下，向数据库中添加10000条数据：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1">#!/usr/bin/env ruby</span>
-</span><span class='line'><span class="c1">#-*- coding:utf-8 -*-</span>
-</span><span class='line'>
-</span><span class='line'><span class="nb">require</span> <span class="s2">&quot;mongo&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">begin</span>
-</span><span class='line'>  <span class="n">conn</span> <span class="o">=</span> <span class="no">Mongo</span><span class="o">::</span><span class="no">Connection</span><span class="o">.</span><span class="n">new</span> <span class="s1">&#39;172.17.0.7&#39;</span>
-</span><span class='line'>  <span class="n">db</span> <span class="o">=</span> <span class="n">conn</span><span class="o">[</span><span class="s1">&#39;mydb&#39;</span><span class="o">]</span>
-</span><span class='line'><span class="k">rescue</span> <span class="no">Exception</span><span class="o">=&gt;</span><span class="n">e</span>
-</span><span class='line'>  <span class="nb">p</span> <span class="n">e</span>
-</span><span class='line'>  <span class="nb">exit</span> <span class="mi">1</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span class='line'><span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">10000</span>
-</span><span class='line'>  <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;no&#39;</span> <span class="o">=&gt;</span> <span class="n">i</span><span class="p">}</span>
-</span><span class='line'>  <span class="n">d</span> <span class="o">=</span> <span class="n">db</span><span class="o">[</span><span class="s1">&#39;test&#39;</span><span class="o">].</span><span class="n">insert</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
-</span><span class='line'>  <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
-</span><span class='line'>  <span class="nb">puts</span> <span class="n">d</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>然后分别查看 172.17.0.8 和 172.17.0.9 的状态：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="mi">172</span><span class="o">.</span><span class="mi">17</span><span class="o">.</span><span class="mi">0</span><span class="o">.</span><span class="mi">8</span><span class="p">:</span>
-</span><span class='line'><span class="o">&gt;</span> <span class="n">db</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
-</span><span class='line'><span class="mi">4952</span>
-</span><span class='line'>
-</span><span class='line'><span class="mi">172</span><span class="o">.</span><span class="mi">17</span><span class="o">.</span><span class="mi">0</span><span class="o">.</span><span class="mi">9</span><span class="p">:</span>
-</span><span class='line'><span class="o">&gt;</span> <span class="n">db</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
-</span><span class='line'><span class="mi">5048</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>数据基本上是平均的分布在两台服务器上。</p>
-
-<p>参考： <a href="http://docs.mongodb.org/manual/tutorial/deploy-shard-cluster/">http://docs.mongodb.org/manual/tutorial/deploy-shard-cluster/</a></p>
 ]]></content>
   </entry>
   
