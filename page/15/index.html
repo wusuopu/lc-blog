@@ -9,11 +9,9 @@
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="根据TQ2440的手册可知KEY1、2、3、4分别由GPF1、4、2、0控制。
-程序的步骤为：
-1、先将GPB1、4、2、0设为输入；
-2、若有按键按下则对应引脚为0，否则为1. 程序如下：
-文件名 crt0.S 1
+  <meta name="description" content="根据原理图知道TOUT0与GPB0连接，因此当GPB0输出高电平时蜂鸣器鸣；当GPB0输出低电平时蜂鸣器停止鸣。
+程序如下：
+文件名 beep.S 1
 2
 3
 4
@@ -24,8 +22,23 @@
 9
 10
 11
-.text
-.global &hellip;">
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+. &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -82,6 +95,196 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83736.html">TQ2440 蜂鸣器程序</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2012-05-12T00:00:00+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>12</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83736.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83736.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>根据原理图知道TOUT0与GPB0连接，因此当GPB0输出高电平时蜂鸣器鸣；当GPB0输出低电平时蜂鸣器停止鸣。<br/>
+程序如下：<br/>
+文件名 beep.S</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>.include "gpio.inc"
+</span><span class='line'>.text
+</span><span class='line'>.global _start
+</span><span class='line'>_start:
+</span><span class='line'>        ldr r0, =GPBCON
+</span><span class='line'>        mov r1, #0b01
+</span><span class='line'>        str r1, [r0]
+</span><span class='line'>        ldr r0, =GPBUP
+</span><span class='line'>        mov r1, #0
+</span><span class='line'>        str r1, [r0]
+</span><span class='line'>        ldr r0, =GPBDAT
+</span><span class='line'>        mov r1, #1
+</span><span class='line'>next:   
+</span><span class='line'>        mvn r1, r1
+</span><span class='line'>        str r1, [r0]
+</span><span class='line'>        bl delay
+</span><span class='line'>        b next
+</span><span class='line'>
+</span><span class='line'>delay:
+</span><span class='line'>        ldr r4, =100000
+</span><span class='line'>delay1: sub r4, r4, #1
+</span><span class='line'>        cmp r4, #0
+</span><span class='line'>        bgt delay1
+</span><span class='line'>        mov pc, lr
+</span><span class='line'>
+</span><span class='line'>main_loop:
+</span><span class='line'>        b main_loop</span></code></pre></td></tr></table></div></figure>
+
+
+<p>文件名 gpio.inc</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>.equ GPACON, 0x56000000
+</span><span class='line'>.equ GPADAT, 0x56000004
+</span><span class='line'>
+</span><span class='line'>.equ GPBCON, 0x56000010
+</span><span class='line'>.equ GPBDAT, 0x56000014
+</span><span class='line'>.equ GPBUP,  0x56000018
+</span><span class='line'>
+</span><span class='line'>.equ GPCCON, 0x56000020
+</span><span class='line'>.equ GPCDAT, 0x56000024
+</span><span class='line'>.equ GPCUP,  0x56000028
+</span><span class='line'>
+</span><span class='line'>.equ GPDCON, 0x56000030
+</span><span class='line'>.equ GPDDAT, 0x56000034
+</span><span class='line'>.equ GPDUP,  0x56000038
+</span><span class='line'>
+</span><span class='line'>.equ GPECON, 0x56000040
+</span><span class='line'>.equ GPEDAT, 0x56000044
+</span><span class='line'>.equ GPEUP,  0x56000048
+</span><span class='line'>
+</span><span class='line'>.equ GPFCON, 0x56000050
+</span><span class='line'>.equ GPFDAT, 0x56000054
+</span><span class='line'>.equ GPFUP,  0x56000058
+</span><span class='line'>
+</span><span class='line'>.equ GPGCON, 0x56000060
+</span><span class='line'>.equ GPGDAT, 0x56000064
+</span><span class='line'>.equ GPGUP,  0x56000068
+</span><span class='line'>
+</span><span class='line'>.equ GPHCON, 0x56000070
+</span><span class='line'>.equ GPHDAT, 0x56000074
+</span><span class='line'>.equ GPHUP,  0x56000078
+</span><span class='line'>
+</span><span class='line'>.equ GPJCON, 0x560000d0
+</span><span class='line'>.equ GPJDAT, 0x560000d4
+</span><span class='line'>.equ GPJUP,  0x560000d8</span></code></pre></td></tr></table></div></figure>
+
+
+<p>文件名 Makefile</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>ARCH = arm-linux-
+</span><span class='line'>CC = $(ARCH)gcc
+</span><span class='line'>LD = $(ARCH)ld
+</span><span class='line'>OBJCOPY = $(ARCH)objcopy
+</span><span class='line'>
+</span><span class='line'>all:beep.S
+</span><span class='line'>  $(CC) -g -c -o beep.o beep.S
+</span><span class='line'>  $(LD) -Ttext 0x00000000 -g -o beep-elf beep.o
+</span><span class='line'>  $(OBJCOPY) -O binary -S beep-elf beep.bin
+</span><span class='line'>
+</span><span class='line'>clean:
+</span><span class='line'>  rm -f beep.o beep-elf beep.bin</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1406,184 +1609,6 @@ arg：各个量使用与cmd设置有关<br/>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83695.html">Linux进程通信——使用共享内存</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2012-02-22T00:00:00+08:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2012</span></span> <span class='time'>12:00 am</span></time>
-        
-           | <a href="http://www.xefan.com/archives/83695.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/83695.html">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>头文件： <br/>
-  #include &lt;sys/ipc.h&gt;<br/>
-  #include &lt;sys/shm.h&gt;</p>
-
-<p>函数：shmget 分配共享内存<br/>
-函数原型： int shmget(key_t key, size_t size, int shmflg)；<br/>
-key：键值，当为IPC_PRIVATE时新建一块共享内存；若为0时而shmflg中设了IPC_PRIVATE也将新建。<br/>
-size：内存大小。<br/>
-shmflg：标志。<br/>
-IPC_CREAT：内存不存在则新建，否则打开；<br/>
-IPC_EXCL：只有在内存不存在时才创建，否则出错。<br/>
-返回：成功则返回标识符，出错返回-1</p>
-
-<p>函数： void <em>shmat(int shmid, char </em>shmaddr, int shmflg)；<br/>
-shmid：通过shmget获取<br/>
-shmaddr：映射到进程地址空间的起始地址，设为NULL将自动分配<br/>
-shmflg：标志；SHM-RDONLY为只读，否则可读可写<br/>
-返回：成功则返回内存起始地址，失败返回-1</p>
-
-<p>函数： int shmdt(const void *shmaddr)；<br/>
-使共享内存区脱离映射的进程的地址空间<br/>
-返回：成功返回0，错误返回-1</p>
-
-<p>函数： void shmctl(int shmid, int cmd, struct shmid_ds *buf)；<br/>
-shmid：通过shmget获取<br/>
-cmd：控制命令，如下：<br/>
-IPC_STAT：获取内存状态<br/>
-IPC_SET：改变内存状态<br/>
-IPC_RMID：删除内存<br/>
-buf：结构体指针，用于存放共享内存状态<br/>
-返回：成功返回0，错误返回-1</p>
-
-<p><span style="color: #ff0000;">注意：共享内存一旦创建就会一直存在系统中，直到手动删除或者重启系统。</span>
-例子：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="cm">/**************************************</span>
-</span><span class='line'><span class="cm"> *</span>
-</span><span class='line'><span class="cm"> * 使用共享内存进行进程通信</span>
-</span><span class='line'><span class="cm"> * 龙昌博客：http://www.xefan.com</span>
-</span><span class='line'><span class="cm"> *</span>
-</span><span class='line'><span class="cm">**************************************/</span>
-</span><span class='line'><span class="cp">#include &lt;sys/ipc.h&gt;</span>
-</span><span class='line'><span class="cp">#include &lt;sys/shm.h&gt;</span>
-</span><span class='line'><span class="cp">#include &lt;sys/stat.h&gt;</span>
-</span><span class='line'><span class="cp">#include &lt;errno.h&gt;</span>
-</span><span class='line'><span class="cp">#include &lt;string.h&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">argc</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">{</span>
-</span><span class='line'>        <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Usage:%s str</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
-</span><span class='line'>        <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">shmid</span><span class="p">;</span>
-</span><span class='line'>    <span class="kt">char</span> <span class="o">*</span><span class="n">p_addr</span><span class="p">,</span> <span class="o">*</span><span class="n">c_addr</span><span class="p">;</span>
-</span><span class='line'>    <span class="c1">//创建共享内存</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">((</span><span class="n">shmid</span><span class="o">=</span><span class="n">shmget</span><span class="p">(</span><span class="n">IPC_PRIVATE</span><span class="p">,</span> <span class="mi">1024</span><span class="p">,</span> <span class="n">IPC_CREAT</span><span class="p">))</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">{</span>
-</span><span class='line'>        <span class="n">perror</span><span class="p">(</span><span class="s">&quot;shmget&quot;</span><span class="p">);</span>
-</span><span class='line'>        <span class="n">exit</span><span class="p">(</span><span class="n">errno</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="n">fork</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>   <span class="c1">//父进程向内存写入数据</span>
-</span><span class='line'>    <span class="p">{</span>
-</span><span class='line'>        <span class="c1">//获取内存起始地址</span>
-</span><span class='line'>  <span class="n">p_addr</span> <span class="o">=</span> <span class="n">shmat</span><span class="p">(</span><span class="n">shmid</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
-</span><span class='line'>        <span class="n">memset</span><span class="p">(</span><span class="n">p_addr</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1024</span><span class="p">);</span>
-</span><span class='line'>  <span class="c1">//向内存中写入数据</span>
-</span><span class='line'>        <span class="n">strncpy</span><span class="p">(</span><span class="n">p_addr</span><span class="p">,</span> <span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1024</span><span class="p">);</span>
-</span><span class='line'>        <span class="n">shmdt</span><span class="p">(</span><span class="n">p_addr</span><span class="p">);</span>
-</span><span class='line'>        <span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
-</span><span class='line'>        <span class="n">wait</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="k">else</span>       <span class="c1">//子进程从内存中读取数据</span>
-</span><span class='line'>    <span class="p">{</span>
-</span><span class='line'>        <span class="c1">//获取内存起始地址</span>
-</span><span class='line'>        <span class="n">c_addr</span> <span class="o">=</span> <span class="n">shmat</span><span class="p">(</span><span class="n">shmid</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
-</span><span class='line'>        <span class="n">sleep</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
-</span><span class='line'>        <span class="n">printf</span><span class="p">(</span><span class="s">&quot;child get %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">c_addr</span><span class="p">);</span>
-</span><span class='line'>        <span class="n">shmdt</span><span class="p">(</span><span class="n">c_addr</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="c1">//删除共享内存</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">shmctl</span><span class="p">(</span><span class="n">shmid</span><span class="p">,</span> <span class="n">IPC_RMID</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">{</span>
-</span><span class='line'>        <span class="n">perror</span><span class="p">(</span><span class="s">&quot;shmctl&quot;</span><span class="p">);</span>
-</span><span class='line'>        <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/page/16">&larr; Older</a>
@@ -1605,6 +1630,10 @@ buf：结构体指针，用于存放共享内存状态<br/>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="http://www.xefan.com/archives/84160.html">gulp+browserSync配置</a>
+      </li>
+    
+      <li class="post">
         <a href="http://www.xefan.com/archives/84159.html">HTTP Access Control跨域请求</a>
       </li>
     
@@ -1620,19 +1649,15 @@ buf：结构体指针，用于存放共享内存状态<br/>
         <a href="http://www.xefan.com/archives/84156.html">AngularJS学习笔记7——与rails整合</a>
       </li>
     
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84155.html">AngularJS学习笔记6——与jQuery、Bootstrap结合</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (32)</a></li><li><a href='/categories/web开发/index.html'>web开发 (20)</a></li><li><a href='/categories/前端相关/index.html'>前端相关 (9)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (16)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (24)</a></li></ul>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (32)</a></li><li><a href='/categories/web开发/index.html'>web开发 (20)</a></li><li><a href='/categories/前端相关/index.html'>前端相关 (10)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (16)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (24)</a></li></ul>
 </section>
 <section>
   <h1>Tag Cloud</h1>
-    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 102.68656716417911%'>ajax(3)</a> <a href='/tags/angular/index.html' style='font-size: 106.26865671641791%'>angular(7)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 108.95522388059702%'>js(10)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mac/index.html' style='font-size: 100.8955223880597%'>Mac(1)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 129.55223880597015%'>Ruby(33)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xcode/index.html' style='font-size: 100.8955223880597%'>Xcode(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 123.28358208955224%'>翻译(26)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 102.68656716417911%'>ajax(3)</a> <a href='/tags/angular/index.html' style='font-size: 106.26865671641791%'>angular(7)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/gulp/index.html' style='font-size: 100.8955223880597%'>gulp(1)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 109.85074626865672%'>js(11)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mac/index.html' style='font-size: 100.8955223880597%'>Mac(1)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 129.55223880597015%'>Ruby(33)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xcode/index.html' style='font-size: 100.8955223880597%'>Xcode(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 123.28358208955224%'>翻译(26)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
 </section>
 <section>
   <h1>Link</h1>

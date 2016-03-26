@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 前端相关 | 龍昌博客]]></title>
   <link href="http://www.xefan.com/categories/前端相关/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2016-03-17T17:27:04+08:00</updated>
+  <updated>2016-03-26T11:27:45+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -12,6 +12,79 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[gulp+browserSync配置]]></title>
+    <link href="http://www.xefan.com/archives/84160.html"/>
+    <updated>2016-03-26T14:32:56+08:00</updated>
+    <id>http://www.xefan.com/archives/84160-gulp+browserSync配置</id>
+    <content type="html"><![CDATA[<p>Browsersync  是一个前端调试的利器，它能够让你在页面文件改动之后自动刷新浏览器，从而方便了前端的调试工作。</p>
+
+<p>本文就是对于 Browsersync + Gulp 的配置作个简单的笔记。</p>
+
+<ol>
+<li>首先安装 Browsersync 与 Gulp:</li>
+</ol>
+
+
+<pre><code>$ npm install browser-sync gulp --save-dev
+</code></pre>
+
+<ol>
+<li>在 <code>gulpfile.js</code> 中创建新任务：</li>
+</ol>
+
+
+<pre><code>var gulp = require('gulp');
+var browserSync = require('browser-sync').create();
+
+var config = {
+  baseDir: 'src',
+  watchFiles: [ 'src/**/*.html', 'src/assets/css/*.css', 'src/assets/js/*.js' ]
+}
+
+gulp.task('serve', function() {
+  browserSync.init({
+    files: config.watchFiles,
+    server: {
+      baseDir: config.baseDir
+    }
+  });
+})
+</code></pre>
+
+<p>这里表示以 <code>src</code> 目录作为根目录启动 HTTP 服务，并监听 <code>src</code> 目录下的所有 <code>html</code>、<code>css</code> 以及 <code>js</code> 类型的文件，当这些文件有改动时 Browsersync 会自动刷新浏览器页面。</p>
+
+<p>如果想配合使用 SASS 之类的，可以参考： <a href="https://www.browsersync.io/docs/gulp/">https://www.browsersync.io/docs/gulp/</a></p>
+
+<p>同时为了避免之后每次都要重新配置一遍，于是我自己写了个简单的 <code>yo</code> 生成器： <a href="https://github.com/wusuopu/my-yeoman-generator">https://github.com/wusuopu/my-yeoman-generator</a></p>
+
+<p>由于这只是我自己 generator，并没有发布到 npm 上，因此只能手动进行安装。各位有兴趣的可以试试。使用方法：</p>
+
+<ol>
+<li><p>安装 yo 和 bower： <code>$ npm install -g yo bower</code></p></li>
+<li><p>安装 generator:</p></li>
+</ol>
+
+
+<pre><code>$ git clone https://github.com/wusuopu/my-yeoman-generator generator-wusuopu
+$ cd generator-wusuopu
+$ npm link
+</code></pre>
+
+<ol>
+<li>生成项目：</li>
+</ol>
+
+
+<pre><code>$ mkdir webpage
+$ cd webpage
+$ yo wusuopu:bootstrap3
+</code></pre>
+
+<p>这里 bootstrap3 generator 包含了 bootstrap3、font-awesome、jquery 这些常用的前端库，省得每次都需要重新下载一遍。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Javascript使用async进行流程控制]]></title>
@@ -324,49 +397,6 @@ asset 'components-font-awesome'
 <p>好了，现在打开浏览器看下效果吧。</p>
 
 <p>体验了一下，感觉它比 angular 之类的框架的学习成本要低。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[AngularJS学习笔记5——路由]]></title>
-    <link href="http://www.xefan.com/archives/84151.html"/>
-    <updated>2015-08-20T20:58:53+08:00</updated>
-    <id>http://www.xefan.com/archives/84151-AngularJS学习笔记5——路由</id>
-    <content type="html"><![CDATA[<p>angularjs 的 <code>ngRoute</code> 模块提供了前端路由的功能。
-在 angularjs 1.3 中 route 模块被单独提取了出来，要使用其功能需要将引用进来。</p>
-
-<pre><code>  &lt;script src="http://www.xefan.com/lib/angular-1.3.15.min.js"&gt;&lt;/script&gt;
-  &lt;script src="http://www.xefan.com/lib/angular-route-1.3.15.min.js"&gt;&lt;/script&gt;
-</code></pre>
-
-<pre><code>var routeApp = angular.module('routeApp', ['ngRoute']);
-routeApp.config(['$routeProvider',function ($routeProvider) {
-    $routeProvider
-    .when('/list', {
-      templateUrl: 'list.html',
-      controller: 'RouteListCtl'
-    })
-    .when('/list/:id', {
-        templateUrl: 'detail.html',
-        controller: 'RouteDetailCtl'
-    })
-    .otherwise({
-      redirectTo: '/list'
-    });
-}]);
-</code></pre>
-
-<p>这里定义了两条路由规则，对应的视图模板分别为 list.html 和 detail.html</p>
-
-<p>视图模板有三种定义方式：<br/>
-方法1：编写在单独的文件中，然后 angularjs 通过 ajax 获取其内容；<br/>
-方法2：直接在页面中使用 script 标签定义，如： <code>&lt;script type="text/ng-template" id="list.html"&gt; .... &lt;/script&gt;</code>；<br/>
-方法3：使用 <code>$templateCache</code> 进行定义，如:<br/>
-<code>
-routeApp.run(function($templateCache) {
-  $templateCache.put('list.html', '...');
-});
-</code></p>
 ]]></content>
   </entry>
   

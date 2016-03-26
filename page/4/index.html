@@ -9,7 +9,7 @@
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="docker是一个Linux下的应用容器引擎。使用它可以很方便地将程序以及依赖都打包到一个可移植的容器中。最后体验了一下，使用docker配置了一个Web开发环境。这样就不用担心每次重装系统之后都要重新配置开发环境。 安装 首先是安装docker应用程序，目前只有64位系统才能使用。 $ [ &hellip;">
+  <meta name="description" content="每次重装系统之后都要重新编译一次VIM，为了方便就将编译参数记录如下： ./configure --prefix=/opt/vim --enable-acl --enable-cscope --enable-largefile --enable-multibyte --enable-sniff &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -66,6 +66,52 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84127.html">VIM编译参数</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-10-18T00:00:00+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>18</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/84127.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/84127.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>每次重装系统之后都要重新编译一次VIM，为了方便就将编译参数记录如下：</p>
+
+
+<pre><code>./configure --prefix=/opt/vim --enable-acl --enable-cscope --enable-largefile --enable-multibyte --enable-sniff --enable-mzschemeinterp --enable-xim --enable-tclinterp --enable-perlinterp --enable-python3interp --enable-pythonint
+erp --enable-rubyinterp --enable-netbeans --enable-gui --enable-luainterp --enable-nls --enable-xsmp --enable-xsmp-interact --enable-fontset --with-features=huge --with-x
+</code></pre>
+
+
+
+
+<p>上面的参数中启用了对tcl、perl、python、ruby、lau的支持。同时为了使用系统的剪切板还启用了对X的支持。</p>
+
+
+<p>我的VIM配置文件： https://github.com/wusuopu/my-vimrc</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1411,316 +1457,6 @@ gc.collect()
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84093.html">使用C语言编写Python扩展4——创建自定义类型(2)</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2014-04-14T00:00:00+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>14</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>12:00 am</span></time>
-        
-           | <a href="http://www.xefan.com/archives/84093.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/84093.html">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>上一节中我们创建了一个简单的类。这一节我们将对这个类进行扩展，添加属性、方法，并且支持子类。</p>
-
-
-<h2>为类型添加方法和数据</h2>
-
-
-<p>接着上一节的例子，继续编辑<em>noddy.c</em>。  </p>
-
-
-<pre><code>typedef struct {
-    PyObject_HEAD
-    /* Type-specific fields go here. */
-    PyObject *first; /* first name */
-    PyObject *last;  /* last name */
-    int number;
-} noddy_NoddyObject;
-</code></pre>
-
-
-<p>修改 noddy_NoddyObject 结构体，为其添加三个字段。  </p>
-
-
-<p>然后定义自己的__new__方法，为对象分配内存空间：  </p>
-
-
-<pre><code>static PyObject * Noddy_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
-{
-    noddy_NoddyObject*self;
-    self = (noddy_NoddyObject*)type-&gt;tp_alloc(type, 0);
-    if (self != NULL) {
-        self-&gt;first = PyString_FromString("");
-        if (self-&gt;first == NULL)
-        {
-          Py_DECREF(self);
-          return NULL;
-        }
-        self-&gt;last = PyString_FromString("");
-        if (self-&gt;last == NULL)
-        {
-          Py_DECREF(self);
-          return NULL;
-        }
-        self-&gt;number = 0;
-    }
-    return (PyObject *)self;
-}
-</code></pre>
-
-
-<p>接着定义对象的初始化函数__init__：  </p>
-
-
-<pre><code>static int Noddy_init(noddy_NoddyObject*self, PyObject *args, PyObject *kwds)
-{
-    PyObject *first=NULL, *last=NULL, *tmp;
-    static char *kwlist[] = {"first", "last", "number", NULL};
-
-    if (! PyArg_ParseTupleAndKeywords(args, kwds, "|OOi", kwlist, 
-                                      &amp;first, &amp;last, 
-                                      &amp;self-&gt;number))
-        return -1;
-
-    if (first) {
-        tmp = self-&gt;first;
-        Py_INCREF(first);
-        self-&gt;first = first;
-        Py_XDECREF(tmp);
-    }
-
-    if (last) {
-        tmp = self-&gt;last;
-        Py_INCREF(last);
-        self-&gt;last = last;
-        Py_XDECREF(tmp);
-    }
-    return 0;
-}
-</code></pre>
-
-
-<p>由于对象包含了几项数据，因此在对象销毁时需要先释放数据的资源。定义资源释放方法：</p>
-
-
-<pre><code>static void Noddy_dealloc(noddy_NoddyObject* self)
-{
-    Py_XDECREF(self-&gt;first);
-    Py_XDECREF(self-&gt;last);
-    Py_TYPE(self)-&gt;tp_free((PyObject*)self);
-}
-</code></pre>
-
-
-<p>然后再为该类定义一个方法用于返回该对象的first值和last值：  </p>
-
-
-<pre><code>static PyObject * Noddy_name(noddy_NoddyObject* self)
-{
-    static PyObject *format = NULL;
-    PyObject *args, *result;
-    if (format == NULL) {
-        format = PyString_FromString("%s %s");
-        if (format == NULL)
-            return NULL;
-    }
-    if (self-&gt;first == NULL) {
-        PyErr_SetString(PyExc_AttributeError, "first");
-        return NULL;
-    }
-    if (self-&gt;last == NULL) {
-        PyErr_SetString(PyExc_AttributeError, "last");
-        return NULL;
-    }
-    args = Py_BuildValue("OO", self-&gt;first, self-&gt;last);
-    if (args == NULL)
-        return NULL;
-    result = PyString_Format(format, args);
-    Py_DECREF(args);
-    return result;
-}
-static PyMethodDef Noddy_methods[] = {
-    {"name", (PyCFunction)Noddy_name, METH_NOARGS, "Return the name, combining the first and last name"},
-    {NULL}  /* Sentinel */
-};
-</code></pre>
-
-
-<p>最后在定义 noddy_NoddyType 变量时将对应字段进行填充：</p>
-
-
-<pre><code>static PyTypeObject noddy_NoddyType = {
-    PyObject_HEAD_INIT(NULL)
-    0,                         /*ob_size*/
-    "noddy.Noddy",             /*tp_name*/
-    sizeof(noddy_NoddyObject), /*tp_basicsize*/
-    0,                         /*tp_itemsize*/
-    (destructor)Noddy_dealloc, /*tp_dealloc*/
-    0,                         /*tp_print*/
-    0,                         /*tp_getattr*/
-    0,                         /*tp_setattr*/
-    0,                         /*tp_compare*/
-    0,                         /*tp_repr*/
-    0,                         /*tp_as_number*/
-    0,                         /*tp_as_sequence*/
-    0,                         /*tp_as_mapping*/
-    0,                         /*tp_hash */
-    0,                         /*tp_call*/
-    0,                         /*tp_str*/
-    0,                         /*tp_getattro*/
-    0,                         /*tp_setattro*/
-    0,                         /*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,  /*tp_flags*/
-    "Noddy objects",           /*tp_doc*/
-    0,                         /* tp_traverse */
-    0,                         /* tp_clear */
-    0,                         /* tp_richcompare */
-    0,                         /* tp_weaklistoffset */
-    0,                         /* tp_iter */
-    0,                         /* tp_iternext */
-    Noddy_methods,             /* tp_methods */
-    0,                         /* tp_members */
-    0,                         /* tp_getset */
-    0,                         /* tp_base */
-    0,                         /* tp_dict */
-    0,                         /* tp_descr_get */
-    0,                         /* tp_descr_set */
-    0,                         /* tp_dictoffset */
-    (initproc)Noddy_init,      /* tp_init */
-    0,                         /* tp_alloc */
-    Noddy_new,                 /* tp_new */
-};
-</code></pre>
-
-
-<p>tp_flags字段增加了  Py_TPFLAGS_BASETYPE 属性，表示该类可以被继承。最后进行编译测试：  </p>
-
-
-<pre><code>import noddy
-
-o = noddy.Noddy("abc", "def", 12)
-print(o, o.name())
-print(type(o), type(noddy.Noddy))
-print(o.number, o.first, o.last)
-
-class A(noddy.Noddy):
-    pass
-</code></pre>
-
-
-<p>运行以上程序会发现Noddy对象没有number、first和last这几个属性。这是因为虽然在noddy_NoddyObject结构体中定义了这几个字段，但是它们仍然在Python中是不可见的。<br>
-为了能在Python中访问这几个属性，需要设置noddy_NoddyType的tp_members字段。  </p>
-
-
-<pre><code>static PyMemberDef Noddy_members[] = {
-    {"first", T_OBJECT_EX, offsetof(noddy_NoddyObject, first), 0, "first name"},
-    {"last", T_OBJECT_EX, offsetof(noddy_NoddyObject, last), 0, "last name"},
-    {"number", T_INT, offsetof(noddy_NoddyObject, number), 0, "noddy number"},
-    {NULL}  /* Sentinel */
-};
-</code></pre>
-
-
-<p>先定义一个 PyMemberDef 结构体类型的数组，然后将noddy_NoddyType的tp_members字段设为Noddy_members。PyMemberDef和T_OBJECT_EX以及T_INT均是在 <em>structmember.h</em> 头文件中定义的，因此还需要先包含该文件。  </p>
-
-
-<pre><code>#include &lt;structmember.h&gt;
-</code></pre>
-
-
-<h2>数据属性的访问控制</h2>
-
-
-<p>数据属性的访问控制可以对属性的设置进行合法性检查，例如这里我们想要确保 Noddy 对象的first属性和last属性都必须是字符串。<br>
-首先定义属性的get方法和set方法：  </p>
-
-
-<pre><code>static PyObject * Noddy_getfirst(noddy_NoddyObject *self, void *closure)
-{
-    Py_INCREF(self-&gt;first);
-    return self-&gt;first;
-}
-static int Noddy_setfirst(noddy_NoddyObject *self, PyObject *value, void *closure)
-{
-  if (value == NULL) {
-    PyErr_SetString(PyExc_TypeError, "Cannot delete the first attribute");
-    return -1;
-  }
-  if (! PyString_Check(value)) {
-    PyErr_SetString(PyExc_TypeError, 
-                    "The first attribute value must be a string");
-    return -1;
-  }
-  Py_DECREF(self-&gt;first);
-  Py_INCREF(value);
-  self-&gt;first = value;    
-  return 0;
-}
-static PyObject * Noddy_getlast(noddy_NoddyObject *self, void *closure)
-{
-    Py_INCREF(self-&gt;last);
-    return self-&gt;last;
-}
-static int Noddy_setlast(noddy_NoddyObject *self, PyObject *value, void *closure)
-{
-  if (value == NULL) {
-    PyErr_SetString(PyExc_TypeError, "Cannot delete the last attribute");
-    return -1;
-  }
-  if (! PyString_Check(value)) {
-    PyErr_SetString(PyExc_TypeError, 
-                    "The last attribute value must be a string");
-    return -1;
-  }
-  Py_DECREF(self-&gt;last);
-  Py_INCREF(value);
-  self-&gt;last = value;    
-  return 0;
-}
-</code></pre>
-
-
-<p>然后创建一个 PyGetSetDef 结构类型的数组：  </p>
-
-
-<pre><code>static PyGetSetDef Noddy_getseters[] = {
-    {"first", (getter)Noddy_getfirst, (setter)Noddy_setfirst, "first name", NULL},
-    {"last", (getter)Noddy_getlast, (setter)Noddy_setlast, "last name", NULL},
-    {NULL}  /* Sentinel */
-};
-</code></pre>
-
-
-<p>最后再设置 noddy_NoddyType 的tp_getset字段的值为 Noddy_getseters 即可。  </p>
-
-
-<p><strong>注意</strong>：以上的代码均是针对Python2的，在Python3中略有不同。  </p>
-
-
-<p>本文中的示例代码可从 https://github.com/wusuopu/python-c-extension-sample 获取到。  </p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/page/5">&larr; Older</a>
@@ -1742,6 +1478,10 @@ static int Noddy_setlast(noddy_NoddyObject *self, PyObject *value, void *closure
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="http://www.xefan.com/archives/84160.html">gulp+browserSync配置</a>
+      </li>
+    
+      <li class="post">
         <a href="http://www.xefan.com/archives/84159.html">HTTP Access Control跨域请求</a>
       </li>
     
@@ -1757,19 +1497,15 @@ static int Noddy_setlast(noddy_NoddyObject *self, PyObject *value, void *closure
         <a href="http://www.xefan.com/archives/84156.html">AngularJS学习笔记7——与rails整合</a>
       </li>
     
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84155.html">AngularJS学习笔记6——与jQuery、Bootstrap结合</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (32)</a></li><li><a href='/categories/web开发/index.html'>web开发 (20)</a></li><li><a href='/categories/前端相关/index.html'>前端相关 (9)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (16)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (24)</a></li></ul>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (32)</a></li><li><a href='/categories/web开发/index.html'>web开发 (20)</a></li><li><a href='/categories/前端相关/index.html'>前端相关 (10)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (16)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (24)</a></li></ul>
 </section>
 <section>
   <h1>Tag Cloud</h1>
-    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 102.68656716417911%'>ajax(3)</a> <a href='/tags/angular/index.html' style='font-size: 106.26865671641791%'>angular(7)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 108.95522388059702%'>js(10)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mac/index.html' style='font-size: 100.8955223880597%'>Mac(1)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 129.55223880597015%'>Ruby(33)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xcode/index.html' style='font-size: 100.8955223880597%'>Xcode(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 123.28358208955224%'>翻译(26)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 102.68656716417911%'>ajax(3)</a> <a href='/tags/angular/index.html' style='font-size: 106.26865671641791%'>angular(7)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/gulp/index.html' style='font-size: 100.8955223880597%'>gulp(1)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 109.85074626865672%'>js(11)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mac/index.html' style='font-size: 100.8955223880597%'>Mac(1)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 129.55223880597015%'>Ruby(33)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xcode/index.html' style='font-size: 100.8955223880597%'>Xcode(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 123.28358208955224%'>翻译(26)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
 </section>
 <section>
   <h1>Link</h1>
