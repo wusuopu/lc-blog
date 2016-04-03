@@ -9,59 +9,7 @@
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53 &hellip;">
+  <meta name="description" content="弄了两天，经过了N次失败后现在终于编译成功了，赶紧做个笔记。 1、下载crosstool(http://www.kegel.com/crosstool/crosstool-0.43.tar.gz) 2、下载编译过程中需要用到的源代码，虽然crosstool也会自动下载不过速度很慢， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -118,6 +66,134 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83613.html">Ubuntu 10.10 Crosstool ARM交叉编译</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2011-09-17T00:00:00+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83613.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83613.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>弄了两天，经过了N次失败后现在终于编译成功了，赶紧做个笔记。</p>
+
+<p>1、下载crosstool(<a href="http://www.kegel.com/crosstool/crosstool-0.43.tar.gz">http://www.kegel.com/crosstool/crosstool-0.43.tar.gz</a>)</p>
+
+<p>2、下载编译过程中需要用到的源代码，虽然crosstool也会自动下载不过速度很慢，建议还是自己先下载好，源代码的版本根据自己的情况选择：<br/>
+binutils-2.15 <a href="http://ftp.gnu.org/gnu/binutils/  ">http://ftp.gnu.org/gnu/binutils/  </a>
+gcc-3.4.5 <a href="http://ftp.gnu.org/gnu/gcc/  ">http://ftp.gnu.org/gnu/gcc/  </a>
+glibc-2.3.6 <a href="ftp://ftp.gnu.org/gnu/glibc/">ftp://ftp.gnu.org/gnu/glibc/</a>
+glibc-linuxthreads-2.3.6 <a href="ftp://ftp.gnu.org/gnu/glibc/">ftp://ftp.gnu.org/gnu/glibc/</a></p>
+
+<p>linux-2.6.10 <a href="http://ftp.cc.uoc.gr/mirrors/ftp.kernel.org/pub/linux/kernel/v2.6/linux-2.6.10.tar.gz  ">http://ftp.cc.uoc.gr/mirrors/ftp.kernel.org/pub/linux/kernel/v2.6/linux-2.6.10.tar.gz  </a>
+linux-libc-headers-2.6.12.0 <a href="http://ep09.pld-linux.org/~mmazur/linux-libc-headers/linux-libc-headers-2.6.12.0.tar.bz2">http://ep09.pld-linux.org/~mmazur/linux-libc-headers/linux-libc-headers-2.6.12.0.tar.bz2</a></p>
+
+<p>将以上七个压缩包放在同一个目录下。</p>
+
+<p>3、编译过程依赖这几个软件，没有的请自行安装。Bison、flex 、build-essential、patch 、libncurses5-de<br/>
+还有gcc的编译依赖于gmp、mpfr、mpc这几个软件，没有的请先安装。<br/>
+mpc-0.9.tar.gz <a href="http://www.multiprecision.org/mpc/download/mpc-0.9.tar.gz  ">http://www.multiprecision.org/mpc/download/mpc-0.9.tar.gz  </a>
+mpfr-3.0.1.tar.bz2 <a href="http://www.mpfr.org/mpfr-current/mpfr-3.0.1.tar.bz2  ">http://www.mpfr.org/mpfr-current/mpfr-3.0.1.tar.bz2  </a>
+gmp-5.0.2.tar.bz2 <a href="ftp://ftp.gmplib.org/pub/gmp-5.0.2/gmp-5.0.2.tar.bz2  ">ftp://ftp.gmplib.org/pub/gmp-5.0.2/gmp-5.0.2.tar.bz2  </a>
+这几个软件之间也存在依赖关系，请按顺序依次安装gmp、mpfr、mpc</p>
+
+<p>4、修改配置<br/>
+1)、ubuntu10.10自己的GCC是4.4版本，使用这个版本的进行编译会出错，建议使用gcc-4.1。<br/>
+sudo apt-get install gcc-4.1<br/>
+sudo rm /usr/bin/gcc<br/>
+sudo ln -s /usr/bin/gcc-4.1 /usr/bin/gcc</p>
+
+<p>2)、修改sh，ubuntu10.10默认的sh是用的dash<br/>
+如果运行 ls -la /bin/sh 看到链接是dash，则需要修改一下。不改的话编译会出错。<br/>
+我是直接运行命令 sudo ln -sf /bin/bash /bin/sh 修改。改完后重启下，或者切换工作台以使其生效。</p>
+
+<p>3)、修改编译脚本<br/>
+解压crosstool然后进入解压目录，这里我选择demo-arm.sh这个脚本。<br/>
+cp demo-arm.sh arm.sh</p>
+
+<p>修改arm.sh<br/>
+vi arm.sh</p>
+
+<pre><code>TARBALLS_DIR=(刚刚下载的源码存放目录)  
+RESULT_TOP=(生成工具链要安装到的目录)  
+eval `cat arm.dat gcc-3.4.5-glibc-2.3.6.dat` sh all.sh –notest #这个根据自己的情况选择
+</code></pre>
+
+<p>然后修改gcc-3.4.5-glibc-2.3.6.dat这个文件<br/>
+BINUTILS_DIR=binutils-2.15<br/>
+GCC_DIR=gcc-3.4.5<br/>
+GLIBC_DIR=glibc-2.3.6<br/>
+LINUX_DIR=linux-2.6.10<br/>
+LINUX_SANITIZED_HEADER_DIR=linux-libc-headers-2.6.12.0<br/>
+GLIBCTHREADS_FILENAME=glibc-linuxthreads-2.3.6</p>
+
+<p>再修改arm.dat这个文件</p>
+
+<pre><code>KERNELCONFIG=`pwd`/arm.config  
+TARGET=arm-linux #生成的工具链名称  
+TARGET_CFLAGS=”-O”  
+</code></pre>
+
+<p>还有ubuntu10.10自带的ar、ld是2.20版本的，而这个编译时需要的是2.13~2.19版本的，所以会出错。<br/>
+解决方法：<br/>
+(1)、像上面的gcc一样，再安装个低版本的ls、ar。<br/>
+(2)、如果不想再另外安装就可以用这个方法。修改glibc-2.3.6.tar.bz2这个压缩包内的configure文件。将3920行和3981行处的”2.1[3-9])<em>”改为”2.[1-2][0-9]</em>)”。</p>
+
+<p>5、开始编译<br/>
+都配置好了之后就可以开始了<br/>
+./arm.sh<br/>
+漫长的等待开始了……，我的是奔腾双核处理器，整个过程花了半个多小时</p>
+
+<p>6、测试<br/>
+现在用刚刚编译安装好的arm-linux-gcc来编译一个C程序试试。<br/>
+先将arm-linux-gcc的安装目录添加到环境变量中。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="c1">//文件名:hello.c</span>
+</span><span class='line'> <span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span><span class='line'> <span class="p">{</span>
+</span><span class='line'> <span class="n">printf</span><span class="p">(</span><span class="o">&amp;</span><span class="n">quot</span><span class="p">;</span><span class="n">www</span><span class="p">.</span><span class="n">xefam</span><span class="p">.</span><span class="n">com</span><span class="o">&amp;</span><span class="n">quot</span><span class="p">;);</span>
+</span><span class='line'> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>$ arm-linux-gcc -o hello hello.c<br/>
+$ file hello<br/>
+hello: ELF 32-bit LSB executable, ARM, version 1, dynamically linked (uses shared libs), for GNU/Linux 2.4.3, not stripped<br/>
+这就说明这个已经成功了！</p>
+
+<p>7、现在可以恢复之前的系统配置了<br/>
+将gcc修为gcc-4.4<br/>
+将sh修改dash</p>
+
+<p>如果嫌麻烦不想自己编译的可以直接下载已经编译好的来用，下面这个就是我编译好：
+gcc-3.4.5-glibc-2.3.6.tar.gz <a href="http://115.com/file/e65akpi1">http://115.com/file/e65akpi1</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -994,148 +1070,6 @@ key.name —— 接受键值返回键名</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83586.html">Pygame学习笔记5：事件</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2011-08-17T00:00:00+08:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
-        
-           | <a href="http://www.xefan.com/archives/83586.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/83586.html">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><strong>事件系统</strong></p>
-
-<p>Pygame通过一个事件系统与用户进行交互，以及处理一些系统发生的事件。事件系统包括一个事件队列，其中每一项都是一个Event对象。所有的用户输入和一些系统事件，都会形成一个Event对象被添加到事件队列中。pygame.event模块提供了很多函数去访问和控制这个队列。
-Event对象有各种不同的类型，比如KEYDOWN(键盘键按下)、MOUSEBUTTONDOWN(鼠标键按下)等，通过Event.type属性来区分。不同的类型的Event对象还有不同的其它属性。通过Event.dict属性来查看。常用的类型和对应的属性有：</p>
-
-<p>事件              产生途径              参数</p>
-
-<p>QUIT             用户按下关闭按钮      none</p>
-
-<p>ATIVEEVENT     Pygame被激活或者隐藏  gain, state</p>
-
-<p>KEYDOWN       键盘被按下             unicode, key, mod</p>
-
-<p>KEYUP           键盘被放开             key, mod</p>
-
-<p>MOUSEMOTION   鼠标移动               pos, rel, buttons</p>
-
-<p>MOUSEBUTTONDOWN    鼠标按下        pos, button</p>
-
-<p>MOUSEBUTTONUP  鼠标放开              pos, button</p>
-
-<p>JOYAXISMOTION   游戏手柄(Joystick or pad)移动   joy, axis, value</p>
-
-<p>JOYBALLMOTION   游戏球(Joy ball)?移动    joy, axis, value</p>
-
-<p>JOYHATMOTION    游戏手柄(Joystick)?移动   joy, axis, value</p>
-
-<p>JOYBUTTONDOWN   游戏手柄按下         joy, button</p>
-
-<p>JOYBUTTONUP   游戏手柄放开            joy, button</p>
-
-<p>VIDEORESIZE    Pygame窗口缩放         size, w, h</p>
-
-<p>VIDEOEXPOSE   Pygame窗口部分公开(expose)?  none</p>
-
-<p>USEREVENT     触发了一个用户事件        code</p>
-
-<p>pygame.event.get函数可以从队列获取所有的消息，并把它们从队列中删除。</p>
-
-<p>pygame.event.poll()提取并删除一个事件，如果队列是空的，这个函数会马上返回一个pygame.NOEVENT。</p>
-
-<p>pygame.event.wait()提取一个事件，如果没有事件则会等待直到有事件发生。</p>
-
-<p>pygame.event.clear()可以清空整个队列。</p>
-
-<p>如果只关心某些类型的事件，可以用pygame.event.get(type)，只取得队列中某种类型的事件。也可以用一个类型的列表，只取得某些类型的事件。pygame.event.peek(type)函数可以检查列表中是否有某种或者某些类型的事件，如果有就返回True。除此以外还可以用pygame.event.set_blocked阻止某些类型的事件进入事件队列，使用pygame.event.set_allowed来只允许某些类型的事件进入队列。</p>
-
-<p>pygame.event.post函数可以往队列中添加一个事件。</p>
-
-<p>用pygame.event.Event可以创建一个事件，比如：</p>
-
-<p>e = pygame.event.Event(pygame.USEREVENT)</p>
-
-<p>然后可以通过</p>
-
-<p>pygame.event.post(e)</p>
-
-<p>把这个事件添加到队列中，等待处理。在创建事件时可以添加自定义的属性。</p>
-
-<p>在窗口方式下运行，通常只有活动的窗口才能获得用户键盘、鼠标的事件。如果希望在窗口方式下，不是活动状态也能获得事件，可以通过</p>
-
-<p><em>pygame.event.set_grab(True)</em></p>
-
-<p>来捕获所有输入。不过这样会阻止其它程序获得用户输入，使得除了这个游戏以外其它程序都不能正常运行。要解除这样的状态，可以执行</p>
-
-<p><em>pygame.event.set_grab(False)</em></p>
-
-<p><strong><span style="text-decoration: underline">注意：这个慎用！！！</span></strong><br><br></p>
-
-<p>可以使用如下代码来测试事件：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="c">#!/usr/bin/env python</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">pygame</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">pygame</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">screen</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">set_mode</span><span class="p">((</span><span class="mi">640</span><span class="p">,</span> <span class="mi">480</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">pygame</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">pygame</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="k">print</span> <span class="nb">str</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">pygame</span><span class="o">.</span><span class="n">QUIT</span><span class="p">:</span>
-</span><span class='line'>
-</span><span class='line'>            <span class="nb">exit</span><span class="p">()</span>
-</span></code></pre></td></tr></table></div></figure>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/page/19">&larr; Older</a>
@@ -1157,6 +1091,10 @@ Event对象有各种不同的类型，比如KEYDOWN(键盘键按下)、MOUSEBUTT
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="http://www.xefan.com/archives/84161.html">Mac OS中VirtualBox的Android蓝牙设置</a>
+      </li>
+    
+      <li class="post">
         <a href="http://www.xefan.com/archives/84160.html">gulp+browserSync配置</a>
       </li>
     
@@ -1172,19 +1110,15 @@ Event对象有各种不同的类型，比如KEYDOWN(键盘键按下)、MOUSEBUTT
         <a href="http://www.xefan.com/archives/84157.html">Javascript使用async进行流程控制</a>
       </li>
     
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84156.html">AngularJS学习笔记7——与rails整合</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (32)</a></li><li><a href='/categories/web开发/index.html'>web开发 (20)</a></li><li><a href='/categories/前端相关/index.html'>前端相关 (10)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (16)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (24)</a></li></ul>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (32)</a></li><li><a href='/categories/web开发/index.html'>web开发 (20)</a></li><li><a href='/categories/前端相关/index.html'>前端相关 (10)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (16)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (39)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (24)</a></li></ul>
 </section>
 <section>
   <h1>Tag Cloud</h1>
-    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 102.68656716417911%'>ajax(3)</a> <a href='/tags/angular/index.html' style='font-size: 106.26865671641791%'>angular(7)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/gulp/index.html' style='font-size: 100.8955223880597%'>gulp(1)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 109.85074626865672%'>js(11)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mac/index.html' style='font-size: 100.8955223880597%'>Mac(1)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 129.55223880597015%'>Ruby(33)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xcode/index.html' style='font-size: 100.8955223880597%'>Xcode(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 123.28358208955224%'>翻译(26)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 102.68656716417911%'>ajax(3)</a> <a href='/tags/android/index.html' style='font-size: 100.8955223880597%'>Android(1)</a> <a href='/tags/angular/index.html' style='font-size: 106.26865671641791%'>angular(7)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/gulp/index.html' style='font-size: 100.8955223880597%'>gulp(1)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 109.85074626865672%'>js(11)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mac/index.html' style='font-size: 100.8955223880597%'>Mac(1)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 129.55223880597015%'>Ruby(33)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xcode/index.html' style='font-size: 100.8955223880597%'>Xcode(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 123.28358208955224%'>翻译(26)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
 </section>
 <section>
   <h1>Link</h1>

@@ -9,7 +9,7 @@
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="Ruby中的对象 在这章的教程中我们将简要的介绍下Ruby语言对象的概念。更多的内容将会在面向对象的章节中学习。由于Ruby的许多特性可以会使新手们迷惑，尤其是已经学习过其他编程语言的，因此才编写了这个关于对象的预备章节。 Ruby是一门面向对象的编程语言。这意味着我们可以在Ruby语言中使用对象 &hellip;">
+  <meta name="description" content="数据类型 在这一章的教程中我们开始讨论数据类型。 所有类别的计算机程序，包括电子表格、文本编辑器、计算器和聊天软件都使用数据。现代计算机语言中各种数据类型是必不可少的。一种数据类型是一些可操作的值的集合。 Ruby中有一些数据类型，这些类型都是基于类的。以下是Ruby中公认的数据类型： 布尔( &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -66,6 +66,1334 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83913.html">[翻译]Ruby教程6——数据类型</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-11-07T00:00:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83913.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83913.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h1>数据类型</h1>
+
+
+<p>在这一章的教程中我们开始讨论数据类型。</p>
+
+
+<p>所有类别的计算机程序，包括电子表格、文本编辑器、计算器和聊天软件都使用数据。现代计算机语言中各种数据类型是必不可少的。一种数据类型是一些可操作的值的集合。</p>
+
+
+<p>Ruby中有一些数据类型，这些类型都是基于类的。以下是Ruby中公认的数据类型：  </p>
+
+
+<ul>
+<li>布尔(Booleans)  </li>
+<li>符号(Symbols)  </li>
+<li>数字(Numbers)  </li>
+<li>字符串(Strings)</li>
+<li>数组(Arrays)  </li>
+<li>哈希(Hashes)</li>
+</ul>
+
+
+<p>下面的例子中我们展示Ruby中所有重要的数据类型。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+h = { :name =&gt; "Jane", :age =&gt; 17 }
+
+p true.class, false.class
+p "Ruby".class
+p 1.class
+p 4.5.class
+p 3_463_456_457.class
+p :age.class
+p [1, 2, 3].class
+p h.class
+</code></pre>
+
+
+<p>我们将它们的类型名打印出来，类型是用于创建对象的模块。  </p>
+
+
+<pre><code>p true.class, false.class
+</code></pre>
+
+
+<p><em>true</em>和<em>false</em>对象展示的布尔类型。</p>
+
+
+<pre><code>p "Ruby".class
+</code></pre>
+
+
+<p>这个是字符串。</p>
+
+
+<pre><code>p 1.class
+p 4.5.class
+p 3_463_456_457.class
+</code></pre>
+
+
+<p>这些是数字。</p>
+
+
+<pre><code>p :age.class
+</code></pre>
+
+
+<p>这个是符号标志，Ruby的一种特殊数据类型。</p>
+
+
+<pre><code>p [1, 2, 3].class
+p h.class
+</code></pre>
+
+
+<p>这是两个容器，数组和哈希表。</p>
+
+
+<p>$ ./types.rb<br>
+TrueClass<br>
+FalseClass<br>
+String<br>
+Fixnum<br>
+Float<br>
+Bignum<br>
+Symbol<br>
+Array<br>
+Hash  </p>
+
+
+<p>这个程序列出了属于Ruby的类型。</p>
+
+
+<h2>布尔值</h2>
+
+
+<p>在我们的世界里存在着对偶关系。天与地、水与火、男与女、爱与恨。这些就是我们自然中的“布尔”。在Ruby里，布尔类型只有一种，具有两个值：<em>true</em>(真)与<em>false</em>(假)。布尔是一种基本的数据类型，它在计算机程序中非常普遍。</p>
+
+
+<p>高兴的父母等待着孩子的诞生。他们可能会给孩子取个名字。如果是男孩就叫John，如果是女孩就叫Victoria。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+# kid.rb
+
+bool = [true, false]
+
+male = bool[rand(2)]
+
+
+if male
+    puts "We will use name John"
+else 
+    puts "We will use name Victoria"
+end
+</code></pre>
+
+
+<p>在这个程序中我们使用随机数来模拟这种情况。</p>
+
+
+<pre><code>bool = [true, false]
+</code></pre>
+
+
+<p>我们创建一个名为<em>bool</em>的变量，它是一个数组包含了两个布尔值。这个数组是使用方括号创建的。</p>
+
+
+<pre><code>male = bool[rand(2)]
+</code></pre>
+
+
+<p>我们使用<em>rand()</em>方法生成一个随机数。这个方法返回0或1。返回的数用于数组的索引。</p>
+
+
+<pre><code>if male
+    puts "We will use name John"
+else 
+    puts "We will use name Victoria"
+end
+</code></pre>
+
+
+<p>根据<em>male</em>变量我们打印一条信息。如果<em>male</em>是<em>true</em>则名字选择John，否则选择Vactoria。类似<em>is/else</em>的结构控制语句是根据布尔值来选择的。</p>
+
+
+<p>$ ./kid.rb <br>
+We will use name Victoria <br>
+$ ./kid.rb <br>
+We will use name Victoria<br>
+$ ./kid.rb <br>
+We will use name John<br>
+$ ./kid.rb <br>
+We will use name John<br>
+$ ./kid.rb <br>
+We will use name John  </p>
+
+
+<p>程序运行多次的结果如上。</p>
+
+
+<h2>符号标志</h2>
+
+
+<p>符号标志代表其他对象。使用符号标志而不是字符串，是因为可能保存一些资源。一个符号标志是<em>Symbol</em>类的一个实例对象。符号标志通常是在标识符的前面加上冒号，比如 :name。一些对象具有<em>to_sym</em>方法，用于将这些对象转化为符号标志。</p>
+
+
+<p>Ruby的符号标志在程序运行时是不可改变的。它通常用于当作哈希表的键，因为一个键不需要完整的字符串功能。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+p :name
+p :name.class
+p :name.methods.size
+p "Jane".methods.size
+
+p :name.object_id
+p :name.object_id
+p "name".object_id
+p "name".object_id
+</code></pre>
+
+
+<p>第一个例子展示了符号标志的基本操作。</p>
+
+
+<pre><code>p :name
+p :name.class
+</code></pre>
+
+
+<p>在终端上打印一个符号标志和它的类型。符号标志的类型是<em>Symbol</em>。</p>
+
+
+<pre><code>p :name.methods.size
+p "Jane".methods.size
+</code></pre>
+
+
+<p>比较字符串实例与符号标志实例分配的方法数量。字符串的方法数是符号标志的两位多。</p>
+
+
+<pre><code>p :name.object_id
+p :name.object_id
+p "name".object_id
+p "name".object_id
+</code></pre>
+
+
+<p>相同的符号标志具有相同的id，相同的字符串的id却不同。</p>
+
+
+<p>$ ./symbols.rb<br>
+:name<br>
+Symbol<br>
+79<br>
+162<br>
+10328<br>
+10328<br>
+77344750<br>
+77344730  </p>
+
+
+<p>程序输出结果。</p>
+
+
+<hr>
+
+
+<p>符号标志也可以作为常量标志，类似于C/C++中的枚举类型。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+light = :on
+
+if light == :on
+    puts "The light is on"
+else
+    puts "The light is off"
+end
+
+light = :off
+
+if light == :on
+    puts "The light is on"
+else
+    puts "The light is off"
+end
+</code></pre>
+
+
+<p>电灯不是开就是关。对于这两种情况定义了符号标志。</p>
+
+
+<pre><code>light = :on
+</code></pre>
+
+
+<p>灯是开的。</p>
+
+
+<pre><code>if light == :on
+    puts "The light is on"
+else
+    puts "The light is off"
+end
+</code></pre>
+
+
+<p>程序的逻辑依赖于<em>light</em>变量的状态。</p>
+
+
+<hr>
+
+
+<p>符号标志通常在哗然容器中作为键。这比字符串更加有效。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+domains = {:sk =&gt; "Slovakia", :no =&gt; "Norway", :hu =&gt; "Hungary"}
+
+puts domains[:sk]
+puts domains[:no]
+puts domains[:hu]
+</code></pre>
+
+
+<p>在这个脚本中创建了一个名为<em>domains</em>的哈希表。它的键全是符号标志。</p>
+
+
+<pre><code>puts domains[:sk]
+puts domains[:no]
+puts domains[:hu]
+</code></pre>
+
+
+<p>在哈希表中键是用于访问值的。接下来我们打印出这个哈希表的值。</p>
+
+
+<p>$ ./symbols3.rb<br>
+Slovakia<br>
+Norway<br>
+Hungary  </p>
+
+
+<p>以上是例子的输出结果。</p>
+
+
+<hr>
+
+
+<p>Ruby解释器将内部引用存储为符号标志。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+class Being
+
+    def initialize
+        @is = true
+    end
+
+    def say
+        "I am being"
+    end
+end
+
+b = Being.new
+
+p b.method :say
+p b.instance_variable_get :@is
+</code></pre>
+
+
+<p>定义了一个<em>Being</em>类。该类有一个自定义实例变量<em>@is</em>和一个方法<em>say</em>。这两个实体在Ruby中保存为符号标志。</p>
+
+
+<pre><code>p b.method :say
+</code></pre>
+
+
+<p><em>method</em>方法用于在<em>b</em>对象在查找给定名字的方法。我们查找的是<em>:say</em>符号。</p>
+
+
+<pre><code>p b.instance_variable_get :@is
+</code></pre>
+
+
+<p>使用<em>instance_variable_get</em>检查<em>@is</em>是不是<em>b</em>对象的一个实例变量。在内部变量存储为<em>:@is</em>符号。</p>
+
+
+<p>$ ./symbols4.rb   </p>
+
+
+<h1><Method: Being#say></h1>
+
+
+<p>true  </p>
+
+
+<p>输出结果。</p>
+
+
+<hr>
+
+
+<p>所有的符号都存储在符号表中。下一个例子我们来看看这个表。<em>Symbol</em>类的<em>all_symbols</em>方法返回了一个数组包含这个表的全部符号。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+def info
+  "info method"
+end
+
+@v = "Ruby"
+@@n = "16"
+
+p Symbol.all_symbols.include? :info
+p Symbol.all_symbols.include? :@v
+p Symbol.all_symbols.include? :@@n
+</code></pre>
+
+
+<p>在这个Ruby脚本中创建了一个方法、一个实例变量和一个类变量。我们检查这些实体是否存储在符号表中。</p>
+
+
+<pre><code>p Symbol.all_symbols.include? :info
+</code></pre>
+
+
+<p>检查<em>:info</em>符号是否在符号表中。这行返回的是<em>true</em>。</p>
+
+
+<p>$ ./symbols5.rb<br>
+true<br>
+true<br>
+true  </p>
+
+
+<p>三个符号都在符号表中。</p>
+
+
+<h2>整数</h2>
+
+
+<p>整数是实数的一个子集。它没有分数或者小数。整数属于集合Z = {&#8230;, -2, -1, 0, 1, 2, &#8230;} 。这个集合是无限的。</p>
+
+
+<p>在计算机语言中，整数是原始的数据类型。实际中计算机仅支持整数的一个子集，因为计算机的能力有限。整数用于统计离散的实体。我们有3、4、6个人，但是不能有3.33个人。我们有3.33千克。</p>
+
+
+<p>在Ruby中整数是<em>Fixnum</em>或者<em>Bignum</em>类的实例对象。不同于其他语言，如Java或者C，在Ruby中整数是一个对象。这两种类型的大小不同。<em>Fixnum</em>类型的整数有一些限制，这些限制与机器有关。<em>Bignum</em>的值表示范围比<em>Fixnum</em>大。如果一些操作超出了<em>Fixnum</em>的范围，它会自动的转换成<em>Bignum</em>。程序员通常不需要关心整数的类型。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+p -2
+p 121
+p 123265
+p -34253464356
+p 34867367893463476
+
+p 1.class
+p 23453246.class
+p 234532423563456346.class
+p 2345324235632363463456456346.class
+
+p 5 / 2
+p 5.div 2
+</code></pre>
+
+
+<p>这个例子中我们处理的一些整数。</p>
+
+
+<pre><code>p -2
+p 121
+p 123265
+p -34253464356
+p 34867367893463476
+</code></pre>
+
+
+<p>这是一些不同大小的正数和负数。</p>
+
+
+<pre><code>p 1.class
+p 23453246.class
+p 234532423563456346.class
+p 2345324235632363463456456346.class
+</code></pre>
+
+
+<p>打印出这些数的类型。前两个整数是<em>Fixnum</em>类型，其余两个是<em>Bignum</em>类型。</p>
+
+
+<pre><code>p 5 / 2
+p 5.div 2
+</code></pre>
+
+
+<p>这两行展示的整数的相除。当两个数相除时我们使用了相除操作符/方法,结果也是一个整数。</p>
+
+
+<p>$ ./integers.rb<br>
+-2<br>
+121<br>
+123265<br>
+-34253464356<br>
+34867367893463476<br>
+Fixnum<br>
+Fixnum<br>
+Bignum<br>
+Bignum<br>
+2<br>
+2  </p>
+
+
+<p>例子的输出结果。</p>
+
+
+<hr>
+
+
+<p>在Ruby中整数可以有不同的表现符号。十进制、十六进制、八进制和二进制数都是可用的。十六进制数以0x字符开头，八进制以0字符开头，二进制以0b字符开头。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+puts 122
+puts 0x7a
+puts 0172
+puts 0b1111010
+</code></pre>
+
+
+<p>这个例子中我们打印了十进制数<em>122</em>的所有表现形式。</p>
+
+
+<p>$ ./inotations.rb<br>
+122<br>
+122<br>
+122<br>
+122  </p>
+
+
+<p>以上是输出结果。</p>
+
+
+<hr>
+
+
+<p>我们使用整数的话，那么就是用于处理离散的实体。也许我们用于统计苹果的数量。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+baskets = 16
+apples_in_basket = 24
+
+total = baskets * apples_in_basket
+
+puts "There are total of #{total} apples"
+</code></pre>
+
+
+<p>在这个程序中我们使用整数统计苹果的总数。</p>
+
+
+<p>$ ./apples.rb<br>
+There are total of 384 apples  </p>
+
+
+<p>以上是程序的输出。</p>
+
+
+<hr>
+
+
+<p>大数字读起来比较困难。如果我们有一个数245342395423452，我们发现很难快速的将它读出来。计算机之外大的数字是用空格或者逗号分隔开来。为了可读性，Ruby允许数字包含下划线。Ruby解释器会忽略整数中的下划线。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+p 23482345629
+p 23_482_345_629
+
+p 23482345629 == 23_482_345_629
+</code></pre>
+
+
+<p>这个例子演示了下划线的使用。</p>
+
+
+<pre><code>p 23482345629 == 23_482_345_629
+</code></pre>
+
+
+<p>这行展示了两个数据是相等的。</p>
+
+
+<p>$ ./underscore.rb<br>
+23482345629<br>
+23482345629<br>
+true  </p>
+
+
+<p>例子的输出结果。</p>
+
+
+<h2>浮点数</h2>
+
+
+<p>在计算中浮点数表示实数。实例意味着连续的数量，如：重量、高度和速度。Ruby中小数是<em>Float</em>或者<em>BigDecimal</em>类对象。<em>BigDecimal</em>类是Ruby的核心类，是Ruby标准库的一部分。此外我们还可以使用<em>Rational</em>对象。</p>
+
+
+<p>我们需要理解数字是不业精确的。Ruby的官方文档清楚地说道浮点数对象表示的是不精确的实数。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+p 15.4
+p 0.3455
+p -343.4563
+
+p 12.5.class
+p -12.5.class
+p (5.0 / 2).class
+
+p 5.fdiv 2
+p 12.to_f
+</code></pre>
+
+
+<p>上面的这个例子我们使用了浮点数。</p>
+
+
+<pre><code>p 15.4
+p 0.3455
+p -343.4563
+</code></pre>
+
+
+<p>这里我们打印三个小数的值。小数包含了小数点字符。</p>
+
+
+<pre><code>p 12.5.class
+p -12.5.class
+p (5.0 / 2).class
+</code></pre>
+
+
+<p>以上展示的数字的类型，全都是浮点数。最后一个整数与浮点数相除结果为浮点数。</p>
+
+
+<pre><code>p 5.fdiv 2
+p 12.to_f
+</code></pre>
+
+
+<p>这里我们创建浮点数除法<em>fdiv</em>和转换方法<em>to_f</em>来创建浮点数。</p>
+
+
+<p>$ ./decimals.rb<br>
+15.4<br>
+0.3455<br>
+-343.4563<br>
+Float<br>
+Float<br>
+Float<br>
+2.5<br>
+12.0  </p>
+
+
+<p>以上为转出结果。</p>
+
+
+<hr>
+
+
+<p>一个小数默认最多只显示小数点后16个数字。我们可以使用<em>sprintf</em>或者<em>printf</em>方法来控制浮点数的格式。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+p 1/3.0
+p 1.fdiv 2
+
+puts sprintf "%.4f" % (1/3.0)
+puts sprintf "%.7f" % (5/3.0)
+</code></pre>
+
+
+<p>格式化小数。</p>
+
+
+<pre><code>p 1/3.0
+p 13.fdiv 4
+p 1.fdiv 2
+</code></pre>
+
+
+<p>第一行打印的小数在小数点后有16个数字。第二行打印的有两个。第三行打印的有一个。</p>
+
+
+<pre><code>puts sprintf "%.4f" % (1/3.0)
+puts sprintf "%.7f" % (5/3.0)
+</code></pre>
+
+
+<p>这里我们使用<em>sprintf</em>方法控制小数点后面的数字个数。<em>sprintf</em>方法的格式说明符是精确的。它是一个数字接着<em>%</em>符号。<em>f</em>是一个转换说明符，表示处理的是一个浮点数。</p>
+
+
+<p>$ ./formatfloat.rb<br>
+0.3333333333333333<br>
+3.25<br>
+0.5<br>
+0.3333<br>
+1.6666667  </p>
+
+
+<p>以上是输出结果。</p>
+
+
+<hr>
+
+
+<p>Ruby支持使用科学的记数法来表示一个浮点数。这也称为指数记数法，它是将非常大或者非常小的数转换成正常的小数形式。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+p 1.2e-3
+p 0.0012
+
+p 1.5E-4
+p 0.00015
+</code></pre>
+
+
+<p>这个例子展示了两个使用科学记数表示的小数。</p>
+
+
+<p>$ ./scientific.rb<br>
+0.0012<br>
+0.0012<br>
+0.00015<br>
+0.00015  </p>
+
+
+<p>这是以上程序的输出。</p>
+
+
+<hr>
+
+
+<p>前面我们主说过浮点数的值稍微有些不精确。在很多计算中，普通的浮点小数已经足够精确了，如：我们的体重是60kg还是60.000024kg并不重要。对于其他计算，包括科学和工程应用，精确度是非常重要的。</p>
+
+
+<p>Ruby有一个<em>BigDecimal</em>标准库。这个类对于非常大或者非常精准的浮点数提供了任意的精度。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+require 'bigdecimal'
+
+sum = 0
+
+1000.times do
+    sum = sum + 0.0001
+end
+
+p sum
+
+
+sum = BigDecimal.new("0")
+
+1000.times do
+    sum = sum + BigDecimal.new("0.0001")
+end
+
+puts sum.to_s('F')
+puts sum.to_s('E')
+</code></pre>
+
+
+<p>在这个例子中我们比较了<em>Float</em>与<em>BigDecimal</em>的精度。 </p>
+
+
+<pre><code>require 'bigdecimal'
+</code></pre>
+
+
+<p><em>BigDecimal</em>类必须导入。</p>
+
+
+<pre><code>sum = 0
+
+1000.times do
+    sum = sum + 0.0001
+end
+
+p sum
+</code></pre>
+
+
+<p>通过循环对一个很小的浮点数求和。最后会出现一点误差。</p>
+
+
+<pre><code>sum = BigDecimal.new("0")
+
+1000.times do
+    sum = sum + BigDecimal.new("0.0001")
+end
+</code></pre>
+
+
+<p>然后再对<em>BigDecimal</em>做同样的事情。</p>
+
+
+<pre><code>puts sum.to_s('F')
+puts sum.to_s('E')
+</code></pre>
+
+
+<p>将<em>sum</em>浮点数打印为工程记数形式。</p>
+
+
+<p>$ ./bigdecimal.rb<br>
+0.10000000000000184<br>
+0.1<br>
+0.1E0  </p>
+
+
+<p>输出结果表示<em>BigDecimal</em>比<em>Float</em>更精确。</p>
+
+
+<hr>
+
+
+<p>如果一个短路运动员100m跑9.87s，那么他的时速是多少？</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+distance = 0.1
+time = 9.87 / 3600
+
+speed = distance / time
+
+puts "The average speed of a sprinter is #{speed} km/h"
+</code></pre>
+
+
+<p>这个例子必需使用浮点数。</p>
+
+
+<pre><code>distance = 0.1
+</code></pre>
+
+
+<p>100m等于0.1km。</p>
+
+
+<pre><code>time = 9.87 / 3600
+</code></pre>
+
+
+<p>9.87s等于9.87/60*60 h。</p>
+
+
+<pre><code>speed = distance / time
+</code></pre>
+
+
+<p>要计算速度，我们用距离除以时间。</p>
+
+
+<p>$ ./speed.rb<br>
+The average speed of a sprinter is 36.4741641337386 km/h  </p>
+
+
+<p>以上是<em>speed.rb</em>脚本的输出。</p>
+
+
+<h2>有理数</h2>
+
+
+<p>Ruby支持有理数。有理数是一个确切的数。使用有理数可以避免舍入错误。Ruby中有理数是<em>Rational</em>类的对象。我们可以使用某些对象的<em>to_r</em>方法来创建有理数。</p>
+
+
+<p>有理数可以用于表示两个整数相除的分数，a/b（b!=0）。如果b为1,每个整数都是一个有理数。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+puts 2.to_r
+puts "23".to_r
+puts 2.6.to_r
+
+p Rational 0
+p Rational 1/5.0
+p Rational 0.5
+</code></pre>
+
+
+<p>这个例子展示了一些有理数。</p>
+
+
+<pre><code>puts 2.to_r
+</code></pre>
+
+
+<p>变量我们使用<em>to_r</em>方法将整数2转化为有理数2/1。</p>
+
+
+<pre><code>p Rational 0.5
+</code></pre>
+
+
+<p>使用<em>Rational</em>方法创建一个有理数》</p>
+
+
+<p>$ ./rational.rb<br>
+2/1<br>
+23/1<br>
+5854679515581645/2251799813685248<br>
+(0/1)<br>
+(3602879701896397/18014398509481984)<br>
+(1/2)  </p>
+
+
+<p>例子的输出结果。</p>
+
+
+<h2>空值</h2>
+
+
+<p>Ruby有一个特殊的值<em>nil</em>。它表示空值。<em>nil</em>是<em>NilClass</em>类的单实例，仅有一个<em>nil</em>。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+puts nil
+p nil
+
+p $val
+
+p [1, 2, 3][4]
+
+p $val1 == $val2
+</code></pre>
+
+
+<p><em>nil</em>的一个例子。</p>
+
+
+<pre><code>puts nil
+p nil
+</code></pre>
+
+
+<p>在终端上打印<em>nil</em>的值。<em>puts</em>方法打印空字符串，<em>p</em>方法打印<em>&#8216;nil&#8217;</em>字符串。</p>
+
+
+<pre><code>p $val
+</code></pre>
+
+
+<p>当我们引用一个没有定义的全局变量时会返回<em>nil</em>值。</p>
+
+
+<pre><code>p [1, 2, 3][3]
+</code></pre>
+
+
+<p>这行代码我们引用了一个3元素数组的第4个元素，结果返回<em>nil</em>。Ruby中的许多方法对于无效的值都返回<em>nil</em>。</p>
+
+
+<pre><code>p $val1 == $val2
+</code></pre>
+
+
+<p>这行返回<em>true</em>，这实际上是因为<em>nil</em>是<em>NilClass</em>的单实例对象。</p>
+
+
+<p>$ ./nilvalue.rb  </p>
+
+
+<p>nil<br>
+nil<br>
+nil<br>
+true  </p>
+
+
+<p>输出结果。</p>
+
+
+<h2>字符串</h2>
+
+
+<p>字符串在计算机程序代表文本数据。Ruby字符串是一个序列化的unicode字符。字符串是<em>String</em>的一个对象。字符串的字面量是字符加上双引号或者单引号。</p>
+
+
+<p>字符串是一个非常重要的数据类型。它需要专门用一章来介绍。这里我们仅包含一个小例子。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+p "Ruby"
+p 'Python'
+
+p "Ruby".size
+p "Ruby".upcase
+
+p 23.to_s
+</code></pre>
+
+
+<p>这个例子中我们使用了Ruby的字符串。我们使用<em>p</em>方法是为了在输出中看到数据类型。</p>
+
+
+<pre><code>p "Ruby"
+p 'Python'
+</code></pre>
+
+
+<p>在终端中打印两个字符串的字面值。第一个字面量是使用双引号，第二个是单引号。</p>
+
+
+<pre><code>p "Ruby".size
+p "Ruby".upcase
+</code></pre>
+
+
+<p>这两行调用了两个字符串的方法。<em>size</em>方法返回字符串的长度，在这里是4个字符。<em>upcase</em>方法是将字符串转为大写。</p>
+
+
+<pre><code>p 23.to_s
+</code></pre>
+
+
+<p><em>to_s</em>方法是将整数转为字符串。</p>
+
+
+<p>$ ./strings.rb<br>
+&#8220;Ruby&#8221;<br>
+&#8220;Python&#8221;<br>
+4<br>
+&#8220;RUBY&#8221;<br>
+&#8220;23&#8221;  </p>
+
+
+<p>在输出中我们看到字符串是在引号内。这就是我们使用<em>p</em>方法的结果，<em>print</em>和<em>puts</em>方法都不会带上引号。</p>
+
+
+<h2>数组和哈希表</h2>
+
+
+<p>数组和哈希表是对象的集合。他们将对象集合在一起。</p>
+
+
+<p>数组是对象的有序集合。哈希表是键-值对的集合。我们将会用单独的一章来介绍数组和哈希表。以下仅是一个预览的例子。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+nums = [1, 2, 3, 4]
+
+puts "There are #{nums.size} items in the array"
+
+nums.each do |num|
+    puts num
+end
+
+
+domains = { :de =&gt; "Germany", :sk =&gt; "Slovakia",
+            :us =&gt; "United States", :no =&gt; "Norway" }
+
+puts domains.keys
+puts domains.values
+</code></pre>
+
+
+<p>这是一个Ruby数组和哈希表的例子。</p>
+
+
+<pre><code>nums = [1, 2, 3, 4]
+
+puts "There are #{nums.size} items in the array"
+
+nums.each do |num|
+    puts num
+end
+</code></pre>
+
+
+<p>这里创建一个有4项内容的数组。第二行统计了这个数组数据项的数量，并合并到了消息中。随后我们使用<em>each</em>方法将每个元素打印在终端上。</p>
+
+
+<pre><code>domains = { :de =&gt; "Germany", :sk =&gt; "Slovakia",
+            :us =&gt; "United States", :no =&gt; "Norway" }
+
+puts domains.keys
+puts domains.values
+</code></pre>
+
+
+<p>创建了Ruby的哈希表，然后打印它的键和值。</p>
+
+
+<p>$ ./arrayshashes.rb<br>
+There are 4 items in the array<br>
+1<br>
+2<br>
+3<br>
+4<br>
+de<br>
+sk<br>
+us<br>
+no<br>
+Germany<br>
+Slovakia<br>
+United States<br>
+Norway  </p>
+
+
+<p>例子的输出结果。</p>
+
+
+<h2>类型转换</h2>
+
+
+<p>我们经常是一次使用多种数据类型。在编程中从一种数据类型转换为其他类型是很平常的。类型转换或者类型的引用会将一个实体从一个类型转换成另一个类型。有两种类型转换的方式：隐式和显式。隐式类型转换又称为强制转换，是被编译器自动的转换。Ruby只有显式转换。</p>
+
+
+<p>Ruby有内建的转换方法。如：<em>to_i</em>、<em>to_s</em>或者<em>to_f</em>。内核模块有一些公共的方法用来转换，如<em>Interger</em>、<em>String</em>或者<em>Float</em>。这些方法还要与Ruby的类混淆。</p>
+
+
+<p>#!/usr/bin/ruby</p>
+
+
+<pre><code>p Array(1..6)
+p Complex 6
+p Float 12
+p Integer "34"
+p Rational 6
+p String 22
+</code></pre>
+
+
+<p>这里我们展示了内核模块的转换方法。</p>
+
+
+<p>$ ./convertmethods.rb<br>
+[1, 2, 3, 4, 5, 6]<br>
+(6+0i)<br>
+12.0<br>
+34<br>
+(6/1)<br>
+&#8220;22&#8221;  </p>
+
+
+<p>例子的输出结果。</p>
+
+
+<hr>
+
+
+<pre><code>#!/usr/bin/ruby
+
+p "12".to_i
+p 12.5.to_i
+p nil.to_i
+
+p 12.to_f
+p "11".to_f
+p nil.to_f
+</code></pre>
+
+
+<p>以上例子我们展示了数字的转换。一些对象具有<em>to_i</em>和<em>to_f</em>方法将对象转换成整数和浮点数。</p>
+
+
+<pre><code>p "12".to_i
+p 12.5.to_i
+p nil.to_i
+</code></pre>
+
+
+<p>这里我们将字符串、小数和nil转换成整数。</p>
+
+
+<pre><code>p 12.to_f
+p "11".to_f
+p nil.to_f
+</code></pre>
+
+
+<p>这三行将整数、字符串和nil转换成小数。</p>
+
+
+<p>$ ./conversions.rb<br>
+12<br>
+12<br>
+0<br>
+12.0<br>
+11.0<br>
+0.0  </p>
+
+
+<p>例子的输出结果。</p>
+
+
+<hr>
+
+
+<p>第二个例子展示了一些字符串的转换。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+p "12".to_i
+p "13".to_f
+p "12".to_r
+p "13".to_c
+
+p "Jane".to_sym
+
+v = "Ruby Python Tcl PHP Perl".split
+p v.class
+</code></pre>
+
+
+<p>上面的例子中我们将字符串转换为不同类型的对象。</p>
+
+
+<pre><code>p "12".to_i
+p "13".to_f
+p "12".to_r
+p "13".to_c
+</code></pre>
+
+
+<p>这里将字符串转换成整数、小数、有理数和复数。</p>
+
+
+<pre><code>p "Jane".to_sym
+</code></pre>
+
+
+<p>将字符串变为符号标志。</p>
+
+
+<pre><code>v = "Ruby Python Tcl PHP Perl".split
+p v.class
+</code></pre>
+
+
+<p>使用字符串的<em>split</em>方法将字符串转换成数组。</p>
+
+
+<p>$ ./stringconv.rb<br>
+12<br>
+13.0<br>
+(12/1)<br>
+(13+0i)<br>
+:Jane<br>
+Array  </p>
+
+
+<p>输出结果。</p>
+
+
+<hr>
+
+
+<p>下面的小例子展示了数组哈希表的转换。</p>
+
+
+<pre><code>#!/usr/bin/ruby
+
+h = {:de =&gt; "Germany", :sk =&gt; "Slovakia"}
+p h.to_a
+
+a = [:de, "Germany", :sk, "Slovakia", 
+     :hu, "Hungary", :no, "Norway"]
+p Hash[*a]
+</code></pre>
+
+
+<p>这个例子的代码我们创建了一个哈希表并转换成数组，创建一个数组并转换成哈希表。</p>
+
+
+<pre><code>h = {:de =&gt; "Germany", :sk =&gt; "Slovakia"}
+p h.to_a
+</code></pre>
+
+
+<p>哈希表转换为数组使用<em>to_a</em>方法。</p>
+
+
+<pre><code>a = [:de, "Germany", :sk, "Slovakia", 
+     :hu, "Hungary", :no, "Norway"]
+p Hash[*a]
+</code></pre>
+
+
+<p>将数组转换成哈希表。在这里的上下文中使用了星号操作符。这个风格来自<em>Perl</em>。它将一个数组分割成多个变量。</p>
+
+
+<p>$ ./h2a.rb<br>
+[[:de, &#8220;Germany&#8221;], [:sk, &#8220;Slovakia&#8221;]]<br>
+{:de=&gt;&#8221;Germany&#8221;, :sk=&gt;&#8221;Slovakia&#8221;, :hu=&gt;&#8221;Hungary&#8221;, :no=&gt;&#8221;Norway&#8221;}  </p>
+
+
+<p>输出结果。</p>
+
+
+<p>这章在教程覆盖了数据类型和它们的转换。</p>
+
+
+<hr>
+
+
+<p>原文地址： <a href="http://zetcode.com/lang/rubytutorial/datatypes/">http://zetcode.com/lang/rubytutorial/datatypes/</a><br>
+翻译：龙昌  admin@longchangjin.cn<br>
+完整教程：<a href="https://github.com/wusuopu/Ruby-tutorial">https://github.com/wusuopu/Ruby-tutorial</a>  </p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -3258,68 +4586,6 @@ luakit也是基于gtk和webkit的，只不过它是用lua语言开发的。它�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83877.html">分享两个vim的git插件</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2013-08-11T00:00:00+08:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>11</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
-        
-           | <a href="http://www.xefan.com/archives/83877.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/83877.html">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>1.vim-git</p>
-
-<p>我只是简单体验发一下，个人觉得这个就是用vim的命令把git的命令包装了一下，还不如直接在终端下操作方便。</p>
-
-<p>常用命令<br/>
-:GitAdd<br/>
-:GitCommit<br/>
-:GitStatus<br/>
-:GitLog<br/>
-:GitCheckout<br/>
-:GitDiff<br/>
-:GitPull<br/>
-:GitPush</p>
-
-<p>快捷键<br/>
-&lt;Leader&gt;gd 等同于 :GitDiff<br/>
-&lt;Leader&gt;gD 等同于 :GitDiff —cached<br/>
-&lt;Leader&gt;gs 等同于 :GitStatus<br/>
-&lt;Leader&gt;gl 等同于 :GitLog<br/>
-&lt;Leader&gt;ga 等同于 :GitAdd<br/>
-&lt;Leader&gt;gA 等同于 :GitAdd &lt;cfile&gt;<br/>
-&lt;Leader&gt;gc 等同于 :GitCommit</p>
-
-<p>下载地址：<a href="https://github.com/motemen/git-vim.git">https://github.com/motemen/git-vim.git</a></p>
-
-<p>2.vim-fugitive</p>
-
-<p>感觉这个比较强大，尤其是配合vimdiff来查看文件的发动非常方便。
-它的说明文档介绍到如果你的vim版本低于7.2，那么建议同时也把vim-git安装上。</p>
-
-<p>下载地址：<a href="https://github.com/tpope/vim-fugitive.git">https://github.com/tpope/vim-fugitive.git</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/page/11">&larr; Older</a>
@@ -3341,6 +4607,10 @@ luakit也是基于gtk和webkit的，只不过它是用lua语言开发的。它�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="http://www.xefan.com/archives/84161.html">Mac OS中VirtualBox的Android蓝牙设置</a>
+      </li>
+    
+      <li class="post">
         <a href="http://www.xefan.com/archives/84160.html">gulp+browserSync配置</a>
       </li>
     
@@ -3356,19 +4626,15 @@ luakit也是基于gtk和webkit的，只不过它是用lua语言开发的。它�
         <a href="http://www.xefan.com/archives/84157.html">Javascript使用async进行流程控制</a>
       </li>
     
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84156.html">AngularJS学习笔记7——与rails整合</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (32)</a></li><li><a href='/categories/web开发/index.html'>web开发 (20)</a></li><li><a href='/categories/前端相关/index.html'>前端相关 (10)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (16)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (24)</a></li></ul>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (32)</a></li><li><a href='/categories/web开发/index.html'>web开发 (20)</a></li><li><a href='/categories/前端相关/index.html'>前端相关 (10)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (16)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (39)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (24)</a></li></ul>
 </section>
 <section>
   <h1>Tag Cloud</h1>
-    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 102.68656716417911%'>ajax(3)</a> <a href='/tags/angular/index.html' style='font-size: 106.26865671641791%'>angular(7)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/gulp/index.html' style='font-size: 100.8955223880597%'>gulp(1)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 109.85074626865672%'>js(11)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mac/index.html' style='font-size: 100.8955223880597%'>Mac(1)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 129.55223880597015%'>Ruby(33)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xcode/index.html' style='font-size: 100.8955223880597%'>Xcode(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 123.28358208955224%'>翻译(26)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 102.68656716417911%'>ajax(3)</a> <a href='/tags/android/index.html' style='font-size: 100.8955223880597%'>Android(1)</a> <a href='/tags/angular/index.html' style='font-size: 106.26865671641791%'>angular(7)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/gulp/index.html' style='font-size: 100.8955223880597%'>gulp(1)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 109.85074626865672%'>js(11)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mac/index.html' style='font-size: 100.8955223880597%'>Mac(1)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 129.55223880597015%'>Ruby(33)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xcode/index.html' style='font-size: 100.8955223880597%'>Xcode(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 123.28358208955224%'>翻译(26)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
 </section>
 <section>
   <h1>Link</h1>

@@ -9,7 +9,7 @@
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="写字 相对于在Surface上画图，在Surface上写文字要复杂得多。 首先需要导入pygame.font模块并初始化。 import pygame.font pygame.font.init() 选择字体 然后用pygame.font.get_fonts获取可用的字体的列表。 pygame. &hellip;">
+  <meta name="description" content="事件系统 Pygame通过一个事件系统与用户进行交互，以及处理一些系统发生的事件。事件系统包括一个事件队列，其中每一项都是一个Event对象。所有的用户输入和一些系统事件，都会形成一个Event对象被添加到事件队列中。pygame.event模块提供了很多函数去访问和控制这个队列。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -66,6 +66,148 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83586.html">Pygame学习笔记5：事件</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2011-08-17T00:00:00+08:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83586.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83586.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><strong>事件系统</strong></p>
+
+<p>Pygame通过一个事件系统与用户进行交互，以及处理一些系统发生的事件。事件系统包括一个事件队列，其中每一项都是一个Event对象。所有的用户输入和一些系统事件，都会形成一个Event对象被添加到事件队列中。pygame.event模块提供了很多函数去访问和控制这个队列。
+Event对象有各种不同的类型，比如KEYDOWN(键盘键按下)、MOUSEBUTTONDOWN(鼠标键按下)等，通过Event.type属性来区分。不同的类型的Event对象还有不同的其它属性。通过Event.dict属性来查看。常用的类型和对应的属性有：</p>
+
+<p>事件              产生途径              参数</p>
+
+<p>QUIT             用户按下关闭按钮      none</p>
+
+<p>ATIVEEVENT     Pygame被激活或者隐藏  gain, state</p>
+
+<p>KEYDOWN       键盘被按下             unicode, key, mod</p>
+
+<p>KEYUP           键盘被放开             key, mod</p>
+
+<p>MOUSEMOTION   鼠标移动               pos, rel, buttons</p>
+
+<p>MOUSEBUTTONDOWN    鼠标按下        pos, button</p>
+
+<p>MOUSEBUTTONUP  鼠标放开              pos, button</p>
+
+<p>JOYAXISMOTION   游戏手柄(Joystick or pad)移动   joy, axis, value</p>
+
+<p>JOYBALLMOTION   游戏球(Joy ball)?移动    joy, axis, value</p>
+
+<p>JOYHATMOTION    游戏手柄(Joystick)?移动   joy, axis, value</p>
+
+<p>JOYBUTTONDOWN   游戏手柄按下         joy, button</p>
+
+<p>JOYBUTTONUP   游戏手柄放开            joy, button</p>
+
+<p>VIDEORESIZE    Pygame窗口缩放         size, w, h</p>
+
+<p>VIDEOEXPOSE   Pygame窗口部分公开(expose)?  none</p>
+
+<p>USEREVENT     触发了一个用户事件        code</p>
+
+<p>pygame.event.get函数可以从队列获取所有的消息，并把它们从队列中删除。</p>
+
+<p>pygame.event.poll()提取并删除一个事件，如果队列是空的，这个函数会马上返回一个pygame.NOEVENT。</p>
+
+<p>pygame.event.wait()提取一个事件，如果没有事件则会等待直到有事件发生。</p>
+
+<p>pygame.event.clear()可以清空整个队列。</p>
+
+<p>如果只关心某些类型的事件，可以用pygame.event.get(type)，只取得队列中某种类型的事件。也可以用一个类型的列表，只取得某些类型的事件。pygame.event.peek(type)函数可以检查列表中是否有某种或者某些类型的事件，如果有就返回True。除此以外还可以用pygame.event.set_blocked阻止某些类型的事件进入事件队列，使用pygame.event.set_allowed来只允许某些类型的事件进入队列。</p>
+
+<p>pygame.event.post函数可以往队列中添加一个事件。</p>
+
+<p>用pygame.event.Event可以创建一个事件，比如：</p>
+
+<p>e = pygame.event.Event(pygame.USEREVENT)</p>
+
+<p>然后可以通过</p>
+
+<p>pygame.event.post(e)</p>
+
+<p>把这个事件添加到队列中，等待处理。在创建事件时可以添加自定义的属性。</p>
+
+<p>在窗口方式下运行，通常只有活动的窗口才能获得用户键盘、鼠标的事件。如果希望在窗口方式下，不是活动状态也能获得事件，可以通过</p>
+
+<p><em>pygame.event.set_grab(True)</em></p>
+
+<p>来捕获所有输入。不过这样会阻止其它程序获得用户输入，使得除了这个游戏以外其它程序都不能正常运行。要解除这样的状态，可以执行</p>
+
+<p><em>pygame.event.set_grab(False)</em></p>
+
+<p><strong><span style="text-decoration: underline">注意：这个慎用！！！</span></strong><br><br></p>
+
+<p>可以使用如下代码来测试事件：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="c">#!/usr/bin/env python</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">pygame</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">pygame</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">screen</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">set_mode</span><span class="p">((</span><span class="mi">640</span><span class="p">,</span> <span class="mi">480</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">pygame</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">pygame</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">print</span> <span class="nb">str</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">pygame</span><span class="o">.</span><span class="n">QUIT</span><span class="p">:</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="nb">exit</span><span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1897,133 +2039,6 @@ md5:eb80322f7da800196cb77d79d7e7d6a2<br/>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83556.html">PHP GET方法ajax实例</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2011-07-24T00:00:00+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>24</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
-        
-           | <a href="http://www.xefan.com/archives/83556.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/83556.html">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>首先新建两个文件，文件名分别为：mail.html、mail.php，放在同一目录下。</p>
-
-<p><strong>mail.html</strong>文件内容如下：</p>
-
-<p><font color="#804040">&nbsp;1 </font><font color="#008080">&lt;</font><font color="#804040"><b>html</b></font><font color="#008080">&gt;</font><br>
-<font color="#804040">&nbsp;2 </font><font color="#008080">&lt;</font><font color="#804040"><b>head</b></font><font color="#008080">&gt;</font><br>
-<font color="#804040">&nbsp;3 </font><font color="#008080">&lt;</font><font color="#804040"><b>meta</b></font><font color="#008080">&nbsp;</font><font color="#2e8b57"><b>http-equiv</b></font><font color="#008080">=</font><font color="#ff00ff">&quot;content-type&quot;</font><font color="#008080">&nbsp;</font><font color="#2e8b57"><b>content</b></font><font color="#008080">=</font><font color="#ff00ff">&quot;text/html;charset=utf-8&quot;</font><font color="#008080">&gt;</font><br>
-<font color="#804040">&nbsp;4 </font><font color="#008080">&lt;/</font><font color="#804040"><b>head</b></font><font color="#008080">&gt;</font><br>
-<font color="#804040">&nbsp;5 </font><font color="#008080">&lt;</font><font color="#804040"><b>body</b></font><font color="#008080">&gt;</font><br>
-<font color="#804040">&nbsp;6 </font><font color="#008080">&lt;</font><font color="#804040"><b>form</b></font><font color="#008080">&nbsp;</font><font color="#2e8b57"><b>action</b></font><font color="#008080">=</font><font color="#ff00ff">&quot;&quot;</font><font color="#008080">&nbsp;</font><font color="#2e8b57"><b>method</b></font><font color="#008080">=</font><font color="#ff00ff">&quot;post&quot;</font><font color="#008080">&nbsp;</font><font color="#2e8b57"><b>name</b></font><font color="#008080">=</font><font color="#ff00ff">&quot;form1&quot;</font><font color="#008080">&nbsp;</font><font color="#2e8b57"><b>id</b></font><font color="#008080">=</font><font color="#ff00ff">&quot;form1&quot;</font><font color="#008080">&gt;</font><br>
-<font color="#804040">&nbsp;7 </font><font color="#008080">&lt;</font><font color="#804040"><b>table</b></font><font color="#008080">&nbsp;</font><font color="#2e8b57"><b>border</b></font><font color="#008080">=</font><font color="#ff00ff">&quot;1&quot;</font><font color="#008080">&nbsp;</font><font color="#2e8b57"><b>width</b></font><font color="#008080">=</font><font color="#ff00ff">&quot;100%&quot;</font><font color="#008080">&gt;</font><br>
-<font color="#804040">&nbsp;8 </font><font color="#008080">&lt;</font><font color="#804040"><b>tr</b></font><font color="#008080">&gt;&lt;</font><font color="#804040"><b>td</b></font><font color="#008080">&nbsp;</font><font color="#2e8b57"><b>height</b></font><font color="#008080">=</font><font color="#ff00ff">&quot;30&quot;</font><font color="#008080">&gt;</font><br>
-<font color="#804040">&nbsp;9 </font>请选择：<br>
-<font color="#804040">10 </font><font color="#008080">&lt;</font><font color="#804040"><b>select</b></font><font color="#008080">&nbsp;</font><font color="#2e8b57"><b>name</b></font><font color="#008080">=</font><font color="#ff00ff">&quot;Card_Choice&quot;</font><font color="#008080">&nbsp;</font><font color="#2e8b57"><b>id</b></font><font color="#008080">=</font><font color="#ff00ff">&quot;Card_Choice&quot;</font><font color="#008080">&nbsp;</font><font color="#6a5acd">onChange=&quot;</font><font color="#6a5acd">valideMail</font>(<font color="#008080">this</font>)<font color="#6a5acd">&quot;</font><font color="#008080">&gt;</font><br>
-<font color="#804040">11 </font><br>
-<font color="#804040">12 </font><font color="#008080">&lt;</font><font color="#804040"><b>option</b></font><font color="#008080">&nbsp;</font><font color="#2e8b57"><b>id</b></font><font color="#008080">=</font><font color="#ff00ff">&quot;s1&quot;</font><font color="#008080">&nbsp;</font><font color="#2e8b57"><b>value</b></font><font color="#008080">=</font><font color="#ff00ff">&quot;无&quot;</font><font color="#008080">&gt;</font>无<font color="#008080">&lt;/</font><font color="#804040"><b>option</b></font><font color="#008080">&gt;</font><br>
-<font color="#804040">13 </font><br>
-<font color="#804040">14 </font><font color="#008080">&lt;</font><font color="#804040"><b>option</b></font><font color="#008080">&nbsp;</font><font color="#2e8b57"><b>id</b></font><font color="#008080">=</font><font color="#ff00ff">&quot;s2&quot;</font><font color="#008080">&nbsp;</font><font color="#2e8b57"><b>value</b></font><font color="#008080">=</font><font color="#ff00ff">&quot;123&quot;</font><font color="#008080">&gt;</font>123<font color="#008080">&lt;/</font><font color="#804040"><b>option</b></font><font color="#008080">&gt;</font><br>
-<font color="#804040">15 </font><br>
-<font color="#804040">16 </font><font color="#008080">&lt;</font><font color="#804040"><b>option</b></font><font color="#008080">&nbsp;</font><font color="#2e8b57"><b>id</b></font><font color="#008080">=</font><font color="#ff00ff">&quot;s3&quot;</font><font color="#008080">&nbsp;</font><font color="#2e8b57"><b>value</b></font><font color="#008080">=</font><font color="#ff00ff">&quot;abc&quot;</font><font color="#008080">&gt;</font>abc<font color="#008080">&lt;/</font><font color="#804040"><b>option</b></font><font color="#008080">&gt;</font><br>
-<font color="#804040">17 </font><br>
-<font color="#804040">18 </font><font color="#008080">&lt;</font><font color="#804040"><b>option</b></font><font color="#008080">&nbsp;</font><font color="#2e8b57"><b>id</b></font><font color="#008080">=</font><font color="#ff00ff">&quot;s4&quot;</font><font color="#008080">&nbsp;</font><font color="#2e8b57"><b>value</b></font><font color="#008080">=</font><font color="#ff00ff">&quot;34dfd@&quot;</font><font color="#008080">&gt;</font>34dfd@<font color="#008080">&lt;/</font><font color="#804040"><b>option</b></font><font color="#008080">&gt;</font><br>
-<font color="#804040">19 </font><br>
-<font color="#804040">20 </font><font color="#008080">&lt;/</font><font color="#804040"><b>select</b></font><font color="#008080">&gt;</font><font color="#008080">&lt;</font><font color="#804040"><b>span</b></font><font color="#008080">&nbsp;</font><font color="#2e8b57"><b>id</b></font><font color="#008080">=</font><font color="#ff00ff">&quot;show&quot;</font><font color="#008080">&gt;</font><font color="#008080">&lt;/</font><font color="#804040"><b>span</b></font><font color="#008080">&gt;</font><br>
-<font color="#804040">21 </font><br>
-<font color="#804040">22 </font><font color="#008080">&lt;/</font><font color="#804040"><b>td</b></font><font color="#008080">&gt;&lt;/</font><font color="#804040"><b>tr</b></font><font color="#008080">&gt;</font><br>
-<font color="#804040">23 </font><br>
-<font color="#804040">24 </font><font color="#008080">&lt;/</font><font color="#804040"><b>table</b></font><font color="#008080">&gt;</font><br>
-<font color="#804040">25 </font><br>
-<font color="#804040">26 </font><font color="#008080">&lt;/</font><font color="#804040"><b>form</b></font><font color="#008080">&gt;</font><br>
-<font color="#804040">27 </font><br>
-<font color="#804040">28 </font><font color="#008080">&lt;/</font><font color="#804040"><b>body</b></font><font color="#008080">&gt;</font><br>
-<font color="#804040">29 </font><br>
-<font color="#804040">30 </font><font color="#008080">&lt;/</font><font color="#804040"><b>html</b></font><font color="#008080">&gt;</font><br>
-<font color="#804040">31 </font><br>
-<font color="#804040">32 </font><font color="#008080">&lt;</font><font color="#804040"><b>script</b></font><font color="#008080">&nbsp;</font><font color="#2e8b57"><b>language</b></font><font color="#008080">=</font><font color="#ff00ff">&quot;javascript&quot;</font><font color="#008080">&gt;</font><br>
-<font color="#804040">33 </font><br>
-<font color="#804040">34 </font><font color="#008080">var</font><font color="#6a5acd">&nbsp;xmlHttp;</font><br>
-<font color="#804040">35 </font><br>
-<font color="#804040">36 </font><font color="#008080">function</font><font color="#6a5acd">&nbsp;valideMail</font>(<font color="#6a5acd">obj</font>)<font color="#6a5acd">&nbsp;</font><font color="#008080">{</font><br>
-<font color="#804040">37 </font><br>
-<font color="#804040">38 </font><font color="#0000ff">//var email = document.getElementById(&quot;eMail&quot;);</font><br>
-<font color="#804040">39 </font><br>
-<font color="#804040">40 </font><font color="#008080">var</font><font color="#6a5acd">&nbsp;url = </font><font color="#ff00ff">&quot;mail.php?email=&quot;</font><font color="#6a5acd">&nbsp;+ obj.value;</font><br>
-<font color="#804040">41 </font><br>
-<font color="#804040">42 </font><font color="#804040"><b>if</b></font><font color="#6a5acd">&nbsp;</font>(<font color="#804040"><b>window</b></font><font color="#6a5acd">.ActiveXObject</font>)<font color="#6a5acd">&nbsp;</font><font color="#008080">{</font><br>
-<font color="#804040">43 </font><br>
-<font color="#804040">44 </font><font color="#6a5acd">xmlHttp = </font><font color="#804040"><b>new</b></font><font color="#6a5acd">&nbsp;ActiveXObject</font>(<font color="#ff00ff">&quot;Microsoft.XMLHTTP&quot;</font>)<font color="#6a5acd">;</font><br>
-<font color="#804040">45 </font><br>
-<font color="#804040">46 </font><font color="#008080">}</font><font color="#6a5acd">&nbsp;</font><font color="#804040"><b>else</b></font><font color="#6a5acd">&nbsp;</font><font color="#804040"><b>if</b></font><font color="#6a5acd">&nbsp;</font>(<font color="#804040"><b>window</b></font><font color="#6a5acd">.XMLHttpRequest</font>)<font color="#6a5acd">&nbsp;</font><font color="#008080">{</font><br>
-<font color="#804040">47 </font><br>
-<font color="#804040">48 </font><font color="#6a5acd">xmlHttp = </font><font color="#804040"><b>new</b></font><font color="#6a5acd">&nbsp;XMLHttpRequest</font>()<font color="#6a5acd">;</font><br>
-<font color="#804040">49 </font><br>
-<font color="#804040">50 </font><font color="#008080">}</font><br>
-<font color="#804040">51 </font><br>
-<font color="#804040">52 </font><font color="#6a5acd">xmlHttp.onreadystatechange = callBack;</font><br>
-<font color="#804040">53 </font><br>
-<font color="#804040">54 </font><font color="#6a5acd">xmlHttp.open</font>(<font color="#ff00ff">&lsquo;GET&rsquo;</font><font color="#6a5acd">, url, </font><font color="#ff00ff">true</font>)<font color="#6a5acd">;</font><br>
-<font color="#804040">55 </font><br>
-<font color="#804040">56 </font><font color="#6a5acd">xmlHttp.send</font>(<font color="#804040"><b>null</b></font>)<font color="#6a5acd">;</font><br>
-<font color="#804040">57 </font><br>
-<font color="#804040">58 </font><font color="#008080">}</font><br>
-<font color="#804040">59 </font><br>
-<font color="#804040">60 </font><font color="#008080">function</font><font color="#6a5acd">&nbsp;callBack</font>()<font color="#6a5acd">&nbsp;</font><font color="#008080">{</font><br>
-<font color="#804040">61 </font><br>
-<font color="#804040">62 </font><font color="#804040"><b>if</b></font><font color="#6a5acd">&nbsp;</font>(<font color="#6a5acd">xmlHttp.readyState == </font>4)<font color="#6a5acd">&nbsp;</font><font color="#008080">{</font><br>
-<font color="#804040">63 </font><br>
-<font color="#804040">64 </font><font color="#804040"><b>if</b></font><font color="#6a5acd">&nbsp;</font>(<font color="#6a5acd">xmlHttp.</font><font color="#804040"><b>status</b></font><font color="#6a5acd">&nbsp;== </font>200)<font color="#6a5acd">&nbsp;</font><font color="#008080">{</font><br>
-<font color="#804040">65 </font><br>
-<font color="#804040">66 </font><font color="#804040"><b>document</b></font><font color="#6a5acd">.getElementById</font>(<font color="#ff00ff">&quot;show&quot;</font>)<font color="#6a5acd">.innerHTML = </font><font color="#ff00ff">&quot;show:&quot;</font><font color="#6a5acd">&nbsp;+ xmlHttp.responseText;</font><br>
-<font color="#804040">67 </font><br>
-<font color="#804040">68 </font><font color="#008080">}</font><br>
-<font color="#804040">69 </font><br>
-<font color="#804040">70 </font><font color="#008080">}</font><br>
-<font color="#804040">71 </font><br>
-<font color="#804040">72 </font><font color="#008080">}</font><br>
-<font color="#804040">73 </font><br>
-<font color="#804040">74 </font><font color="#008080">&lt;/</font><font color="#804040"><b>script</b></font><font color="#008080">&gt;</font><br></p>
-
-<p><strong>mail.php</strong>文件内容如下：</p>
-
-<p><font color="#804040">&nbsp;1 </font><font color="#6a5acd">&lt;?php</font><br>
-<font color="#804040">&nbsp;2 </font><br>
-<font color="#804040">&nbsp;3 </font><font color="#804040"><b>$</b></font><font color="#008080">email</font>&nbsp;<font color="#804040"><b>=</b></font>&nbsp;<font color="#804040"><b>$</b></font><font color="#008080">_GET</font><font color="#6a5acd">[</font>&quot;<font color="#ff00ff">email</font>&quot;<font color="#6a5acd">]</font>;<br>
-<font color="#804040">&nbsp;4 </font><br>
-<font color="#804040">&nbsp;5 </font><font color="#804040"><b>if</b></font>&nbsp;<font color="#6a5acd">(</font><font color="#804040"><b>$</b></font><font color="#008080">email</font>&nbsp;<font color="#804040"><b>==</b></font>&nbsp;&quot;&quot;<font color="#6a5acd">)</font>&nbsp;<font color="#6a5acd">{</font><br>
-<font color="#804040">&nbsp;6 </font><br>
-<font color="#804040">&nbsp;7 </font><font color="#804040"><b>$</b></font><font color="#008080">email</font>&nbsp;<font color="#804040"><b>=</b></font>&nbsp;&quot;<font color="#ff00ff">rrrrrrrrrrrrrrrrrr !</font>&quot;;<br>
-<font color="#804040">&nbsp;8 </font><br>
-<font color="#804040">&nbsp;9 </font><font color="#6a5acd">}</font><br>
-<font color="#804040">10 </font><br>
-<font color="#804040">11 </font><font color="#a020f0">echo</font>&nbsp;<font color="#6a5acd">(</font><font color="#804040"><b>$</b></font><font color="#008080">email</font><font color="#6a5acd">)</font>;<br>
-<font color="#804040">12 </font><br>
-<font color="#804040">13 </font><font color="#804040"><b>exit</b></font><font color="#6a5acd">(</font><font color="#ff00ff">0</font><font color="#6a5acd">)</font>;<br>
-<font color="#804040">14 </font><br>
-<font color="#804040">15 </font><font color="#6a5acd">?&gt;</font><br></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/page/20">&larr; Older</a>
@@ -2045,6 +2060,10 @@ md5:eb80322f7da800196cb77d79d7e7d6a2<br/>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="http://www.xefan.com/archives/84161.html">Mac OS中VirtualBox的Android蓝牙设置</a>
+      </li>
+    
+      <li class="post">
         <a href="http://www.xefan.com/archives/84160.html">gulp+browserSync配置</a>
       </li>
     
@@ -2060,19 +2079,15 @@ md5:eb80322f7da800196cb77d79d7e7d6a2<br/>
         <a href="http://www.xefan.com/archives/84157.html">Javascript使用async进行流程控制</a>
       </li>
     
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84156.html">AngularJS学习笔记7——与rails整合</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (32)</a></li><li><a href='/categories/web开发/index.html'>web开发 (20)</a></li><li><a href='/categories/前端相关/index.html'>前端相关 (10)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (16)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (38)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (24)</a></li></ul>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (32)</a></li><li><a href='/categories/web开发/index.html'>web开发 (20)</a></li><li><a href='/categories/前端相关/index.html'>前端相关 (10)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (16)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (39)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (24)</a></li></ul>
 </section>
 <section>
   <h1>Tag Cloud</h1>
-    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 102.68656716417911%'>ajax(3)</a> <a href='/tags/angular/index.html' style='font-size: 106.26865671641791%'>angular(7)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/gulp/index.html' style='font-size: 100.8955223880597%'>gulp(1)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 109.85074626865672%'>js(11)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mac/index.html' style='font-size: 100.8955223880597%'>Mac(1)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 129.55223880597015%'>Ruby(33)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xcode/index.html' style='font-size: 100.8955223880597%'>Xcode(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 123.28358208955224%'>翻译(26)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 102.68656716417911%'>ajax(3)</a> <a href='/tags/android/index.html' style='font-size: 100.8955223880597%'>Android(1)</a> <a href='/tags/angular/index.html' style='font-size: 106.26865671641791%'>angular(7)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/gulp/index.html' style='font-size: 100.8955223880597%'>gulp(1)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 109.85074626865672%'>js(11)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mac/index.html' style='font-size: 100.8955223880597%'>Mac(1)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 129.55223880597015%'>Ruby(33)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xcode/index.html' style='font-size: 100.8955223880597%'>Xcode(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 123.28358208955224%'>翻译(26)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
 </section>
 <section>
   <h1>Link</h1>
