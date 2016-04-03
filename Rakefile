@@ -93,6 +93,27 @@ task :preview do
   [jekyllPid, compassPid, rackupPid].each { |pid| Process.wait(pid) }
 end
 
+# usage rake new_image
+desc "Add a new image in #{source_dir}/wp-content/uploads"
+task :new_image, :filename do |t, args|
+  if !args.filename || !File.exists?(args.filename)
+    raise "filename must be exist"
+  end
+
+  last_post = Dir['source/_posts/*'][-1]
+  if last_post
+    date = File.basename(last_post).split('-')[0, 3]
+  else
+    date = Time.now.utc.strftime('%Y-%m-%d').split('-')
+  end
+
+  basename = File.basename args.filename
+  dest_dir = "#{source_dir}/wp-content/uploads/#{date[0]}/#{date[1]}/#{date[2]}"
+  mkdir_p dest_dir
+  puts "-> #{dest_dir}/#{basename}"
+  FileUtils.copy args.filename, dest_dir
+end
+
 # usage rake new_post[my-new-post] or rake new_post['my new post'] or rake new_post (defaults to "new-post")
 desc "Begin a new post in #{source_dir}/#{posts_dir}"
 task :new_post, :title do |t, args|
