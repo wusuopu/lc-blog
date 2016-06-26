@@ -9,18 +9,9 @@
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="在开发 ReactNative 应用时，jsbundle 有两种加载方式。第一种是指定 url 通过网络进行加载；第二种是 pre-bundled 将 jsbundle 文件打包进 app 安装包中。 以下就是创建项目之后 ios 的默认配置。 1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12 &hellip;">
+  <meta name="description" content="在上一篇文章中介绍了 RN(ReactNative) 自动设置 development server IP 的方法。
+这在开发过程中方便了不少，然而我在想能否更加方便一些呢。首先我们知道在开发 RN 应用时，jsbundle 有两种加载方式。
+第一种是指定 url 通过网络进行加载；第二种是 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -77,6 +68,167 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84163.html">ReactNative Jsbundle管理</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-06-26T12:02:30+08:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>26</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>12:02 pm</span></time>
+        
+           | <a href="http://www.xefan.com/archives/84163.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/84163.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在<a href="http://www.xefan.com/archives/84162.html">上一篇文章</a>中介绍了 RN(ReactNative) 自动设置 development server IP 的方法。
+这在开发过程中方便了不少，然而我在想能否更加方便一些呢。首先我们知道在开发 RN 应用时，jsbundle 有两种加载方式。
+第一种是指定 url 通过网络进行加载；第二种是 pre-bundled 将 jsbundle 文件打包进 app 安装包中。
+编译生成的安装包有 Debug 和 Release 两种模式，在 Debug 模式下默认是使用第一种方式加载 jsbundle，在 Release 模式下默认是使用第二种方式。</p>
+
+<p>现在我的需求是编译生成三种模式的安装包：Debug、Release 和 Stage。前两种跟之前一样，
+而 Stage 模式下是使用第二种方式加载 jsbundle， 但是生成的 jsbundle 是 DEV 状态下的。
+这样在开发过程中给他人安装app进行测试时就不需要反复的修改配置了。</p>
+
+<h2>修改 Android 的配置</h2>
+
+<p>对于的 android 的配置比较简单。只需修改 <code>android/app/build.gradle</code> 文件，新添加一个 <code>buildTypes</code> 即可。</p>
+
+<p>在 <code>apply from: "react.gradle"</code> 之前添加如下内容：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>project.ext.react = [
+</span><span class='line'>  bundleInStage: true
+</span><span class='line'>]
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后再修改配置如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>android {
+</span><span class='line'>    buildTypes {
+</span><span class='line'>        debug {
+</span><span class='line'>            applicationIdSuffix ".debug"
+</span><span class='line'>            resValue 'string', 'app_name', '"XXXX(Debug)"'
+</span><span class='line'>            ......
+</span><span class='line'>        }
+</span><span class='line'>        release {
+</span><span class='line'>            minifyEnabled enableProguardInReleaseBuilds
+</span><span class='line'>            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+</span><span class='line'>            resValue 'string', 'app_name', '"XXXX"'
+</span><span class='line'>            ......
+</span><span class='line'>        }
+</span><span class='line'>        stage {
+</span><span class='line'>            initWith(buildTypes.debug)
+</span><span class='line'>            applicationIdSuffix ".stage"
+</span><span class='line'>            resValue 'string', 'app_name', '"XXXX(Stage)"'
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这里添加了一个 <code>stage</code> buildTypes 继承至 <code>debug</code>。并且为了能够同时安装不同模式下的app，这里设置了不同模式 bundleID 的后缀。
+同时还设置了不同模式下app的名称，以便区分。</p>
+
+<p>然后进行 <code>android</code> 目录下执行 <code>./gradlew assemble</code> 命令，即可在 <code>android/app/build/outputs/apk</code> 目录生成 app-debug.apk、app-release.apk 和 app-stage.apk 三个 apk 包。</p>
+
+<h2>修改 iOS 的配置</h2>
+
+<p>首先将 Debug Configuration 复制为 Stage
+<img src="/wp-content/uploads/2016/06/26/Xcode-configuration.png" alt="Xcode-configuration" /></p>
+
+<p>然后进入 <code>Build Settings</code> 修改 <code>Preprocessor Macros</code>，对 <code>Stage</code> 添加一项配置： <code>STAGE=1</code>
+<img src="/wp-content/uploads/2017/06/26/Xcode-buildSettings.png" alt="Xcode-buildSettings" /></p>
+
+<p>然后再编辑 <code>AppDelegate.m</code> 文件，修改 <code>jsCodeLocation</code> 相关配置。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#if STAGE
+</span><span class='line'>#warning "STAGE"
+</span><span class='line'>  jsCodeLocation = [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
+</span><span class='line'>#elif DEBUG
+</span><span class='line'>#if TARGET_OS_SIMULATOR
+</span><span class='line'>#warning "DEBUG SIMULATOR"
+</span><span class='line'>  jsCodeLocation = [NSURL URLWithString:@"http://localhost:8081/index.ios.bundle?platform=ios&dev=true"];
+</span><span class='line'>#else
+</span><span class='line'>#warning "DEBUG DEVICE"
+</span><span class='line'>  NSString *serverIP = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"SERVER_IP"];
+</span><span class='line'>  NSString *jsCodeUrlString = [NSString stringWithFormat:@"http://%@:8081/index.ios.bundle?platform=ios&dev=true", serverIP];
+</span><span class='line'>  NSString *jsBundleUrlString = [jsCodeUrlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+</span><span class='line'>  jsCodeLocation = [NSURL URLWithString:jsBundleUrlString];
+</span><span class='line'>#endif
+</span><span class='line'>#else
+</span><span class='line'>#warning "PRODUCTION DEVICE"
+</span><span class='line'>  jsCodeLocation = [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
+</span><span class='line'>#endif</span></code></pre></td></tr></table></div></figure>
+
+
+<p>为了能够同时安装多个应用，还需要设置各个模式下的 Bundle Identifier。进入 <code>Build Settings</code> -> <code>Packaging</code> -> <code>Product Bundle Identifier</code>
+<img src="/wp-content/uploads/2017/06/26/Xcode-bundleID.png" alt="Xcode-bundleID" /></p>
+
+<p>为了便于区分，最好给各个模式下的应用设置不同的AppName。进入 <code>Build Settings</code> -> <code>User-Defined</code>，添加一项设置
+<img src="/wp-content/uploads/2017/06/26/Xcode-User-Defined.png" alt="Xcode-User-Defined" /></p>
+
+<p>然后再进入 <code>Info</code>，设置 <code>CFBundleDisplayName</code> 的值为 <code>$(BUNDLE_DISPLAY_NAME)</code></p>
+
+<p>至此，配置已经修改完成。如果之前有使用 cocoapods 安装过第三方库的话，那么可能还需要再重新安装一遍。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1299,131 +1451,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84153.html">Mac下使用supervisor进行服务管理</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-08-22T17:32:32+08:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2015</span></span> <span class='time'>5:32 pm</span></time>
-        
-           | <a href="http://www.xefan.com/archives/84153.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/84153.html">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>最近刚切换到 Mac 平台上，感觉各种不适应。之前使用 Ubuntu 时，有 service 命令可以对服务进行管理，
-但是在 Mac 系统下没有对应的工具。也许有人说可以用 launchctl 啊。但是 launchctl 的服务是开机自动启动的，
-而我又不想要开机自动启动，只想在需要时启动，使用完后就停止。</p>
-
-<p>由于没有相应的工具，因此我只得在终端下通过命令来启动服务，但是这个又得一直打开着一个新的终端标签。
-对于有洁癖的我来说，表示很不爽。本来想自己写个脚本来管理的，但是这个又得针对每个服务写个脚本，也很麻烦。
-正在纠结的时候想起了还有 supervisor 可以用。</p>
-
-<p>supervisor 是使用 python 开发的一个后台服务管理程序。</p>
-
-<p>首先使用 brew 安装 python 工具： <code>brew install python</code>，并覆盖掉系统自带的 python。
-因为我有洁癖不想将软件安装在系统目录中，因此就再单独安装一个 python。
-若对此不在意的可跳过此步。</p>
-
-<p>然后再安装 supervisor： <code>pip install supervisor</code>。
-supervisor 不支持 python3，并且如果你使用的是系统自带的 python ，可能需要在命令前加上 sudo。</p>
-
-<p>安装完成之后默认是不会创建配置文件的，因此再手动创建配置文件 <code>/usr/local/etc/supervisord.conf</code>，我的配置如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>[unix_http_server]
-</span><span class='line'>file=/tmp/supervisor.sock                                 ; path to your socket file
-</span><span class='line'>
-</span><span class='line'>[supervisord]
-</span><span class='line'>logfile=/usr/local/var/log/supervisord/supervisord.log    ; supervisord log file
-</span><span class='line'>logfile_maxbytes=50MB                                     ; maximum size of logfile before rotation
-</span><span class='line'>logfile_backups=10                                        ; number of backed up logfiles
-</span><span class='line'>loglevel=error                                            ; info, debug, warn, trace
-</span><span class='line'>pidfile=/usr/local/var/run/supervisord.pid                ; pidfile location
-</span><span class='line'>nodaemon=false                                            ; run supervisord as a daemon
-</span><span class='line'>minfds=1024                                               ; number of startup file descriptors
-</span><span class='line'>minprocs=200                                              ; number of process descriptors
-</span><span class='line'>user=root                                                 ; default user
-</span><span class='line'>childlogdir=/usr/local/var/log/supervisord/               ; where child log files will live
-</span><span class='line'>
-</span><span class='line'>[rpcinterface:supervisor]
-</span><span class='line'>supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
-</span><span class='line'>
-</span><span class='line'>[supervisorctl]
-</span><span class='line'>serverurl=unix:///tmp/supervisor.sock                     ; use a unix:// URL  for a unix socket
-</span><span class='line'>
-</span><span class='line'>[program:mongod]
-</span><span class='line'>command=/usr/local/bin/mongod --config /usr/local/etc/mongod.conf
-</span><span class='line'>autostart=false
-</span><span class='line'>autorestart=true
-</span><span class='line'>
-</span><span class='line'>[program:redis]
-</span><span class='line'>command=/usr/local/bin/redis-server /usr/local/etc/redis.conf
-</span><span class='line'>autostart=false
-</span><span class='line'>autorestart=true
-</span><span class='line'>
-</span><span class='line'>[program:nginx]
-</span><span class='line'>command=/usr/local/bin/nginx -c /usr/local/etc/nginx/nginx.conf
-</span><span class='line'>autostart=false
-</span><span class='line'>autorestart=true</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这里我的这几个服务都没有设置为自动启动，如有需要可自行将 <code>autostart</code> 设置为 true。</p>
-
-<p>最后执行 <code>supervisord</code> 命令启动 supervisor 服务。之后就可以通过 <code>supervisorctl</code> 命令来进行服务管理了。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/page/2">&larr; Older</a>
@@ -1443,6 +1470,10 @@ supervisor 不支持 python3，并且如果你使用的是系统自带的 python
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="http://www.xefan.com/archives/84163.html">ReactNative Jsbundle管理</a>
+      </li>
+    
+      <li class="post">
         <a href="http://www.xefan.com/archives/84162.html">ReactNative自动设置开发服务器IP</a>
       </li>
     
@@ -1458,19 +1489,15 @@ supervisor 不支持 python3，并且如果你使用的是系统自带的 python
         <a href="http://www.xefan.com/archives/84159.html">HTTP Access Control跨域请求</a>
       </li>
     
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84158.html">Xcode文档离线安装</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (32)</a></li><li><a href='/categories/web开发/index.html'>web开发 (20)</a></li><li><a href='/categories/前端相关/index.html'>前端相关 (10)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (16)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (40)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (24)</a></li></ul>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (32)</a></li><li><a href='/categories/web开发/index.html'>web开发 (20)</a></li><li><a href='/categories/前端相关/index.html'>前端相关 (10)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (16)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (41)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (24)</a></li></ul>
 </section>
 <section>
   <h1>Tag Cloud</h1>
-    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 102.68656716417911%'>ajax(3)</a> <a href='/tags/android/index.html' style='font-size: 100.8955223880597%'>Android(1)</a> <a href='/tags/angular/index.html' style='font-size: 106.26865671641791%'>angular(7)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/gulp/index.html' style='font-size: 100.8955223880597%'>gulp(1)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 109.85074626865672%'>js(11)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mac/index.html' style='font-size: 100.8955223880597%'>Mac(1)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/react/index.html' style='font-size: 100.8955223880597%'>react(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 129.55223880597015%'>Ruby(33)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xcode/index.html' style='font-size: 100.8955223880597%'>Xcode(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 123.28358208955224%'>翻译(26)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 102.68656716417911%'>ajax(3)</a> <a href='/tags/android/index.html' style='font-size: 100.8955223880597%'>Android(1)</a> <a href='/tags/angular/index.html' style='font-size: 106.26865671641791%'>angular(7)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/gulp/index.html' style='font-size: 100.8955223880597%'>gulp(1)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 109.85074626865672%'>js(11)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mac/index.html' style='font-size: 100.8955223880597%'>Mac(1)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/react/index.html' style='font-size: 101.7910447761194%'>react(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 129.55223880597015%'>Ruby(33)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xcode/index.html' style='font-size: 100.8955223880597%'>Xcode(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 123.28358208955224%'>翻译(26)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
 </section>
 <section>
   <h1>Link</h1>

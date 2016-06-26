@@ -4,7 +4,7 @@
   <title><![CDATA[龍昌博客]]></title>
   <link href="http://www.xefan.com/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2016-06-18T22:29:12+08:00</updated>
+  <updated>2016-06-26T13:08:06+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -12,6 +12,144 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[ReactNative Jsbundle管理]]></title>
+    <link href="http://www.xefan.com/archives/84163.html"/>
+    <updated>2016-06-26T12:02:30+08:00</updated>
+    <id>http://www.xefan.com/archives/84163-ReactNative jsbundle管理</id>
+    <content type="html"><![CDATA[<p>在<a href="http://www.xefan.com/archives/84162.html">上一篇文章</a>中介绍了 RN(ReactNative) 自动设置 development server IP 的方法。
+这在开发过程中方便了不少，然而我在想能否更加方便一些呢。首先我们知道在开发 RN 应用时，jsbundle 有两种加载方式。
+第一种是指定 url 通过网络进行加载；第二种是 pre-bundled 将 jsbundle 文件打包进 app 安装包中。
+编译生成的安装包有 Debug 和 Release 两种模式，在 Debug 模式下默认是使用第一种方式加载 jsbundle，在 Release 模式下默认是使用第二种方式。</p>
+
+<p>现在我的需求是编译生成三种模式的安装包：Debug、Release 和 Stage。前两种跟之前一样，
+而 Stage 模式下是使用第二种方式加载 jsbundle， 但是生成的 jsbundle 是 DEV 状态下的。
+这样在开发过程中给他人安装app进行测试时就不需要反复的修改配置了。</p>
+
+<h2>修改 Android 的配置</h2>
+
+<p>对于的 android 的配置比较简单。只需修改 <code>android/app/build.gradle</code> 文件，新添加一个 <code>buildTypes</code> 即可。</p>
+
+<p>在 <code>apply from: "react.gradle"</code> 之前添加如下内容：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>project.ext.react = [
+</span><span class='line'>  bundleInStage: true
+</span><span class='line'>]
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后再修改配置如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>android {
+</span><span class='line'>    buildTypes {
+</span><span class='line'>        debug {
+</span><span class='line'>            applicationIdSuffix ".debug"
+</span><span class='line'>            resValue 'string', 'app_name', '"XXXX(Debug)"'
+</span><span class='line'>            ......
+</span><span class='line'>        }
+</span><span class='line'>        release {
+</span><span class='line'>            minifyEnabled enableProguardInReleaseBuilds
+</span><span class='line'>            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+</span><span class='line'>            resValue 'string', 'app_name', '"XXXX"'
+</span><span class='line'>            ......
+</span><span class='line'>        }
+</span><span class='line'>        stage {
+</span><span class='line'>            initWith(buildTypes.debug)
+</span><span class='line'>            applicationIdSuffix ".stage"
+</span><span class='line'>            resValue 'string', 'app_name', '"XXXX(Stage)"'
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这里添加了一个 <code>stage</code> buildTypes 继承至 <code>debug</code>。并且为了能够同时安装不同模式下的app，这里设置了不同模式 bundleID 的后缀。
+同时还设置了不同模式下app的名称，以便区分。</p>
+
+<p>然后进行 <code>android</code> 目录下执行 <code>./gradlew assemble</code> 命令，即可在 <code>android/app/build/outputs/apk</code> 目录生成 app-debug.apk、app-release.apk 和 app-stage.apk 三个 apk 包。</p>
+
+<h2>修改 iOS 的配置</h2>
+
+<p>首先将 Debug Configuration 复制为 Stage
+<img src="http://www.xefan.com/wp-content/uploads/2016/06/26/Xcode-configuration.png" alt="Xcode-configuration" /></p>
+
+<p>然后进入 <code>Build Settings</code> 修改 <code>Preprocessor Macros</code>，对 <code>Stage</code> 添加一项配置： <code>STAGE=1</code>
+<img src="http://www.xefan.com/wp-content/uploads/2017/06/26/Xcode-buildSettings.png" alt="Xcode-buildSettings" /></p>
+
+<p>然后再编辑 <code>AppDelegate.m</code> 文件，修改 <code>jsCodeLocation</code> 相关配置。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#if STAGE
+</span><span class='line'>#warning "STAGE"
+</span><span class='line'>  jsCodeLocation = [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
+</span><span class='line'>#elif DEBUG
+</span><span class='line'>#if TARGET_OS_SIMULATOR
+</span><span class='line'>#warning "DEBUG SIMULATOR"
+</span><span class='line'>  jsCodeLocation = [NSURL URLWithString:@"http://localhost:8081/index.ios.bundle?platform=ios&dev=true"];
+</span><span class='line'>#else
+</span><span class='line'>#warning "DEBUG DEVICE"
+</span><span class='line'>  NSString *serverIP = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"SERVER_IP"];
+</span><span class='line'>  NSString *jsCodeUrlString = [NSString stringWithFormat:@"http://%@:8081/index.ios.bundle?platform=ios&dev=true", serverIP];
+</span><span class='line'>  NSString *jsBundleUrlString = [jsCodeUrlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+</span><span class='line'>  jsCodeLocation = [NSURL URLWithString:jsBundleUrlString];
+</span><span class='line'>#endif
+</span><span class='line'>#else
+</span><span class='line'>#warning "PRODUCTION DEVICE"
+</span><span class='line'>  jsCodeLocation = [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
+</span><span class='line'>#endif</span></code></pre></td></tr></table></div></figure>
+
+
+<p>为了能够同时安装多个应用，还需要设置各个模式下的 Bundle Identifier。进入 <code>Build Settings</code> -> <code>Packaging</code> -> <code>Product Bundle Identifier</code>
+<img src="http://www.xefan.com/wp-content/uploads/2017/06/26/Xcode-bundleID.png" alt="Xcode-bundleID" /></p>
+
+<p>为了便于区分，最好给各个模式下的应用设置不同的AppName。进入 <code>Build Settings</code> -> <code>User-Defined</code>，添加一项设置
+<img src="http://www.xefan.com/wp-content/uploads/2017/06/26/Xcode-User-Defined.png" alt="Xcode-User-Defined" /></p>
+
+<p>然后再进入 <code>Info</code>，设置 <code>CFBundleDisplayName</code> 的值为 <code>$(BUNDLE_DISPLAY_NAME)</code></p>
+
+<p>至此，配置已经修改完成。如果之前有使用 cocoapods 安装过第三方库的话，那么可能还需要再重新安装一遍。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[ReactNative自动设置开发服务器IP]]></title>
@@ -2219,779 +2357,6 @@ Matz详细讨论了静态类型，但没有提到并行计算。详细的内容�
 
 <p>好了，我只看懂了这么多。其余的各位感兴趣的自己去看原文吧。
 (怎么感觉好坑啊，这总结得跟没总结一样啊。没办法了我的日语水平有限。)</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Ruby中一些重要的钩子方法]]></title>
-    <link href="http://www.xefan.com/archives/84143.html"/>
-    <updated>2015-04-30T22:35:42+08:00</updated>
-    <id>http://www.xefan.com/archives/84143-Ruby中一些重要的钩子方法</id>
-    <content type="html"><![CDATA[<p>Ruby的哲学理念是基于一个基本的要素，那就是让程序员快乐。Ruby非常注重程序员的快乐，并且也提供了许多不同的方法来实现它。
-它的元编程能力能够让程序员编写在运行时动态生成的代码。它的线程功能使得程序员有一种优雅的的方式编写多线程代码。
-它的钩子方法能让程序员在程序运行时扩展它的行为。</p>
-
-<p>上述的这些特性，以及一些其他很酷的语言方面，使得Ruby成为编写代码的优先选择之一。
-本文将探讨Ruby中的一些重要的钩子方法。我们将从不同方面讨论钩子方法，如它们是什么，它们用于什么，以及我们如何使用它们来解决不同的问题。
-我们同时也了解一下一些流行的Ruby框架/Gem包/库是如何使用它们来提供非常酷的特性的。</p>
-
-<p>我们开始吧。</p>
-
-<h1>什么是钩子方法？</h1>
-
-<p>钩子方法提供了一种方式用于在程序运行时扩展程序的行为。
-假设有这样的功能，可以在无论何时一个子类继承了一些特定的父类时收到通知，
-或者是比较优雅地处理一个对象上的不可调用的方法而不是让编译器抛出异常。
-这些情况就是使用钩子方法，但是它们的用法并不仅限于此。
-不同的框架/库使用了不同的钩子方法来实现它们的功能。</p>
-
-<p>在本文中我们将会讨论如下几个钩子方法：</p>
-
-<ul>
-<li>included</li>
-<li>extended</li>
-<li>prepended</li>
-<li>inherited</li>
-<li>method_missing</li>
-</ul>
-
-
-<h2>included</h2>
-
-<p>Ruby给我们提供了一种方式使用 <code>模块(modules)</code> （在其他语言中被称作 <code>混入类(mixins)</code>）来编写模块化的代码供其他的 <code>模块</code>/<code>类</code> 使用。
-<code>模块</code> 的概念很简单，它就是一个可以在其他地方使用的独立代码块。</p>
-
-<p>例如，如果我们想要编写一些代码在任何时候调用特定的方法都会返回一个静态字符串。
-我们姑且将这个方法称作 <code>name</code>。你可能在其他地方也会想使用同一块代码。
-这样最好是新建一个模块。让我们来创建一个：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Person</span>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">name</span>
-</span><span class='line'>    <span class="nb">puts</span> <span class="s2">&quot;My name is Person&quot;</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这是一个非常简单的模块，仅有一个 <code>name</code> 方法用于返回一个静态字符串。在我们的程序中使用这个模块：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">User</span>
-</span><span class='line'>  <span class="kp">include</span> <span class="no">Person</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Ruby提供了一些不同的方法来使用<code>模块</code>。<code>include</code> 是其中之一。<code>include</code> 所做的就是将在 <code>module</code> 内定义的方法在一个 <code>class</code> 的实例变量上可用。
-在我们的例子中，是将 <code>Person</code> 模块中定义的方法变为一个 <code>User</code> 类实例对象的方法。
-这就相当于我们是将 <code>name</code> 方法写在 <code>User</code> 类里一样，但是定义在 <code>module</code> 里的好处是可复用。
-要调用 <code>name</code> 方法我们需要创建一个 <code>User</code> 的实例对象，然后再在这个对象上调用 <code>name</code> 方法。例如：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">User</span><span class="o">.</span><span class="n">new</span><span class="o">.</span><span class="n">name</span>
-</span><span class='line'><span class="o">=&gt;</span> <span class="no">My</span> <span class="nb">name</span> <span class="n">is</span> <span class="no">Person</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>让我们看看基于 <code>include</code> 的钩子方法。<code>included</code> 是Ruby提供的一个钩子方法，当你在一些 <code>module</code> 或者 <code>class</code> 中 <code>include</code> 了一个 <code>module</code> 时它会被调用。
-更新 <code>Person</code> 模块：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Person</span>
-</span><span class='line'>  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">included</span><span class="p">(</span><span class="n">base</span><span class="p">)</span>
-</span><span class='line'>    <span class="nb">puts</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">base</span><span class="si">}</span><span class="s2"> included </span><span class="si">#{</span><span class="nb">self</span><span class="si">}</span><span class="s2">&quot;</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">name</span>
-</span><span class='line'>    <span class="s2">&quot;My name is Person&quot;</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>你可以看到一个新的方法 <code>included</code> 被定义为 <code>Person</code> 模块的类方法。当你在其他的模块或者类中执行 <code>include Person</code> 时，这个 <code>included</code> 方法会被调用。
-该方法接收的一个参数是对包含该模块的类的引用。试试运行 <code>User.new.name</code>，你会看到如下的输出：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">User</span> <span class="n">included</span> <span class="no">Person</span>
-</span><span class='line'><span class="no">My</span> <span class="nb">name</span> <span class="n">is</span> <span class="no">Person</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>正如你所见，<code>base</code> 返回的是包含该模块的类名。现在我们有了一个包含 <code>Person</code> 模块的类的引用，我们可以通过元编程来实现我们想要的功能。
-让我们来看看 <strong>Devise</strong>是如何使用 <code>included</code> 钩子的。</p>
-
-<h3>Devise中的 <code>included</code></h3>
-
-<p>Devise是Ruby中使用最广泛的身份验证gem包之一。它主要是由我喜欢的程序员 <a href="https://twitter.com/josevalim">José Valim</a> 开发的，现在是由一些了不起的贡献者在维护。
-Devise为我们提供了从注册到登录，从忘记密码到找回密码等等完善的功能。它可以让我们在用户模型中使用简单的语法来配置各种模块：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">devise</span> <span class="ss">:database_authenticatable</span><span class="p">,</span> <span class="ss">:registerable</span><span class="p">,</span> <span class="ss">:validatable</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>在我们模型中使用的 <code>devise</code> 方法在<a href="https://github.com/plataformatec/devise/blob/v3.4.1/lib/devise/models.rb#L77">这里</a>定义。
-为了方便我将这段代码粘贴在下面：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">devise</span><span class="p">(</span><span class="o">*</span><span class="n">modules</span><span class="p">)</span>
-</span><span class='line'>  <span class="n">options</span> <span class="o">=</span> <span class="n">modules</span><span class="o">.</span><span class="n">extract_options!</span><span class="o">.</span><span class="n">dup</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">selected_modules</span> <span class="o">=</span> <span class="n">modules</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:to_sym</span><span class="p">)</span><span class="o">.</span><span class="n">uniq</span><span class="o">.</span><span class="n">sort_by</span> <span class="k">do</span> <span class="o">|</span><span class="n">s</span><span class="o">|</span>
-</span><span class='line'>    <span class="no">Devise</span><span class="o">::</span><span class="no">ALL</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">||</span> <span class="o">-</span><span class="mi">1</span>  <span class="c1"># follow Devise::ALL order</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">devise_modules_hook!</span> <span class="k">do</span>
-</span><span class='line'>    <span class="kp">include</span> <span class="no">Devise</span><span class="o">::</span><span class="no">Models</span><span class="o">::</span><span class="no">Authenticatable</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">selected_modules</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">m</span><span class="o">|</span>
-</span><span class='line'>      <span class="n">mod</span> <span class="o">=</span> <span class="no">Devise</span><span class="o">::</span><span class="no">Models</span><span class="o">.</span><span class="n">const_get</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">to_s</span><span class="o">.</span><span class="n">classify</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="k">if</span> <span class="n">mod</span><span class="o">.</span><span class="n">const_defined?</span><span class="p">(</span><span class="s2">&quot;ClassMethods&quot;</span><span class="p">)</span>
-</span><span class='line'>        <span class="n">class_mod</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">const_get</span><span class="p">(</span><span class="s2">&quot;ClassMethods&quot;</span><span class="p">)</span>
-</span><span class='line'>        <span class="kp">extend</span> <span class="n">class_mod</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="k">if</span> <span class="n">class_mod</span><span class="o">.</span><span class="n">respond_to?</span><span class="p">(</span><span class="ss">:available_configs</span><span class="p">)</span>
-</span><span class='line'>          <span class="n">available_configs</span> <span class="o">=</span> <span class="n">class_mod</span><span class="o">.</span><span class="n">available_configs</span>
-</span><span class='line'>          <span class="n">available_configs</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
-</span><span class='line'>            <span class="k">next</span> <span class="k">unless</span> <span class="n">options</span><span class="o">.</span><span class="n">key?</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-</span><span class='line'>            <span class="nb">send</span><span class="p">(</span><span class="ss">:&quot;</span><span class="si">#{</span><span class="n">config</span><span class="si">}</span><span class="ss">=&quot;</span><span class="p">,</span> <span class="n">options</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">config</span><span class="p">))</span>
-</span><span class='line'>          <span class="k">end</span>
-</span><span class='line'>        <span class="k">end</span>
-</span><span class='line'>      <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="kp">include</span> <span class="n">mod</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nb">self</span><span class="o">.</span><span class="n">devise_modules</span> <span class="o">|=</span> <span class="n">selected_modules</span>
-</span><span class='line'>    <span class="n">options</span><span class="o">.</span><span class="n">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="o">|</span> <span class="nb">send</span><span class="p">(</span><span class="ss">:&quot;</span><span class="si">#{</span><span class="n">key</span><span class="si">}</span><span class="ss">=&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="p">}</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>在我们的模型中传给 <code>devise</code> 方法的模块名将会作为一个数组保存在 <code>*modules</code> 中。
-对于传入的模块调用 <code>extract_options!</code> 方法提取可能传入的选项。
-在11行中调用 <code>each</code> 方法，并且每个模块在代码块中用 <code>m</code> 表示。
-在12行中 <code>m</code> 将会转化为一个常量（类名），因此使用 <code>m.to.classify</code> 一个例如 <code>:validatable</code> 这样的符号会变为 <code>Validatable</code> 。
-随便说一下 <code>classify</code> 是ActiveSupport的方法。<br/>
-<code>Devise::Models.const_get(m.to_classify)</code> 会获取该模块的引用，并赋值给 <code>mod</code>。
-在27行使用 <code>include mod</code> 包含该模块。
-例子中的 <code>Validatable</code> 模块是定义在<a href="https://github.com/plataformatec/devise/blob/v3.4.1/lib/devise/models/validatable.rb">这里</a>。
-<code>Validatable</code> 的 <code>included</code> 钩子方法定义如下：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">included</span><span class="p">(</span><span class="n">base</span><span class="p">)</span>
-</span><span class='line'>  <span class="n">base</span><span class="o">.</span><span class="n">extend</span> <span class="no">ClassMethods</span>
-</span><span class='line'>  <span class="n">assert_validations_api!</span><span class="p">(</span><span class="n">base</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">base</span><span class="o">.</span><span class="n">class_eval</span> <span class="k">do</span>
-</span><span class='line'>    <span class="n">validates_presence_of</span>   <span class="ss">:email</span><span class="p">,</span> <span class="k">if</span><span class="p">:</span> <span class="ss">:email_required?</span>
-</span><span class='line'>    <span class="n">validates_uniqueness_of</span> <span class="ss">:email</span><span class="p">,</span> <span class="ss">allow_blank</span><span class="p">:</span> <span class="kp">true</span><span class="p">,</span> <span class="k">if</span><span class="p">:</span> <span class="ss">:email_changed?</span>
-</span><span class='line'>    <span class="n">validates_format_of</span>     <span class="ss">:email</span><span class="p">,</span> <span class="ss">with</span><span class="p">:</span> <span class="n">email_regexp</span><span class="p">,</span> <span class="ss">allow_blank</span><span class="p">:</span> <span class="kp">true</span><span class="p">,</span> <span class="k">if</span><span class="p">:</span> <span class="ss">:email_changed?</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">validates_presence_of</span>     <span class="ss">:password</span><span class="p">,</span> <span class="k">if</span><span class="p">:</span> <span class="ss">:password_required?</span>
-</span><span class='line'>    <span class="n">validates_confirmation_of</span> <span class="ss">:password</span><span class="p">,</span> <span class="k">if</span><span class="p">:</span> <span class="ss">:password_required?</span>
-</span><span class='line'>    <span class="n">validates_length_of</span>       <span class="ss">:password</span><span class="p">,</span> <span class="ss">within</span><span class="p">:</span> <span class="n">password_length</span><span class="p">,</span> <span class="ss">allow_blank</span><span class="p">:</span> <span class="kp">true</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>此时模型是 <code>base</code>。在第5行的 <code>class_eval</code> 代码块会以该类作为上下文进行求值运算。
-通过 <code>class_eval</code> 编写的代码与直接打开该类的文件将代码粘贴进去效果是一样的。
-Devise是通过 <code>class_eval</code> 将验证包含到我们的用户模型中的。</p>
-
-<p>当我们试着使用Devise注册或者登录时，我们会看到这些验证，但是我们并没有编写这些验证代码。
-Devise是利用了 <code>included</code> 钩子来实现这些的。非常的优雅吧。</p>
-
-<h2>extended</h2>
-
-<p>Ruby也允许开发者 <code>扩展(extend)</code> 一个模块，这与 <code>包含(include)</code> 有点不同。
-<code>extend</code> 是将定义在 <code>模块(module)</code> 内的方法应用为类的方法，而不是实例的方法。
-让我们来看一个简单的例子：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Person</span>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">name</span>
-</span><span class='line'>    <span class="s2">&quot;My name is Person&quot;</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">class</span> <span class="nc">User</span>
-</span><span class='line'>  <span class="kp">extend</span> <span class="no">Person</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="nb">puts</span> <span class="no">User</span><span class="o">.</span><span class="n">name</span> <span class="c1"># =&gt; My name is Person</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>正如你所看到的，我们将 <code>Person</code> 模块内定义的 <code>name</code> 方法作为了 <code>User</code> 的类方法调用。
-<code>extend</code> 将 <code>Person</code> 模块内的方法添加到了 <code>User</code> 类中。<code>extend</code> 同样也可以用于将模块内的方法作为单例方法(singleton methods)。
-让我们再来看另外一个例子：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># We are using same Person module and User class from previous example.     </span>
-</span><span class='line'>
-</span><span class='line'><span class="n">u1</span> <span class="o">=</span> <span class="no">User</span><span class="o">.</span><span class="n">new</span>
-</span><span class='line'><span class="n">u2</span> <span class="o">=</span> <span class="no">User</span><span class="o">.</span><span class="n">new</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">u1</span><span class="o">.</span><span class="n">extend</span> <span class="no">Person</span>
-</span><span class='line'>
-</span><span class='line'><span class="nb">puts</span> <span class="n">u1</span><span class="o">.</span><span class="n">name</span> <span class="c1"># =&gt; My name is Person</span>
-</span><span class='line'><span class="nb">puts</span> <span class="n">u2</span><span class="o">.</span><span class="n">name</span> <span class="c1"># =&gt; undefined method `name&#39; for #&lt;User:0x007fb8aaa2ab38&gt; (NoMethodError)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>我们创建了两个 <code>User</code> 的实例对象，并将 <code>Person</code> 作为参数在 <code>u1</code> 上调用 <code>extend</code> 方法。
-使用这种调用方式，<code>Person</code> 的 <code>name</code> 方法仅对 <code>u1</code> 有效，对于其他实例是无效的。</p>
-
-<p>正如 <code>included</code> 一样，与 <code>extend</code> 相对应的钩子方法是 <code>extended</code>。
-当一个模块被其他模块或者类执行了 <code>extend</code> 操作时，该方法将会被调用。
-让我们来看一个例子：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># Modified version of Person module</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">module</span> <span class="nn">Person</span>
-</span><span class='line'>  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">extended</span><span class="p">(</span><span class="n">base</span><span class="p">)</span>
-</span><span class='line'>    <span class="nb">puts</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">base</span><span class="si">}</span><span class="s2"> extended </span><span class="si">#{</span><span class="nb">self</span><span class="si">}</span><span class="s2">&quot;</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">name</span>
-</span><span class='line'>    <span class="s2">&quot;My name is Person&quot;</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">class</span> <span class="nc">User</span>
-</span><span class='line'>  <span class="kp">extend</span> <span class="no">Person</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>该代码的运行结果是输出 <code>User extended Person</code>。</p>
-
-<p>关于 <code>extended</code> 的介绍已经完了，让我们来看看 <code>ActiveRecord</code> 是如何使用它的。</p>
-
-<h3>ActiveRecord中的 <code>extended</code></h3>
-
-<p><code>ActiveRecord</code> 是在 Ruby 以及 Rails 中广泛使用的ORM框架。它具有许多酷的特性，
-因此使用它在很多情况下成为了ORM的首选。让我们进入 <code>ActiveRecord</code> 内部看看 <code>ActiveRecord</code> 是如何使用回调的。
-(我们使用的是 Rails v3.2.21)</p>
-
-<p><code>ActiveRecord</code> 在<a href="https://github.com/rails/rails/blob/v3.2.21/activerecord/lib/active_record/callbacks.rb#L246">这里</a> <code>extend</code> 了 <code>ActiveRecord::Models</code> 模块。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="kp">extend</span> <span class="no">ActiveModel</span><span class="o">::</span><span class="no">Callbacks</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><code>ActiveModel</code> 提供了一套在模型类中使用的接口。它们允许 ActionPack 与不是 ActiveRecord 的模型进行交互。
-在<a href="https://github.com/rails/rails/blob/v3.2.21/activemodel/lib/active_model/callbacks.rb#L49-L53">这里</a>， <code>ActiveModel::Callbacks</code> 内部你将会看到如下代码：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">extended</span><span class="p">(</span><span class="n">base</span><span class="p">)</span>
-</span><span class='line'>  <span class="n">base</span><span class="o">.</span><span class="n">class_eval</span> <span class="k">do</span>
-</span><span class='line'>    <span class="kp">include</span> <span class="no">ActiveSupport</span><span class="o">::</span><span class="no">Callbacks</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><code>ActiveModel::Callbacks</code> 对 <code>base</code> 即就是 <code>ActiveRecord::Callbacks</code> 调用了 <code>class_eval</code> 方法，
-并包含了 <code>ActiveSupport::Callbacks</code> 模块。我们前面已经提到过了，对一个类调用 <code>class_eval</code> 与手动地将代码写在这个类里是一样的。
-<code>ActiveSupport::Callbacks</code> 为 <code>ActiveRecord::Callbacks</code> 提供了 Rails 中的回调方法。</p>
-
-<p>这里我们讨论了 <code>extend</code> 方法，以及与之对应的钩子 <code>extended</code>。并且也了解了 <code>ActiveRecord</code> / <code>ActiveModel</code>
-是如何使用上述方法为我们提供可用功能的。</p>
-
-<h2>prepended</h2>
-
-<p>另一个使用定义在模块内部方法的方式称为 <code>prepend</code>。<code>prepend</code> 是在Ruby 2.0中引入的，并且与 <code>include</code> 和 <code>extend</code> 很不一样。
-使用 <code>include</code> 和 <code>extend</code> 引入的方法可以被目标模块/类重新定义覆盖。
-例如，如果我们在某个模块中定义了一个名为 <code>name</code> 的方法，并且在目标模块/类中也定义同名的方法。
-那么这个在我们类在定义的 <code>name</code> 方法将会覆盖模块中的。而 <code>prepend</code> 是不一样的，它会将 <code>prepend</code> 引入的模块
-中的方法覆盖掉我们模块/类中定义的方法。让我们来看一个简单的例子：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Person</span>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">name</span>
-</span><span class='line'>    <span class="s2">&quot;My name belongs to Person&quot;</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">class</span> <span class="nc">User</span>
-</span><span class='line'>  <span class="kp">include</span> <span class="no">Person</span>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">name</span>
-</span><span class='line'>    <span class="s2">&quot;My name belongs to User&quot;</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="nb">puts</span> <span class="no">User</span><span class="o">.</span><span class="n">new</span><span class="o">.</span><span class="n">name</span>
-</span><span class='line'><span class="o">=&gt;</span> <span class="no">My</span> <span class="nb">name</span> <span class="n">belongs</span> <span class="n">to</span> <span class="no">User</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>现在再来看看 <code>prepend</code> 的情况：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Person</span>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">name</span>
-</span><span class='line'>    <span class="s2">&quot;My name belongs to Person&quot;</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">class</span> <span class="nc">User</span>
-</span><span class='line'>  <span class="n">prepend</span> <span class="no">Person</span>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">name</span>
-</span><span class='line'>    <span class="s2">&quot;My name belongs to User&quot;</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="nb">puts</span> <span class="no">User</span><span class="o">.</span><span class="n">new</span><span class="o">.</span><span class="n">name</span>
-</span><span class='line'><span class="o">=&gt;</span> <span class="no">My</span> <span class="nb">name</span> <span class="n">belongs</span> <span class="n">to</span> <span class="no">Person</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>使用 <code>prepend Person</code> 会将 <code>User</code> 中的同名方法给覆盖掉，因此在终端输出的结果为 <code>My name belongs to Person</code>。
-<code>prepend</code> 实际上是将方法添加到方法链的前端。在调用 <code>User</code> 类内定义的 <code>name</code> 方法时，会调用 <code>super</code> 从而调用 <code>Person</code> 模块的 <code>name</code>。</p>
-
-<p>与 <code>prepend</code> 对应的回调名为（你应该猜到了） <code>prepended</code>。当一个模块被预置到另一个模块/类中时它会被调用。
-我们来看下效果。更新 <code>Person</code> 模块的定义：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Person</span>
-</span><span class='line'>  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">prepended</span><span class="p">(</span><span class="n">base</span><span class="p">)</span>
-</span><span class='line'>    <span class="nb">puts</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="nb">self</span><span class="si">}</span><span class="s2"> prepended to </span><span class="si">#{</span><span class="n">base</span><span class="si">}</span><span class="s2">&quot;</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">name</span>
-</span><span class='line'>    <span class="s2">&quot;My name belongs to Person&quot;</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>你再运行这段代码应该会看到如下结果：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">Person</span> <span class="n">prepended</span> <span class="n">to</span> <span class="no">User</span>
-</span><span class='line'><span class="no">My</span> <span class="nb">name</span> <span class="n">belongs</span> <span class="n">to</span> <span class="no">Person</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><code>prepend</code> 的引入是为了去除 <code>alias_method_chain</code> hack的丑陋，它曾被Rails以及其他库广泛地使用以达到与 <code>prepend</code> 相同的功能。
-因为 <code>prepend</code> 只有在 Ruby >= 2.0 的版本中才能使用，因此如果你打算使用 <code>prepend</code> 的话，那么你就应该升级你的Ruby版本。</p>
-
-<h2>inherited</h2>
-
-<p>继承是面向对象中一个最重要的概念。Ruby是一门面向对象的编程语言，并且提供了从基/父类继承一个子类的功能。
-我们来看一个简单的例子：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">Person</span>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">name</span>
-</span><span class='line'>     <span class="s2">&quot;My name is Person&quot;</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">class</span> <span class="nc">User</span> <span class="o">&lt;</span> <span class="no">Person</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="nb">puts</span> <span class="no">User</span><span class="o">.</span><span class="n">new</span><span class="o">.</span><span class="n">name</span> <span class="c1"># =&gt; My name is Person</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>我们创建了一个 <code>Person</code> 类和一个子类 <code>User</code>。在 <code>Person</code> 中定义的方法也成为了 <code>User</code> 的一部分。
-这是非常简单的继承。你可能会好奇，是否有什么方法可以在一个类被其他类继承时收到通知呢？
-是的，Ruby有一个名为 <code>inherited</code> 的钩子可以实现。我们再看看这个例子：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">Person</span>
-</span><span class='line'>  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">inherited</span><span class="p">(</span><span class="n">child_class</span><span class="p">)</span>
-</span><span class='line'>    <span class="nb">puts</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">child_class</span><span class="si">}</span><span class="s2"> inherits </span><span class="si">#{</span><span class="nb">self</span><span class="si">}</span><span class="s2">&quot;</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">name</span>
-</span><span class='line'>    <span class="s2">&quot;My name is Person&quot;</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">class</span> <span class="nc">User</span> <span class="o">&lt;</span> <span class="no">Person</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="nb">puts</span> <span class="no">User</span><span class="o">.</span><span class="n">new</span><span class="o">.</span><span class="n">name</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>正如你所见，当 <code>Person</code> 类被其他子类继承时 <code>inherited</code> 类方法将会被调用。
-运行以上代码结果如下：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">User</span> <span class="n">inherits</span> <span class="no">Person</span>
-</span><span class='line'><span class="no">My</span> <span class="nb">name</span> <span class="n">is</span> <span class="no">Person</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>让我们看看 <code>Rails</code> 在它的代码中是如何使用 <code>inherited</code> 的。</p>
-
-<h3>Rails中的 <code>inherited</code></h3>
-
-<p>Rails应用中有一个重要的类名为 <code>Application</code> ，定义中 <strong>config/application.rb</strong> 文件内。
-这个类执行了许多不同的任务，如运行所有的Railties，引擎以及插件的初始化。
-关于 <code>Application</code> 类的一个有趣的事件是，在同一个进程中不能运行两个实例。
-如果我们尝试修改这个行为，Rails将会抛出一个异常。让我们来看看Rails是如何实现这个特性的。</p>
-
-<p><code>Application</code> 类继承自 <code>Rails::Application</code>，它是在<a href="https://github.com/rails/rails/blob/v3.2.21/railties/lib/rails/application.rb">这里</a>定义的。
-在62行定义了 <code>inherited</code> 钩子，它会在我们的Rails应用 <code>Application</code> 类继承 <code>Rails::Application</code> 时被调用。
-<code>inherited</code> 钩子的代码如下：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="o">&lt;&lt;</span> <span class="nb">self</span>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">inherited</span><span class="p">(</span><span class="n">base</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">raise</span> <span class="s2">&quot;You cannot have more than one Rails::Application&quot;</span> <span class="k">if</span> <span class="no">Rails</span><span class="o">.</span><span class="n">application</span>
-</span><span class='line'>    <span class="k">super</span>
-</span><span class='line'>    <span class="no">Rails</span><span class="o">.</span><span class="n">application</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">instance</span>
-</span><span class='line'>    <span class="no">Rails</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">add_lib_to_load_path!</span>
-</span><span class='line'>    <span class="no">ActiveSupport</span><span class="o">.</span><span class="n">run_load_hooks</span><span class="p">(</span><span class="ss">:before_configuration</span><span class="p">,</span> <span class="n">base</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><code>class &lt;&lt; self</code> 是Ruby中的另一个定义类方法的方式。在 <code>inherited</code> 中的第1行是检查 <code>Rails.application</code> 是否已存在。
-如果存在则抛出异常。第一次运行这段代码时 <code>Rails.application</code> 会返回false然后调用 <code>super</code>。
-在这里 <code>super</code> 即是 <code>Rails::Engine</code> 的 <code>inherited</code> 钩子，因为 <code>Rails::Application</code> 继承自 <code>Rails::Engine</code>。</p>
-
-<p>在下一行，你会看到 <code>Rails.application</code> 被赋值为 <code>base.instance</code> 。其余就是设置Rails应用了。</p>
-
-<p>这就是Rails如何巧妙地使用 <code>inherited</code> 钩子来实现我们的Rails <code>Application</code> 类的单实例。</p>
-
-<h2>method_missing</h2>
-
-<p><code>method_missing</code> 可能是Ruby中使用最广的钩子。在许多流行的Ruby框架/gem包/库中都有使用它。
-当我们试图访问一个对象上不存在的方法时则会调用这个钩子方法。
-让我们来看一个简单的例子：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">Person</span>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">name</span>
-</span><span class='line'>    <span class="s2">&quot;My name is Person&quot;</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="nb">p</span> <span class="o">=</span> <span class="no">Person</span><span class="o">.</span><span class="n">new</span>
-</span><span class='line'>
-</span><span class='line'><span class="nb">puts</span> <span class="nb">p</span><span class="o">.</span><span class="n">name</span>     <span class="c1"># =&gt; My name is Person </span>
-</span><span class='line'><span class="nb">puts</span> <span class="nb">p</span><span class="o">.</span><span class="n">address</span>  <span class="c1"># =&gt; undefined method `address&#39; for #&lt;Person:0x007fb730a2b450&gt; (NoMethodError)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>我们定义了一个简单的 <code>Person</code> 类， 它只有一个 <code>name</code> 方法。然后创建一个 <code>Person</code> 的实例对象，
-并分别调用 <code>name</code> 和 <code>address</code>　两个方法。因为 <code>Person</code> 中定义了 <code>name</code>，因此这个运行没问题。
-然而 <code>Person</code> 并没有定义 <code>address</code>，这将会抛出一个异常。
-<code>method_missing</code> 钩子可以优雅地捕捉到这些未定义的方法，避免此类异常。
-让我们修改一下 <code>Person</code> 类：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">Person</span>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">method_missing</span><span class="p">(</span><span class="n">sym</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
-</span><span class='line'>     <span class="s2">&quot;</span><span class="si">#{</span><span class="n">sym</span><span class="si">}</span><span class="s2"> not defined on </span><span class="si">#{</span><span class="nb">self</span><span class="si">}</span><span class="s2">&quot;</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">name</span>
-</span><span class='line'>    <span class="s2">&quot;My name is Person&quot;</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="nb">p</span> <span class="o">=</span> <span class="no">Person</span><span class="o">.</span><span class="n">new</span>
-</span><span class='line'>
-</span><span class='line'><span class="nb">puts</span> <span class="nb">p</span><span class="o">.</span><span class="n">name</span>     <span class="c1"># =&gt; My name is Person</span>
-</span><span class='line'><span class="nb">puts</span> <span class="nb">p</span><span class="o">.</span><span class="n">address</span>  <span class="c1"># =&gt; address not defined on #&lt;Person:0x007fb2bb022fe0&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><code>method_missing</code> 接收两个参数：被调用的方法名和传递给该方法的参数。
-首先Ruby会寻找我们试图调用的方法，如果方法没找到则会寻找 <code>method_missing</code> 方法。
-现在我们重载了 <code>Person</code> 中的 <code>method_missing</code>，因此Ruby将会调用它而不是抛出异常。</p>
-
-<p>让我们来看看 <code>Rake</code> 是如何使用 <code>method_missing</code> 的。</p>
-
-<h3>Rake中的 <code>method_missing</code></h3>
-
-<p><code>Rake</code> 是Ruby中使用最广泛的gem包之一。<code>Rake</code> 使用 <code>method_missing</code> 来提供访问传递给Rake任务的参数。
-首先创建一个简单的rake任务：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">task</span> <span class="ss">:hello</span> <span class="k">do</span>
-</span><span class='line'>  <span class="nb">puts</span> <span class="s2">&quot;Hello&quot;</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>如果你通过调用 <code>rake hello</code> 来执行这个任务，你会看到输出 <code>Hello</code>。
-让我们扩展这个rake任务，以便接收一个参数（一个人名）并向他打招呼：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">task</span> <span class="ss">:hello</span><span class="p">,</span> <span class="ss">:name</span> <span class="k">do</span> <span class="o">|</span><span class="n">t</span><span class="p">,</span> <span class="n">args</span><span class="o">|</span>
-</span><span class='line'>  <span class="nb">puts</span> <span class="s2">&quot;Hello </span><span class="si">#{</span><span class="n">args</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><code>t</code> 是任务名，<code>args</code> 保存了传递过来的参数。正如你所见，我们调用 <code>args.name</code> 来获取传递给 <code>hello</code> 任务的 <code>name</code> 参数。
-运行该任务，并传递一个参数：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">rake</span> <span class="n">hello</span><span class="o">[</span><span class="s2">&quot;Imran Latif&quot;</span><span class="o">]</span>
-</span><span class='line'><span class="o">=&gt;</span> <span class="no">Hello</span> <span class="no">Imran</span> <span class="no">Latif</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>让我们来看看 <code>Rake</code> 是如何使用 <code>method_missing</code> 为我们提供了传递给任务的参数的。</p>
-
-<p>在上面任务中的 <code>args</code> 对象是一个 <code>Rake::TaskArguments</code> 实例，它是在<a href="https://github.com/ruby/rake/blob/v10.4.2/lib/rake/task_arguments.rb">这里</a>所定义。
-这个类负责管理传递给Rake任务的参数。查看 <code>Rake::TaskArguments</code> 的代码，你会发现并没有定义相关的方法将参数传给任务。
-那么 <code>Rake</code> 是如何将参数提供给任务的呢？答案是 <code>Rake</code> 是使用了 <code>method_missing</code> 巧妙地实现了这个功能。
-看看第64行 <code>method_missing</code> 的定义：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">method_missing</span><span class="p">(</span><span class="n">sym</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
-</span><span class='line'>  <span class="n">lookup</span><span class="p">(</span><span class="n">sym</span><span class="o">.</span><span class="n">to_sym</span><span class="p">)</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>在这个类中定义 <code>method_missing</code> 是为了保证能够访问到那些未定义的方法，而不是由Ruby抛出异常。
-在 <code>method_missing</code> 中它调用了 <code>lookup</code> 方法：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">lookup</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
-</span><span class='line'>  <span class="k">if</span> <span class="vi">@hash</span><span class="o">.</span><span class="n">has_key?</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
-</span><span class='line'>   <span class="vi">@hash</span><span class="o">[</span><span class="nb">name</span><span class="o">]</span>
-</span><span class='line'>  <span class="k">elsif</span> <span class="vi">@parent</span>
-</span><span class='line'>    <span class="vi">@parent</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><code>method_missing</code> 调用 <code>lookup</code>，并将方法名以 <code>Symbol(符号)</code> 的形式传递给它。
-<code>lookup</code> 方法将会在 <code>@hash</code> 中进行查找，它是在 <code>Rake::TaskArguments</code> 的构造函数中创建的。
-如果 <code>@hash</code> 中包含该参数则返回，如果在 <code>@hash</code> 中没有则 <code>Rake</code> 会尝试调用 <code>@parent</code> 的 <code>lookup</code>。
-如果该参数没有找到，则什么都不返回。</p>
-
-<p>这就是 <code>Rake</code> 如何巧妙地使用 <code>method_missing</code> 提供了访问传递给Rake任务的参数的。
-感谢<a href="https://twitter.com/jimweirich">Jim Weirich</a>编写了Rake。</p>
-
-<h1>结束语</h1>
-
-<p>我们讨论了5个重要的Ruby钩子方法，探索了它们是如何工作的，以及一些流行的框架/gem包是如何使用它们来提供一些优雅的功能。
-我希望你能喜欢这篇文章。请在评论中告诉我们你所喜欢的Ruby钩子，以及你使用它们所解决的问题。</p>
-
-<p>原文地址： <a href="http://www.sitepoint.com/rubys-important-hook-methods/">http://www.sitepoint.com/rubys-important-hook-methods/</a></p>
 ]]></content>
   </entry>
   

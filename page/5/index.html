@@ -9,8 +9,7 @@
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="最近折腾了一下平铺式的窗口管理器 awesome 和 i3。感觉这两个都很不错，现在进行一下简单的总结。 Awesome 先说一下Awesome吧。安装过程很简单。
-对于ArchLinux的用户可以使用 pacman 直接进行安装： $ [sudo] pacman install awesome &hellip;">
+  <meta name="description" content="Rack是Ruby应用与web服务器之间的一个接口，它在服务器与应用程序之间作为中间件，可以对用户的请求和程序的返回数据进行处理。现在几乎所有主流的Ruby web框架都是支持Rack接口的。 Rack与Python的wsgi很相似，在它的规格书（http://rack.rubyforge.org &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -67,6 +66,101 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84103.html">Rack开发简介</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-05-02T00:00:00+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>2</span><span class='date-suffix'>nd</span>, <span class='date-year'>2014</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/84103.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/84103.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Rack是Ruby应用与web服务器之间的一个接口，它在服务器与应用程序之间作为中间件，可以对用户的请求和程序的返回数据进行处理。现在几乎所有主流的Ruby web框架都是支持Rack接口的。</p>
+
+
+<p>Rack与Python的wsgi很相似，在它的规格书（http://rack.rubyforge.org/doc/SPEC.html）中也说道它采用了WSGI的一些内容。</p>
+
+
+<h2>开始</h2>
+
+
+<p>首先安装Rack:</p>
+
+
+<pre><code>[sudo] gem install rack
+</code></pre>
+
+
+<p>然后通过一个简单的例子来讲解。</p>
+
+
+<pre><code>require "rack"
+rack_app = lambda{|env| [200, {}, ["Hello World!"]]}
+Rack::Handler::WEBrick.run rack_app, :Port =&gt; 3000
+</code></pre>
+
+
+<p>执行上述代码，然后访问 http://127.0.0.1:3000 会看到 &#8220;Hello World!&#8221;。</p>
+
+
+<p>上面代码中的rack_app即是一个Rack应用。Rack应用除了lambda之外也还可以使用其他对象，只要满足以下条件即可：<br>
+  * 可响应call方法的对象；<br>
+  * 接收一个参数rack环境 environment 。它是一个散列表，包含了CGI的信息和rack的一些变量；<br>
+  * 返回一个有三个值的数组，第一个值为返回状态 status；第二个值为返回头 headers，也是一个散列表；第三个值为返回正文 body，它必须是一个可响应each方法并生成字符串的对象，例如字符串数组。</p>
+
+
+<p>WEBrick是Handler的一种。Handler用于将web服务器与Rack连接。使用 Rack::Handler.constants 可以查看Rack包含的所有Handler。</p>
+
+
+<h2>请求/Request</h2>
+
+
+<p>在Rack应用中可以直接操作env参数来访问请求信息，但是这种方法不太方便。对于这种操作Rack::Request对象提供了方便的接口。</p>
+
+
+<pre><code>request = Rack::Request.new env
+</code></pre>
+
+
+<p>创建request对象时传入env参数。</p>
+
+
+<h2>响应/Response</h2>
+
+
+<p>Rack应用的返回值是一个有三个值的数组，包含了返回状态、返回头和返回正文。对于简单的程序手动构建数组还行，如果是复杂的程序则要考虑自动构建了。<br>
+同样的可以使用Rack::Request对象来创建返回数据。</p>
+
+
+<pre><code>response = Rack::Response.new
+response.finish
+</code></pre>
+
+
+<p>内容填充完之后调用response对象的finish方法生成符合Rack规范的数组对象。</p>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1695,197 +1789,6 @@ num_users = User.objects.count()
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84066.html">Mongoengine教程(2)——文档模式</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2014-04-03T00:00:00+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2014</span></span> <span class='time'>12:00 am</span></time>
-        
-           | <a href="http://www.xefan.com/archives/84066.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/84066.html">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>在MongoDB中一个文档(document)与关系型数据库中的一行(row)相似；文档保存在集合(collection)中，行保存在表(table)中。</p>
-
-
-<h2>定义文档的模式</h2>
-
-
-<p>与django类似，要定义一个文档模式只需要创建一个类继承自 Document，并添加一些 Field 对象。</p>
-
-
-<pre><code>from mongoengine import *
-import datetime
-
-class Page(Document):
-    title = StringField(max_length=200, required=True)
-    date_modified = DateTimeField(default=datetime.datetime.now)
-</code></pre>
-
-
-<p>如上定义了一个文档模式具有 title和date_modified 两个字段。</p>
-
-
-<p>同时MongoDB本身就是无模式的，因此我们还可以创建动态的文档模式。它可以在添加数据时为不同的数据设置不同的字段。</p>
-
-
-<pre><code>class Page(DynamicDocument):
-    title = StringField(max_length=200, required=True)
-</code></pre>
-
-
-<p>添加数据：</p>
-
-
-<pre><code>page = Page(title='Using MongoEngine')
-page.tags = ['mongodb', 'mongoengine']
-page.save()
-</code></pre>
-
-
-<h2>文档字段</h2>
-
-
-<p>文档字段(Field)不是必需的，但是使用它来进行数据验证、设置默认值等操作会比较方便。</p>
-
-
-<p>MongoEngine提供了如下这些类型的Field:</p>
-
-
-<ul>
-<li>BinaryField  </li>
-<li>BooleanField  </li>
-<li>ComplexDateTimeField  </li>
-<li>DateTimeField  </li>
-<li>DecimalField  </li>
-<li>DictField  </li>
-<li>DynamicField  </li>
-<li>EmailField  </li>
-<li>EmbeddedDocumentField  </li>
-<li>FileField  </li>
-<li>FloatField  </li>
-<li>GenericEmbeddedDocumentField  </li>
-<li>GenericReferenceField  </li>
-<li>GeoPointField  </li>
-<li>ImageField  </li>
-<li>IntField  </li>
-<li>ListField  </li>
-<li>MapField  </li>
-<li>ObjectIdField  </li>
-<li>ReferenceField  </li>
-<li>SequenceField  </li>
-<li>SortedListField  </li>
-<li>StringField  </li>
-<li>URLField  </li>
-<li>UUIDField  </li>
-</ul>
-
-
-<h2>文档之间引用关系</h2>
-
-
-<p>在关系型数据库中多个表可以使用外键进行关联。然而MongoDB是无模式的，因此想要达到这样的效果就这能在应用程序中自己手动的进行关联了。</p>
-
-
-<p>不过还好，使用MongoEngine的ReferenceField可以很方便的实现。</p>
-
-
-<pre><code>class User(Document):
-    name = StringField()
-
-class Page(Document):
-    content = StringField()
-    author = ReferenceField(User)
-
-john = User(name="John Smith")
-john.save()
-
-post = Page(content="Test Page")
-post.author = john
-post.save()
-</code></pre>
-
-
-<h3>一对多的关系</h3>
-
-
-<p>对于一对多的关系可以使用ListField来保存一个ReferenceField列表。在进行查询操作是需要传入一个实例对象。</p>
-
-
-<pre><code>class User(Document):
-    name = StringField()
-
-class Page(Document):
-    content = StringField()
-    authors = ListField(ReferenceField(User))
-
-bob = User(name="Bob Jones").save()
-john = User(name="John Smith").save()
-
-Page(content="Test Page", authors=[bob, john]).save()
-Page(content="Another Page", authors=[john]).save()
-
-# Find all pages Bob authored
-Page.objects(authors__in=[bob])
-</code></pre>
-
-
-<h3>引用对象的删除操作</h3>
-
-
-<p>MongoDB默认不会检查数据的完整性，因此在删除一个对象是就需要自己手动的处理引用了该对象的其他对象。</p>
-
-
-<p>同样的MongoEngine也提供了一样的功能。ReferenceField有一个 reverse_delete_rule 参数可以进行设置。它的取值如下：  </p>
-
-
-<ul>
-<li>mongoengine.DO_NOTHING:默认就是这个值，它不会进行任何操作。  </li>
-<li>mongoengine.DENY:如果该对象还被其他对象引用，则拒绝删除。  </li>
-<li>mongoengine.NULLIFY:将其他对象对该对象的引用字段设为null。  </li>
-<li>mongoengine.CASCADE:将引用了该对象的其他对象也删除掉。  </li>
-<li>mongoengine.PULL:移除对该对象的引用。  </li>
-</ul>
-
-
-<h2>索引</h2>
-
-
-<p>与django的Model相似，MongoEngine的Document也可以在meta属性中设置索引。</p>
-
-
-<pre><code>class Page(Document):
-    title = StringField()
-    rating = StringField()
-    meta = {
-        'indexes': ['title', ('title', '-rating')]
-    }
-</code></pre>
-
-
-<p>meta中的indexes可以是一个列表，也可以是一个字典。</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/page/6">&larr; Older</a>
@@ -1907,6 +1810,10 @@ Page.objects(authors__in=[bob])
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="http://www.xefan.com/archives/84163.html">ReactNative Jsbundle管理</a>
+      </li>
+    
+      <li class="post">
         <a href="http://www.xefan.com/archives/84162.html">ReactNative自动设置开发服务器IP</a>
       </li>
     
@@ -1922,19 +1829,15 @@ Page.objects(authors__in=[bob])
         <a href="http://www.xefan.com/archives/84159.html">HTTP Access Control跨域请求</a>
       </li>
     
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84158.html">Xcode文档离线安装</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (32)</a></li><li><a href='/categories/web开发/index.html'>web开发 (20)</a></li><li><a href='/categories/前端相关/index.html'>前端相关 (10)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (16)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (40)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (24)</a></li></ul>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (32)</a></li><li><a href='/categories/web开发/index.html'>web开发 (20)</a></li><li><a href='/categories/前端相关/index.html'>前端相关 (10)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (16)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (41)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (24)</a></li></ul>
 </section>
 <section>
   <h1>Tag Cloud</h1>
-    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 102.68656716417911%'>ajax(3)</a> <a href='/tags/android/index.html' style='font-size: 100.8955223880597%'>Android(1)</a> <a href='/tags/angular/index.html' style='font-size: 106.26865671641791%'>angular(7)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/gulp/index.html' style='font-size: 100.8955223880597%'>gulp(1)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 109.85074626865672%'>js(11)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mac/index.html' style='font-size: 100.8955223880597%'>Mac(1)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/react/index.html' style='font-size: 100.8955223880597%'>react(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 129.55223880597015%'>Ruby(33)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xcode/index.html' style='font-size: 100.8955223880597%'>Xcode(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 123.28358208955224%'>翻译(26)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 102.68656716417911%'>ajax(3)</a> <a href='/tags/android/index.html' style='font-size: 100.8955223880597%'>Android(1)</a> <a href='/tags/angular/index.html' style='font-size: 106.26865671641791%'>angular(7)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/gulp/index.html' style='font-size: 100.8955223880597%'>gulp(1)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 109.85074626865672%'>js(11)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mac/index.html' style='font-size: 100.8955223880597%'>Mac(1)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/react/index.html' style='font-size: 101.7910447761194%'>react(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 129.55223880597015%'>Ruby(33)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xcode/index.html' style='font-size: 100.8955223880597%'>Xcode(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 123.28358208955224%'>翻译(26)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
 </section>
 <section>
   <h1>Link</h1>
