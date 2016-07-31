@@ -1,0 +1,417 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>ReactNative获取设备屏幕尺寸 - 龍昌博客</title>
+  <meta name="author" content="龍昌">
+
+  
+  <meta name="description" content="在做移动开发过程中，有时我们需要适配不同尺寸大小的屏幕。这里我们就需要到获取设备屏幕的大小。
+由于我们是使用的 ReactNative 来开发手机 app，这里就介绍一下在 ReactNative 中如何获取到设备屏幕的分辨率的。
+也算是对之前踩坑的总结吧。 在此之前需要先了解 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.xefan.com/archives/84164.html">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="龍昌博客" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.useso.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.useso.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.useso.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">龍昌博客</a></h1>
+  
+    <h2>从Pythoneer转向Rubist</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.xefan.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+ <li><a href="/about/">About</a></li>  <li><a href="/gbook/">留言板</a></li> 
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">ReactNative获取设备屏幕尺寸</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-07-31T16:25:17+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>31</span><span class='date-suffix'>st</span>, <span class='date-year'>2016</span></span> <span class='time'>4:25 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>在做移动开发过程中，有时我们需要适配不同尺寸大小的屏幕。这里我们就需要到获取设备屏幕的大小。
+由于我们是使用的 ReactNative 来开发手机 app，这里就介绍一下在 ReactNative 中如何获取到设备屏幕的分辨率的。
+也算是对之前踩坑的总结吧。</p>
+
+<p>在此之前需要先了解 ReactNative 中的尺寸计算单位，它并不是使用的px。<a href="http://facebook.github.io/react-native/releases/next/docs/pixelratio.html">http://facebook.github.io/react-native/releases/next/docs/pixelratio.html</a></p>
+
+<h2>使用 Dimensions 模块</h2>
+
+<p>在 ReactNative 中有一个 Dimensions 模块，通过它可以获取当前设备的屏幕分辨率。
+参考： <a href="http://facebook.github.io/react-native/releases/next/docs/dimensions.html">http://facebook.github.io/react-native/releases/next/docs/dimensions.html</a></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>var {height, width} = Dimensions.get('window');</span></code></pre></td></tr></table></div></figure>
+
+
+<p>刚开始时我也是使用这种方法来得到整个屏幕的分辨率的，感觉轻松搞定。然而这里面却有一个坑。</p>
+
+<p>首先来看看 ios 和 android 中的界面结构：</p>
+
+<p><img src="/wp-content/uploads/2016/07/31/ios-screen-struct.png" alt="ios-screen-struct" />
+<img src="/wp-content/uploads/2016/07/31/android-screen-struct.png" alt="android-screen-struct" /></p>
+
+<p>如图所示，屏幕的宽度计算比较简单，就是从左边到右边的距离即可。
+然后就是屏幕的高度了，这里其实我们是需要获取到可用区域的高度。
+如图所示，对于 ios 系统来说可用区域高度就是整个屏幕的高度减去 Status Bar 的高度；
+对于 android 系统来说就是屏幕的高度减去 Status Bar 和 Soft Menu Bar 的高度。</p>
+
+<h2>获取 iOS 设备的屏幕分辨率</h2>
+
+<p>正如上面所说的，在 ios 下的计算方法为：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>var WIDTH = Dimensions.get('window').width;
+</span><span class='line'>var HEIGHT = Dimensions.get('window').height - STATUS_BAR_HEIGHT;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在 ios 系统状态栏高度(STATUS_BAR_HEIGHT)通常为 20。
+不过如果你设置了隐藏状态栏的话，那么 <code>STATUS_BAR_HEIGHT</code> 则为0。</p>
+
+<p>以上是手机竖屏的情况，在横屏状态下则交换两个值：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>var LANDSCAPE_WIDTH = HEIGHT + STATUS_BAR_HEIGHT;
+</span><span class='line'>var LANDSCAPE_HEIGHT = WIDTH - STATUS_BAR_HEIGHT;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>到了这里虽然麻烦了一点，但是总体来说也还好。问题都解决了。
+感觉生活是如此美好啊，然而这个世界上却还有一个系统名为 android。
+它有着数不清种类屏幕大小的设备，然后瞬间感觉整个人都不好了。</p>
+
+<h2>获取 Android 设备的屏幕分辨率</h2>
+
+<p>如果按照 ios 下的方法来做，获取到 <code>WIDTH</code> 是没有问题，
+但是 <code>HEIGHT</code> 的话还需要减去 Status Bar 和 Soft Menu Bar 的高度。
+因此我们还需要获取到状态栏的高度(STATUS_BAR_HEIGHT)和虚拟按钮的高度(SOFT_MENU_BAR_HEIGHT)。</p>
+
+<p>这里我们使用<a href="https://github.com/jaysoo/react-native-extra-dimensions-android">react-native-extra-dimensions-android</a>这个库。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>const ExtraDimensions = require('react-native-extra-dimensions-android');
+</span><span class='line'>
+</span><span class='line'>const STATUS_BAR_HEIGHT = ExtraDimensions.get('STATUS_BAR_HEIGHT');
+</span><span class='line'>const SOFT_MENU_BAR_HEIGHT = ExtraDimensions.get('SOFT_MENU_BAR_HEIGHT');
+</span><span class='line'>const WIDTH = ExtraDimensions.get('REAL_WINDOW_WIDTH');
+</span><span class='line'>const HEIGHT = ExtraDimensions.get('REAL_WINDOW_HEIGHT') - STATUS_BAR_HEIGHT - SOFT_MENU_BAR_HEIGHT;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>以上是设备竖屏的结果，在横屏下你以为是不是只需要交换两个值就搞定了呢。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>var LANDSCAPE_WIDTH = HEIGHT + STATUS_BAR_HEIGHT;
+</span><span class='line'>var LANDSCAPE_HEIGHT = WIDTH - STATUS_BAR_HEIGHT;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Naive!!如果这么轻松就搞定了的话，android就不叫做android了。</p>
+
+<p>先来看看下面两张图片吧，分别是一个android平板设备在横屏和竖屏状态下的截图：</p>
+
+<p><img src="/wp-content/uploads/2016/07/31/android-pad-landscape.png" alt="android-pad-landscape" />
+<img src="/wp-content/uploads/2016/07/31/android-pad-portrait.png" alt="android-pad-portrait" /></p>
+
+<p>你把你手中的 android 手机分别进入横屏和竖屏状态下，再对照上面两张图片你会发现什么。
+没错的，在平板设备上屏幕旋转之后 Soft Menu Bar 也跟着旋转了，
+而在手机设备上 Soft Menu Bar 是始终固定在手机底部的。</p>
+
+<p>尼玛，太坑爹了。看到这里瞬间呕血三升，要适配手机跟平板实现是太麻烦了。
+以下是我的解决办法，先检查当前设备是否为平板，然后再分别处理。
+至于平板的判断方法就自己想办法了，我的方法也不一定准。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>if (isPad) {
+</span><span class='line'>  LANDSCAPE_WIDTH = HEIGHT + STATUS_BAR_HEIGHT + SOFT_MENU_BAR_HEIGHT;
+</span><span class='line'>  LANDSCAPE_HEIGHT = WIDTH - STATUS_BAR_HEIGHT - SOFT_MENU_BAR_HEIGHT;
+</span><span class='line'>} else {
+</span><span class='line'>  LANDSCAPE_WIDTH = HEIGHT + STATUS_BAR_HEIGHT;
+</span><span class='line'>  LANDSCAPE_HEIGHT = WIDTH - STATUS_BAR_HEIGHT;
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>以上是在 android 下遇到的第一个大坑。</p>
+
+<p>到了这里我以为一切都该结束了吧，然而没想到还有一种手机叫做魅族。如下图：</p>
+
+<p><img src="/wp-content/uploads/2016/07/31/Mezu-smart-bar.png" alt="Mezu-smart-bar" /></p>
+
+<p>在屏幕右下角其实是有一个按钮的，然而左图所示的，该按钮被魅族手机的 Smart Bar 遮住了。
+进入系统设置将 Smart Bar 隐藏后效果如右图所示。</p>
+
+<p>看到这里又吐了两口老血，此为第二个大坑。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>const SMART_BAR_HEIGHT = ExtraDimensions.get('SMART_BAR_HEIGHT');
+</span><span class='line'>
+</span><span class='line'>if (SMART_BAR_HEIGHT) {
+</span><span class='line'>  HEIGHT -= SMART_BAR_HEIGHT;
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>....
+</span><span class='line'>// 在上面 LANDSCAPE 的计算结果上再作如下处理
+</span><span class='line'>
+</span><span class='line'>if (SMART_BAR_HEIGHT) {
+</span><span class='line'>  LANDSCAPE_WIDTH += SMART_BAR_HEIGHT;
+</span><span class='line'>  LANDSCAPE_HEIGHT -= SMART_BAR_HEIGHT;
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在魅族的手机上计算屏幕高度时还需要再减去 Smart Bar 的高度，
+同时还需要注意的是， Smart Bar 跟平板上的Soft Menu Bar 一样会随着屏幕旋转而转动的。</p>
+
+<p>最后还有一点需要注意的是，在安装 <code>react-native-extra-dimensions-android</code> 库时不能直接使用 <code>npm install --save react-native-extra-dimensions-android</code> 进行安装，
+而是需要直接通过 git 仓库来安装： <code>npm install --save git+https://github.com/jaysoo/react-native-extra-dimensions-android.git</code>。</p>
+
+<p>因为在 npm 上 <code>react-native-extra-dimensions-android</code> 的最新版为 0.17.0，
+而 <code>SMART_BAR_HEIGHT</code> 的功能是在此之后才添加进来的。</p>
+
+<p>在库的版本上面又被坑了一下。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">龍昌</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2016-07-31T16:25:17+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>31</span><span class='date-suffix'>st</span>, <span class='date-year'>2016</span></span> <span class='time'>4:25 pm</span></time>
+    </p>
+    <p class="meta">
+      Categories: 
+
+<span class="categories">
+  
+    <a class='category' href='/categories/编程开发/index.html'>编程开发</a>
+  
+</span>
+
+
+    </p>
+    <p class="meta">
+      Tags: 
+
+<span class="tags">
+  
+    <a class='tag' href='/tags/react/index.html'>react</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/archives/84163.html" title="Previous Post: ReactNative jsbundle管理">&laquo; ReactNative jsbundle管理</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Subscription</h1>
+  <!--以下是QQ邮件列表订阅嵌入代码--><script >var nId = "e7ee5da6d322dc7157c25cfd8a7700bb23a056dd1fb18cb4",nWidth="auto",sColor="light",sText="请输入邮件地址：" ;</script><script src="http://list.qq.com/zh_CN/htmledition/js/qf/page/qfcode.js" charset="gb18030"></script>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84164.html">ReactNative获取设备屏幕尺寸</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84163.html">ReactNative Jsbundle管理</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84162.html">ReactNative自动设置开发服务器IP</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84161.html">Mac OS中VirtualBox的Android蓝牙设置</a>
+      </li>
+    
+      <li class="post">
+        <a href="http://www.xefan.com/archives/84160.html">gulp+browserSync配置</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (32)</a></li><li><a href='/categories/web开发/index.html'>web开发 (20)</a></li><li><a href='/categories/前端相关/index.html'>前端相关 (10)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (16)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (42)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (24)</a></li></ul>
+</section>
+<section>
+  <h1>Tag Cloud</h1>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 102.68656716417911%'>ajax(3)</a> <a href='/tags/android/index.html' style='font-size: 100.8955223880597%'>Android(1)</a> <a href='/tags/angular/index.html' style='font-size: 106.26865671641791%'>angular(7)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/gulp/index.html' style='font-size: 100.8955223880597%'>gulp(1)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 109.85074626865672%'>js(11)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mac/index.html' style='font-size: 100.8955223880597%'>Mac(1)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/react/index.html' style='font-size: 102.68656716417911%'>react(3)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 129.55223880597015%'>Ruby(33)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xcode/index.html' style='font-size: 100.8955223880597%'>Xcode(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 123.28358208955224%'>翻译(26)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
+</section>
+<section>
+  <h1>Link</h1>
+    <ul id="category-list">
+      <li><a target="_blank" title="我的Github" href="https://github.com/wusuopu">@Github</a></li>
+      <li><a target="_blank" title="我的微博" href="http://www.weibo.com/u/1768691343">@Weibo</a></li>
+      <li><a target="_blank" title="我的Twitter" href="https://twitter.com/longchangjin">@Twitter</a></li>
+      <li><a target="_blank" title="我的豆瓣" href="http://www.douban.com/people/lchj/">@Douban</a></li>
+
+      <li><a target="_blank" title="" href="http://www.vimer.cn/">Vimer的程序世界</a></li>
+      <li><a target="_blank" title="" href="http://pythoner.net/">python开发者社区</a></li>
+      <li><a target="_blank" title="" href="http://simple-is-better.com/">python.cn(news, jobs)</a></li>
+      <li><a target="_blank" title="" href="http://gtk.awaysoft.com/">GTK+ 中文社区</a></li>
+    </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - 龍昌 -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+<div style="display:none;"><script src="http://s94.cnzz.com/stat.php?id=1259846&web_id=1259846&show=pic" language="JavaScript"></script></div>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'longchang';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://www.xefan.com/archives/84164.html';
+        var disqus_url = 'http://www.xefan.com/archives/84164.html';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      //dsq.src = '/javascripts/disqus/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

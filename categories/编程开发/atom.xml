@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 编程开发 | 龍昌博客]]></title>
   <link href="http://www.xefan.com/categories/编程开发/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2016-06-26T14:00:18+08:00</updated>
+  <updated>2016-07-31T13:42:03+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -12,6 +12,143 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[ReactNative获取设备屏幕尺寸]]></title>
+    <link href="http://www.xefan.com/archives/84164.html"/>
+    <updated>2016-07-31T16:25:17+08:00</updated>
+    <id>http://www.xefan.com/archives/84164-ReactNative获取设备屏幕尺寸</id>
+    <content type="html"><![CDATA[<p>在做移动开发过程中，有时我们需要适配不同尺寸大小的屏幕。这里我们就需要到获取设备屏幕的大小。
+由于我们是使用的 ReactNative 来开发手机 app，这里就介绍一下在 ReactNative 中如何获取到设备屏幕的分辨率的。
+也算是对之前踩坑的总结吧。</p>
+
+<p>在此之前需要先了解 ReactNative 中的尺寸计算单位，它并不是使用的px。<a href="http://facebook.github.io/react-native/releases/next/docs/pixelratio.html">http://facebook.github.io/react-native/releases/next/docs/pixelratio.html</a></p>
+
+<h2>使用 Dimensions 模块</h2>
+
+<p>在 ReactNative 中有一个 Dimensions 模块，通过它可以获取当前设备的屏幕分辨率。
+参考： <a href="http://facebook.github.io/react-native/releases/next/docs/dimensions.html">http://facebook.github.io/react-native/releases/next/docs/dimensions.html</a></p>
+
+<pre><code>var {height, width} = Dimensions.get('window');
+</code></pre>
+
+<p>刚开始时我也是使用这种方法来得到整个屏幕的分辨率的，感觉轻松搞定。然而这里面却有一个坑。</p>
+
+<p>首先来看看 ios 和 android 中的界面结构：</p>
+
+<p><img src="/wp-content/uploads/2016/07/31/ios-screen-struct.png" alt="ios-screen-struct" />
+<img src="/wp-content/uploads/2016/07/31/android-screen-struct.png" alt="android-screen-struct" /></p>
+
+<p>如图所示，屏幕的宽度计算比较简单，就是从左边到右边的距离即可。
+然后就是屏幕的高度了，这里其实我们是需要获取到可用区域的高度。
+如图所示，对于 ios 系统来说可用区域高度就是整个屏幕的高度减去 Status Bar 的高度；
+对于 android 系统来说就是屏幕的高度减去 Status Bar 和 Soft Menu Bar 的高度。</p>
+
+<h2>获取 iOS 设备的屏幕分辨率</h2>
+
+<p>正如上面所说的，在 ios 下的计算方法为：</p>
+
+<pre><code>var WIDTH = Dimensions.get('window').width;
+var HEIGHT = Dimensions.get('window').height - STATUS_BAR_HEIGHT;
+</code></pre>
+
+<p>在 ios 系统状态栏高度(STATUS_BAR_HEIGHT)通常为 20。
+不过如果你设置了隐藏状态栏的话，那么 <code>STATUS_BAR_HEIGHT</code> 则为0。</p>
+
+<p>以上是手机竖屏的情况，在横屏状态下则交换两个值：</p>
+
+<pre><code>var LANDSCAPE_WIDTH = HEIGHT + STATUS_BAR_HEIGHT;
+var LANDSCAPE_HEIGHT = WIDTH - STATUS_BAR_HEIGHT;
+</code></pre>
+
+<p>到了这里虽然麻烦了一点，但是总体来说也还好。问题都解决了。
+感觉生活是如此美好啊，然而这个世界上却还有一个系统名为 android。
+它有着数不清种类屏幕大小的设备，然后瞬间感觉整个人都不好了。</p>
+
+<h2>获取 Android 设备的屏幕分辨率</h2>
+
+<p>如果按照 ios 下的方法来做，获取到 <code>WIDTH</code> 是没有问题，
+但是 <code>HEIGHT</code> 的话还需要减去 Status Bar 和 Soft Menu Bar 的高度。
+因此我们还需要获取到状态栏的高度(STATUS_BAR_HEIGHT)和虚拟按钮的高度(SOFT_MENU_BAR_HEIGHT)。</p>
+
+<p>这里我们使用<a href="https://github.com/jaysoo/react-native-extra-dimensions-android">react-native-extra-dimensions-android</a>这个库。</p>
+
+<pre><code>const ExtraDimensions = require('react-native-extra-dimensions-android');
+
+const STATUS_BAR_HEIGHT = ExtraDimensions.get('STATUS_BAR_HEIGHT');
+const SOFT_MENU_BAR_HEIGHT = ExtraDimensions.get('SOFT_MENU_BAR_HEIGHT');
+const WIDTH = ExtraDimensions.get('REAL_WINDOW_WIDTH');
+const HEIGHT = ExtraDimensions.get('REAL_WINDOW_HEIGHT') - STATUS_BAR_HEIGHT - SOFT_MENU_BAR_HEIGHT;
+</code></pre>
+
+<p>以上是设备竖屏的结果，在横屏下你以为是不是只需要交换两个值就搞定了呢。</p>
+
+<pre><code>var LANDSCAPE_WIDTH = HEIGHT + STATUS_BAR_HEIGHT;
+var LANDSCAPE_HEIGHT = WIDTH - STATUS_BAR_HEIGHT;
+</code></pre>
+
+<p>Naive!!如果这么轻松就搞定了的话，android就不叫做android了。</p>
+
+<p>先来看看下面两张图片吧，分别是一个android平板设备在横屏和竖屏状态下的截图：</p>
+
+<p><img src="/wp-content/uploads/2016/07/31/android-pad-landscape.png" alt="android-pad-landscape" />
+<img src="/wp-content/uploads/2016/07/31/android-pad-portrait.png" alt="android-pad-portrait" /></p>
+
+<p>你把你手中的 android 手机分别进入横屏和竖屏状态下，再对照上面两张图片你会发现什么。
+没错的，在平板设备上屏幕旋转之后 Soft Menu Bar 也跟着旋转了，
+而在手机设备上 Soft Menu Bar 是始终固定在手机底部的。</p>
+
+<p>尼玛，太坑爹了。看到这里瞬间呕血三升，要适配手机跟平板实现是太麻烦了。
+以下是我的解决办法，先检查当前设备是否为平板，然后再分别处理。
+至于平板的判断方法就自己想办法了，我的方法也不一定准。</p>
+
+<pre><code>if (isPad) {
+  LANDSCAPE_WIDTH = HEIGHT + STATUS_BAR_HEIGHT + SOFT_MENU_BAR_HEIGHT;
+  LANDSCAPE_HEIGHT = WIDTH - STATUS_BAR_HEIGHT - SOFT_MENU_BAR_HEIGHT;
+} else {
+  LANDSCAPE_WIDTH = HEIGHT + STATUS_BAR_HEIGHT;
+  LANDSCAPE_HEIGHT = WIDTH - STATUS_BAR_HEIGHT;
+}
+</code></pre>
+
+<p>以上是在 android 下遇到的第一个大坑。</p>
+
+<p>到了这里我以为一切都该结束了吧，然而没想到还有一种手机叫做魅族。如下图：</p>
+
+<p><img src="/wp-content/uploads/2016/07/31/Mezu-smart-bar.png" alt="Mezu-smart-bar" /></p>
+
+<p>在屏幕右下角其实是有一个按钮的，然而左图所示的，该按钮被魅族手机的 Smart Bar 遮住了。
+进入系统设置将 Smart Bar 隐藏后效果如右图所示。</p>
+
+<p>看到这里又吐了两口老血，此为第二个大坑。</p>
+
+<pre><code>const SMART_BAR_HEIGHT = ExtraDimensions.get('SMART_BAR_HEIGHT');
+
+if (SMART_BAR_HEIGHT) {
+  HEIGHT -= SMART_BAR_HEIGHT;
+}
+
+....
+// 在上面 LANDSCAPE 的计算结果上再作如下处理
+
+if (SMART_BAR_HEIGHT) {
+  LANDSCAPE_WIDTH += SMART_BAR_HEIGHT;
+  LANDSCAPE_HEIGHT -= SMART_BAR_HEIGHT;
+}
+</code></pre>
+
+<p>在魅族的手机上计算屏幕高度时还需要再减去 Smart Bar 的高度，
+同时还需要注意的是， Smart Bar 跟平板上的Soft Menu Bar 一样会随着屏幕旋转而转动的。</p>
+
+<p>最后还有一点需要注意的是，在安装 <code>react-native-extra-dimensions-android</code> 库时不能直接使用 <code>npm install --save react-native-extra-dimensions-android</code> 进行安装，
+而是需要直接通过 git 仓库来安装： <code>npm install --save git+https://github.com/jaysoo/react-native-extra-dimensions-android.git</code>。</p>
+
+<p>因为在 npm 上 <code>react-native-extra-dimensions-android</code> 的最新版为 0.17.0，
+而 <code>SMART_BAR_HEIGHT</code> 的功能是在此之后才添加进来的。</p>
+
+<p>在库的版本上面又被坑了一下。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[ReactNative Jsbundle管理]]></title>
@@ -379,155 +516,6 @@ make -j 3  46.17s user 5.20s system 40% cpu 2:05.66 total
 
 
 <p><a href="http://www.xefan.com/wp-content/uploads/2014/01/distcc-Monitor.png"><img src="http://www.xefan.com/wp-content/uploads/2014/01/distcc-Monitor-300x194.png" alt="" title="distcc Monitor" width="300" height="194" class="aligncenter size-medium wp-image-84028" /></a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[使用ccache加快编译速度]]></title>
-    <link href="http://www.xefan.com/archives/84024.html"/>
-    <updated>2014-01-04T00:00:00+08:00</updated>
-    <id>http://www.xefan.com/archives/84024-使用ccache加快编译速度</id>
-    <content type="html"><![CDATA[<p>ccache是一个编译器缓存，可以将编译的结果缓存起来。这样尽管第一次编译会花费长一点的时间，不过之后再次编译将变得非常非常快。 </p>
-
-
-<h3>1、安装</h3>
-
-
-<p>主流的linux发行版应该都有这个包，对于Debian系列的可以执行以下命令安装：</p>
-
-
-<pre><code>sudo apt-get install ccache
-</code></pre>
-
-
-<h3>2、使用</h3>
-
-
-<p>安装之后基本不用进行什么配置就可以直接使用了。<br>
-例如之前要编译一个hello.c文件要执行命令：  </p>
-
-
-<pre><code>gcc hello.c -o hello
-</code></pre>
-
-
-<p>现在是：</p>
-
-
-<pre><code>ccache gcc hello.c -o hello
-</code></pre>
-
-
-<p>ccache默认是将结果缓存保存到 $HOME/.ccache 目录下。如果想要修改这个目录，可以修改 CCACHE_DIR 环境变量。例如：</p>
-
-
-<pre><code>export CCACHE_DIR=/ramdisk/ccache
-</code></pre>
-
-
-<p>如果觉得每次都在命令前加上ccache比较麻烦的话，有一个一劳永逸的办法。执行如下命令：</p>
-
-
-<pre><code>cp ccache /usr/local/bin/
-ln -s ccache /usr/local/bin/gcc
-ln -s ccache /usr/local/bin/g++
-ln -s ccache /usr/local/bin/cc
-ln -s ccache /usr/local/bin/c++
-</code></pre>
-
-
-<p>不过这样的话每次都是使用的ccache，不太灵活。这个就要自己取舍了。</p>
-
-
-<h3>3、实例</h3>
-
-
-<p>接下来通过一个例子来看看使用ccache和不使用的差别。<br>
-作为一个Python程序员，我们就来编译一个Python试试。</p>
-
-
-<pre><code>$ tar xf Python-2.7.3.tar.gz
-$ cd Python-2.7.3
-$ ./configure
-$ time make
-make  96.49s user 5.10s system 93% cpu 1:48.77 total
-</code></pre>
-
-
-<p>首次编译花了1分48秒。</p>
-
-
-<pre><code>$ time make
-make  0.12s user 0.03s system 88% cpu 0.172 total
-$ make clean
-$ time make
-make  96.46s user 4.98s system 95% cpu 1:46.43 total
-</code></pre>
-
-
-<p>清除结果之后再次编译，还是花了1分46秒。</p>
-
-
-<p>再来看看使用ccache后的结果：</p>
-
-
-<pre><code>$ tar xf Python-2.7.3.tar.gz
-$ cd Python-2.7.3
-$ ./configure
-$ time make
-make  99.42s user 5.84s system 93% cpu 1:52.95 total
-
-$ time make
-make  0.16s user 0.00s system 89% cpu 0.178 total
-$ make clean
-$ time make
-make  3.36s user 1.41s system 52% cpu 9.093 total
-</code></pre>
-
-
-<p>首次编译花了1分52秒，之后都是只花了几秒。</p>
-
-
-<p>查看ccache的统计信息：</p>
-
-
-<pre><code>$ ccache -s
-cache directory                     /home/longchang/.ccache
-cache hit (direct)                   250
-cache hit (preprocessed)               4
-cache miss                           349
-called for link                      132
-alled for preprocessing              84
-compile failed                        29
-preprocessor error                    28
-bad compiler arguments                 5
-unsupported source language            6
-autoconf compile/link                224
-no input file                         24
-files in cache                       710
-cache size                          30.3 Mbytes
-max cache size                       1.0 Gbytes
-</code></pre>
-
-
-<p>清除掉缓存后再次编译：</p>
-
-
-<pre><code>$ ccache -c
-Cleaned cache
-
-$ make clean
-$ time make
-make  99.36s user 5.94s system 92% cpu 1:53.47 total
-
-$ make clean
-$ time make
-make  3.48s user 1.42s system 54% cpu 9.049 total
-</code></pre>
-
-
-<p>ccache手册： <a href="http://ccache.samba.org/manual.html">http://ccache.samba.org/manual.html</a></p>
-
 ]]></content>
   </entry>
   

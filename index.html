@@ -9,9 +9,9 @@
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="在上一篇文章中介绍了 RN(ReactNative) 自动设置 development server IP 的方法。
-这在开发过程中方便了不少，然而我在想能否更加方便一些呢。首先我们知道在开发 RN 应用时，jsbundle 有两种加载方式。
-第一种是指定 url 通过网络进行加载；第二种是 &hellip;">
+  <meta name="description" content="在做移动开发过程中，有时我们需要适配不同尺寸大小的屏幕。这里我们就需要到获取设备屏幕的大小。
+由于我们是使用的 ReactNative 来开发手机 app，这里就介绍一下在 ReactNative 中如何获取到设备屏幕的分辨率的。
+也算是对之前踩坑的总结吧。 在此之前需要先了解 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -68,6 +68,199 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84164.html">ReactNative获取设备屏幕尺寸</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-07-31T16:25:17+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>31</span><span class='date-suffix'>st</span>, <span class='date-year'>2016</span></span> <span class='time'>4:25 pm</span></time>
+        
+           | <a href="http://www.xefan.com/archives/84164.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/84164.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在做移动开发过程中，有时我们需要适配不同尺寸大小的屏幕。这里我们就需要到获取设备屏幕的大小。
+由于我们是使用的 ReactNative 来开发手机 app，这里就介绍一下在 ReactNative 中如何获取到设备屏幕的分辨率的。
+也算是对之前踩坑的总结吧。</p>
+
+<p>在此之前需要先了解 ReactNative 中的尺寸计算单位，它并不是使用的px。<a href="http://facebook.github.io/react-native/releases/next/docs/pixelratio.html">http://facebook.github.io/react-native/releases/next/docs/pixelratio.html</a></p>
+
+<h2>使用 Dimensions 模块</h2>
+
+<p>在 ReactNative 中有一个 Dimensions 模块，通过它可以获取当前设备的屏幕分辨率。
+参考： <a href="http://facebook.github.io/react-native/releases/next/docs/dimensions.html">http://facebook.github.io/react-native/releases/next/docs/dimensions.html</a></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>var {height, width} = Dimensions.get('window');</span></code></pre></td></tr></table></div></figure>
+
+
+<p>刚开始时我也是使用这种方法来得到整个屏幕的分辨率的，感觉轻松搞定。然而这里面却有一个坑。</p>
+
+<p>首先来看看 ios 和 android 中的界面结构：</p>
+
+<p><img src="/wp-content/uploads/2016/07/31/ios-screen-struct.png" alt="ios-screen-struct" />
+<img src="/wp-content/uploads/2016/07/31/android-screen-struct.png" alt="android-screen-struct" /></p>
+
+<p>如图所示，屏幕的宽度计算比较简单，就是从左边到右边的距离即可。
+然后就是屏幕的高度了，这里其实我们是需要获取到可用区域的高度。
+如图所示，对于 ios 系统来说可用区域高度就是整个屏幕的高度减去 Status Bar 的高度；
+对于 android 系统来说就是屏幕的高度减去 Status Bar 和 Soft Menu Bar 的高度。</p>
+
+<h2>获取 iOS 设备的屏幕分辨率</h2>
+
+<p>正如上面所说的，在 ios 下的计算方法为：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>var WIDTH = Dimensions.get('window').width;
+</span><span class='line'>var HEIGHT = Dimensions.get('window').height - STATUS_BAR_HEIGHT;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在 ios 系统状态栏高度(STATUS_BAR_HEIGHT)通常为 20。
+不过如果你设置了隐藏状态栏的话，那么 <code>STATUS_BAR_HEIGHT</code> 则为0。</p>
+
+<p>以上是手机竖屏的情况，在横屏状态下则交换两个值：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>var LANDSCAPE_WIDTH = HEIGHT + STATUS_BAR_HEIGHT;
+</span><span class='line'>var LANDSCAPE_HEIGHT = WIDTH - STATUS_BAR_HEIGHT;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>到了这里虽然麻烦了一点，但是总体来说也还好。问题都解决了。
+感觉生活是如此美好啊，然而这个世界上却还有一个系统名为 android。
+它有着数不清种类屏幕大小的设备，然后瞬间感觉整个人都不好了。</p>
+
+<h2>获取 Android 设备的屏幕分辨率</h2>
+
+<p>如果按照 ios 下的方法来做，获取到 <code>WIDTH</code> 是没有问题，
+但是 <code>HEIGHT</code> 的话还需要减去 Status Bar 和 Soft Menu Bar 的高度。
+因此我们还需要获取到状态栏的高度(STATUS_BAR_HEIGHT)和虚拟按钮的高度(SOFT_MENU_BAR_HEIGHT)。</p>
+
+<p>这里我们使用<a href="https://github.com/jaysoo/react-native-extra-dimensions-android">react-native-extra-dimensions-android</a>这个库。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>const ExtraDimensions = require('react-native-extra-dimensions-android');
+</span><span class='line'>
+</span><span class='line'>const STATUS_BAR_HEIGHT = ExtraDimensions.get('STATUS_BAR_HEIGHT');
+</span><span class='line'>const SOFT_MENU_BAR_HEIGHT = ExtraDimensions.get('SOFT_MENU_BAR_HEIGHT');
+</span><span class='line'>const WIDTH = ExtraDimensions.get('REAL_WINDOW_WIDTH');
+</span><span class='line'>const HEIGHT = ExtraDimensions.get('REAL_WINDOW_HEIGHT') - STATUS_BAR_HEIGHT - SOFT_MENU_BAR_HEIGHT;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>以上是设备竖屏的结果，在横屏下你以为是不是只需要交换两个值就搞定了呢。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>var LANDSCAPE_WIDTH = HEIGHT + STATUS_BAR_HEIGHT;
+</span><span class='line'>var LANDSCAPE_HEIGHT = WIDTH - STATUS_BAR_HEIGHT;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Naive!!如果这么轻松就搞定了的话，android就不叫做android了。</p>
+
+<p>先来看看下面两张图片吧，分别是一个android平板设备在横屏和竖屏状态下的截图：</p>
+
+<p><img src="/wp-content/uploads/2016/07/31/android-pad-landscape.png" alt="android-pad-landscape" />
+<img src="/wp-content/uploads/2016/07/31/android-pad-portrait.png" alt="android-pad-portrait" /></p>
+
+<p>你把你手中的 android 手机分别进入横屏和竖屏状态下，再对照上面两张图片你会发现什么。
+没错的，在平板设备上屏幕旋转之后 Soft Menu Bar 也跟着旋转了，
+而在手机设备上 Soft Menu Bar 是始终固定在手机底部的。</p>
+
+<p>尼玛，太坑爹了。看到这里瞬间呕血三升，要适配手机跟平板实现是太麻烦了。
+以下是我的解决办法，先检查当前设备是否为平板，然后再分别处理。
+至于平板的判断方法就自己想办法了，我的方法也不一定准。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>if (isPad) {
+</span><span class='line'>  LANDSCAPE_WIDTH = HEIGHT + STATUS_BAR_HEIGHT + SOFT_MENU_BAR_HEIGHT;
+</span><span class='line'>  LANDSCAPE_HEIGHT = WIDTH - STATUS_BAR_HEIGHT - SOFT_MENU_BAR_HEIGHT;
+</span><span class='line'>} else {
+</span><span class='line'>  LANDSCAPE_WIDTH = HEIGHT + STATUS_BAR_HEIGHT;
+</span><span class='line'>  LANDSCAPE_HEIGHT = WIDTH - STATUS_BAR_HEIGHT;
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>以上是在 android 下遇到的第一个大坑。</p>
+
+<p>到了这里我以为一切都该结束了吧，然而没想到还有一种手机叫做魅族。如下图：</p>
+
+<p><img src="/wp-content/uploads/2016/07/31/Mezu-smart-bar.png" alt="Mezu-smart-bar" /></p>
+
+<p>在屏幕右下角其实是有一个按钮的，然而左图所示的，该按钮被魅族手机的 Smart Bar 遮住了。
+进入系统设置将 Smart Bar 隐藏后效果如右图所示。</p>
+
+<p>看到这里又吐了两口老血，此为第二个大坑。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>const SMART_BAR_HEIGHT = ExtraDimensions.get('SMART_BAR_HEIGHT');
+</span><span class='line'>
+</span><span class='line'>if (SMART_BAR_HEIGHT) {
+</span><span class='line'>  HEIGHT -= SMART_BAR_HEIGHT;
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>....
+</span><span class='line'>// 在上面 LANDSCAPE 的计算结果上再作如下处理
+</span><span class='line'>
+</span><span class='line'>if (SMART_BAR_HEIGHT) {
+</span><span class='line'>  LANDSCAPE_WIDTH += SMART_BAR_HEIGHT;
+</span><span class='line'>  LANDSCAPE_HEIGHT -= SMART_BAR_HEIGHT;
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在魅族的手机上计算屏幕高度时还需要再减去 Smart Bar 的高度，
+同时还需要注意的是， Smart Bar 跟平板上的Soft Menu Bar 一样会随着屏幕旋转而转动的。</p>
+
+<p>最后还有一点需要注意的是，在安装 <code>react-native-extra-dimensions-android</code> 库时不能直接使用 <code>npm install --save react-native-extra-dimensions-android</code> 进行安装，
+而是需要直接通过 git 仓库来安装： <code>npm install --save git+https://github.com/jaysoo/react-native-extra-dimensions-android.git</code>。</p>
+
+<p>因为在 npm 上 <code>react-native-extra-dimensions-android</code> 的最新版为 0.17.0，
+而 <code>SMART_BAR_HEIGHT</code> 的功能是在此之后才添加进来的。</p>
+
+<p>在库的版本上面又被坑了一下。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1196,261 +1389,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84154.html">在Ruby中使用DATA和__END__将代码和数据混合</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-08-23T10:12:08+08:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>23</span><span class='date-suffix'>rd</span>, <span class='date-year'>2015</span></span> <span class='time'>10:12 am</span></time>
-        
-           | <a href="http://www.xefan.com/archives/84154.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/84154.html">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>之前一直不理解 <code>__END__</code> 的用法，现在看了这篇文章后才算是了解了，于是便翻译之。<br/>
-《Mixing code and data in Ruby with DATA and __END__》: <a href="http://blog.honeybadger.io/data-and-end-in-ruby/">http://blog.honeybadger.io/data-and-end-in-ruby/</a></p>
-
-<hr />
-
-<p>你知道 Ruby 提供了一种方法在你的脚本中可以将源文件作为数据源来使用吗？当你在写一些一次性的脚本用于验证概念时这个小技巧会为你节约一些时间。让我们来看看吧。</p>
-
-<h2>DATA 和 __END__</h2>
-
-<p>在下面这个例子中，我使用了一个有趣的关键字 <code>__END__</code>。所有在 <code>__END__</code> 下面的内容将会被 Ruby 解释器所忽略。但是有趣的是 ruby 为你提供了一个称为 <code>DATA</code> 的 IO 对象，就像你可以读取其他任何文件一样，它能让你读取到 <code>__END__</code> 以下的所有内容。</p>
-
-<p>下面这个例子中，我们遍历每一行并进行输出。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">DATA</span><span class="o">.</span><span class="n">each_line</span> <span class="k">do</span> <span class="o">|</span><span class="n">line</span><span class="o">|</span>
-</span><span class='line'>  <span class="nb">puts</span> <span class="n">line</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="cp">__END__</span>
-</span><span class='line'><span class="cp">Doom</span>
-</span><span class='line'><span class="cp">Quake</span>
-</span><span class='line'><span class="cp">Diablo</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>关于这个技术我最喜欢的实例是使用 <code>DATA</code> 来包含一个 ERB 模板。它同样也可用于 YAML、CSV等等。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;erb&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">time</span> <span class="o">=</span> <span class="no">Time</span><span class="o">.</span><span class="n">now</span>
-</span><span class='line'><span class="n">renderer</span> <span class="o">=</span> <span class="no">ERB</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="no">DATA</span><span class="o">.</span><span class="n">read</span><span class="p">)</span>
-</span><span class='line'><span class="nb">puts</span> <span class="n">renderer</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
-</span><span class='line'>
-</span><span class='line'><span class="cp">__END__</span>
-</span><span class='line'><span class="cp">The current time is &lt;%= time %&gt;.</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>实际上你也可以使用 <code>DATA</code> 来读取 <code>__END__</code> 关键字以上的内容。那是因为 <code>DATA</code> 实际上是一个指向了整个源文件，并定位到 <code>__END__</code> 关键字的位置。你可以试试看在输出之前将 IO 对象反转。下面这个例子将会输出整个源文件。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">DATA</span><span class="o">.</span><span class="n">rewind</span>
-</span><span class='line'><span class="nb">puts</span> <span class="no">DATA</span><span class="o">.</span><span class="n">read</span> <span class="c1"># prints the entire source file</span>
-</span><span class='line'>
-</span><span class='line'><span class="cp">__END__</span>
-</span><span class='line'><span class="cp">meh</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>多文件问题</h2>
-
-<p>这个技术最大的缺点是它只能用于单个文件的脚本，直接运行该文件，不能在其他文件进行导入。</p>
-
-<p>下面这个例子，我们有两个文件，并且每个都有它们自己的 <code>__END__</code> 部分。然而却只有一个全局 <code>DATA</code> 对象。因此第二个文件的 <code>__END__</code> 部分刚访问不到了。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># first.rb</span>
-</span><span class='line'><span class="nb">require</span> <span class="s2">&quot;./second&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nb">puts</span> <span class="s2">&quot;First file</span><span class="se">\n</span><span class="s2">----------------------&quot;</span>
-</span><span class='line'><span class="nb">puts</span> <span class="no">DATA</span><span class="o">.</span><span class="n">read</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">print_second_data</span><span class="p">()</span>
-</span><span class='line'>
-</span><span class='line'><span class="cp">__END__</span>
-</span><span class='line'><span class="cp">First end clause</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># second.rb</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">def</span> <span class="nf">print_second_data</span>
-</span><span class='line'>  <span class="nb">puts</span> <span class="s2">&quot;Second file</span><span class="se">\n</span><span class="s2">----------------------&quot;</span>
-</span><span class='line'>  <span class="nb">puts</span> <span class="no">DATA</span><span class="o">.</span><span class="n">read</span> <span class="c1"># Won&#39;t output anything, since first.rb read the entire file</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="cp">__END__</span>
-</span><span class='line'><span class="cp"> </span>
-</span><span class='line'><span class="cp">Second end clause</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">snhorne</span> <span class="o">~</span><span class="sr">/tmp $ ruby first.rb</span>
-</span><span class='line'><span class="sr">First file</span>
-</span><span class='line'><span class="sr">----------------------</span>
-</span><span class='line'><span class="sr">First end clause</span>
-</span><span class='line'><span class="sr"> </span>
-</span><span class='line'><span class="sr">Second file</span>
-</span><span class='line'><span class="sr">----------------------</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>对于多文件的一个解决方案</h2>
-
-<p>在 Sinatra 中有一个很酷的特性是它允许你在你应用的 <code>__END__</code> 部分添加多个内联模板。它看起来像下面这样：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># This code is from the Sinatra docs at http://www.sinatrarb.com/intro.html</span>
-</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;sinatra&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">get</span> <span class="s1">&#39;/&#39;</span> <span class="k">do</span>
-</span><span class='line'>  <span class="n">haml</span> <span class="ss">:index</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="cp">__END__</span>
-</span><span class='line'><span class="cp"> </span>
-</span><span class='line'><span class="cp">@@ layout</span>
-</span><span class='line'><span class="cp">%html</span>
-</span><span class='line'><span class="cp"> </span>
-</span><span class='line'><span class="cp">  = yield</span>
-</span><span class='line'><span class="cp"> </span>
-</span><span class='line'><span class="cp">@@ index</span>
-</span><span class='line'><span class="cp">%div.title Hello world.</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>sinatra 是如何实现的呢？毕竟你的应用可能是运行在 rack 上。在生产环境中你不能再通过 <code>ruby myapp.rb</code> 来运行！他们必须有一种在多文件中使用 <code>DATA</code> 的解决方案。</p>
-
-<p>因此如果你稍微深入一下 Sinatra 的源代码，你会发现它们并没有使用 <code>DATA</code>。而是使用了跟下面这段代码类似的方案。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># I&#39;m paraphrasing. See the original at https://github.com/sinatra/sinatra/blob/master/lib/sinatra/base.rb#L1284</span>
-</span><span class='line'><span class="n">app</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="no">File</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">__FILE__</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sr">/^__END__$/</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>实际上它比这个要更复杂一些，因为它们不想读取 <code>__FILE__</code>，它只是 <code>sinatra/base.rb</code> 文件。它们其实是需要获取调用了该方法的文件的内容。它们通过解析 <code>caller</code> 的结果来获取。</p>
-
-<p><code>caller</code> 方法将会告诉你当前运行的方法是从哪调用的。这里是个简单的例子：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">some_method</span>
-</span><span class='line'>  <span class="nb">puts</span> <span class="nb">caller</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">some_method</span> <span class="c1"># =&gt; caller.rb:5:in `&lt;main&gt;&#39;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>现在可以简单地获取到文件名了，然后从该文件中再提取出与 <code>DATA</code> 等价的内容。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">get_caller_data</span>
-</span><span class='line'>  <span class="nb">puts</span> <span class="no">File</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="nb">caller</span><span class="o">.</span><span class="n">first</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;__END__&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">last</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>请善用它，不要作恶</h2>
-
-<p>希望对于这些技巧你不要经常使用。它们不会使得代码干净、可维护。</p>
-
-<p>然后，你偶尔需要一些又快又脏的实现一个一次性的脚本或者验证一些概念。此时 <code>DATA</code> 和 <code>__END__</code> 就非常有用了。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/page/2">&larr; Older</a>
@@ -1470,6 +1408,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="http://www.xefan.com/archives/84164.html">ReactNative获取设备屏幕尺寸</a>
+      </li>
+    
+      <li class="post">
         <a href="http://www.xefan.com/archives/84163.html">ReactNative Jsbundle管理</a>
       </li>
     
@@ -1485,19 +1427,15 @@
         <a href="http://www.xefan.com/archives/84160.html">gulp+browserSync配置</a>
       </li>
     
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84159.html">HTTP Access Control跨域请求</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (32)</a></li><li><a href='/categories/web开发/index.html'>web开发 (20)</a></li><li><a href='/categories/前端相关/index.html'>前端相关 (10)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (16)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (41)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (24)</a></li></ul>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (32)</a></li><li><a href='/categories/web开发/index.html'>web开发 (20)</a></li><li><a href='/categories/前端相关/index.html'>前端相关 (10)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (16)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (42)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (24)</a></li></ul>
 </section>
 <section>
   <h1>Tag Cloud</h1>
-    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 102.68656716417911%'>ajax(3)</a> <a href='/tags/android/index.html' style='font-size: 100.8955223880597%'>Android(1)</a> <a href='/tags/angular/index.html' style='font-size: 106.26865671641791%'>angular(7)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/gulp/index.html' style='font-size: 100.8955223880597%'>gulp(1)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 109.85074626865672%'>js(11)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mac/index.html' style='font-size: 100.8955223880597%'>Mac(1)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/react/index.html' style='font-size: 101.7910447761194%'>react(2)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 129.55223880597015%'>Ruby(33)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xcode/index.html' style='font-size: 100.8955223880597%'>Xcode(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 123.28358208955224%'>翻译(26)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 102.68656716417911%'>ajax(3)</a> <a href='/tags/android/index.html' style='font-size: 100.8955223880597%'>Android(1)</a> <a href='/tags/angular/index.html' style='font-size: 106.26865671641791%'>angular(7)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/gulp/index.html' style='font-size: 100.8955223880597%'>gulp(1)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 109.85074626865672%'>js(11)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mac/index.html' style='font-size: 100.8955223880597%'>Mac(1)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/react/index.html' style='font-size: 102.68656716417911%'>react(3)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 129.55223880597015%'>Ruby(33)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xcode/index.html' style='font-size: 100.8955223880597%'>Xcode(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 123.28358208955224%'>翻译(26)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
 </section>
 <section>
   <h1>Link</h1>

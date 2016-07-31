@@ -4,7 +4,7 @@
   <title><![CDATA[龍昌博客]]></title>
   <link href="http://www.xefan.com/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2016-06-26T14:00:18+08:00</updated>
+  <updated>2016-07-31T13:42:03+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -12,6 +12,176 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[ReactNative获取设备屏幕尺寸]]></title>
+    <link href="http://www.xefan.com/archives/84164.html"/>
+    <updated>2016-07-31T16:25:17+08:00</updated>
+    <id>http://www.xefan.com/archives/84164-ReactNative获取设备屏幕尺寸</id>
+    <content type="html"><![CDATA[<p>在做移动开发过程中，有时我们需要适配不同尺寸大小的屏幕。这里我们就需要到获取设备屏幕的大小。
+由于我们是使用的 ReactNative 来开发手机 app，这里就介绍一下在 ReactNative 中如何获取到设备屏幕的分辨率的。
+也算是对之前踩坑的总结吧。</p>
+
+<p>在此之前需要先了解 ReactNative 中的尺寸计算单位，它并不是使用的px。<a href="http://facebook.github.io/react-native/releases/next/docs/pixelratio.html">http://facebook.github.io/react-native/releases/next/docs/pixelratio.html</a></p>
+
+<h2>使用 Dimensions 模块</h2>
+
+<p>在 ReactNative 中有一个 Dimensions 模块，通过它可以获取当前设备的屏幕分辨率。
+参考： <a href="http://facebook.github.io/react-native/releases/next/docs/dimensions.html">http://facebook.github.io/react-native/releases/next/docs/dimensions.html</a></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>var {height, width} = Dimensions.get('window');</span></code></pre></td></tr></table></div></figure>
+
+
+<p>刚开始时我也是使用这种方法来得到整个屏幕的分辨率的，感觉轻松搞定。然而这里面却有一个坑。</p>
+
+<p>首先来看看 ios 和 android 中的界面结构：</p>
+
+<p><img src="http://www.xefan.com/wp-content/uploads/2016/07/31/ios-screen-struct.png" alt="ios-screen-struct" />
+<img src="http://www.xefan.com/wp-content/uploads/2016/07/31/android-screen-struct.png" alt="android-screen-struct" /></p>
+
+<p>如图所示，屏幕的宽度计算比较简单，就是从左边到右边的距离即可。
+然后就是屏幕的高度了，这里其实我们是需要获取到可用区域的高度。
+如图所示，对于 ios 系统来说可用区域高度就是整个屏幕的高度减去 Status Bar 的高度；
+对于 android 系统来说就是屏幕的高度减去 Status Bar 和 Soft Menu Bar 的高度。</p>
+
+<h2>获取 iOS 设备的屏幕分辨率</h2>
+
+<p>正如上面所说的，在 ios 下的计算方法为：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>var WIDTH = Dimensions.get('window').width;
+</span><span class='line'>var HEIGHT = Dimensions.get('window').height - STATUS_BAR_HEIGHT;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在 ios 系统状态栏高度(STATUS_BAR_HEIGHT)通常为 20。
+不过如果你设置了隐藏状态栏的话，那么 <code>STATUS_BAR_HEIGHT</code> 则为0。</p>
+
+<p>以上是手机竖屏的情况，在横屏状态下则交换两个值：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>var LANDSCAPE_WIDTH = HEIGHT + STATUS_BAR_HEIGHT;
+</span><span class='line'>var LANDSCAPE_HEIGHT = WIDTH - STATUS_BAR_HEIGHT;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>到了这里虽然麻烦了一点，但是总体来说也还好。问题都解决了。
+感觉生活是如此美好啊，然而这个世界上却还有一个系统名为 android。
+它有着数不清种类屏幕大小的设备，然后瞬间感觉整个人都不好了。</p>
+
+<h2>获取 Android 设备的屏幕分辨率</h2>
+
+<p>如果按照 ios 下的方法来做，获取到 <code>WIDTH</code> 是没有问题，
+但是 <code>HEIGHT</code> 的话还需要减去 Status Bar 和 Soft Menu Bar 的高度。
+因此我们还需要获取到状态栏的高度(STATUS_BAR_HEIGHT)和虚拟按钮的高度(SOFT_MENU_BAR_HEIGHT)。</p>
+
+<p>这里我们使用<a href="https://github.com/jaysoo/react-native-extra-dimensions-android">react-native-extra-dimensions-android</a>这个库。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>const ExtraDimensions = require('react-native-extra-dimensions-android');
+</span><span class='line'>
+</span><span class='line'>const STATUS_BAR_HEIGHT = ExtraDimensions.get('STATUS_BAR_HEIGHT');
+</span><span class='line'>const SOFT_MENU_BAR_HEIGHT = ExtraDimensions.get('SOFT_MENU_BAR_HEIGHT');
+</span><span class='line'>const WIDTH = ExtraDimensions.get('REAL_WINDOW_WIDTH');
+</span><span class='line'>const HEIGHT = ExtraDimensions.get('REAL_WINDOW_HEIGHT') - STATUS_BAR_HEIGHT - SOFT_MENU_BAR_HEIGHT;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>以上是设备竖屏的结果，在横屏下你以为是不是只需要交换两个值就搞定了呢。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>var LANDSCAPE_WIDTH = HEIGHT + STATUS_BAR_HEIGHT;
+</span><span class='line'>var LANDSCAPE_HEIGHT = WIDTH - STATUS_BAR_HEIGHT;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Naive!!如果这么轻松就搞定了的话，android就不叫做android了。</p>
+
+<p>先来看看下面两张图片吧，分别是一个android平板设备在横屏和竖屏状态下的截图：</p>
+
+<p><img src="http://www.xefan.com/wp-content/uploads/2016/07/31/android-pad-landscape.png" alt="android-pad-landscape" />
+<img src="http://www.xefan.com/wp-content/uploads/2016/07/31/android-pad-portrait.png" alt="android-pad-portrait" /></p>
+
+<p>你把你手中的 android 手机分别进入横屏和竖屏状态下，再对照上面两张图片你会发现什么。
+没错的，在平板设备上屏幕旋转之后 Soft Menu Bar 也跟着旋转了，
+而在手机设备上 Soft Menu Bar 是始终固定在手机底部的。</p>
+
+<p>尼玛，太坑爹了。看到这里瞬间呕血三升，要适配手机跟平板实现是太麻烦了。
+以下是我的解决办法，先检查当前设备是否为平板，然后再分别处理。
+至于平板的判断方法就自己想办法了，我的方法也不一定准。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>if (isPad) {
+</span><span class='line'>  LANDSCAPE_WIDTH = HEIGHT + STATUS_BAR_HEIGHT + SOFT_MENU_BAR_HEIGHT;
+</span><span class='line'>  LANDSCAPE_HEIGHT = WIDTH - STATUS_BAR_HEIGHT - SOFT_MENU_BAR_HEIGHT;
+</span><span class='line'>} else {
+</span><span class='line'>  LANDSCAPE_WIDTH = HEIGHT + STATUS_BAR_HEIGHT;
+</span><span class='line'>  LANDSCAPE_HEIGHT = WIDTH - STATUS_BAR_HEIGHT;
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>以上是在 android 下遇到的第一个大坑。</p>
+
+<p>到了这里我以为一切都该结束了吧，然而没想到还有一种手机叫做魅族。如下图：</p>
+
+<p><img src="http://www.xefan.com/wp-content/uploads/2016/07/31/Mezu-smart-bar.png" alt="Mezu-smart-bar" /></p>
+
+<p>在屏幕右下角其实是有一个按钮的，然而左图所示的，该按钮被魅族手机的 Smart Bar 遮住了。
+进入系统设置将 Smart Bar 隐藏后效果如右图所示。</p>
+
+<p>看到这里又吐了两口老血，此为第二个大坑。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>const SMART_BAR_HEIGHT = ExtraDimensions.get('SMART_BAR_HEIGHT');
+</span><span class='line'>
+</span><span class='line'>if (SMART_BAR_HEIGHT) {
+</span><span class='line'>  HEIGHT -= SMART_BAR_HEIGHT;
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>....
+</span><span class='line'>// 在上面 LANDSCAPE 的计算结果上再作如下处理
+</span><span class='line'>
+</span><span class='line'>if (SMART_BAR_HEIGHT) {
+</span><span class='line'>  LANDSCAPE_WIDTH += SMART_BAR_HEIGHT;
+</span><span class='line'>  LANDSCAPE_HEIGHT -= SMART_BAR_HEIGHT;
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在魅族的手机上计算屏幕高度时还需要再减去 Smart Bar 的高度，
+同时还需要注意的是， Smart Bar 跟平板上的Soft Menu Bar 一样会随着屏幕旋转而转动的。</p>
+
+<p>最后还有一点需要注意的是，在安装 <code>react-native-extra-dimensions-android</code> 库时不能直接使用 <code>npm install --save react-native-extra-dimensions-android</code> 进行安装，
+而是需要直接通过 git 仓库来安装： <code>npm install --save git+https://github.com/jaysoo/react-native-extra-dimensions-android.git</code>。</p>
+
+<p>因为在 npm 上 <code>react-native-extra-dimensions-android</code> 的最新版为 0.17.0，
+而 <code>SMART_BAR_HEIGHT</code> 的功能是在此之后才添加进来的。</p>
+
+<p>在库的版本上面又被坑了一下。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[ReactNative Jsbundle管理]]></title>
@@ -2313,50 +2483,6 @@ angularjs 2.0 的理念又变为了 Web 组件，与 1.x 不兼容。
 <p>这个问题不是太重要，稍微注意一下即可。</p>
 
 <p>原文地址：<a href="http://rocket-science.ru/hacking/2013/12/17/ruby-memory-pitfalls/">http://rocket-science.ru/hacking/2013/12/17/ruby-memory-pitfalls/</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[未来的Ruby 3.0]]></title>
-    <link href="http://www.xefan.com/archives/84144.html"/>
-    <updated>2015-05-13T21:33:08+08:00</updated>
-    <id>http://www.xefan.com/archives/84144-未来的Ruby 3.0</id>
-    <content type="html"><![CDATA[<p>原文地址：<a href="http://hrnabi.com/2015/05/12/7035/  ">http://hrnabi.com/2015/05/12/7035/  </a>
-谁日语好的为大家做下贡献，把原文翻译一下吧。</p>
-
-<p>反正我不会日语，根据文中的一些汉字连蒙带猜的，大致看了一遍，现在简单总结一下。
-如果有总结得不对的，本人不负责哦。</p>
-
-<p>看来要玩好Ruby不仅需要学英语，也还得学日语啊。</p>
-
-<hr />
-
-<p>在2014年9月举行的 RubyKaigi 2014 大会上，Matz在演讲过程中首次提到了 Ruby 3.0。<br/>
-文中说的Ruby 3.0的三个工作方向：</p>
-
-<ul>
-<li>Concurrency (并行性)</li>
-<li>JIT (即时编译)</li>
-<li>Static typing (静态类型)</li>
-</ul>
-
-
-<p>Ruby要引入静态类型检查？<br/>
-Matz说，在20世纪出生的语言大多是脚本语言，如：Ruby、PHP和Perl、JavaScript，这些都不是静态类型的。
-另一方面，最近推出的如Scala和Dart、Go是属于静态类型的。
-在Ruby中可以考虑引入Python这种通过注释来进行检查的方法。</p>
-
-<p>Ruby要引入并行计算？<br/>
-Matz详细讨论了静态类型，但没有提到并行计算。详细的内容是由笹田氏来说的。<br/>
-（这部分内容我没看懂，只是大概知道这位笹田氏的博士论文与这个相关。）<br/>
-关于并行计算，Matz提到了Erlang和Scala的actor模型。</p>
-
-<p>最后期待下一个Ruby开发者大会。</p>
-
-<hr />
-
-<p>好了，我只看懂了这么多。其余的各位感兴趣的自己去看原文吧。
-(怎么感觉好坑啊，这总结得跟没总结一样啊。没办法了我的日语水平有限。)</p>
 ]]></content>
   </entry>
   
