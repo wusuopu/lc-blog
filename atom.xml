@@ -4,7 +4,7 @@
   <title><![CDATA[龍昌博客]]></title>
   <link href="http://www.xefan.com/atom.xml" rel="self"/>
   <link href="http://www.xefan.com/"/>
-  <updated>2016-07-31T13:42:03+08:00</updated>
+  <updated>2016-08-20T17:38:11+08:00</updated>
   <id>http://www.xefan.com/</id>
   <author>
     <name><![CDATA[龍昌]]></name>
@@ -12,6 +12,127 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[使用CodePush对ReactNative进行热更新]]></title>
+    <link href="http://www.xefan.com/archives/84165.html"/>
+    <updated>2016-08-20T16:15:34+08:00</updated>
+    <id>http://www.xefan.com/archives/84165-使用CodePush对ReactNative进行热更新</id>
+    <content type="html"><![CDATA[<p><a href="http://microsoft.github.io/code-push/">CodePush</a>是微软提供的可用于对 Cordova 和 ReactNative 进行代码热更新的库。
+在其官方的文档中已经写得很详细了，按照其说明来配置即可。我这里只是对在使用过程中遇到的一些坑作为总结。</p>
+
+<h2>创建应用</h2>
+
+<p>首先注册一个账号并创建一个 CodePush 的应用：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>npm install -g code-push-cli
+</span><span class='line'>code-push register
+</span><span class='line'>code-push app add &lt;appName&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>安装配置CodePush</h2>
+
+<p>按照说明 <a href="https://github.com/Microsoft/react-native-code-push#getting-started%EF%BC%8C%E4%BD%BF%E7%94%A8">https://github.com/Microsoft/react-native-code-push#getting-started%EF%BC%8C%E4%BD%BF%E7%94%A8</a> rnpm 进行安装即可：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>npm install --save react-native-code-push
+</span><span class='line'>rnpm link react-native-code-push</span></code></pre></td></tr></table></div></figure>
+
+
+<p>安装完成之后还需要再进行一些配置，对于 iOS 需要将 <code>AppDelegate.m</code> 文件中的 <code>jsCodeLocation</code> 修改为： <code>jsCodeLocation = [CodePush bundleURL];</code>。
+同时再在 <code>Info.plist</code> 文件中添加一项 <code>CodePushDeploymentKey</code>，其值为 CodePush 应用的 Deployment Key。</p>
+
+<p>对于 android 需要在 <code>MainActivity</code> 类的 <code>getPackages</code> 方法中设置 Deployment Key。同时根据 ReactNative 的版本不同而使用不同的方法来设置 <code>getJSBundleFile</code>，
+参考： <code>https://github.com/Microsoft/react-native-code-push#android-setup</code>。</p>
+
+<h2>程序更新</h2>
+
+<p>在安装、配置完成之后，即可以使用CodePush进行程序的更新操作了。
+根据官方的说明只需要调用 <code>CodePush.sync()</code> 即可完成自动更新操作。
+我针对自己的情况再进行封装了一下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>function syncCodePush() {
+</span><span class='line'>  NetInfo.fetch().done(
+</span><span class='line'>    (reach) =&gt; {
+</span><span class='line'>      // 检查网络环境
+</span><span class='line'>      if (_.includes(['wifi', 'WIFI', 'VPN'], reach)) {
+</span><span class='line'>        CodePush.sync().done(
+</span><span class='line'>          () =&gt; {
+</span><span class='line'>            // 检查更新成功
+</span><span class='line'>          },
+</span><span class='line'>          (err) =&gt; {
+</span><span class='line'>            // 更新失败
+</span><span class='line'>          }
+</span><span class='line'>        );
+</span><span class='line'>      }
+</span><span class='line'>    }
+</span><span class='line'>  );
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>以上函数是保证只有在wifi的网络环境下才进行更新操作，同时由于 <code>CodePush.sync()</code> 返回的是一个 <code>Promise</code> 对象，
+在这里我就遇到了由于网络异常而下载出错，从而导致 app 崩溃。因此需要处理 <code>reject</code> 的情况。</p>
+
+<p>有时在程序更新之后的首次运行时可能会需要作一些迁移的操作，这里可以使用 <code>getUpdateMetadata</code> 来检查程序是不是首次运行。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Codepush.getUpdateMetadata().then(
+</span><span class='line'>  (update) =&gt; {
+</span><span class='line'>    if (update && update.isFirstRun) {
+</span><span class='line'>      // 首次运行执行一些操作
+</span><span class='line'>    }
+</span><span class='line'>  }
+</span><span class='line'>).done( callback );</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>发布更新</h2>
+
+<p>在 app 发布安装包发布出去之后，已经有用户下载安装了。此时如果再有 js 代码更新或者图片文件的改动的话，可以使用 CodePush 进行发布。
+进入 ReactNative 的项目根目录，使用 code-push 命令进行发布更新。例如：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>code-push release-react DemoApp ios -m -d Staging --des "更新描述" -t "~2.0.0"</span></code></pre></td></tr></table></div></figure>
+
+
+<p>以上命令是发布一个紧急更新到 Staging ，只有 ios appp 的版本为 2.0~3.0 的才会下载该更新包。
+由于是紧急更新，app在下载安装完成之后会自动重启应用该更新包。否则的话就需要用户下次手动启动app时该更新包才会生效。</p>
+
+<p>在 CodePush 中针对 ios 和 android 可以共用一个应用，只是我个人感觉这样在管理 deployment history 时不太方便。
+因此我通常会创建两个应用，例如： DemoApp-iOS、DemoApp-Android 这样的。</p>
+
+<p>需要注意的是，由于 CodePush 的 server 是在国外，因此下载的速度会比较慢。</p>
+
+<p>最后我自己使用 Electron + Vue.js 开发了一个 CodePush 的简易管理工具，<a href="https://github.com/wusuopu/code-push-gui">https://github.com/wusuopu/code-push-gui</a> 。
+可以对 CodePush 的 app 跟 deployment 进行简单的管理。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[ReactNative获取设备屏幕尺寸]]></title>
@@ -2371,118 +2492,6 @@ angularjs 2.0 的理念又变为了 Web 组件，与 1.x 不兼容。
 <em>浏览器中显示服务端返回的时间戳</em></p>
 
 <p>原文地址： <a href="http://blog.honeybadger.io/how-unicorn-talks-to-nginx-an-introduction-to-unix-sockets-in-ruby/">http://blog.honeybadger.io/how-unicorn-talks-to-nginx-an-introduction-to-unix-sockets-in-ruby/</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Ruby的内存陷阱]]></title>
-    <link href="http://www.xefan.com/archives/84145.html"/>
-    <updated>2015-05-14T21:24:21+08:00</updated>
-    <id>http://www.xefan.com/archives/84145-Ruby的内存陷阱</id>
-    <content type="html"><![CDATA[<p>Ruby有一套自动的内存管理机制。这在大多数情况下是不错的，但是有时它却是个麻烦。</p>
-
-<p>Ruby的内存管理既简洁又笨重。它将对象（名为 <code>RVALUE</code>）存储在大约有16KB大小的堆中。
-从底层上，<code>RVALUE</code> 是一个 <code>C</code> 的结构体，它包含了一个共同体表示不同的标准ruby对象。</p>
-
-<p>因此在堆中存储着大小不超过40字节的 <code>RVALUE</code> 对象，如 <code>String</code>、<code>Array</code>、<code>Hash</code>等。
-这意味着小的对象在堆中很合适，但是一旦它们达到到阈值，那么就需要在Ruby的堆之外再分配一片额外的内存。</p>
-
-<p><strong>这块额外的内存空间是灵活的。一旦对象被垃圾回收了它就会被释放掉。但是堆本身的内存是不会被释放给操作系统的。</strong></p>
-
-<p>让我们来看一个简单的例子：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">report</span>
-</span><span class='line'>  <span class="nb">puts</span> <span class="s1">&#39;Memory &#39;</span> <span class="o">+</span> <span class="sb">`ps ax -o pid,rss | grep -E &quot;^[[:space:]]*</span><span class="si">#{</span><span class="vg">$$</span><span class="si">}</span><span class="sb">&quot;`</span>
-</span><span class='line'>          <span class="o">.</span><span class="n">strip</span><span class="o">.</span><span class="n">split</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:to_i</span><span class="p">)</span><span class="o">[</span><span class="mi">1</span><span class="o">].</span><span class="n">to_s</span> <span class="o">+</span> <span class="s1">&#39;KB&#39;</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">report</span>
-</span><span class='line'><span class="n">big_var</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="mi">10_000_000</span>
-</span><span class='line'><span class="n">report</span>
-</span><span class='line'><span class="n">big_var</span> <span class="o">=</span> <span class="kp">nil</span>
-</span><span class='line'><span class="n">report</span>
-</span><span class='line'><span class="no">ObjectSpace</span><span class="o">.</span><span class="n">garbage_collect</span>
-</span><span class='line'><span class="nb">sleep</span> <span class="mi">1</span>
-</span><span class='line'><span class="n">report</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1"># ⇒ Memory 11788KB</span>
-</span><span class='line'><span class="c1"># ⇒ Memory 65188KB</span>
-</span><span class='line'><span class="c1"># ⇒ Memory 65188KB</span>
-</span><span class='line'><span class="c1"># ⇒ Memory 11788KB</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这里我们分配了大量的内存，使用完后又释放给操作系统。这一切看起来似乎没有问题。现在让我们稍微修改一下代码：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">-</span>  <span class="n">big_var</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="mi">10_000_000</span>
-</span><span class='line'><span class="o">+</span>  <span class="n">big_var</span> <span class="o">=</span> <span class="mi">1_000_000</span><span class="o">.</span><span class="n">times</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:to_s</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这只是一个简单的修改，不是吗。但是结果：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># ⇒ Memory 11788KB</span>
-</span><span class='line'><span class="c1"># ⇒ Memory 65188KB</span>
-</span><span class='line'><span class="c1"># ⇒ Memory 65188KB</span>
-</span><span class='line'><span class="c1"># ⇒ Memory 57448KB</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>怎么回事？内存没有释放归还给操作系统。这是因为数组中的每个元素符合 <code>RVALUE</code> 的大小并存储在ruby的堆中。</p>
-
-<p>在大多情况下这是正常的。现在ruby堆中多了许多空的位置，再次运行代码将不会再消耗额外的内存了。
-每次我们处理 <code>big_var</code> 和一些空的堆时， <code>GC[:heap_used]</code>的值果然减小了。
-对于这些操作Ruby是早有准备，注意这里是Ruby而不是操作系统。</p>
-
-<p>因此，对于创建大量的符合40个字节的临时变量就要注意了：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">big_var</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="mi">10_000_000</span>
-</span><span class='line'><span class="n">big_var</span><span class="o">.</span><span class="n">gsub</span><span class="p">(</span><span class="sr">/\s/</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">c</span><span class="o">|</span> <span class="s1">&#39;-&#39;</span> <span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>结果同样是Ruby的内存疯狂增长，并且这部分内存在程序运行期间是不会归还给操作系统的：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># ⇒ Memory 10156KB</span>
-</span><span class='line'><span class="c1"># ⇒ Memory 13788KB</span>
-</span><span class='line'><span class="c1"># ⇒ Memory 13788KB</span>
-</span><span class='line'><span class="c1"># ⇒ Memory 12808KB</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这个问题不是太重要，稍微注意一下即可。</p>
-
-<p>原文地址：<a href="http://rocket-science.ru/hacking/2013/12/17/ruby-memory-pitfalls/">http://rocket-science.ru/hacking/2013/12/17/ruby-memory-pitfalls/</a></p>
 ]]></content>
   </entry>
   

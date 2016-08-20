@@ -9,10 +9,10 @@
   <meta name="author" content="龍昌">
 
   
-  <meta name="description" content="使用nfs根文件系统对于开发非常方便，不用每次编译好后又要烧写到开发板上。 设置方法：
-打开开发板电源后进入u-boot，然后选择“[0] Set the boot parameters”。
-再选择“[1] Set NFS boot parameter ”。
-然后依次输入PC的IP、开发板的IP、 &hellip;">
+  <meta name="description" content="基姆拉尔森计算公式
+W= (d+2*m+3*(m+1)/5+y+y/4-y/100+y/400) mod 7 在公式中d表示日期中的日数+1，m表示月份数，y表示年数。
+注意：在公式中有个与其他公式不同的地方：
+把一月和二月看成是上一年的十三月和十四月，例：如果是2004-1-10则换算成： &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -69,6 +69,148 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83714.html">使用Python打印日历</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2012-04-13T00:00:00+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>12:00 am</span></time>
+        
+           | <a href="http://www.xefan.com/archives/83714.html#disqus_thread"
+             data-disqus-identifier="http://www.xefan.com/archives/83714.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>基姆拉尔森计算公式<br/>
+<code>W= (d+2*m+3*(m+1)/5+y+y/4-y/100+y/400) mod 7</code></p>
+
+<p>在公式中d表示日期中的日数+1，m表示月份数，y表示年数。<br/>
+注意：在公式中有个与其他公式不同的地方：<br/>
+把一月和二月看成是上一年的十三月和十四月，例：如果是2004-1-10则换算成：2003-13-10来代入公式计算。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="c">#!/usr/bin/env python</span>
+</span><span class='line'><span class="c">#-*- coding:utf-8 -*-</span>
+</span><span class='line'><span class="c">##</span>
+</span><span class='line'><span class="c"># @文件名(file): date.py</span>
+</span><span class='line'><span class="c"># @作者(author): 龙昌锦(LongChangjin)</span>
+</span><span class='line'><span class="c"># @博客(blog): http://www.xefan.com</span>
+</span><span class='line'><span class="c"># @时间(date): 2012-04-13</span>
+</span><span class='line'><span class="c"># </span>
+</span><span class='line'>
+</span><span class='line'><span class="n">monthday</span> <span class="o">=</span> <span class="p">[</span><span class="mi">31</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">31</span><span class="p">]</span>
+</span><span class='line'><span class="n">weekname</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;星期日&quot;</span><span class="p">,</span><span class="s">&quot;星期一&quot;</span><span class="p">,</span><span class="s">&quot;星期二&quot;</span><span class="p">,</span><span class="s">&quot;星期三&quot;</span><span class="p">,</span><span class="s">&quot;星期四&quot;</span><span class="p">,</span><span class="s">&quot;星期五&quot;</span><span class="p">,</span><span class="s">&quot;星期六&quot;</span><span class="p">]</span>
+</span><span class='line'><span class="c"># 计算某年某月某日是星期几</span>
+</span><span class='line'><span class="c"># 基姆拉尔森计算公式</span>
+</span><span class='line'><span class="k">def</span> <span class="nf">week</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+</span><span class='line'>    <span class="k">if</span> <span class="n">m</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">m</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+</span><span class='line'>        <span class="n">m</span> <span class="o">=</span> <span class="n">m</span> <span class="o">+</span> <span class="mi">12</span>
+</span><span class='line'>        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="mi">1</span>
+</span><span class='line'>    <span class="n">w</span> <span class="o">=</span> <span class="p">((</span><span class="n">d</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">m</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="p">(</span><span class="n">m</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">5</span> <span class="o">+</span> <span class="n">y</span> <span class="o">+</span> <span class="n">y</span><span class="o">/</span><span class="mi">4</span> <span class="o">-</span> <span class="n">y</span><span class="o">/</span><span class="mi">100</span> <span class="o">+</span> <span class="n">y</span><span class="o">/</span><span class="mi">400</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">7</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">year</span><span class="p">,</span> <span class="n">month</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s">&quot;输入日期，如：2012,4:&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="k">if</span> <span class="n">year</span><span class="o">%</span><span class="mi">4</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span><span class='line'>    <span class="n">monthday</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">29</span>
+</span><span class='line'><span class="n">w</span> <span class="o">=</span> <span class="n">week</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%d</span><span class="s">年</span><span class="si">%d</span><span class="s">月&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">))</span>
+</span><span class='line'><span class="k">print</span> <span class="n">weekname</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">weekname</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">weekname</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">weekname</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">weekname</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">weekname</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">weekname</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span>
+</span><span class='line'><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span class='line'><span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">w</span><span class="p">:</span>
+</span><span class='line'>    <span class="k">print</span><span class="p">(</span><span class="s">&quot;      &quot;</span><span class="p">),</span>
+</span><span class='line'>    <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+</span><span class='line'><span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span class='line'><span class="k">while</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">monthday</span><span class="p">[</span><span class="n">month</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+</span><span class='line'>    <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%3d</span><span class="s">   &quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">),</span>
+</span><span class='line'>    <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+</span><span class='line'>    <span class="n">w</span> <span class="o">=</span> <span class="n">w</span> <span class="o">+</span> <span class="mi">1</span>
+</span><span class='line'>    <span class="k">if</span> <span class="n">w</span> <span class="o">==</span> <span class="mi">7</span><span class="p">:</span>
+</span><span class='line'>        <span class="k">print</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">w</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#运行结果如下：</span>
+</span><span class='line'><span class="c">#[lcj@lcj time]$ python date.py </span>
+</span><span class='line'><span class="c">#输入日期，如：2012,4:2012,2</span>
+</span><span class='line'><span class="c">#2012年2月</span>
+</span><span class='line'><span class="c">#星期日 星期一 星期二 星期三 星期四 星期五 星期六</span>
+</span><span class='line'><span class="c">#                       1      2      3      4    </span>
+</span><span class='line'><span class="c">#  5      6      7      8      9     10     11    </span>
+</span><span class='line'><span class="c"># 12     13     14     15     16     17     18    </span>
+</span><span class='line'><span class="c"># 19     20     21     22     23     24     25    </span>
+</span><span class='line'><span class="c"># 26     27     28     29   </span>
+</span><span class='line'><span class="c">#[lcj@lcj time]$ </span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1579,79 +1721,6 @@ option：为WNOHANG时若无任何已结束的子进程则马上返回，不予�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/83668.html">Windows下静态编译Qt4</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2011-12-29T00:00:00+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>29</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
-        
-           | <a href="http://www.xefan.com/archives/83668.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/83668.html">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>既然是静态编译，那就要编译出来的程序不信赖于任何dll文件。<br/>
-首先下载qt-win-opensource-4.7.4-mingw.exe： <a href="http://get.qt.nokia.com/qt/source/qt-win-opensource-4.7.4-mingw.exe">http://get.qt.nokia.com/qt/source/qt-win-opensource-4.7.4-mingw.exe</a> 和MinGW-gcc440_1.zip： <a href="http://get.qt.nokia.com/misc/MinGW-gcc440_1.zip">http://get.qt.nokia.com/misc/MinGW-gcc440_1.zip</a></p>
-
-<p>然后依次解压MinGW-gcc440_1.zip、安装qt-win-opensource-4.7.4-mingw.exe。记得要将gcc的目录和qt的目录添加到环境变量中。</p>
-
-<p>然后打开DOS窗口并切换到Qt的目录（比如我的是D:\Qt\4.7.4），再设置两个变量<br/>
-<em>set QTDIR=D:\Qt\4.7.4</em><br/>
-<em> set QMAKESPEC=win32-g++</em></p>
-
-<p>再编辑D:\Qt\4.7.4\mkspecs\win32-g++\qmake.conf文件（最好先备份），改两处：<br/>
-<em>QMAKE_LFLAGS = -enable-stdcall-fixup -Wl,-enable-auto-import -Wl,-enable-runtime-pseudo-reloc</em><br/>
-修改为<br/>
-<em>QMAKE_LFLAGS = <span style="color: #ff0000;">-static</span> -enable-stdcall-fixup -Wl,-enable-auto-import -Wl,-enable-runtime-pseudo-reloc</em><br/>
-再将<br/>
-<em>QMAKE_LFLAGS_DLL = -shared</em><br/>
-修改为<br/>
-<em>QMAKE_LFLAGS_DLL = -static</em></p>
-
-<p>再执行命令：<br/>
-configure -platform win32-g++ <span style="color: #ff0000;">-release</span> -opensource <span style="color: #ff0000;">-static</span> -fast -qt-sql-sqlite -plugin-sql-sqlite -qt-zlib -qt-gif -qt-libpng -qt-libmng -qt-libtiff -qt-libjpeg -no-webkit -nomake examples -nomake docs -nomake demos</p>
-
-<p>如果有提问是否遵守LGPL协议，选y。配置完成后，最后两句是这样的：<br/>
-Qt is now configured for building. Just run mingw32-make.<br/>
-To reconfigure, run mingw32-make confclean and configure.</p>
-
-<p>cd src<br/>
-mingw32-make -i -k</p>
-
-<p>注意：我们只在在Qt子目录src里运行make。不要在整个qt库的大目录下运行make。只在src目录make，这样只编译核心的Qt库和一些插件，节省时间，而且有核心Qt库就够用了。<br/>
-如果在D:\Qt\4.7.4\ 整个大目录下运行make，那么make还会去重新编译生成tools目录下的代码，重新做工具程序，像assistant.exe、designer.exe、linguist.exe、qmlviewer.exe等等（生成后全在bin目录）。这些工具使用静态库生成后巨大无比。这些工具程序不管是静态链接还是动态链接生成的，对我们编程压根没影响，都一样用。</p>
-
-<p>好了，接下来就是漫长的等待。2个多小时左右就应该可以编译完成了。<br/>
-此时再用Qt编译生成的可执行文件不用再信赖Qt的动态库了,但是文件比较大随便一个都是10M以上，而且如果使用的是从qt官网下载的MinGW-gcc编译生成的可执行文件还是会信赖mingwm10.dll动态库。这个只需换一个版本的编译器即可，我用的是这个： <a href="http://115.com/file/dn3fkn1g">http://115.com/file/dn3fkn1g</a></p>
-
-<p>如果嫌这个过程太麻烦可以直接下载我编译好的静态库来使用：<br/>
-Qt4.7.4_Win32静态库.part1.rar： <a href="http://115.com/file/dn3zwayy  ">http://115.com/file/dn3zwayy  </a>
-Qt4.7.4_Win32静态库.part2.rar： <a href="http://115.com/file/dn3zwa9g  ">http://115.com/file/dn3zwa9g  </a>
-这个是完整版的，解压下来有2G多。如果觉得太大了可以下载精简版：<br/>
-Qt4.7.4_Win32静态库精简版.rar： <a href="http://115.com/file/bhy7bat6  ">http://115.com/file/bhy7bat6  </a>
-精简版只保留了编译时需要的库文件和qmake等必要的工具，解压下来有500M左右。<br/>
-注意：只有解压到D盘根目录下才能使用<br/>
-编译器用的是mingw-7.2.exe： <a href="http://115.com/file/dn3fkn1g">http://115.com/file/dn3fkn1g</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/page/17">&larr; Older</a>
@@ -1673,6 +1742,10 @@ Qt4.7.4_Win32静态库精简版.rar： <a href="http://115.com/file/bhy7bat6  ">
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="http://www.xefan.com/archives/84165.html">使用CodePush对ReactNative进行热更新</a>
+      </li>
+    
+      <li class="post">
         <a href="http://www.xefan.com/archives/84164.html">ReactNative获取设备屏幕尺寸</a>
       </li>
     
@@ -1688,19 +1761,15 @@ Qt4.7.4_Win32静态库精简版.rar： <a href="http://115.com/file/bhy7bat6  ">
         <a href="http://www.xefan.com/archives/84161.html">Mac OS中VirtualBox的Android蓝牙设置</a>
       </li>
     
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84160.html">gulp+browserSync配置</a>
-      </li>
-    
   </ul>
 </section>
 <section>
   <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (32)</a></li><li><a href='/categories/web开发/index.html'>web开发 (20)</a></li><li><a href='/categories/前端相关/index.html'>前端相关 (10)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (16)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (42)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (24)</a></li></ul>
+    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (32)</a></li><li><a href='/categories/web开发/index.html'>web开发 (20)</a></li><li><a href='/categories/前端相关/index.html'>前端相关 (10)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (11)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (16)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (43)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (24)</a></li></ul>
 </section>
 <section>
   <h1>Tag Cloud</h1>
-    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 102.68656716417911%'>ajax(3)</a> <a href='/tags/android/index.html' style='font-size: 100.8955223880597%'>Android(1)</a> <a href='/tags/angular/index.html' style='font-size: 106.26865671641791%'>angular(7)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/gulp/index.html' style='font-size: 100.8955223880597%'>gulp(1)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 109.85074626865672%'>js(11)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mac/index.html' style='font-size: 100.8955223880597%'>Mac(1)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/react/index.html' style='font-size: 102.68656716417911%'>react(3)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 129.55223880597015%'>Ruby(33)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xcode/index.html' style='font-size: 100.8955223880597%'>Xcode(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 123.28358208955224%'>翻译(26)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
+    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 102.68656716417911%'>ajax(3)</a> <a href='/tags/android/index.html' style='font-size: 100.8955223880597%'>Android(1)</a> <a href='/tags/angular/index.html' style='font-size: 106.26865671641791%'>angular(7)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/gulp/index.html' style='font-size: 100.8955223880597%'>gulp(1)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 109.85074626865672%'>js(11)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mac/index.html' style='font-size: 100.8955223880597%'>Mac(1)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/react/index.html' style='font-size: 103.58208955223881%'>react(4)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 129.55223880597015%'>Ruby(33)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xcode/index.html' style='font-size: 100.8955223880597%'>Xcode(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 123.28358208955224%'>翻译(26)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
 </section>
 <section>
   <h1>Link</h1>
