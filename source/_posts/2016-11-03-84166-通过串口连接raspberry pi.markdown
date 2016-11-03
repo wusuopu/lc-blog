@@ -1,0 +1,36 @@
+---
+layout: post
+title: "通过串口连接raspberry pi"
+date: 2016-11-03 05:35:57 +0000
+comments: true
+post_id: 84166
+permalink: /archives/84166.html
+categories: ["嵌入式栏目"]
+tags: ["Raspberry pi"]
+---
+
+最近在玩树莓派，有时没有网络，也没有显示器，此时如果想要连接树莓派执行一些操作的话会很麻烦。
+因为之前玩过 ARM 的开发板编程，因此想能不能通过串口登录到 pi 呢。于是网上查了一下，还真的可以哦。
+以下就作为备忘笔记记录一下操作过程。
+
+1.首先需要一根 USB 转串口的线，如果没有的话可以去某宝上买一根吧，反正也不贵。我选的是 PL2303。
+再根据系统以及芯片的不同而下载安装不同的驱动程序。 对于 mac OS 用户执行命令： `ls /dev/ | grep tty.usb` ，
+如果驱动都安装正确的话应该是会有输出结果的。
+
+
+2.然后在 pi 的系统上启用 serial。我安装的是 debian 系统，执行命令： `sudo raspi-config` ，
+选择 `advanced options` -> `serial` 进行启用 serial。
+
+3.串口连接  
+
+对于 Raspberry Pi3 的 GPIO 引脚如下：  
+![pi3_gpio](/wp-content/uploads/2016/11/03/pi3_gpio.png)
+
+串口线与 pi 的连接方式为： GND -> GND, RXD -> TXD, TXD -> RXD， 如图：  
+![pi3-board](/wp-content/uploads/2016/11/03/pi3-board.png)
+
+最后在电脑上使用串口连接软件进行连接，对应的串口设置为 115200 8N1，如图：  
+![raspberry-pi-serial](/wp-content/uploads/2016/11/03/raspberry-pi-serial.png)
+
+
+参考资料： http://elinux.org/RPi_Serial_Connection
