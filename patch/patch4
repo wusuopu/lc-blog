@@ -1,0 +1,44 @@
+--- node_modules/hexo/lib/hexo/post.js	2017-01-21 23:24:08.000000000 +0800
++++ post.js	2017-01-21 23:59:09.000000000 +0800
+@@ -46,6 +46,21 @@
+   data.layout = (data.layout || config.default_layout).toLowerCase();
+   data.date = data.date ? moment(data.date) : moment();
+ 
++  var sourceDir = config.source_dir;
++  var postDir = pathFn.join(sourceDir, '_posts');
++  var allPosts = fs.listDirSync(postDir).sort();
++  var postId = 0;                 // 文章编号
++  _.each(allPosts, function(f) {
++    if (f.endsWith('.markdown')) {
++      var num = parseInt(f.split('-')[3], 10)
++      if (num && num > postId) {
++        postId = num
++      }
++    }
++  });
++  postId++;
++  data.post_id = postId;
++
+   return Promise.all([
+     // Get the post path
+     ctx.execFilter('new_post_path', data, {
+@@ -63,7 +78,7 @@
+       // Write content to file
+       fs.writeFile(path, content),
+       // Create asset folder
+-      createAssetFolder(path, config.post_asset_folder)
++      // createAssetFolder(path, config.post_asset_folder)
+     ]).then(function() {
+       ctx.emit('new', result);
+     }).thenReturn(result);
+@@ -129,8 +144,8 @@
+     for (var i = 0, len = keys.length; i < len; i++) {
+       key = keys[i];
+ 
+-      if (!preservedKeys[key] && obj[key] == null) {
+-        obj[key] = data[key];
++      if (_.has(obj, key)) {
++        obj[key] = JSON.stringify(data[key]);
+       }
+     }
+ 

@@ -5,7 +5,7 @@ date: 2016-03-17 08:35:12 +0000
 comments: true
 post_id: 84159
 permalink: /archives/84159.html
-categories: ["web开发"]
+categories: ["Web开发"]
 tags: ["ajax"]
 ---
 

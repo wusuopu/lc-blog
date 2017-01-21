@@ -5,7 +5,7 @@ date: 2014-11-11 13:02:17 +0000
 comments: true
 post_id: 84135
 permalink: /archives/84135.html
-categories: ["web开发", "python栏目"]
+categories: ["Web开发", "Python栏目"]
 tags: ["Django", "python"]
 ---
 
