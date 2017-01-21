@@ -1,1518 +1,825 @@
-
 <!DOCTYPE html>
-<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
-<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
-<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<html>
 <head>
   <meta charset="utf-8">
+  
   <title>龍昌博客</title>
-  <meta name="author" content="龍昌">
-
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="关注Linux及开源信息">
+<meta property="og:type" content="website">
+<meta property="og:title" content="龍昌博客">
+<meta property="og:url" content="http://www.xefan.com/index.html">
+<meta property="og:site_name" content="龍昌博客">
+<meta property="og:description" content="关注Linux及开源信息">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="龍昌博客">
+<meta name="twitter:description" content="关注Linux及开源信息">
   
-  <meta name="description" content="最近在玩树莓派，有时没有网络，也没有显示器，此时如果想要连接树莓派执行一些操作的话会很麻烦。
-因为之前玩过 ARM 的开发板编程，因此想能不能通过串口登录到 pi 呢。于是网上查了一下，还真的可以哦。
-以下就作为备忘笔记记录一下操作过程。 1.首先需要一根 USB 转串口的线， &hellip;">
+    <link rel="alternate" href="/atom.xml" title="龍昌博客" type="application/atom+xml">
   
-
-  <!-- http://t.co/dKP3o1e -->
-  <meta name="HandheldFriendly" content="True">
-  <meta name="MobileOptimized" content="320">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
   
-  <link rel="canonical" href="http://www.xefan.com/index.html">
-  <link href="/favicon.png" rel="icon">
-  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <link href="/atom.xml" rel="alternate" title="龍昌博客" type="application/atom+xml">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="//lib.sinaapp.com/js/jquery/1.9.1/jquery-1.9.1.min.js"></script>
-  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
-  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
-<!--<link href="//fonts.useso.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">&#8211;>
-<!--<link href="//fonts.useso.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">&#8211;>
-
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css">
   
 
 </head>
 
-<body   >
-  <header role="banner"><hgroup>
-  <h1><a href="/">龍昌博客</a></h1>
-  
-    <h2>从Pythoneer转向Rubist</h2>
-  
-</hgroup>
-
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">龍昌博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">从Pythoneer转向Rubist</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+          <a class="main-nav-link" href="/gbook">留言板</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.xefan.com"></form>
+      </div>
+    </div>
+  </div>
 </header>
-  <nav role="navigation"><ul class="subscription" data-subscription="rss">
-  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+      <div class="outer">
+        <section id="main">
   
-</ul>
-  
-<form action="https://www.google.com/search" method="get">
-  <fieldset role="search">
-    <input type="hidden" name="q" value="site:www.xefan.com" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
-  </fieldset>
-</form>
-  
-<ul class="main-navigation">
-  <li><a href="/">Home</a></li>
-  <li><a href="/blog/archives">Archives</a></li>
- <li><a href="/about/">About</a></li>  <li><a href="/gbook/">留言板</a></li> 
-</ul>
+    <article id="post-/archives/84166.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/84166.html" class="article-date">
+  <time datetime="2016-11-03T13:35:57.000Z" itemprop="datePublished">2016-11-03</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/嵌入式栏目/">嵌入式栏目</a>
+  </div>
 
-</nav>
-  <div id="main">
-    <div id="content">
-      <div class="blog-index">
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
   
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/84166.html">通过串口连接raspberry pi</a>
+    </h1>
   
-  
-    <article>
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
       
-  <header>
-    
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84166.html">通过串口连接raspberry Pi</a></h1>
-    
-    
-      <p class="meta">
-        
+        <p>最近在玩树莓派，有时没有网络，也没有显示器，此时如果想要连接树莓派执行一些操作的话会很麻烦。<br>因为之前玩过 ARM 的开发板编程，因此想能不能通过串口登录到 pi 呢。于是网上查了一下，还真的可以哦。<br>以下就作为备忘笔记记录一下操作过程。</p>
+<p>1.首先需要一根 USB 转串口的线，如果没有的话可以去某宝上买一根吧，反正也不贵。我选的是 PL2303。<br>再根据系统以及芯片的不同而下载安装不同的驱动程序。 对于 mac OS 用户执行命令： <code>ls /dev/ | grep tty.usb</code> ，<br>如果驱动都安装正确的话应该是会有输出结果的。</p>
+<p>2.然后在 pi 的系统上启用 serial。我安装的是 debian 系统，执行命令： <code>sudo raspi-config</code> ，<br>选择 <code>advanced options</code> -&gt; <code>serial</code> 进行启用 serial。</p>
+<p>3.串口连接  </p>
+<p>对于 Raspberry Pi3 的 GPIO 引脚如下：<br><img src="/wp-content/uploads/2016/11/03/pi3_gpio.png" alt="pi3_gpio"></p>
+<p>串口线与 pi 的连接方式为： GND -&gt; GND, RXD -&gt; TXD, TXD -&gt; RXD， 如图：<br><img src="/wp-content/uploads/2016/11/03/pi3-board.jpg" alt="pi3-board"></p>
+<p>最后在电脑上使用串口连接软件进行连接，对应的串口设置为 115200 8N1，如图：<br><img src="/wp-content/uploads/2016/11/03/raspberry-pi-serial.png" alt="raspberry-pi-serial"></p>
+<p>参考资料： <a href="http://elinux.org/RPi_Serial_Connection" target="_blank" rel="external">http://elinux.org/RPi_Serial_Connection</a></p>
 
-
-
-
-<time class='entry-date' datetime='2016-11-03T13:35:57+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2016</span></span> <span class='time'>1:35 pm</span></time>
-        
-           | <a href="http://www.xefan.com/archives/84166.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/84166.html">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>最近在玩树莓派，有时没有网络，也没有显示器，此时如果想要连接树莓派执行一些操作的话会很麻烦。
-因为之前玩过 ARM 的开发板编程，因此想能不能通过串口登录到 pi 呢。于是网上查了一下，还真的可以哦。
-以下就作为备忘笔记记录一下操作过程。</p>
-
-<p>1.首先需要一根 USB 转串口的线，如果没有的话可以去某宝上买一根吧，反正也不贵。我选的是 PL2303。
-再根据系统以及芯片的不同而下载安装不同的驱动程序。 对于 mac OS 用户执行命令： <code>ls /dev/ | grep tty.usb</code> ，
-如果驱动都安装正确的话应该是会有输出结果的。</p>
-
-<p>2.然后在 pi 的系统上启用 serial。我安装的是 debian 系统，执行命令： <code>sudo raspi-config</code> ，
-选择 <code>advanced options</code> -> <code>serial</code> 进行启用 serial。</p>
-
-<p>3.串口连接</p>
-
-<p>对于 Raspberry Pi3 的 GPIO 引脚如下：<br/>
-<img src="/wp-content/uploads/2016/11/03/pi3_gpio.png" alt="pi3_gpio" /></p>
-
-<p>串口线与 pi 的连接方式为： GND -> GND, RXD -> TXD, TXD -> RXD， 如图：<br/>
-<img src="/wp-content/uploads/2016/11/03/pi3-board.png" alt="pi3-board" /></p>
-
-<p>最后在电脑上使用串口连接软件进行连接，对应的串口设置为 115200 8N1，如图：<br/>
-<img src="/wp-content/uploads/2016/11/03/raspberry-pi-serial.png" alt="raspberry-pi-serial" /></p>
-
-<p>参考资料： <a href="http://elinux.org/RPi_Serial_Connection">http://elinux.org/RPi_Serial_Connection</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
       
-  <header>
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com//archives/84166.html" data-id="ciy7g0eg800qsjhnexykbf8i4" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Raspberry-pi/">Raspberry pi</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-/archives/84165.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/84165.html" class="article-date">
+  <time datetime="2016-08-20T16:15:34.000Z" itemprop="datePublished">2016-08-20</time>
+</a>
     
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84165.html">使用CodePush对ReactNative进行热更新</a></h1>
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/编程开发/">编程开发</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
     
     
-      <p class="meta">
+      <header class="article-header">
         
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/84165.html">使用CodePush对ReactNative进行热更新</a>
+    </h1>
+  
 
-
-
-
-<time class='entry-date' datetime='2016-08-20T16:15:34+08:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>4:15 pm</span></time>
-        
-           | <a href="http://www.xefan.com/archives/84165.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/84165.html">Comments</a>
-        
-      </p>
+      </header>
     
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://microsoft.github.io/code-push/">CodePush</a>是微软提供的可用于对 Cordova 和 ReactNative 进行代码热更新的库。
-在其官方的文档中已经写得很详细了，按照其说明来配置即可。我这里只是对在使用过程中遇到的一些坑作为总结。</p>
-
-<h2>创建应用</h2>
-
-<p>首先注册一个账号并创建一个 CodePush 的应用：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>npm install -g code-push-cli
-</span><span class='line'>code-push register
-</span><span class='line'>code-push app add &lt;appName&gt;</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>安装配置CodePush</h2>
-
-<p>按照说明 <a href="https://github.com/Microsoft/react-native-code-push#getting-started%EF%BC%8C%E4%BD%BF%E7%94%A8">https://github.com/Microsoft/react-native-code-push#getting-started%EF%BC%8C%E4%BD%BF%E7%94%A8</a> rnpm 进行安装即可：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>npm install --save react-native-code-push
-</span><span class='line'>rnpm link react-native-code-push</span></code></pre></td></tr></table></div></figure>
-
-
-<p>安装完成之后还需要再进行一些配置，对于 iOS 需要将 <code>AppDelegate.m</code> 文件中的 <code>jsCodeLocation</code> 修改为： <code>jsCodeLocation = [CodePush bundleURL];</code>。
-同时再在 <code>Info.plist</code> 文件中添加一项 <code>CodePushDeploymentKey</code>，其值为 CodePush 应用的 Deployment Key。</p>
-
-<p>对于 android 需要在 <code>MainActivity</code> 类的 <code>getPackages</code> 方法中设置 Deployment Key。同时根据 ReactNative 的版本不同而使用不同的方法来设置 <code>getJSBundleFile</code>，
-参考： <code>https://github.com/Microsoft/react-native-code-push#android-setup</code>。</p>
-
-<h2>程序更新</h2>
-
-<p>在安装、配置完成之后，即可以使用CodePush进行程序的更新操作了。
-根据官方的说明只需要调用 <code>CodePush.sync()</code> 即可完成自动更新操作。
-我针对自己的情况再进行封装了一下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>function syncCodePush() {
-</span><span class='line'>  NetInfo.fetch().done(
-</span><span class='line'>    (reach) =&gt; {
-</span><span class='line'>      // 检查网络环境
-</span><span class='line'>      if (_.includes(['wifi', 'WIFI', 'VPN'], reach)) {
-</span><span class='line'>        CodePush.sync().done(
-</span><span class='line'>          () =&gt; {
-</span><span class='line'>            // 检查更新成功
-</span><span class='line'>          },
-</span><span class='line'>          (err) =&gt; {
-</span><span class='line'>            // 更新失败
-</span><span class='line'>          }
-</span><span class='line'>        );
-</span><span class='line'>      }
-</span><span class='line'>    }
-</span><span class='line'>  );
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<p>以上函数是保证只有在wifi的网络环境下才进行更新操作，同时由于 <code>CodePush.sync()</code> 返回的是一个 <code>Promise</code> 对象，
-在这里我就遇到了由于网络异常而下载出错，从而导致 app 崩溃。因此需要处理 <code>reject</code> 的情况。</p>
-
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><a href="http://microsoft.github.io/code-push/" target="_blank" rel="external">CodePush</a>是微软提供的可用于对 Cordova 和 ReactNative 进行代码热更新的库。<br>在其官方的文档中已经写得很详细了，按照其说明来配置即可。我这里只是对在使用过程中遇到的一些坑作为总结。</p>
+<h2 id="创建应用"><a href="#创建应用" class="headerlink" title="创建应用"></a>创建应用</h2><p>首先注册一个账号并创建一个 CodePush 的应用：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">npm install -g code-push-cli</div><div class="line">code-push register</div><div class="line">code-push app add &lt;appName&gt;</div></pre></td></tr></table></figure>
+<h2 id="安装配置CodePush"><a href="#安装配置CodePush" class="headerlink" title="安装配置CodePush"></a>安装配置CodePush</h2><p>按照说明 <a href="https://github.com/Microsoft/react-native-code-push#getting-started，使用" target="_blank" rel="external">https://github.com/Microsoft/react-native-code-push#getting-started，使用</a> rnpm 进行安装即可：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">npm install --save react-native-code-push</div><div class="line">rnpm link react-native-code-push</div></pre></td></tr></table></figure>
+<p>安装完成之后还需要再进行一些配置，对于 iOS 需要将 <code>AppDelegate.m</code> 文件中的 <code>jsCodeLocation</code> 修改为： <code>jsCodeLocation = [CodePush bundleURL];</code>。<br>同时再在 <code>Info.plist</code> 文件中添加一项 <code>CodePushDeploymentKey</code>，其值为 CodePush 应用的 Deployment Key。</p>
+<p>对于 android 需要在 <code>MainActivity</code> 类的 <code>getPackages</code> 方法中设置 Deployment Key。同时根据 ReactNative 的版本不同而使用不同的方法来设置 <code>getJSBundleFile</code>，<br>参考： <code>https://github.com/Microsoft/react-native-code-push#android-setup</code>。</p>
+<h2 id="程序更新"><a href="#程序更新" class="headerlink" title="程序更新"></a>程序更新</h2><p>在安装、配置完成之后，即可以使用CodePush进行程序的更新操作了。<br>根据官方的说明只需要调用 <code>CodePush.sync()</code> 即可完成自动更新操作。<br>我针对自己的情况再进行封装了一下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">function syncCodePush() &#123;</div><div class="line">  NetInfo.fetch().done(</div><div class="line">    (reach) =&gt; &#123;</div><div class="line">      // 检查网络环境</div><div class="line">      if (_.includes([&apos;wifi&apos;, &apos;WIFI&apos;, &apos;VPN&apos;], reach)) &#123;</div><div class="line">        CodePush.sync().done(</div><div class="line">          () =&gt; &#123;</div><div class="line">            // 检查更新成功</div><div class="line">          &#125;,</div><div class="line">          (err) =&gt; &#123;</div><div class="line">            // 更新失败</div><div class="line">          &#125;</div><div class="line">        );</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  );</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>以上函数是保证只有在wifi的网络环境下才进行更新操作，同时由于 <code>CodePush.sync()</code> 返回的是一个 <code>Promise</code> 对象，<br>在这里我就遇到了由于网络异常而下载出错，从而导致 app 崩溃。因此需要处理 <code>reject</code> 的情况。</p>
 <p>有时在程序更新之后的首次运行时可能会需要作一些迁移的操作，这里可以使用 <code>getUpdateMetadata</code> 来检查程序是不是首次运行。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>Codepush.getUpdateMetadata().then(
-</span><span class='line'>  (update) =&gt; {
-</span><span class='line'>    if (update && update.isFirstRun) {
-</span><span class='line'>      // 首次运行执行一些操作
-</span><span class='line'>    }
-</span><span class='line'>  }
-</span><span class='line'>).done( callback );</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>发布更新</h2>
-
-<p>在 app 发布安装包发布出去之后，已经有用户下载安装了。此时如果再有 js 代码更新或者图片文件的改动的话，可以使用 CodePush 进行发布。
-进入 ReactNative 的项目根目录，使用 code-push 命令进行发布更新。例如：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>code-push release-react DemoApp ios -m -d Staging --des "更新描述" -t "~2.0.0"</span></code></pre></td></tr></table></div></figure>
-
-
-<p>以上命令是发布一个紧急更新到 Staging ，只有 ios appp 的版本为 2.0~3.0 的才会下载该更新包。
-由于是紧急更新，app在下载安装完成之后会自动重启应用该更新包。否则的话就需要用户下次手动启动app时该更新包才会生效。</p>
-
-<p>在 CodePush 中针对 ios 和 android 可以共用一个应用，只是我个人感觉这样在管理 deployment history 时不太方便。
-因此我通常会创建两个应用，例如： DemoApp-iOS、DemoApp-Android 这样的。</p>
-
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">Codepush.getUpdateMetadata().then(</div><div class="line">  (update) =&gt; &#123;</div><div class="line">    if (update &amp;&amp; update.isFirstRun) &#123;</div><div class="line">      // 首次运行执行一些操作</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">).done( callback );</div></pre></td></tr></table></figure>
+<h2 id="发布更新"><a href="#发布更新" class="headerlink" title="发布更新"></a>发布更新</h2><p>在 app 发布安装包发布出去之后，已经有用户下载安装了。此时如果再有 js 代码更新或者图片文件的改动的话，可以使用 CodePush 进行发布。<br>进入 ReactNative 的项目根目录，使用 code-push 命令进行发布更新。例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">code-push release-react DemoApp ios -m -d Staging --des &quot;更新描述&quot; -t &quot;~2.0.0&quot;</div></pre></td></tr></table></figure>
+<p>以上命令是发布一个紧急更新到 Staging ，只有 ios appp 的版本为 2.0~3.0 的才会下载该更新包。<br>由于是紧急更新，app在下载安装完成之后会自动重启应用该更新包。否则的话就需要用户下次手动启动app时该更新包才会生效。</p>
+<p>在 CodePush 中针对 ios 和 android 可以共用一个应用，只是我个人感觉这样在管理 deployment history 时不太方便。<br>因此我通常会创建两个应用，例如： DemoApp-iOS、DemoApp-Android 这样的。</p>
 <p>需要注意的是，由于 CodePush 的 server 是在国外，因此下载的速度会比较慢。</p>
+<p>最后我自己使用 Electron + Vue.js 开发了一个 CodePush 的简易管理工具，<a href="https://github.com/wusuopu/code-push-gui" target="_blank" rel="external">https://github.com/wusuopu/code-push-gui</a> 。<br>可以对 CodePush 的 app 跟 deployment 进行简单的管理。</p>
 
-<p>最后我自己使用 Electron + Vue.js 开发了一个 CodePush 的简易管理工具，<a href="https://github.com/wusuopu/code-push-gui">https://github.com/wusuopu/code-push-gui</a> 。
-可以对 CodePush 的 app 跟 deployment 进行简单的管理。</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
       
-  <header>
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com//archives/84165.html" data-id="ciy7g0eg600qpjhneau5iw3vz" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/react/">react</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-/archives/84164.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/84164.html" class="article-date">
+  <time datetime="2016-07-31T16:25:17.000Z" itemprop="datePublished">2016-07-31</time>
+</a>
     
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84164.html">ReactNative获取设备屏幕尺寸</a></h1>
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/编程开发/">编程开发</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
     
     
-      <p class="meta">
+      <header class="article-header">
         
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/84164.html">ReactNative获取设备屏幕尺寸</a>
+    </h1>
+  
 
-
-
-
-<time class='entry-date' datetime='2016-07-31T16:25:17+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>31</span><span class='date-suffix'>st</span>, <span class='date-year'>2016</span></span> <span class='time'>4:25 pm</span></time>
-        
-           | <a href="http://www.xefan.com/archives/84164.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/84164.html">Comments</a>
-        
-      </p>
+      </header>
     
-  </header>
-
-
-  <div class="entry-content"><p>在做移动开发过程中，有时我们需要适配不同尺寸大小的屏幕。这里我们就需要到获取设备屏幕的大小。
-由于我们是使用的 ReactNative 来开发手机 app，这里就介绍一下在 ReactNative 中如何获取到设备屏幕的分辨率的。
-也算是对之前踩坑的总结吧。</p>
-
-<p>在此之前需要先了解 ReactNative 中的尺寸计算单位，它并不是使用的px。<a href="http://facebook.github.io/react-native/releases/next/docs/pixelratio.html">http://facebook.github.io/react-native/releases/next/docs/pixelratio.html</a></p>
-
-<h2>使用 Dimensions 模块</h2>
-
-<p>在 ReactNative 中有一个 Dimensions 模块，通过它可以获取当前设备的屏幕分辨率。
-参考： <a href="http://facebook.github.io/react-native/releases/next/docs/dimensions.html">http://facebook.github.io/react-native/releases/next/docs/dimensions.html</a></p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>var {height, width} = Dimensions.get('window');</span></code></pre></td></tr></table></div></figure>
-
-
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>在做移动开发过程中，有时我们需要适配不同尺寸大小的屏幕。这里我们就需要到获取设备屏幕的大小。<br>由于我们是使用的 ReactNative 来开发手机 app，这里就介绍一下在 ReactNative 中如何获取到设备屏幕的分辨率的。<br>也算是对之前踩坑的总结吧。</p>
+<p>在此之前需要先了解 ReactNative 中的尺寸计算单位，它并不是使用的px。<a href="http://facebook.github.io/react-native/releases/next/docs/pixelratio.html" target="_blank" rel="external">http://facebook.github.io/react-native/releases/next/docs/pixelratio.html</a></p>
+<h2 id="使用-Dimensions-模块"><a href="#使用-Dimensions-模块" class="headerlink" title="使用 Dimensions 模块"></a>使用 Dimensions 模块</h2><p>在 ReactNative 中有一个 Dimensions 模块，通过它可以获取当前设备的屏幕分辨率。<br>参考： <a href="http://facebook.github.io/react-native/releases/next/docs/dimensions.html" target="_blank" rel="external">http://facebook.github.io/react-native/releases/next/docs/dimensions.html</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">var &#123;height, width&#125; = Dimensions.get(&apos;window&apos;);</div></pre></td></tr></table></figure>
 <p>刚开始时我也是使用这种方法来得到整个屏幕的分辨率的，感觉轻松搞定。然而这里面却有一个坑。</p>
-
 <p>首先来看看 ios 和 android 中的界面结构：</p>
-
-<p><img src="/wp-content/uploads/2016/07/31/ios-screen-struct.png" alt="ios-screen-struct" />
-<img src="/wp-content/uploads/2016/07/31/android-screen-struct.png" alt="android-screen-struct" /></p>
-
-<p>如图所示，屏幕的宽度计算比较简单，就是从左边到右边的距离即可。
-然后就是屏幕的高度了，这里其实我们是需要获取到可用区域的高度。
-如图所示，对于 ios 系统来说可用区域高度就是整个屏幕的高度减去 Status Bar 的高度；
-对于 android 系统来说就是屏幕的高度减去 Status Bar 和 Soft Menu Bar 的高度。</p>
-
-<h2>获取 iOS 设备的屏幕分辨率</h2>
-
-<p>正如上面所说的，在 ios 下的计算方法为：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>var WIDTH = Dimensions.get('window').width;
-</span><span class='line'>var HEIGHT = Dimensions.get('window').height - STATUS_BAR_HEIGHT;</span></code></pre></td></tr></table></div></figure>
-
-
-<p>在 ios 系统状态栏高度(STATUS_BAR_HEIGHT)通常为 20。
-不过如果你设置了隐藏状态栏的话，那么 <code>STATUS_BAR_HEIGHT</code> 则为0。</p>
-
+<p><img src="/wp-content/uploads/2016/07/31/ios-screen-struct.png" alt="ios-screen-struct"><br><img src="/wp-content/uploads/2016/07/31/android-screen-struct.png" alt="android-screen-struct"></p>
+<p>如图所示，屏幕的宽度计算比较简单，就是从左边到右边的距离即可。<br>然后就是屏幕的高度了，这里其实我们是需要获取到可用区域的高度。<br>如图所示，对于 ios 系统来说可用区域高度就是整个屏幕的高度减去 Status Bar 的高度；<br>对于 android 系统来说就是屏幕的高度减去 Status Bar 和 Soft Menu Bar 的高度。</p>
+<h2 id="获取-iOS-设备的屏幕分辨率"><a href="#获取-iOS-设备的屏幕分辨率" class="headerlink" title="获取 iOS 设备的屏幕分辨率"></a>获取 iOS 设备的屏幕分辨率</h2><p>正如上面所说的，在 ios 下的计算方法为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">var WIDTH = Dimensions.get(&apos;window&apos;).width;</div><div class="line">var HEIGHT = Dimensions.get(&apos;window&apos;).height - STATUS_BAR_HEIGHT;</div></pre></td></tr></table></figure>
+<p>在 ios 系统状态栏高度(STATUS_BAR_HEIGHT)通常为 20。<br>不过如果你设置了隐藏状态栏的话，那么 <code>STATUS_BAR_HEIGHT</code> 则为0。</p>
 <p>以上是手机竖屏的情况，在横屏状态下则交换两个值：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>var LANDSCAPE_WIDTH = HEIGHT + STATUS_BAR_HEIGHT;
-</span><span class='line'>var LANDSCAPE_HEIGHT = WIDTH - STATUS_BAR_HEIGHT;</span></code></pre></td></tr></table></div></figure>
-
-
-<p>到了这里虽然麻烦了一点，但是总体来说也还好。问题都解决了。
-感觉生活是如此美好啊，然而这个世界上却还有一个系统名为 android。
-它有着数不清种类屏幕大小的设备，然后瞬间感觉整个人都不好了。</p>
-
-<h2>获取 Android 设备的屏幕分辨率</h2>
-
-<p>如果按照 ios 下的方法来做，获取到 <code>WIDTH</code> 是没有问题，
-但是 <code>HEIGHT</code> 的话还需要减去 Status Bar 和 Soft Menu Bar 的高度。
-因此我们还需要获取到状态栏的高度(STATUS_BAR_HEIGHT)和虚拟按钮的高度(SOFT_MENU_BAR_HEIGHT)。</p>
-
-<p>这里我们使用<a href="https://github.com/jaysoo/react-native-extra-dimensions-android">react-native-extra-dimensions-android</a>这个库。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>const ExtraDimensions = require('react-native-extra-dimensions-android');
-</span><span class='line'>
-</span><span class='line'>const STATUS_BAR_HEIGHT = ExtraDimensions.get('STATUS_BAR_HEIGHT');
-</span><span class='line'>const SOFT_MENU_BAR_HEIGHT = ExtraDimensions.get('SOFT_MENU_BAR_HEIGHT');
-</span><span class='line'>const WIDTH = ExtraDimensions.get('REAL_WINDOW_WIDTH');
-</span><span class='line'>const HEIGHT = ExtraDimensions.get('REAL_WINDOW_HEIGHT') - STATUS_BAR_HEIGHT - SOFT_MENU_BAR_HEIGHT;</span></code></pre></td></tr></table></div></figure>
-
-
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">var LANDSCAPE_WIDTH = HEIGHT + STATUS_BAR_HEIGHT;</div><div class="line">var LANDSCAPE_HEIGHT = WIDTH - STATUS_BAR_HEIGHT;</div></pre></td></tr></table></figure>
+<p>到了这里虽然麻烦了一点，但是总体来说也还好。问题都解决了。<br>感觉生活是如此美好啊，然而这个世界上却还有一个系统名为 android。<br>它有着数不清种类屏幕大小的设备，然后瞬间感觉整个人都不好了。</p>
+<h2 id="获取-Android-设备的屏幕分辨率"><a href="#获取-Android-设备的屏幕分辨率" class="headerlink" title="获取 Android 设备的屏幕分辨率"></a>获取 Android 设备的屏幕分辨率</h2><p>如果按照 ios 下的方法来做，获取到 <code>WIDTH</code> 是没有问题，<br>但是 <code>HEIGHT</code> 的话还需要减去 Status Bar 和 Soft Menu Bar 的高度。<br>因此我们还需要获取到状态栏的高度(STATUS_BAR_HEIGHT)和虚拟按钮的高度(SOFT_MENU_BAR_HEIGHT)。</p>
+<p>这里我们使用<a href="https://github.com/jaysoo/react-native-extra-dimensions-android" target="_blank" rel="external">react-native-extra-dimensions-android</a>这个库。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">const ExtraDimensions = require(&apos;react-native-extra-dimensions-android&apos;);</div><div class="line"></div><div class="line">const STATUS_BAR_HEIGHT = ExtraDimensions.get(&apos;STATUS_BAR_HEIGHT&apos;);</div><div class="line">const SOFT_MENU_BAR_HEIGHT = ExtraDimensions.get(&apos;SOFT_MENU_BAR_HEIGHT&apos;);</div><div class="line">const WIDTH = ExtraDimensions.get(&apos;REAL_WINDOW_WIDTH&apos;);</div><div class="line">const HEIGHT = ExtraDimensions.get(&apos;REAL_WINDOW_HEIGHT&apos;) - STATUS_BAR_HEIGHT - SOFT_MENU_BAR_HEIGHT;</div></pre></td></tr></table></figure>
 <p>以上是设备竖屏的结果，在横屏下你以为是不是只需要交换两个值就搞定了呢。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>var LANDSCAPE_WIDTH = HEIGHT + STATUS_BAR_HEIGHT;
-</span><span class='line'>var LANDSCAPE_HEIGHT = WIDTH - STATUS_BAR_HEIGHT;</span></code></pre></td></tr></table></div></figure>
-
-
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">var LANDSCAPE_WIDTH = HEIGHT + STATUS_BAR_HEIGHT;</div><div class="line">var LANDSCAPE_HEIGHT = WIDTH - STATUS_BAR_HEIGHT;</div></pre></td></tr></table></figure>
 <p>Naive!!如果这么轻松就搞定了的话，android就不叫做android了。</p>
-
 <p>先来看看下面两张图片吧，分别是一个android平板设备在横屏和竖屏状态下的截图：</p>
-
-<p><img src="/wp-content/uploads/2016/07/31/android-pad-landscape.png" alt="android-pad-landscape" />
-<img src="/wp-content/uploads/2016/07/31/android-pad-portrait.png" alt="android-pad-portrait" /></p>
-
-<p>你把你手中的 android 手机分别进入横屏和竖屏状态下，再对照上面两张图片你会发现什么。
-没错的，在平板设备上屏幕旋转之后 Soft Menu Bar 也跟着旋转了，
-而在手机设备上 Soft Menu Bar 是始终固定在手机底部的。</p>
-
-<p>尼玛，太坑爹了。看到这里瞬间呕血三升，要适配手机跟平板实现是太麻烦了。
-以下是我的解决办法，先检查当前设备是否为平板，然后再分别处理。
-至于平板的判断方法就自己想办法了，我的方法也不一定准。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>if (isPad) {
-</span><span class='line'>  LANDSCAPE_WIDTH = HEIGHT + STATUS_BAR_HEIGHT + SOFT_MENU_BAR_HEIGHT;
-</span><span class='line'>  LANDSCAPE_HEIGHT = WIDTH - STATUS_BAR_HEIGHT - SOFT_MENU_BAR_HEIGHT;
-</span><span class='line'>} else {
-</span><span class='line'>  LANDSCAPE_WIDTH = HEIGHT + STATUS_BAR_HEIGHT;
-</span><span class='line'>  LANDSCAPE_HEIGHT = WIDTH - STATUS_BAR_HEIGHT;
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
+<p><img src="/wp-content/uploads/2016/07/31/android-pad-landscape.png" alt="android-pad-landscape"><br><img src="/wp-content/uploads/2016/07/31/android-pad-portrait.png" alt="android-pad-portrait"></p>
+<p>你把你手中的 android 手机分别进入横屏和竖屏状态下，再对照上面两张图片你会发现什么。<br>没错的，在平板设备上屏幕旋转之后 Soft Menu Bar 也跟着旋转了，<br>而在手机设备上 Soft Menu Bar 是始终固定在手机底部的。</p>
+<p>尼玛，太坑爹了。看到这里瞬间呕血三升，要适配手机跟平板实现是太麻烦了。<br>以下是我的解决办法，先检查当前设备是否为平板，然后再分别处理。<br>至于平板的判断方法就自己想办法了，我的方法也不一定准。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">if (isPad) &#123;</div><div class="line">  LANDSCAPE_WIDTH = HEIGHT + STATUS_BAR_HEIGHT + SOFT_MENU_BAR_HEIGHT;</div><div class="line">  LANDSCAPE_HEIGHT = WIDTH - STATUS_BAR_HEIGHT - SOFT_MENU_BAR_HEIGHT;</div><div class="line">&#125; else &#123;</div><div class="line">  LANDSCAPE_WIDTH = HEIGHT + STATUS_BAR_HEIGHT;</div><div class="line">  LANDSCAPE_HEIGHT = WIDTH - STATUS_BAR_HEIGHT;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>以上是在 android 下遇到的第一个大坑。</p>
-
 <p>到了这里我以为一切都该结束了吧，然而没想到还有一种手机叫做魅族。如下图：</p>
-
-<p><img src="/wp-content/uploads/2016/07/31/Mezu-smart-bar.png" alt="Mezu-smart-bar" /></p>
-
-<p>在屏幕右下角其实是有一个按钮的，然而左图所示的，该按钮被魅族手机的 Smart Bar 遮住了。
-进入系统设置将 Smart Bar 隐藏后效果如右图所示。</p>
-
+<p><img src="/wp-content/uploads/2016/07/31/Mezu-smart-bar.png" alt="Mezu-smart-bar"></p>
+<p>在屏幕右下角其实是有一个按钮的，然而左图所示的，该按钮被魅族手机的 Smart Bar 遮住了。<br>进入系统设置将 Smart Bar 隐藏后效果如右图所示。</p>
 <p>看到这里又吐了两口老血，此为第二个大坑。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>const SMART_BAR_HEIGHT = ExtraDimensions.get('SMART_BAR_HEIGHT');
-</span><span class='line'>
-</span><span class='line'>if (SMART_BAR_HEIGHT) {
-</span><span class='line'>  HEIGHT -= SMART_BAR_HEIGHT;
-</span><span class='line'>}
-</span><span class='line'>
-</span><span class='line'>....
-</span><span class='line'>// 在上面 LANDSCAPE 的计算结果上再作如下处理
-</span><span class='line'>
-</span><span class='line'>if (SMART_BAR_HEIGHT) {
-</span><span class='line'>  LANDSCAPE_WIDTH += SMART_BAR_HEIGHT;
-</span><span class='line'>  LANDSCAPE_HEIGHT -= SMART_BAR_HEIGHT;
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<p>在魅族的手机上计算屏幕高度时还需要再减去 Smart Bar 的高度，
-同时还需要注意的是， Smart Bar 跟平板上的Soft Menu Bar 一样会随着屏幕旋转而转动的。</p>
-
-<p>最后还有一点需要注意的是，在安装 <code>react-native-extra-dimensions-android</code> 库时不能直接使用 <code>npm install --save react-native-extra-dimensions-android</code> 进行安装，
-而是需要直接通过 git 仓库来安装： <code>npm install --save git+https://github.com/jaysoo/react-native-extra-dimensions-android.git</code>。</p>
-
-<p>因为在 npm 上 <code>react-native-extra-dimensions-android</code> 的最新版为 0.17.0，
-而 <code>SMART_BAR_HEIGHT</code> 的功能是在此之后才添加进来的。</p>
-
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">const SMART_BAR_HEIGHT = ExtraDimensions.get(&apos;SMART_BAR_HEIGHT&apos;);</div><div class="line"></div><div class="line">if (SMART_BAR_HEIGHT) &#123;</div><div class="line">  HEIGHT -= SMART_BAR_HEIGHT;</div><div class="line">&#125;</div><div class="line"></div><div class="line">....</div><div class="line">// 在上面 LANDSCAPE 的计算结果上再作如下处理</div><div class="line"></div><div class="line">if (SMART_BAR_HEIGHT) &#123;</div><div class="line">  LANDSCAPE_WIDTH += SMART_BAR_HEIGHT;</div><div class="line">  LANDSCAPE_HEIGHT -= SMART_BAR_HEIGHT;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>在魅族的手机上计算屏幕高度时还需要再减去 Smart Bar 的高度，<br>同时还需要注意的是， Smart Bar 跟平板上的Soft Menu Bar 一样会随着屏幕旋转而转动的。</p>
+<p>最后还有一点需要注意的是，在安装 <code>react-native-extra-dimensions-android</code> 库时不能直接使用 <code>npm install --save react-native-extra-dimensions-android</code> 进行安装，<br>而是需要直接通过 git 仓库来安装： <code>npm install --save git+https://github.com/jaysoo/react-native-extra-dimensions-android.git</code>。</p>
+<p>因为在 npm 上 <code>react-native-extra-dimensions-android</code> 的最新版为 0.17.0，<br>而 <code>SMART_BAR_HEIGHT</code> 的功能是在此之后才添加进来的。</p>
 <p>在库的版本上面又被坑了一下。</p>
-</div>
-  
-  
 
-
-    </article>
-  
-  
-    <article>
       
-  <header>
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com//archives/84164.html" data-id="ciy7g0eg500qnjhneb1af5g4v" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/react/">react</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-/archives/84163.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/84163.html" class="article-date">
+  <time datetime="2016-06-26T12:02:30.000Z" itemprop="datePublished">2016-06-26</time>
+</a>
     
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84163.html">ReactNative Jsbundle管理</a></h1>
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/编程开发/">编程开发</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
     
     
-      <p class="meta">
+      <header class="article-header">
         
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/84163.html">ReactNative jsbundle管理</a>
+    </h1>
+  
 
-
-
-
-<time class='entry-date' datetime='2016-06-26T12:02:30+08:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>26</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>12:02 pm</span></time>
-        
-           | <a href="http://www.xefan.com/archives/84163.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/84163.html">Comments</a>
-        
-      </p>
+      </header>
     
-  </header>
-
-
-  <div class="entry-content"><p>在<a href="http://www.xefan.com/archives/84162.html">上一篇文章</a>中介绍了 RN(ReactNative) 自动设置 development server IP 的方法。
-这在开发过程中方便了不少，然而我在想能否更加方便一些呢。首先我们知道在开发 RN 应用时，jsbundle 有两种加载方式。
-第一种是指定 url 通过网络进行加载；第二种是 pre-bundled 将 jsbundle 文件打包进 app 安装包中。
-编译生成的安装包有 Debug 和 Release 两种模式，在 Debug 模式下默认是使用第一种方式加载 jsbundle，在 Release 模式下默认是使用第二种方式。</p>
-
-<p>现在我的需求是编译生成三种模式的安装包：Debug、Release 和 Stage。前两种跟之前一样，
-而 Stage 模式下是使用第二种方式加载 jsbundle， 但是生成的 jsbundle 是 DEV 状态下的。
-这样在开发过程中给他人安装app进行测试时就不需要反复的修改配置了。</p>
-
-<h2>修改 Android 的配置</h2>
-
-<p>对于的 android 的配置比较简单。只需修改 <code>android/app/build.gradle</code> 文件，新添加一个 <code>buildTypes</code> 即可。</p>
-
-<p>在 <code>apply from: "react.gradle"</code> 之前添加如下内容：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>project.ext.react = [
-</span><span class='line'>  bundleInStage: true
-</span><span class='line'>]
-</span></code></pre></td></tr></table></div></figure>
-
-
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>在<a href="http://www.xefan.com/archives/84162.html">上一篇文章</a>中介绍了 RN(ReactNative) 自动设置 development server IP 的方法。<br>这在开发过程中方便了不少，然而我在想能否更加方便一些呢。首先我们知道在开发 RN 应用时，jsbundle 有两种加载方式。<br>第一种是指定 url 通过网络进行加载；第二种是 pre-bundled 将 jsbundle 文件打包进 app 安装包中。<br>编译生成的安装包有 Debug 和 Release 两种模式，在 Debug 模式下默认是使用第一种方式加载 jsbundle，在 Release 模式下默认是使用第二种方式。</p>
+<p>现在我的需求是编译生成三种模式的安装包：Debug、Release 和 Stage。前两种跟之前一样，<br>而 Stage 模式下是使用第二种方式加载 jsbundle， 但是生成的 jsbundle 是 DEV 状态下的。<br>这样在开发过程中给他人安装app进行测试时就不需要反复的修改配置了。</p>
+<h2 id="修改-Android-的配置"><a href="#修改-Android-的配置" class="headerlink" title="修改 Android 的配置"></a>修改 Android 的配置</h2><p>对于的 android 的配置比较简单。只需修改 <code>android/app/build.gradle</code> 文件，新添加一个 <code>buildTypes</code> 即可。</p>
+<p>在 <code>apply from: &quot;react.gradle&quot;</code> 之前添加如下内容：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">project.ext.react = [</div><div class="line">  bundleInStage: true</div><div class="line">]</div></pre></td></tr></table></figure>
 <p>然后再修改配置如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>android {
-</span><span class='line'>    buildTypes {
-</span><span class='line'>        debug {
-</span><span class='line'>            applicationIdSuffix ".debug"
-</span><span class='line'>            resValue 'string', 'app_name', '"XXXX(Debug)"'
-</span><span class='line'>            ......
-</span><span class='line'>        }
-</span><span class='line'>        release {
-</span><span class='line'>            minifyEnabled enableProguardInReleaseBuilds
-</span><span class='line'>            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-</span><span class='line'>            resValue 'string', 'app_name', '"XXXX"'
-</span><span class='line'>            ......
-</span><span class='line'>        }
-</span><span class='line'>        stage {
-</span><span class='line'>            initWith(buildTypes.debug)
-</span><span class='line'>            applicationIdSuffix ".stage"
-</span><span class='line'>            resValue 'string', 'app_name', '"XXXX(Stage)"'
-</span><span class='line'>        }
-</span><span class='line'>    }
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这里添加了一个 <code>stage</code> buildTypes 继承至 <code>debug</code>。并且为了能够同时安装不同模式下的app，这里设置了不同模式 bundleID 的后缀。
-同时还设置了不同模式下app的名称，以便区分。</p>
-
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">android &#123;</div><div class="line">    buildTypes &#123;</div><div class="line">        debug &#123;</div><div class="line">            applicationIdSuffix &quot;.debug&quot;</div><div class="line">            resValue &apos;string&apos;, &apos;app_name&apos;, &apos;&quot;XXXX(Debug)&quot;&apos;</div><div class="line">            ......</div><div class="line">        &#125;</div><div class="line">        release &#123;</div><div class="line">            minifyEnabled enableProguardInReleaseBuilds</div><div class="line">            proguardFiles getDefaultProguardFile(&quot;proguard-android.txt&quot;), &quot;proguard-rules.pro&quot;</div><div class="line">            resValue &apos;string&apos;, &apos;app_name&apos;, &apos;&quot;XXXX&quot;&apos;</div><div class="line">            ......</div><div class="line">        &#125;</div><div class="line">        stage &#123;</div><div class="line">            initWith(buildTypes.debug)</div><div class="line">            applicationIdSuffix &quot;.stage&quot;</div><div class="line">            resValue &apos;string&apos;, &apos;app_name&apos;, &apos;&quot;XXXX(Stage)&quot;&apos;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这里添加了一个 <code>stage</code> buildTypes 继承至 <code>debug</code>。并且为了能够同时安装不同模式下的app，这里设置了不同模式 bundleID 的后缀。<br>同时还设置了不同模式下app的名称，以便区分。</p>
 <p>然后进行 <code>android</code> 目录下执行 <code>./gradlew assemble</code> 命令，即可在 <code>android/app/build/outputs/apk</code> 目录生成 app-debug.apk、app-release.apk 和 app-stage.apk 三个 apk 包。</p>
-
-<h2>修改 iOS 的配置</h2>
-
-<p>首先将 Debug Configuration 复制为 Stage
-<img src="/wp-content/uploads/2016/06/26/Xcode-configuration.png" alt="Xcode-configuration" /></p>
-
-<p>然后进入 <code>Build Settings</code> 修改 <code>Preprocessor Macros</code>，对 <code>Stage</code> 添加一项配置： <code>STAGE=1</code>
-<img src="/wp-content/uploads/2016/06/26/Xcode-buildSettings.png" alt="Xcode-buildSettings" /></p>
-
+<h2 id="修改-iOS-的配置"><a href="#修改-iOS-的配置" class="headerlink" title="修改 iOS 的配置"></a>修改 iOS 的配置</h2><p>首先将 Debug Configuration 复制为 Stage<br><img src="/wp-content/uploads/2016/06/26/Xcode-configuration.png" alt="Xcode-configuration"></p>
+<p>然后进入 <code>Build Settings</code> 修改 <code>Preprocessor Macros</code>，对 <code>Stage</code> 添加一项配置： <code>STAGE=1</code><br><img src="/wp-content/uploads/2016/06/26/Xcode-buildSettings.png" alt="Xcode-buildSettings"></p>
 <p>然后再编辑 <code>AppDelegate.m</code> 文件，修改 <code>jsCodeLocation</code> 相关配置。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>#if STAGE
-</span><span class='line'>#warning "STAGE"
-</span><span class='line'>  jsCodeLocation = [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
-</span><span class='line'>#elif DEBUG
-</span><span class='line'>#if TARGET_OS_SIMULATOR
-</span><span class='line'>#warning "DEBUG SIMULATOR"
-</span><span class='line'>  jsCodeLocation = [NSURL URLWithString:@"http://localhost:8081/index.ios.bundle?platform=ios&dev=true"];
-</span><span class='line'>#else
-</span><span class='line'>#warning "DEBUG DEVICE"
-</span><span class='line'>  NSString *serverIP = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"SERVER_IP"];
-</span><span class='line'>  NSString *jsCodeUrlString = [NSString stringWithFormat:@"http://%@:8081/index.ios.bundle?platform=ios&dev=true", serverIP];
-</span><span class='line'>  NSString *jsBundleUrlString = [jsCodeUrlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-</span><span class='line'>  jsCodeLocation = [NSURL URLWithString:jsBundleUrlString];
-</span><span class='line'>#endif
-</span><span class='line'>#else
-</span><span class='line'>#warning "PRODUCTION DEVICE"
-</span><span class='line'>  jsCodeLocation = [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
-</span><span class='line'>#endif</span></code></pre></td></tr></table></div></figure>
-
-
-<p>为了能够同时安装多个应用，还需要设置各个模式下的 Bundle Identifier。进入 <code>Build Settings</code> -> <code>Packaging</code> -> <code>Product Bundle Identifier</code>
-<img src="/wp-content/uploads/2016/06/26/Xcode-bundleID.png" alt="Xcode-bundleID" /></p>
-
-<p>为了便于区分，最好给各个模式下的应用设置不同的AppName。进入 <code>Build Settings</code> -> <code>User-Defined</code>，添加一项设置
-<img src="/wp-content/uploads/2016/06/26/Xcode-User-Defined.png" alt="Xcode-User-Defined" /></p>
-
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">#if STAGE</div><div class="line">#warning &quot;STAGE&quot;</div><div class="line">  jsCodeLocation = [[NSBundle mainBundle] URLForResource:@&quot;main&quot; withExtension:@&quot;jsbundle&quot;];</div><div class="line">#elif DEBUG</div><div class="line">#if TARGET_OS_SIMULATOR</div><div class="line">#warning &quot;DEBUG SIMULATOR&quot;</div><div class="line">  jsCodeLocation = [NSURL URLWithString:@&quot;http://localhost:8081/index.ios.bundle?platform=ios&amp;dev=true&quot;];</div><div class="line">#else</div><div class="line">#warning &quot;DEBUG DEVICE&quot;</div><div class="line">  NSString *serverIP = [[NSBundle mainBundle] objectForInfoDictionaryKey:@&quot;SERVER_IP&quot;];</div><div class="line">  NSString *jsCodeUrlString = [NSString stringWithFormat:@&quot;http://%@:8081/index.ios.bundle?platform=ios&amp;dev=true&quot;, serverIP];</div><div class="line">  NSString *jsBundleUrlString = [jsCodeUrlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];</div><div class="line">  jsCodeLocation = [NSURL URLWithString:jsBundleUrlString];</div><div class="line">#endif</div><div class="line">#else</div><div class="line">#warning &quot;PRODUCTION DEVICE&quot;</div><div class="line">  jsCodeLocation = [[NSBundle mainBundle] URLForResource:@&quot;main&quot; withExtension:@&quot;jsbundle&quot;];</div><div class="line">#endif</div></pre></td></tr></table></figure>
+<p>为了能够同时安装多个应用，还需要设置各个模式下的 Bundle Identifier。进入 <code>Build Settings</code> -&gt; <code>Packaging</code> -&gt; <code>Product Bundle Identifier</code><br><img src="/wp-content/uploads/2016/06/26/Xcode-bundleID.png" alt="Xcode-bundleID"></p>
+<p>为了便于区分，最好给各个模式下的应用设置不同的AppName。进入 <code>Build Settings</code> -&gt; <code>User-Defined</code>，添加一项设置<br><img src="/wp-content/uploads/2016/06/26/Xcode-User-Defined.png" alt="Xcode-User-Defined"></p>
 <p>然后再进入 <code>Info</code>，设置 <code>CFBundleDisplayName</code> 的值为 <code>$(BUNDLE_DISPLAY_NAME)</code></p>
-
 <p>至此，配置已经修改完成。如果之前有使用 cocoapods 安装过第三方库的话，那么可能还需要再重新安装一遍。</p>
-</div>
-  
-  
 
-
-    </article>
-  
-  
-    <article>
       
-  <header>
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com//archives/84163.html" data-id="ciy7g0eg300qjjhnehblqp2zd" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/react/">react</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-/archives/84162.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/84162.html" class="article-date">
+  <time datetime="2016-06-18T21:40:01.000Z" itemprop="datePublished">2016-06-18</time>
+</a>
     
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84162.html">ReactNative自动设置开发服务器IP</a></h1>
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/编程开发/">编程开发</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
     
     
-      <p class="meta">
+      <header class="article-header">
         
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/84162.html">ReactNative自动设置开发服务器IP</a>
+    </h1>
+  
 
-
-
-
-<time class='entry-date' datetime='2016-06-18T21:40:01+08:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>18</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>9:40 pm</span></time>
-        
-           | <a href="http://www.xefan.com/archives/84162.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/84162.html">Comments</a>
-        
-      </p>
+      </header>
     
-  </header>
-
-
-  <div class="entry-content"><p>在开发 ReactNative 应用时，jsbundle 有两种加载方式。第一种是指定 url 通过网络进行加载；第二种是 pre-bundled 将 jsbundle 文件打包进 app 安装包中。</p>
-
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>在开发 ReactNative 应用时，jsbundle 有两种加载方式。第一种是指定 url 通过网络进行加载；第二种是 pre-bundled 将 jsbundle 文件打包进 app 安装包中。</p>
 <p>以下就是创建项目之后 ios 的默认配置。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>  /**
-</span><span class='line'>   * Loading JavaScript code - uncomment the one you want.
-</span><span class='line'>   *
-</span><span class='line'>   * OPTION 1
-</span><span class='line'>   * Load from development server. Start the server from the repository root:
-</span><span class='line'>   *
-</span><span class='line'>   * $ npm start
-</span><span class='line'>   *
-</span><span class='line'>   * To run on device, change `localhost` to the IP address of your computer
-</span><span class='line'>   * (you can get this by typing `ifconfig` into the terminal and selecting the
-</span><span class='line'>   * `inet` value under `en0:`) and make sure your computer and iOS device are
-</span><span class='line'>   * on the same Wi-Fi network.
-</span><span class='line'>   */
-</span><span class='line'>
-</span><span class='line'>  jsCodeLocation = [NSURL URLWithString:@"http://localhost:8081/index.ios.bundle?platform=ios&dev=true"];
-</span><span class='line'>
-</span><span class='line'>  /**
-</span><span class='line'>   * OPTION 2
-</span><span class='line'>   * Load from pre-bundled file on disk. The static bundle is automatically
-</span><span class='line'>   * generated by the "Bundle React Native code and images" build step when
-</span><span class='line'>   * running the project on an actual device or running the project on the
-</span><span class='line'>   * simulator in the "Release" build configuration.
-</span><span class='line'>   */
-</span><span class='line'>
-</span><span class='line'>//   jsCodeLocation = [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这里有个麻烦的地方就是，当我在真机设备上调试时。每次都需要执行 <code>ifconfig</code> 命令，然后将 <code>localhost</code> 修改为我的 ip 地址。并且在使用 git 进行代码管理时，一不小心将修改后的文件提交上去了，其他同事在 pull 时又会与自己的冲突。
-最终实在忍受不了了，在想能不能编译时自动获取到本机的 ip 呢，这样就不用每次都手动修改了。于是找到了这篇文章： <a href="http://moduscreate.com/automated-ip-configuration-for-react-native-development/">http://moduscreate.com/automated-ip-configuration-for-react-native-development/</a>
-我这里参考了他的方案并做了一点小调整。</p>
-
-<p>按照他的步骤，首先添加 Run Script。
-在 Xcode 中选择“Build Phases”，然后点击左上角的&#8221;+&ldquo;选择“New Run Script Phase”。
-在列表最后出现了“Run Script”，将其展开，然后编辑代码块的内容：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>INFOPLIST="${TARGET_BUILD_DIR}/${INFOPLIST_PATH}"
-</span><span class='line'>echo "writing to $INFOPLIST"
-</span><span class='line'>PLISTCMD="Add :SERVER_IP string $(ifconfig | grep inet\ | tail -1 | cut -d " " -f 2)"
-</span><span class='line'>echo -n "$INFOPLIST" | xargs -0 /usr/libexec/PlistBuddy -c "$PLISTCMD" || true
-</span><span class='line'>PLISTCMD="Set :SERVER_IP $(ifconfig | grep inet\ | tail -1 | cut -d " " -f 2)"
-</span><span class='line'>echo -n "$INFOPLIST" | xargs -0 /usr/libexec/PlistBuddy -c "$PLISTCMD" || true</span></code></pre></td></tr></table></div></figure>
-
-
-<p>第二步编辑 <code>AppDelegate.m</code> 文件。
-将项目默认生成的 <code>jsCodeLocation</code> 配置删除掉，并添加代码：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>#if DEBUG
-</span><span class='line'>#if TARGET_OS_SIMULATOR
-</span><span class='line'>#warning "DEBUG SIMULATOR"
-</span><span class='line'>  jsCodeLocation = [NSURL URLWithString:@"http://localhost:8081/index.ios.bundle?platform=ios&dev=true"];
-</span><span class='line'>#else
-</span><span class='line'>#warning "DEBUG DEVICE"
-</span><span class='line'>  NSString *serverIP = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"SERVER_IP"];
-</span><span class='line'>  NSString *jsCodeUrlString = [NSString stringWithFormat:@"http://%@:8081/index.ios.bundle?platform=ios&dev=true", serverIP];
-</span><span class='line'>  NSString *jsBundleUrlString = [jsCodeUrlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-</span><span class='line'>  jsCodeLocation = [NSURL URLWithString:jsBundleUrlString];
-</span><span class='line'>#endif
-</span><span class='line'>#else
-</span><span class='line'>#warning "PRODUCTION DEVICE"
-</span><span class='line'>  jsCodeLocation = [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
-</span><span class='line'>#endif</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这里如果在模拟器中进行调试，那么 development server 则为 localhost；如果在真机设备中调试,那么 development server 则为电脑的 ip 地址。
-到此已经可以实现自动设置 ip 地址了，如果还想要在 Chrome 中对设备进行调试，那么还需要修改一下 WebSocket 的配置。</p>
-
-<p>第三步编辑 <code>RCTWebSocketExecutor.m</code> 文件。
-在 Xcode 中打开 <YourProject> -> Libraries -> RCTWebSocket.xcodeproj -> RCTWebSocketExecutor.m 文件，大概在文件 53 行左右的位置，将 <code>NSString *URLString = [NSString stringWithFormat:@"http://localhost:%zd/debugger-proxy?role=client", port];</code> 修改为：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>#if TARGET_OS_SIMULATOR
-</span><span class='line'>    NSString *serverIP = @"localhost";
-</span><span class='line'>#else
-</span><span class='line'>    NSString *serverIP = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"SERVER_IP"];
-</span><span class='line'>#endif
-</span><span class='line'>    NSString *URLString = [NSString stringWithFormat:@"http://%@:%zd/debugger-proxy?role=client", serverIP, port];</span></code></pre></td></tr></table></div></figure>
-
-
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">  /**</div><div class="line">   * Loading JavaScript code - uncomment the one you want.</div><div class="line">   *</div><div class="line">   * OPTION 1</div><div class="line">   * Load from development server. Start the server from the repository root:</div><div class="line">   *</div><div class="line">   * $ npm start</div><div class="line">   *</div><div class="line">   * To run on device, change `localhost` to the IP address of your computer</div><div class="line">   * (you can get this by typing `ifconfig` into the terminal and selecting the</div><div class="line">   * `inet` value under `en0:`) and make sure your computer and iOS device are</div><div class="line">   * on the same Wi-Fi network.</div><div class="line">   */</div><div class="line"></div><div class="line">  jsCodeLocation = [NSURL URLWithString:@&quot;http://localhost:8081/index.ios.bundle?platform=ios&amp;dev=true&quot;];</div><div class="line"></div><div class="line">  /**</div><div class="line">   * OPTION 2</div><div class="line">   * Load from pre-bundled file on disk. The static bundle is automatically</div><div class="line">   * generated by the &quot;Bundle React Native code and images&quot; build step when</div><div class="line">   * running the project on an actual device or running the project on the</div><div class="line">   * simulator in the &quot;Release&quot; build configuration.</div><div class="line">   */</div><div class="line"></div><div class="line">//   jsCodeLocation = [[NSBundle mainBundle] URLForResource:@&quot;main&quot; withExtension:@&quot;jsbundle&quot;];</div></pre></td></tr></table></figure>
+<p>这里有个麻烦的地方就是，当我在真机设备上调试时。每次都需要执行 <code>ifconfig</code> 命令，然后将 <code>localhost</code> 修改为我的 ip 地址。并且在使用 git 进行代码管理时，一不小心将修改后的文件提交上去了，其他同事在 pull 时又会与自己的冲突。<br>最终实在忍受不了了，在想能不能编译时自动获取到本机的 ip 呢，这样就不用每次都手动修改了。于是找到了这篇文章： <a href="http://moduscreate.com/automated-ip-configuration-for-react-native-development/" target="_blank" rel="external">http://moduscreate.com/automated-ip-configuration-for-react-native-development/</a><br>我这里参考了他的方案并做了一点小调整。</p>
+<p>按照他的步骤，首先添加 Run Script。<br>在 Xcode 中选择“Build Phases”，然后点击左上角的”+”选择“New Run Script Phase”。<br>在列表最后出现了“Run Script”，将其展开，然后编辑代码块的内容：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">INFOPLIST=&quot;$&#123;TARGET_BUILD_DIR&#125;/$&#123;INFOPLIST_PATH&#125;&quot;</div><div class="line">echo &quot;writing to $INFOPLIST&quot;</div><div class="line">PLISTCMD=&quot;Add :SERVER_IP string $(ifconfig | grep inet\ | tail -1 | cut -d &quot; &quot; -f 2)&quot;</div><div class="line">echo -n &quot;$INFOPLIST&quot; | xargs -0 /usr/libexec/PlistBuddy -c &quot;$PLISTCMD&quot; || true</div><div class="line">PLISTCMD=&quot;Set :SERVER_IP $(ifconfig | grep inet\ | tail -1 | cut -d &quot; &quot; -f 2)&quot;</div><div class="line">echo -n &quot;$INFOPLIST&quot; | xargs -0 /usr/libexec/PlistBuddy -c &quot;$PLISTCMD&quot; || true</div></pre></td></tr></table></figure>
+<p>第二步编辑 <code>AppDelegate.m</code> 文件。<br>将项目默认生成的 <code>jsCodeLocation</code> 配置删除掉，并添加代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">#if DEBUG</div><div class="line">#if TARGET_OS_SIMULATOR</div><div class="line">#warning &quot;DEBUG SIMULATOR&quot;</div><div class="line">  jsCodeLocation = [NSURL URLWithString:@&quot;http://localhost:8081/index.ios.bundle?platform=ios&amp;dev=true&quot;];</div><div class="line">#else</div><div class="line">#warning &quot;DEBUG DEVICE&quot;</div><div class="line">  NSString *serverIP = [[NSBundle mainBundle] objectForInfoDictionaryKey:@&quot;SERVER_IP&quot;];</div><div class="line">  NSString *jsCodeUrlString = [NSString stringWithFormat:@&quot;http://%@:8081/index.ios.bundle?platform=ios&amp;dev=true&quot;, serverIP];</div><div class="line">  NSString *jsBundleUrlString = [jsCodeUrlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];</div><div class="line">  jsCodeLocation = [NSURL URLWithString:jsBundleUrlString];</div><div class="line">#endif</div><div class="line">#else</div><div class="line">#warning &quot;PRODUCTION DEVICE&quot;</div><div class="line">  jsCodeLocation = [[NSBundle mainBundle] URLForResource:@&quot;main&quot; withExtension:@&quot;jsbundle&quot;];</div><div class="line">#endif</div></pre></td></tr></table></figure>
+<p>这里如果在模拟器中进行调试，那么 development server 则为 localhost；如果在真机设备中调试,那么 development server 则为电脑的 ip 地址。<br>到此已经可以实现自动设置 ip 地址了，如果还想要在 Chrome 中对设备进行调试，那么还需要修改一下 WebSocket 的配置。</p>
+<p>第三步编辑 <code>RCTWebSocketExecutor.m</code> 文件。<br>在 Xcode 中打开 <yourproject> -&gt; Libraries -&gt; RCTWebSocket.xcodeproj -&gt; RCTWebSocketExecutor.m 文件，大概在文件 53 行左右的位置，将 <code>NSString *URLString = [NSString stringWithFormat:@&quot;http://localhost:%zd/debugger-proxy?role=client&quot;, port];</code> 修改为：</yourproject></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">#if TARGET_OS_SIMULATOR</div><div class="line">    NSString *serverIP = @&quot;localhost&quot;;</div><div class="line">#else</div><div class="line">    NSString *serverIP = [[NSBundle mainBundle] objectForInfoDictionaryKey:@&quot;SERVER_IP&quot;];</div><div class="line">#endif</div><div class="line">    NSString *URLString = [NSString stringWithFormat:@&quot;http://%@:%zd/debugger-proxy?role=client&quot;, serverIP, port];</div></pre></td></tr></table></figure>
 <p>现在配置已经完成了，接下来就试试看是否有效吧。</p>
-
-<p>经过修改之后相对于之前已经方便了不少，只是我还遇到一个问题。那就是我的 MacBook 在办公室时的 ip 跟在家里的 ip 是不同的。
-这样的话每次切换环境都需要重新编译一下应用，还是有点麻烦。于是乎我自己将第一步的脚本作了下修改，新的内容如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>INFOPLIST="${TARGET_BUILD_DIR}/${INFOPLIST_PATH}"
-</span><span class='line'>echo "writing to $INFOPLIST"
-</span><span class='line'>PLISTCMD="Add :SERVER_IP string $(hostname)"
-</span><span class='line'>echo -n "$INFOPLIST" | xargs -0 /usr/libexec/PlistBuddy -c "$PLISTCMD" || true
-</span><span class='line'>PLISTCMD="Set :SERVER_IP $(hostname)"
-</span><span class='line'>echo -n "$INFOPLIST" | xargs -0 /usr/libexec/PlistBuddy -c "$PLISTCMD" || true</span></code></pre></td></tr></table></div></figure>
-
-
+<p>经过修改之后相对于之前已经方便了不少，只是我还遇到一个问题。那就是我的 MacBook 在办公室时的 ip 跟在家里的 ip 是不同的。<br>这样的话每次切换环境都需要重新编译一下应用，还是有点麻烦。于是乎我自己将第一步的脚本作了下修改，新的内容如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">INFOPLIST=&quot;$&#123;TARGET_BUILD_DIR&#125;/$&#123;INFOPLIST_PATH&#125;&quot;</div><div class="line">echo &quot;writing to $INFOPLIST&quot;</div><div class="line">PLISTCMD=&quot;Add :SERVER_IP string $(hostname)&quot;</div><div class="line">echo -n &quot;$INFOPLIST&quot; | xargs -0 /usr/libexec/PlistBuddy -c &quot;$PLISTCMD&quot; || true</div><div class="line">PLISTCMD=&quot;Set :SERVER_IP $(hostname)&quot;</div><div class="line">echo -n &quot;$INFOPLIST&quot; | xargs -0 /usr/libexec/PlistBuddy -c &quot;$PLISTCMD&quot; || true</div></pre></td></tr></table></figure>
 <p>这里我使用 hostname 来作为 development server 的地址，而不是 ip。这样的话即便是网络环境发生了变化，只要手机设备跟电脑处于同一个局域网内就不需要再重新编译应用了。</p>
-</div>
-  
-  
 
-
-    </article>
-  
-  
-    <article>
       
-  <header>
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com//archives/84162.html" data-id="ciy7g0eg200qgjhneye20pzbm" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/react/">react</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-/archives/84161.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/84161.html" class="article-date">
+  <time datetime="2016-04-03T11:05:11.000Z" itemprop="datePublished">2016-04-03</time>
+</a>
     
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84161.html">Mac OS中VirtualBox的Android蓝牙设置</a></h1>
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/编程开发/">编程开发</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
     
     
-      <p class="meta">
+      <header class="article-header">
         
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/84161.html">Mac OS中VirtualBox的Android蓝牙设置</a>
+    </h1>
+  
 
-
-
-
-<time class='entry-date' datetime='2016-04-03T11:05:11+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2016</span></span> <span class='time'>11:05 am</span></time>
-        
-           | <a href="http://www.xefan.com/archives/84161.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/84161.html">Comments</a>
-        
-      </p>
+      </header>
     
-  </header>
-
-
-  <div class="entry-content"><p>在做手机开发时，由于没有 Android 设备，只得在模拟器中进行测试。然而在模拟器却没法访问本机的蓝牙设备，这对于要做蓝牙开发来说很不方便。</p>
-
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>在做手机开发时，由于没有 Android 设备，只得在模拟器中进行测试。然而在模拟器却没法访问本机的蓝牙设备，这对于要做蓝牙开发来说很不方便。</p>
 <p>经过各种搜索终于找到了一个解决方案。首先需要以下工具：</p>
-
 <ul>
 <li>Mac OS系统</li>
-<li>VirtualBox (<a href="https://www.virtualbox.org/">https://www.virtualbox.org/</a>)</li>
-<li>Android x86 (<a href="https://sourceforge.net/projects/android-x86/">https://sourceforge.net/projects/android-x86/</a>)</li>
+<li>VirtualBox (<a href="https://www.virtualbox.org/" target="_blank" rel="external">https://www.virtualbox.org/</a>)</li>
+<li>Android x86 (<a href="https://sourceforge.net/projects/android-x86/" target="_blank" rel="external">https://sourceforge.net/projects/android-x86/</a>)</li>
 </ul>
-
-
 <p>1.禁用系统的蓝牙服务：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ sudo launchctl unload /System/Library/LaunchDaemons/com.apple.blued.plist
-</span><span class='line'># 对于 Mountain Lion 系统执行如下命令：
-</span><span class='line'>$ sudo kextunload -b com.apple.iokit.IOBluetoothSerialManager
-</span><span class='line'>$ sudo kextunload -b com.apple.iokit.BroadcomBluetoothHCIControllerUSBTransport
-</span><span class='line'># 对于 Snow Leopard 系统执行如下命令：
-</span><span class='line'>$ sudo kextunload -b com.apple.driver.BroadcomUSBBluetoothHCIController
-</span><span class='line'>$ sudo kextunload -b com.apple.driver.AppleUSBBluetoothHCIController</span></code></pre></td></tr></table></div></figure>
-
-
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">$ sudo launchctl unload /System/Library/LaunchDaemons/com.apple.blued.plist</div><div class="line"># 对于 Mountain Lion 系统执行如下命令：</div><div class="line">$ sudo kextunload -b com.apple.iokit.IOBluetoothSerialManager</div><div class="line">$ sudo kextunload -b com.apple.iokit.BroadcomBluetoothHCIControllerUSBTransport</div><div class="line"># 对于 Snow Leopard 系统执行如下命令：</div><div class="line">$ sudo kextunload -b com.apple.driver.BroadcomUSBBluetoothHCIController</div><div class="line">$ sudo kextunload -b com.apple.driver.AppleUSBBluetoothHCIController</div></pre></td></tr></table></figure>
 <p>2.运行 VirtualBox</p>
-
 <p>设置启用 USB 控制器，添加蓝牙设备，如图：</p>
-
-<p><img src="/wp-content/uploads/2016/04/03/virtualbox-android-bluetooth.png" alt="" /></p>
-
+<p><img src="/wp-content/uploads/2016/04/03/virtualbox-android-bluetooth.png" alt=""></p>
 <p>然后运行 android 系统即可。</p>
-
 <p>3.在退出 VirtualBox 之后，重新启用系统的蓝牙服务：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">$ sudo launchctl load /System/Library/LaunchDaemons/com.apple.blued.plist</div><div class="line"># 对于 Mountain Lion 系统执行如下命令：</div><div class="line">$ sudo kextload -b com.apple.iokit.IOBluetoothSerialManager</div><div class="line">$ sudo kextload -b com.apple.iokit.BroadcomBluetoothHCIControllerUSBTransport</div><div class="line"># 对于 Snow Leopard 系统执行如下命令：</div><div class="line">$ sudo kextload -b com.apple.driver.BroadcomUSBBluetoothHCIController</div><div class="line">$ sudo kextload -b com.apple.driver.AppleUSBBluetoothHCIController</div></pre></td></tr></table></figure>
+<p>参考：<br><a href="https://www.virtualbox.org/ticket/2372#comment:17" target="_blank" rel="external">https://www.virtualbox.org/ticket/2372#comment:17</a></p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ sudo launchctl load /System/Library/LaunchDaemons/com.apple.blued.plist
-</span><span class='line'># 对于 Mountain Lion 系统执行如下命令：
-</span><span class='line'>$ sudo kextload -b com.apple.iokit.IOBluetoothSerialManager
-</span><span class='line'>$ sudo kextload -b com.apple.iokit.BroadcomBluetoothHCIControllerUSBTransport
-</span><span class='line'># 对于 Snow Leopard 系统执行如下命令：
-</span><span class='line'>$ sudo kextload -b com.apple.driver.BroadcomUSBBluetoothHCIController
-</span><span class='line'>$ sudo kextload -b com.apple.driver.AppleUSBBluetoothHCIController </span></code></pre></td></tr></table></div></figure>
-
-
-<p>参考：<br/>
-<a href="https://www.virtualbox.org/ticket/2372#comment:17">https://www.virtualbox.org/ticket/2372#comment:17</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
       
-  <header>
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com//archives/84161.html" data-id="ciy7g0eg000qdjhneiqjhbl7r" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-/archives/84160.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/84160.html" class="article-date">
+  <time datetime="2016-03-26T14:32:56.000Z" itemprop="datePublished">2016-03-26</time>
+</a>
     
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84160.html">gulp+browserSync配置</a></h1>
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/前端相关/">前端相关</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
     
     
-      <p class="meta">
+      <header class="article-header">
         
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/84160.html">gulp+browserSync配置</a>
+    </h1>
+  
 
-
-
-
-<time class='entry-date' datetime='2016-03-26T14:32:56+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>26</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>2:32 pm</span></time>
-        
-           | <a href="http://www.xefan.com/archives/84160.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/84160.html">Comments</a>
-        
-      </p>
+      </header>
     
-  </header>
-
-
-  <div class="entry-content"><p>Browsersync  是一个前端调试的利器，它能够让你在页面文件改动之后自动刷新浏览器，从而方便了前端的调试工作。</p>
-
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Browsersync  是一个前端调试的利器，它能够让你在页面文件改动之后自动刷新浏览器，从而方便了前端的调试工作。</p>
 <p>本文就是对于 Browsersync + Gulp 的配置作个简单的笔记。</p>
-
 <ol>
 <li>首先安装 Browsersync 与 Gulp:</li>
 </ol>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ npm install browser-sync gulp --save-dev</span></code></pre></td></tr></table></div></figure>
-
-
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ npm install browser-sync gulp --save-dev</div></pre></td></tr></table></figure>
 <ol>
 <li>在 <code>gulpfile.js</code> 中创建新任务：</li>
 </ol>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>var gulp = require('gulp');
-</span><span class='line'>var browserSync = require('browser-sync').create();
-</span><span class='line'>
-</span><span class='line'>var config = {
-</span><span class='line'>  baseDir: 'src',
-</span><span class='line'>  watchFiles: [ 'src/**/*.html', 'src/assets/css/*.css', 'src/assets/js/*.js' ]
-</span><span class='line'>}
-</span><span class='line'>
-</span><span class='line'>gulp.task('serve', function() {
-</span><span class='line'>  browserSync.init({
-</span><span class='line'>    files: config.watchFiles,
-</span><span class='line'>    server: {
-</span><span class='line'>      baseDir: config.baseDir
-</span><span class='line'>    }
-</span><span class='line'>  });
-</span><span class='line'>})</span></code></pre></td></tr></table></div></figure>
-
-
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">var gulp = require(&apos;gulp&apos;);</div><div class="line">var browserSync = require(&apos;browser-sync&apos;).create();</div><div class="line"></div><div class="line">var config = &#123;</div><div class="line">  baseDir: &apos;src&apos;,</div><div class="line">  watchFiles: [ &apos;src/**/*.html&apos;, &apos;src/assets/css/*.css&apos;, &apos;src/assets/js/*.js&apos; ]</div><div class="line">&#125;</div><div class="line"></div><div class="line">gulp.task(&apos;serve&apos;, function() &#123;</div><div class="line">  browserSync.init(&#123;</div><div class="line">    files: config.watchFiles,</div><div class="line">    server: &#123;</div><div class="line">      baseDir: config.baseDir</div><div class="line">    &#125;</div><div class="line">  &#125;);</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
 <p>这里表示以 <code>src</code> 目录作为根目录启动 HTTP 服务，并监听 <code>src</code> 目录下的所有 <code>html</code>、<code>css</code> 以及 <code>js</code> 类型的文件，当这些文件有改动时 Browsersync 会自动刷新浏览器页面。</p>
-
-<p>如果想配合使用 SASS 之类的，可以参考： <a href="https://www.browsersync.io/docs/gulp/">https://www.browsersync.io/docs/gulp/</a></p>
-
-<p>同时为了避免之后每次都要重新配置一遍，于是我自己写了个简单的 <code>yo</code> 生成器： <a href="https://github.com/wusuopu/my-yeoman-generator">https://github.com/wusuopu/my-yeoman-generator</a></p>
-
+<p>如果想配合使用 SASS 之类的，可以参考： <a href="https://www.browsersync.io/docs/gulp/" target="_blank" rel="external">https://www.browsersync.io/docs/gulp/</a></p>
+<p>同时为了避免之后每次都要重新配置一遍，于是我自己写了个简单的 <code>yo</code> 生成器： <a href="https://github.com/wusuopu/my-yeoman-generator" target="_blank" rel="external">https://github.com/wusuopu/my-yeoman-generator</a></p>
 <p>由于这只是我自己 generator，并没有发布到 npm 上，因此只能手动进行安装。各位有兴趣的可以试试。使用方法：</p>
-
 <ol>
-<li><p>安装 yo 和 bower： <code>$ npm install -g yo bower</code></p></li>
-<li><p>安装 generator:</p></li>
+<li><p>安装 yo 和 bower： <code>$ npm install -g yo bower</code></p>
+</li>
+<li><p>安装 generator:</p>
+</li>
 </ol>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ git clone https://github.com/wusuopu/my-yeoman-generator generator-wusuopu
-</span><span class='line'>$ cd generator-wusuopu
-</span><span class='line'>$ npm link</span></code></pre></td></tr></table></div></figure>
-
-
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$ git clone https://github.com/wusuopu/my-yeoman-generator generator-wusuopu</div><div class="line">$ cd generator-wusuopu</div><div class="line">$ npm link</div></pre></td></tr></table></figure>
 <ol>
 <li>生成项目：</li>
 </ol>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ mkdir webpage
-</span><span class='line'>$ cd webpage
-</span><span class='line'>$ yo wusuopu:bootstrap3</span></code></pre></td></tr></table></div></figure>
-
-
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$ mkdir webpage</div><div class="line">$ cd webpage</div><div class="line">$ yo wusuopu:bootstrap3</div></pre></td></tr></table></figure>
 <p>这里 bootstrap3 generator 包含了 bootstrap3、font-awesome、jquery 这些常用的前端库，省得每次都需要重新下载一遍。</p>
-</div>
-  
-  
 
-
-    </article>
-  
-  
-    <article>
       
-  <header>
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com//archives/84160.html" data-id="ciy7g0efz00qajhnehwktboro" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gulp/">gulp</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-/archives/84159.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/84159.html" class="article-date">
+  <time datetime="2016-03-17T16:35:12.000Z" itemprop="datePublished">2016-03-17</time>
+</a>
     
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84159.html">HTTP Access Control跨域请求</a></h1>
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Web开发/">Web开发</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
     
     
-      <p class="meta">
+      <header class="article-header">
         
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/84159.html">HTTP Access Control跨域请求</a>
+    </h1>
+  
 
-
-
-
-<time class='entry-date' datetime='2016-03-17T16:35:12+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>4:35 pm</span></time>
-        
-           | <a href="http://www.xefan.com/archives/84159.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/84159.html">Comments</a>
-        
-      </p>
+      </header>
     
-  </header>
-
-
-  <div class="entry-content"><p>最近在使用 Ajax api 请求时遇到了跨域的问题，现在问题解决了顺便做个笔记。</p>
-
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>最近在使用 Ajax api 请求时遇到了跨域的问题，现在问题解决了顺便做个笔记。  </p>
 <p>场景：现在主站域名为 example.org ，需要通过 ajax 请求 hello-world.example 上的资源。</p>
-
-<h2>Access-Control-Allow-Origin</h2>
-
-<p>如果请求时遇到如下错误：<br/>
-<code>No 'Access-Control-Allow-Origin' header is present on the requested resource. Origin 'http://example.org' is therefore not allowed access.</code></p>
-
+<h2 id="Access-Control-Allow-Origin"><a href="#Access-Control-Allow-Origin" class="headerlink" title="Access-Control-Allow-Origin"></a>Access-Control-Allow-Origin</h2><p>如果请求时遇到如下错误：<br><code>No &#39;Access-Control-Allow-Origin&#39; header is present on the requested resource. Origin &#39;http://example.org&#39; is therefore not allowed access.</code></p>
 <p>则需要在 hello-world.example 的 server 端 Response Headers 中设置 <code>Access-Control-Allow-Origin</code> 字段。其值根据情况设置为 <code>http://example.org</code> 或者 <code>https://example.org</code> 。</p>
-
-<h2>Access-Control-Allow-Methods</h2>
-
-<p>一般情况下只允许 GET 和 POST 请求，对于 RESTful 的 api 可能会有其他类型的请求。例如：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$.ajax({
-</span><span class='line'>  url: 'http://hello-world.example/sessions/me.json',
-</span><span class='line'>  method: 'DELETE',
-</span><span class='line'>  dataType: 'json'
-</span><span class='line'>});</span></code></pre></td></tr></table></div></figure>
-
-
+<h2 id="Access-Control-Allow-Methods"><a href="#Access-Control-Allow-Methods" class="headerlink" title="Access-Control-Allow-Methods"></a>Access-Control-Allow-Methods</h2><p>一般情况下只允许 GET 和 POST 请求，对于 RESTful 的 api 可能会有其他类型的请求。例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">$.ajax(&#123;</div><div class="line">  url: &apos;http://hello-world.example/sessions/me.json&apos;,</div><div class="line">  method: &apos;DELETE&apos;,</div><div class="line">  dataType: &apos;json&apos;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
 <p>这时如果出现方法不被允许，则需要在 server 端 Response Headers 中设置 <code>Access-Control-Allow-Methods</code> 字段。如： <code>Access-Control-Allow-Methods: GET, POST, DELETE</code> 。</p>
-
-<h2>Access-Control-Allow-Credentials</h2>
-
-<p>当在 hello-world.example 站点登录之后，浏览器会保存对应的 Cookies ，但是在 example.org 站点中使用 ajax 时发现 hello-world.example 的 Cookies 并没有附加到 Request Headers 中。</p>
-
+<h2 id="Access-Control-Allow-Credentials"><a href="#Access-Control-Allow-Credentials" class="headerlink" title="Access-Control-Allow-Credentials"></a>Access-Control-Allow-Credentials</h2><p>当在 hello-world.example 站点登录之后，浏览器会保存对应的 Cookies ，但是在 example.org 站点中使用 ajax 时发现 hello-world.example 的 Cookies 并没有附加到 Request Headers 中。</p>
 <p>此时就需要设置 XMLHttpRequest 的 <code>withCredentials</code> 属性，例如：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$.ajax({
-</span><span class='line'>  url: 'http://hello-world.example/session/me.json',
-</span><span class='line'>  method: 'GET',
-</span><span class='line'>  dataType: 'json',
-</span><span class='line'>  xhrFields: {
-</span><span class='line'>      withCredentials: true
-</span><span class='line'>  }
-</span><span class='line'>});</span></code></pre></td></tr></table></div></figure>
-
-
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">$.ajax(&#123;</div><div class="line">  url: &apos;http://hello-world.example/session/me.json&apos;,</div><div class="line">  method: &apos;GET&apos;,</div><div class="line">  dataType: &apos;json&apos;,</div><div class="line">  xhrFields: &#123;</div><div class="line">      withCredentials: true</div><div class="line">  &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
 <p>同时在 server 端 Response Headers 中设置 <code>Access-Control-Allow-Credentials</code> 字段。说明允许通过跨域修改 Cookies 。如： <code>Access-Control-Allow-Credentials: true</code></p>
+<p>以上是常用的几个字段，更多设置参考手册： <a href="https://www.w3.org/TR/access-control/" target="_blank" rel="external">https://www.w3.org/TR/access-control/</a></p>
 
-<p>以上是常用的几个字段，更多设置参考手册： <a href="https://www.w3.org/TR/access-control/">https://www.w3.org/TR/access-control/</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
       
-  <header>
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com//archives/84159.html" data-id="ciy7g0efx00q6jhnevp4kcf8s" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ajax/">ajax</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-/archives/84158.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/84158.html" class="article-date">
+  <time datetime="2016-01-03T16:52:11.000Z" itemprop="datePublished">2016-01-03</time>
+</a>
     
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84158.html">Xcode文档离线安装</a></h1>
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/资源分享/">资源分享</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
     
     
-      <p class="meta">
+      <header class="article-header">
         
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/84158.html">Xcode文档离线安装</a>
+    </h1>
+  
 
-
-
-
-<time class='entry-date' datetime='2016-01-03T16:52:11+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2016</span></span> <span class='time'>4:52 pm</span></time>
-        
-           | <a href="http://www.xefan.com/archives/84158.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/84158.html">Comments</a>
-        
-      </p>
+      </header>
     
-  </header>
-
-
-  <div class="entry-content"><p>在 Xcode 中下载安装文档速度太慢了，不得已只得自行下载，然后再手动安装。</p>
-
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>在 Xcode 中下载安装文档速度太慢了，不得已只得自行下载，然后再手动安装。</p>
 <ol>
-<li>首先在 <a href="https://developer.apple.com/library/downloads/docset-index.dvtdownloadableindex">https://developer.apple.com/library/downloads/docset-index.dvtdownloadableindex</a> 找到需要下载的文档的下载地址。</li>
+<li>首先在 <a href="https://developer.apple.com/library/downloads/docset-index.dvtdownloadableindex" target="_blank" rel="external">https://developer.apple.com/library/downloads/docset-index.dvtdownloadableindex</a> 找到需要下载的文档的下载地址。</li>
 </ol>
-
-
 <p>这里我需要下载的是 iOS 9.2 的文档，内容如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;!-- START iOS doc set --&gt;
-</span><span class='line'>&lt;dict&gt;
-</span><span class='line'>  &lt;key&gt;fileSize&lt;/key&gt;
-</span><span class='line'>  &lt;integer&gt;1071665431&lt;/integer&gt;
-</span><span class='line'>  &lt;key&gt;identifier&lt;/key&gt;
-</span><span class='line'>  &lt;string&gt;com.apple.adc.documentation.iOS&lt;/string&gt;
-</span><span class='line'>  &lt;key&gt;name&lt;/key&gt;
-</span><span class='line'>  &lt;string&gt;iOS 9.2 Documentation&lt;/string&gt;
-</span><span class='line'>  &lt;key&gt;source&lt;/key&gt;
-</span><span class='line'>  &lt;string&gt;https://devimages.apple.com.edgekey.net/docsets/20151208/031-43202-A.dmg&lt;/string&gt;
-</span><span class='line'>  &lt;key&gt;userInfo&lt;/key&gt;
-</span><span class='line'>  &lt;dict&gt;
-</span><span class='line'>    &lt;key&gt;ActivationPredicate&lt;/key&gt;
-</span><span class='line'>    &lt;string&gt;$XCODE_VERSION &gt;= '7.2'&lt;/string&gt;
-</span><span class='line'>    &lt;key&gt;Category&lt;/key&gt;
-</span><span class='line'>    &lt;string&gt;Documentation&lt;/string&gt;
-</span><span class='line'>    &lt;key&gt;IconType&lt;/key&gt;
-</span><span class='line'>    &lt;string&gt;IDEDownloadablesTypeDocSet&lt;/string&gt;
-</span><span class='line'>    &lt;key&gt;InstallPrefix&lt;/key&gt;
-</span><span class='line'>    &lt;string&gt;$(HOME)/Library/Developer/Shared/Documentation/DocSets&lt;/string&gt;
-</span><span class='line'>    &lt;key&gt;InstalledIfAllReceiptsArePresentOrNewer&lt;/key&gt;
-</span><span class='line'>    &lt;dict&gt;
-</span><span class='line'>      &lt;key&gt;com.apple.pkg.7.0.iOSDocset&lt;/key&gt;
-</span><span class='line'>      &lt;string&gt;10.9.0.0.1.1449203766&lt;/string&gt;
-</span><span class='line'>    &lt;/dict&gt;
-</span><span class='line'>    &lt;key&gt;RequiresADCAuthentication&lt;/key&gt;
-</span><span class='line'>    &lt;false/&gt;
-</span><span class='line'>    &lt;key&gt;Summary&lt;/key&gt;
-</span><span class='line'>    &lt;string&gt;My description of content&lt;/string&gt;
-</span><span class='line'>  &lt;/dict&gt;
-</span><span class='line'>  &lt;key&gt;version&lt;/key&gt;
-</span><span class='line'>  &lt;string&gt;92.7&lt;/string&gt;
-</span><span class='line'>&lt;/dict&gt;
-</span><span class='line'>&lt;!-- END iOS doc set --&gt;</span></code></pre></td></tr></table></div></figure>
-
-
-<p>下载地址为： <a href="https://devimages.apple.com.edgekey.net/docsets/20151208/031-43202-A.dmg">https://devimages.apple.com.edgekey.net/docsets/20151208/031-43202-A.dmg</a></p>
-
-<p>如果觉得官网下载速度太慢了，也可以从我的百度网盘下载： <a href="http://pan.baidu.com/s/1pKsmkY3">http://pan.baidu.com/s/1pKsmkY3</a> 。下载完成之后自行进行文件合并、md5校验。</p>
-
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line">&lt;!-- START iOS doc set --&gt;</div><div class="line">&lt;dict&gt;</div><div class="line">  &lt;key&gt;fileSize&lt;/key&gt;</div><div class="line">  &lt;integer&gt;1071665431&lt;/integer&gt;</div><div class="line">  &lt;key&gt;identifier&lt;/key&gt;</div><div class="line">  &lt;string&gt;com.apple.adc.documentation.iOS&lt;/string&gt;</div><div class="line">  &lt;key&gt;name&lt;/key&gt;</div><div class="line">  &lt;string&gt;iOS 9.2 Documentation&lt;/string&gt;</div><div class="line">  &lt;key&gt;source&lt;/key&gt;</div><div class="line">  &lt;string&gt;https://devimages.apple.com.edgekey.net/docsets/20151208/031-43202-A.dmg&lt;/string&gt;</div><div class="line">  &lt;key&gt;userInfo&lt;/key&gt;</div><div class="line">  &lt;dict&gt;</div><div class="line">    &lt;key&gt;ActivationPredicate&lt;/key&gt;</div><div class="line">    &lt;string&gt;$XCODE_VERSION &amp;gt;= &apos;7.2&apos;&lt;/string&gt;</div><div class="line">    &lt;key&gt;Category&lt;/key&gt;</div><div class="line">    &lt;string&gt;Documentation&lt;/string&gt;</div><div class="line">    &lt;key&gt;IconType&lt;/key&gt;</div><div class="line">    &lt;string&gt;IDEDownloadablesTypeDocSet&lt;/string&gt;</div><div class="line">    &lt;key&gt;InstallPrefix&lt;/key&gt;</div><div class="line">    &lt;string&gt;$(HOME)/Library/Developer/Shared/Documentation/DocSets&lt;/string&gt;</div><div class="line">    &lt;key&gt;InstalledIfAllReceiptsArePresentOrNewer&lt;/key&gt;</div><div class="line">    &lt;dict&gt;</div><div class="line">      &lt;key&gt;com.apple.pkg.7.0.iOSDocset&lt;/key&gt;</div><div class="line">      &lt;string&gt;10.9.0.0.1.1449203766&lt;/string&gt;</div><div class="line">    &lt;/dict&gt;</div><div class="line">    &lt;key&gt;RequiresADCAuthentication&lt;/key&gt;</div><div class="line">    &lt;false/&gt;</div><div class="line">    &lt;key&gt;Summary&lt;/key&gt;</div><div class="line">    &lt;string&gt;My description of content&lt;/string&gt;</div><div class="line">  &lt;/dict&gt;</div><div class="line">  &lt;key&gt;version&lt;/key&gt;</div><div class="line">  &lt;string&gt;92.7&lt;/string&gt;</div><div class="line">&lt;/dict&gt;</div><div class="line">&lt;!-- END iOS doc set --&gt;</div></pre></td></tr></table></figure>
+<p>下载地址为： <a href="https://devimages.apple.com.edgekey.net/docsets/20151208/031-43202-A.dmg" target="_blank" rel="external">https://devimages.apple.com.edgekey.net/docsets/20151208/031-43202-A.dmg</a></p>
+<p>如果觉得官网下载速度太慢了，也可以从我的百度网盘下载： <a href="http://pan.baidu.com/s/1pKsmkY3" target="_blank" rel="external">http://pan.baidu.com/s/1pKsmkY3</a> 。下载完成之后自行进行文件合并、md5校验。</p>
 <ol>
-<li>将下载的 dmg 文件移动到 <code>~/Library/Caches/com.apple.dt.Xcode/Downloads/</code> 目录下（如果目录不存在，自行创建），
-并重命名为 <code>&lt;identifier&gt;-&lt;version&gt;.dmg</code> 这样的形式，在这里为： <code>com.apple.adc.documentation.iOS-92.7.dmg</code></li>
+<li>将下载的 dmg 文件移动到 <code>~/Library/Caches/com.apple.dt.Xcode/Downloads/</code> 目录下（如果目录不存在，自行创建），<br>并重命名为 <code>&lt;identifier&gt;-&lt;version&gt;.dmg</code> 这样的形式，在这里为： <code>com.apple.adc.documentation.iOS-92.7.dmg</code></li>
 </ol>
-
-
-<p>然后转到文档所在目录： <code>~/Library/Developer/Shared/Documentation/DocSets</code>，如果对应的文档文件已存在则删除。
-<code>rm -rf com.apple.adc.documentation.iOS.docset</code></p>
-
+<p>然后转到文档所在目录： <code>~/Library/Developer/Shared/Documentation/DocSets</code>，如果对应的文档文件已存在则删除。<br><code>rm -rf com.apple.adc.documentation.iOS.docset</code></p>
 <ol>
 <li>打开 Xcode ，点击下载对应的文档。此时应该会跳过下载步骤而直接进行安装。</li>
 </ol>
+<p><img src="/wp-content/uploads/2016/01/03/xcode1.png" alt="Xcode"></p>
 
-
-<p><img src="/wp-content/uploads/2016/01/03/xcode1.png" alt="Xcode" /></p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
       
-  <header>
-    
-    <h1 class="entry-title"><a href="http://www.xefan.com/archives/84157.html">Javascript使用async进行流程控制</a></h1>
-    
-    
-      <p class="meta">
-        
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com//archives/84158.html" data-id="ciy7g0efv00q3jhnelun8u9oc" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Xcode/">Xcode</a></li></ul>
 
-
-
-
-<time class='entry-date' datetime='2015-12-13T21:39:26+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>9:39 pm</span></time>
-        
-           | <a href="http://www.xefan.com/archives/84157.html#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com/archives/84157.html">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2>前言</h2>
-
-<p>突然发现博客好久没有更新了，主要是因为最近这几个月比较忙。之前由 Python 转向了 Ruby，现在又由后端转向了前端。
-这几个月接触的内容略有点多，信息量有点大，主要都是 js 相关的。准备之后抽时间将这些知识整理整理，沉淀沉淀。</p>
-
-<h2>Async</h2>
-
-<p>由于 js 是异步的，之前在使用 loopback 进行 server 端开发时，很容易就出现了比较深层次的回调嵌套。
-<a href="https://github.com/caolan/async">async.js</a>是 js 的一个工具，可以用来方便的控制 js 中的异步流程的，类似的库还有 Promise、RxJS 等。
-最初它是设计用于 nodejs 的，不过在浏览器端也可以使用。</p>
-
-<h3>安装</h3>
-
-<p>安装方法很简单，直接使用 npm 即可： <code>npm install async</code> 。</p>
-
-<h3>使用方法</h3>
-
-<p>首先是加载 async 库，在 server 端使用 <code>var async = require('async');</code>，
-在浏览器端直接引用即可： <code>&lt;script type="text/javascript" src="async.js"&gt;&lt;/script&gt;</code>。</p>
-
-<p>async 提供一些集合操作方法和流程控制方法，我比较常用的是：<code>each</code>、<code>map</code>、<code>series</code>、<code>waterfall</code> 这些方法。
-其中 <code>each</code>、<code>map</code> 方法与 <code>lodash</code> 的类似，可以用来遍历某个集合并执行一些操作。</p>
-
-<p><code>each</code> 方法定义如下：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">async</span><span class="p">.</span><span class="nx">each</span><span class="p">(</span><span class="nx">collection</span><span class="p">,</span> <span class="nx">iterator</span><span class="p">,</span> <span class="p">[</span><span class="nx">callback</span><span class="p">])</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>该方法会对 <code>collection</code> 每个元素都调用 <code>iterator</code> 操作， <code>iterator</code> 函数原型为： <code>iterator(item, callback)</code>。
-当 <code>collection</code> 中的所有元素遍历完成或者执行 <code>iterator</code> 时发生错误就会调用 <code>callback</code> 回调，原型为： <code>callback(err)</code>。</p>
-
-<p><code>each</code> 方法只是对每个元素进行操作，如果还需要获取操作的结果，那么可以使用 <code>map</code> 方法。定义如下：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">async</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">collection</span><span class="p">,</span> <span class="nx">iterator</span><span class="p">,</span> <span class="p">[</span><span class="nx">callback</span><span class="p">])</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><code>map</code> 与 <code>each</code> 类似，只是 <code>callback</code> 定义为： <code>callback(err, results)</code>。
-<code>results</code> 为 <code>iterator</code> 操作的结果集合。</p>
-
-<p>如下是一个例子，一次读取多个文件的内容：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">async</span><span class="p">.</span><span class="nx">map</span><span class="p">([</span><span class="s1">&#39;file1&#39;</span><span class="p">,</span><span class="s1">&#39;file2&#39;</span><span class="p">,</span><span class="s1">&#39;file3&#39;</span><span class="p">],</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">readFile</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">results</span><span class="p">){</span>
-</span><span class='line'>    <span class="c1">// doSomething();</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><code>series</code> 与 <code>map</code> 类似，不过 <code>series</code> 是遍历一个方法合集并挨个执行，然后返回结果：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">async</span><span class="p">.</span><span class="nx">series</span><span class="p">(</span><span class="nx">tasks</span><span class="p">,</span> <span class="p">[</span><span class="nx">callback</span><span class="p">])</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>如：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">async</span><span class="p">.</span><span class="nx">series</span><span class="p">([</span>
-</span><span class='line'>  <span class="kd">function</span> <span class="nx">fun1</span><span class="p">(</span><span class="nx">callback</span><span class="p">){</span>
-</span><span class='line'>    <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="s1">&#39;one&#39;</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>  <span class="kd">function</span> <span class="nx">fun2</span><span class="p">(</span><span class="nx">callback</span><span class="p">){</span>
-</span><span class='line'>    <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="s1">&#39;two&#39;</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">],</span>
-</span><span class='line'><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">results</span><span class="p">){</span>
-</span><span class='line'>  <span class="c1">// doSomething();</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>注意，以上这些方法各个任务的完成时间顺序是不确定的。如果有一些操作是需要按照先后顺序执行，可以使用 <code>waterfall</code>。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">async</span><span class="p">.</span><span class="nx">waterfall</span><span class="p">(</span><span class="nx">tasks</span><span class="p">,</span> <span class="p">[</span><span class="nx">callback</span><span class="p">])</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>例如在 <code>loopback</code> 的一个 <code>controller</code> 中，提供修改用户密码的功能。原始写法如下：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">router</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s1">&#39;/user/password&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">User</span><span class="p">.</span><span class="nx">findById</span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">user</span><span class="p">){</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="nx">doSomething</span><span class="p">();</span>
-</span><span class='line'>    <span class="nx">user</span><span class="p">.</span><span class="nx">password</span> <span class="o">=</span> <span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">password</span><span class="p">;</span>
-</span><span class='line'>    <span class="nx">user</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">){</span>
-</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="nx">doSomething</span><span class="p">();</span>
-</span><span class='line'>      <span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mi">200</span><span class="p">).</span><span class="nx">end</span><span class="p">();</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>  <span class="p">});</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>上面的例子功能还比较简单，回调层级不是很深。不过如果使用 <code>waterfall</code> 来控制就更为简单：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">router</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s1">&#39;/user/password&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">async</span><span class="p">.</span><span class="nx">waterfall</span><span class="p">([</span>
-</span><span class='line'>    <span class="kd">function</span><span class="p">(</span><span class="nx">callback</span><span class="p">){</span>
-</span><span class='line'>      <span class="nx">User</span><span class="p">.</span><span class="nx">findById</span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">},</span>
-</span><span class='line'>    <span class="kd">function</span><span class="p">(</span><span class="nx">user</span><span class="p">,</span> <span class="nx">callback</span><span class="p">){</span>
-</span><span class='line'>      <span class="nx">user</span><span class="p">.</span><span class="nx">password</span> <span class="o">=</span> <span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">password</span><span class="p">;</span>
-</span><span class='line'>      <span class="nx">user</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span><span class="nx">callback</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>  <span class="p">],</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">){</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="nx">doSomething</span><span class="p">();</span>
-</span><span class='line'>    <span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mi">200</span><span class="p">).</span><span class="nx">end</span><span class="p">();</span>
-</span><span class='line'>  <span class="p">});</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-</div>
-  
-  
-
-
-    </article>
-  
-  <div class="pagination">
-    
-      <a class="prev" href="/page/2">&larr; Older</a>
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
+    </footer>
   </div>
-</div>
-<aside class="sidebar">
   
-    <section>
-  <h1>Subscription</h1>
-  <!--以下是QQ邮件列表订阅嵌入代码--><script >var nId = "e7ee5da6d322dc7157c25cfd8a7700bb23a056dd1fb18cb4",nWidth="auto",sColor="light",sText="请输入邮件地址：" ;</script><script src="http://list.qq.com/zh_CN/htmledition/js/qf/page/qfcode.js" charset="gb18030"></script>
-</section>
-<section>
-  <h1>Recent Posts</h1>
-  <ul id="recent_posts">
-    
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84166.html">通过串口连接raspberry Pi</a>
-      </li>
-    
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84165.html">使用CodePush对ReactNative进行热更新</a>
-      </li>
-    
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84164.html">ReactNative获取设备屏幕尺寸</a>
-      </li>
-    
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84163.html">ReactNative Jsbundle管理</a>
-      </li>
-    
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84162.html">ReactNative自动设置开发服务器IP</a>
-      </li>
-    
-  </ul>
-</section>
-<section>
-  <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (32)</a></li><li><a href='/categories/web开发/index.html'>web开发 (20)</a></li><li><a href='/categories/前端相关/index.html'>前端相关 (10)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (12)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (16)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (43)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (24)</a></li></ul>
-</section>
-<section>
-  <h1>Tag Cloud</h1>
-    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 102.68656716417911%'>ajax(3)</a> <a href='/tags/android/index.html' style='font-size: 100.8955223880597%'>Android(1)</a> <a href='/tags/angular/index.html' style='font-size: 106.26865671641791%'>angular(7)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/gulp/index.html' style='font-size: 100.8955223880597%'>gulp(1)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 109.85074626865672%'>js(11)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mac/index.html' style='font-size: 100.8955223880597%'>Mac(1)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/raspberry-pi/index.html' style='font-size: 100.8955223880597%'>Raspberry pi(1)</a> <a href='/tags/react/index.html' style='font-size: 103.58208955223881%'>react(4)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 129.55223880597015%'>Ruby(33)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xcode/index.html' style='font-size: 100.8955223880597%'>Xcode(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 123.28358208955224%'>翻译(26)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
-</section>
-<section>
-  <h1>Link</h1>
-    <ul id="category-list">
-      <li><a target="_blank" title="我的Github" href="https://github.com/wusuopu">@Github</a></li>
-      <li><a target="_blank" title="我的微博" href="http://www.weibo.com/u/1768691343">@Weibo</a></li>
-      <li><a target="_blank" title="我的Twitter" href="https://twitter.com/longchangjin">@Twitter</a></li>
-      <li><a target="_blank" title="我的豆瓣" href="http://www.douban.com/people/lchj/">@Douban</a></li>
+</article>
 
-      <li><a target="_blank" title="" href="http://www.vimer.cn/">Vimer的程序世界</a></li>
-      <li><a target="_blank" title="" href="http://pythoner.net/">python开发者社区</a></li>
-      <li><a target="_blank" title="" href="http://simple-is-better.com/">python.cn(news, jobs)</a></li>
-      <li><a target="_blank" title="" href="http://gtk.awaysoft.com/">GTK+ 中文社区</a></li>
-    </ul>
+
+
+  
+    <article id="post-/archives/84157.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/84157.html" class="article-date">
+  <time datetime="2015-12-13T21:39:26.000Z" itemprop="datePublished">2015-12-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/前端相关/">前端相关</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/84157.html">javascript使用async进行流程控制</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>突然发现博客好久没有更新了，主要是因为最近这几个月比较忙。之前由 Python 转向了 Ruby，现在又由后端转向了前端。<br>这几个月接触的内容略有点多，信息量有点大，主要都是 js 相关的。准备之后抽时间将这些知识整理整理，沉淀沉淀。</p>
+<h2 id="Async"><a href="#Async" class="headerlink" title="Async"></a>Async</h2><p>由于 js 是异步的，之前在使用 loopback 进行 server 端开发时，很容易就出现了比较深层次的回调嵌套。<br><a href="https://github.com/caolan/async" target="_blank" rel="external">async.js</a>是 js 的一个工具，可以用来方便的控制 js 中的异步流程的，类似的库还有 Promise、RxJS 等。<br>最初它是设计用于 nodejs 的，不过在浏览器端也可以使用。</p>
+<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><p>安装方法很简单，直接使用 npm 即可： <code>npm install async</code> 。</p>
+<h3 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a>使用方法</h3><p>首先是加载 async 库，在 server 端使用 <code>var async = require(&#39;async&#39;);</code>，<br>在浏览器端直接引用即可： <code>&lt;script type=&quot;text/javascript&quot; src=&quot;async.js&quot;&gt;&lt;/script&gt;</code>。</p>
+<p>async 提供一些集合操作方法和流程控制方法，我比较常用的是：<code>each</code>、<code>map</code>、<code>series</code>、<code>waterfall</code> 这些方法。<br>其中 <code>each</code>、<code>map</code> 方法与 <code>lodash</code> 的类似，可以用来遍历某个集合并执行一些操作。</p>
+<p><code>each</code> 方法定义如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">async</span>.each(collection, iterator, [callback])</div></pre></td></tr></table></figure>
+<p>该方法会对 <code>collection</code> 每个元素都调用 <code>iterator</code> 操作， <code>iterator</code> 函数原型为： <code>iterator(item, callback)</code>。<br>当 <code>collection</code> 中的所有元素遍历完成或者执行 <code>iterator</code> 时发生错误就会调用 <code>callback</code> 回调，原型为： <code>callback(err)</code>。</p>
+<p><code>each</code> 方法只是对每个元素进行操作，如果还需要获取操作的结果，那么可以使用 <code>map</code> 方法。定义如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">async</span>.map(collection, iterator, [callback])</div></pre></td></tr></table></figure>
+<p><code>map</code> 与 <code>each</code> 类似，只是 <code>callback</code> 定义为： <code>callback(err, results)</code>。<br><code>results</code> 为 <code>iterator</code> 操作的结果集合。</p>
+<p>如下是一个例子，一次读取多个文件的内容：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">async</span>.map([<span class="string">'file1'</span>,<span class="string">'file2'</span>,<span class="string">'file3'</span>], fs.readFile, <span class="function"><span class="keyword">function</span>(<span class="params">err, results</span>)</span>&#123;</div><div class="line">    <span class="comment">// doSomething();</span></div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<p><code>series</code> 与 <code>map</code> 类似，不过 <code>series</code> 是遍历一个方法合集并挨个执行，然后返回结果：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">async</span>.series(tasks, [callback])</div></pre></td></tr></table></figure>
+<p>如：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">async</span>.series([</div><div class="line">  <span class="function"><span class="keyword">function</span> <span class="title">fun1</span>(<span class="params">callback</span>)</span>&#123;</div><div class="line">    callback(<span class="literal">null</span>, <span class="string">'one'</span>);</div><div class="line">  &#125;,</div><div class="line">  <span class="function"><span class="keyword">function</span> <span class="title">fun2</span>(<span class="params">callback</span>)</span>&#123;</div><div class="line">    callback(<span class="literal">null</span>, <span class="string">'two'</span>);</div><div class="line">  &#125;</div><div class="line">],</div><div class="line"><span class="function"><span class="keyword">function</span>(<span class="params">err, results</span>)</span>&#123;</div><div class="line">  <span class="comment">// doSomething();</span></div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<p>注意，以上这些方法各个任务的完成时间顺序是不确定的。如果有一些操作是需要按照先后顺序执行，可以使用 <code>waterfall</code>。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">async</span>.waterfall(tasks, [callback])</div></pre></td></tr></table></figure>
+<p>例如在 <code>loopback</code> 的一个 <code>controller</code> 中，提供修改用户密码的功能。原始写法如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">router.post(<span class="string">'/user/password'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">req, res</span>) </span>&#123;</div><div class="line">  User.findById(req.body.id, <span class="function"><span class="keyword">function</span>(<span class="params">err, user</span>)</span>&#123;</div><div class="line">    <span class="keyword">if</span> (err) doSomething();</div><div class="line">    user.password = req.body.password;</div><div class="line">    user.save(<span class="function"><span class="keyword">function</span>(<span class="params">err</span>)</span>&#123;</div><div class="line">      <span class="keyword">if</span> (err) doSomething();</div><div class="line">      res.status(<span class="number">200</span>).end();</div><div class="line">    &#125;);</div><div class="line">  &#125;);</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<p>上面的例子功能还比较简单，回调层级不是很深。不过如果使用 <code>waterfall</code> 来控制就更为简单：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">router.post(<span class="string">'/user/password'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">req, res</span>) </span>&#123;</div><div class="line">  <span class="keyword">async</span>.waterfall([</div><div class="line">    <span class="function"><span class="keyword">function</span>(<span class="params">callback</span>)</span>&#123;</div><div class="line">      User.findById(req.body.id, callback);</div><div class="line">    &#125;,</div><div class="line">    <span class="function"><span class="keyword">function</span>(<span class="params">user, callback</span>)</span>&#123;</div><div class="line">      user.password = req.body.password;</div><div class="line">      user.save(callback);</div><div class="line">    &#125;</div><div class="line">  ], <span class="function"><span class="keyword">function</span>(<span class="params">err</span>)</span>&#123;</div><div class="line">    <span class="keyword">if</span> (err) doSomething();</div><div class="line">    res.status(<span class="number">200</span>).end();</div><div class="line">  &#125;);</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com//archives/84157.html" data-id="ciy7g0eft00q0jhne1h39iur9" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+
+
+  <nav id="page-nav">
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/30/">30</a><a class="extend next" rel="next" href="/page/2/">Next&raquo;</a>
+  </nav>
+
 </section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Linux栏目/">Linux栏目</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Python栏目/">Python栏目</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Ruby栏目/">Ruby栏目</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Ruby栏目/Web开发/">Web开发</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/Web开发/">Web开发</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Web开发/Python栏目/">Python栏目</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/前端相关/">前端相关</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/嵌入式栏目/">嵌入式栏目</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/开源软件/">开源软件</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/教程/">教程</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据库/">数据库</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据结构和算法/">数据结构和算法</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/编程开发/">编程开发</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/网络日志/">网络日志</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/资源分享/">资源分享</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ARM/">ARM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/">Android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Arch/">Arch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/">C</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Django/">Django</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Dreamweaver/">Dreamweaver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Fedora/">Fedora</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flash/">Flash</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GObject/">GObject</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Gentoo/">Gentoo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hash/">Hash</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mac/">Mac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PS/">PS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Qt/">Qt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Raspberry-pi/">Raspberry pi</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redis/">Redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Ruby/">Ruby</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scrapy/">Scrapy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TQ2440/">TQ2440</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/USB/">USB</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/VirtualBox/">VirtualBox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web开发/">Web开发</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WordPress/">WordPress</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Xcode/">Xcode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/access/">access</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/adobe/">adobe</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ajax/">ajax</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apache/">apache</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asp/">asp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css/">css</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/firefox/">firefox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ftp/">ftp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gcc/">gcc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/grub/">grub</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gtk/">gtk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gulp/">gulp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ibus/">ibus</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pygame/">pygame</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vmware/">vmware</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/w3m/">w3m</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/windows/">windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xml/">xml</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/免费/">免费</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内核/">内核</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/匹配算法/">匹配算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/单片机/">单片机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/嵌入式/">嵌入式</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/开源软件/">开源软件</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/排序算法/">排序算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/文件空间/">文件空间</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/无线网/">无线网</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/正则式/">正则式</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/注册机/">注册机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/游戏/">游戏</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/电脑技巧/">电脑技巧</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/空间/">空间</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/算法/">算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/红旗/">红旗</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/经典语录/">经典语录</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络日志/">网络日志</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/翻译/">翻译</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/视频教程/">视频教程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/资源分享/">资源分享</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/转载/">转载</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/随笔/">随笔</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/ARM/" style="font-size: 13.68px;">ARM</a> <a href="/tags/Android/" style="font-size: 10px;">Android</a> <a href="/tags/Arch/" style="font-size: 13.16px;">Arch</a> <a href="/tags/C/" style="font-size: 16.32px;">C</a> <a href="/tags/Django/" style="font-size: 11.05px;">Django</a> <a href="/tags/Dreamweaver/" style="font-size: 10px;">Dreamweaver</a> <a href="/tags/Fedora/" style="font-size: 10.53px;">Fedora</a> <a href="/tags/Flash/" style="font-size: 10px;">Flash</a> <a href="/tags/GObject/" style="font-size: 12.63px;">GObject</a> <a href="/tags/Gentoo/" style="font-size: 10.53px;">Gentoo</a> <a href="/tags/Hash/" style="font-size: 10px;">Hash</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Mac/" style="font-size: 10px;">Mac</a> <a href="/tags/PS/" style="font-size: 12.63px;">PS</a> <a href="/tags/Qt/" style="font-size: 10.53px;">Qt</a> <a href="/tags/Raspberry-pi/" style="font-size: 10px;">Raspberry pi</a> <a href="/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/tags/Ruby/" style="font-size: 18.95px;">Ruby</a> <a href="/tags/Scrapy/" style="font-size: 11.05px;">Scrapy</a> <a href="/tags/TQ2440/" style="font-size: 12.11px;">TQ2440</a> <a href="/tags/USB/" style="font-size: 11.05px;">USB</a> <a href="/tags/VirtualBox/" style="font-size: 11.05px;">VirtualBox</a> <a href="/tags/Web开发/" style="font-size: 16.84px;">Web开发</a> <a href="/tags/WordPress/" style="font-size: 10px;">WordPress</a> <a href="/tags/Xcode/" style="font-size: 10px;">Xcode</a> <a href="/tags/access/" style="font-size: 12.63px;">access</a> <a href="/tags/adobe/" style="font-size: 10px;">adobe</a> <a href="/tags/ajax/" style="font-size: 11.05px;">ajax</a> <a href="/tags/angular/" style="font-size: 13.16px;">angular</a> <a href="/tags/apache/" style="font-size: 10px;">apache</a> <a href="/tags/asp/" style="font-size: 13.16px;">asp</a> <a href="/tags/css/" style="font-size: 10.53px;">css</a> <a href="/tags/firefox/" style="font-size: 11.05px;">firefox</a> <a href="/tags/ftp/" style="font-size: 10px;">ftp</a> <a href="/tags/gcc/" style="font-size: 12.63px;">gcc</a> <a href="/tags/git/" style="font-size: 11.58px;">git</a> <a href="/tags/grub/" style="font-size: 10px;">grub</a> <a href="/tags/gtk/" style="font-size: 17.89px;">gtk</a> <a href="/tags/gulp/" style="font-size: 10px;">gulp</a> <a href="/tags/ibus/" style="font-size: 10px;">ibus</a> <a href="/tags/js/" style="font-size: 15.26px;">js</a> <a href="/tags/mongodb/" style="font-size: 15.79px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 11.58px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/php/" style="font-size: 14.74px;">php</a> <a href="/tags/pygame/" style="font-size: 15.79px;">pygame</a> <a href="/tags/python/" style="font-size: 19.47px;">python</a> <a href="/tags/react/" style="font-size: 11.58px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/ubuntu/" style="font-size: 13.16px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 18.42px;">vim</a> <a href="/tags/vmware/" style="font-size: 10px;">vmware</a> <a href="/tags/w3m/" style="font-size: 10px;">w3m</a> <a href="/tags/windows/" style="font-size: 13.16px;">windows</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/免费/" style="font-size: 10px;">免费</a> <a href="/tags/内核/" style="font-size: 10px;">内核</a> <a href="/tags/匹配算法/" style="font-size: 12.63px;">匹配算法</a> <a href="/tags/单片机/" style="font-size: 10.53px;">单片机</a> <a href="/tags/嵌入式/" style="font-size: 10px;">嵌入式</a> <a href="/tags/开源软件/" style="font-size: 14.21px;">开源软件</a> <a href="/tags/排序算法/" style="font-size: 14.21px;">排序算法</a> <a href="/tags/文件空间/" style="font-size: 10px;">文件空间</a> <a href="/tags/无线网/" style="font-size: 10px;">无线网</a> <a href="/tags/正则式/" style="font-size: 10px;">正则式</a> <a href="/tags/注册机/" style="font-size: 10.53px;">注册机</a> <a href="/tags/游戏/" style="font-size: 14.74px;">游戏</a> <a href="/tags/电脑技巧/" style="font-size: 14.21px;">电脑技巧</a> <a href="/tags/空间/" style="font-size: 10px;">空间</a> <a href="/tags/算法/" style="font-size: 17.37px;">算法</a> <a href="/tags/红旗/" style="font-size: 10px;">红旗</a> <a href="/tags/经典语录/" style="font-size: 10px;">经典语录</a> <a href="/tags/网络日志/" style="font-size: 12.63px;">网络日志</a> <a href="/tags/翻译/" style="font-size: 18.42px;">翻译</a> <a href="/tags/视频教程/" style="font-size: 14.74px;">视频教程</a> <a href="/tags/资源分享/" style="font-size: 15.79px;">资源分享</a> <a href="/tags/转载/" style="font-size: 10.53px;">转载</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05/">May 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/02/">February 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/11/">November 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">October 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">September 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/08/">August 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/07/">July 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/05/">May 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04/">April 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">March 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">January 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/12/">December 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">June 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">May 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">April 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">January 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">October 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/09/">September 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/08/">August 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/07/">July 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/05/">May 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/04/">April 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/03/">March 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/02/">February 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/12/">December 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/11/">November 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/10/">October 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/09/">September 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/08/">August 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/07/">July 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/05/">May 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/04/">April 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/03/">March 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/02/">February 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/01/">January 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/12/">December 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/11/">November 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/10/">October 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/09/">September 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/08/">August 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/07/">July 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/06/">June 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/05/">May 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/04/">April 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/03/">March 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/12/">December 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/11/">November 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/10/">October 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/09/">September 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/08/">August 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/07/">July 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/05/">May 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/12/">December 2008</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/07/">July 2008</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/archives/84166.html">通过串口连接raspberry pi</a>
+          </li>
+        
+          <li>
+            <a href="/archives/84165.html">使用CodePush对ReactNative进行热更新</a>
+          </li>
+        
+          <li>
+            <a href="/archives/84164.html">ReactNative获取设备屏幕尺寸</a>
+          </li>
+        
+          <li>
+            <a href="/archives/84163.html">ReactNative jsbundle管理</a>
+          </li>
+        
+          <li>
+            <a href="/archives/84162.html">ReactNative自动设置开发服务器IP</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    <div class="widget-wrap">
+  <h3 class="widget-title">Link</h3>
+    <div class="widget">
+      <ul id="category-list">
+        <li><a target="_blank" title="我的Github" href="https://github.com/wusuopu">@Github</a></li>
+        <li><a target="_blank" title="我的微博" href="http://www.weibo.com/u/1768691343">@Weibo</a></li>
+        <li><a target="_blank" title="我的Twitter" href="https://twitter.com/longchangjin">@Twitter</a></li>
+        <li><a target="_blank" title="我的豆瓣" href="http://www.douban.com/people/lchj/">@Douban</a></li>
+
+        <li><a target="_blank" title="" href="http://www.vimer.cn/">Vimer的程序世界</a></li>
+        <li><a target="_blank" title="" href="http://pythoner.net/">python开发者社区</a></li>
+        <li><a target="_blank" title="" href="http://simple-is-better.com/">python.cn(news, jobs)</a></li>
+        <li><a target="_blank" title="" href="http://gtk.awaysoft.com/">GTK+ 中文社区</a></li>
+      </ul>
+    </div>
+</div>
 
   
 </aside>
-
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 龍昌<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>
-  <footer role="contentinfo"><p>
-  Copyright &copy; 2016 - 龍昌 -
-  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
-</p>
+</footer>
 <div style="display:none;"><script src="http://s94.cnzz.com/stat.php?id=1259846&web_id=1259846&show=pic" language="JavaScript"></script></div>
 
-</footer>
+    </div>
+    <nav id="mobile-nav">
   
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+    <a href="/gbook" class="mobile-nav-link">留言板</a>
+  
+</nav>
+    
 
-<script type="text/javascript">
-      var disqus_shortname = 'longchang';
-      
-        
-        var disqus_script = 'count.js';
-      
-    (function () {
-      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
-      //dsq.src = '/javascripts/disqus/' + disqus_script;
-      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    }());
-</script>
+<script src="/js/jquery.min.js"></script>
 
 
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
 
 
+<script src="/js/script.js"></script>
 
-
-
-
-
-
-
+  </div>
 </body>
 </html>

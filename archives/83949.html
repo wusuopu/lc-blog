@@ -1,1146 +1,289 @@
-
 <!DOCTYPE html>
-<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
-<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
-<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<html>
 <head>
   <meta charset="utf-8">
-  <title>[翻译]Ruby教程15——输入&输出 - 龍昌博客</title>
-  <meta name="author" content="龍昌">
-
   
-  <meta name="description" content="Ruby的输入&amp;输出 这部分的教程我们讨论Ruby的输入和输出操作。输入是程序从键盘、文件或者其他程序读取数据。输出是程序产生数据。可以输出到屏幕、文件或者其他程序。 输入&amp;输出是一个大的话题。稍后我们通过一些例子来大概介绍一下这个主题。Ruby中的一些类有些方法会执行输入&amp &hellip;">
+  <title>[翻译]Ruby教程15——输入&amp;输出 | 龍昌博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Ruby的输入&amp;amp;输出
+这部分的教程我们讨论Ruby的输入和输出操作。输入是程序从键盘、文件或者其他程序读取数据。输出是程序产生数据。可以输出到屏幕、文件或者其他程序。输入&amp;amp;输出是一个大的话题。稍后我们通过一些例子来大概介绍一下这个主题。Ruby中的一些类有些方法会执行输入&amp;amp;输出操作。例如Kernel、IO、Dir或者File。输出到终端Ruby有一些在终端上打印输出的方法。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[翻译]Ruby教程15——输入&输出">
+<meta property="og:url" content="http://www.xefan.com/archives/83949.html">
+<meta property="og:site_name" content="龍昌博客">
+<meta property="og:description" content="Ruby的输入&amp;amp;输出
+这部分的教程我们讨论Ruby的输入和输出操作。输入是程序从键盘、文件或者其他程序读取数据。输出是程序产生数据。可以输出到屏幕、文件或者其他程序。输入&amp;amp;输出是一个大的话题。稍后我们通过一些例子来大概介绍一下这个主题。Ruby中的一些类有些方法会执行输入&amp;amp;输出操作。例如Kernel、IO、Dir或者File。输出到终端Ruby有一些在终端上打印输出的方法。">
+<meta property="og:updated_time" content="2017-01-21T16:20:19.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="[翻译]Ruby教程15——输入&输出">
+<meta name="twitter:description" content="Ruby的输入&amp;amp;输出
+这部分的教程我们讨论Ruby的输入和输出操作。输入是程序从键盘、文件或者其他程序读取数据。输出是程序产生数据。可以输出到屏幕、文件或者其他程序。输入&amp;amp;输出是一个大的话题。稍后我们通过一些例子来大概介绍一下这个主题。Ruby中的一些类有些方法会执行输入&amp;amp;输出操作。例如Kernel、IO、Dir或者File。输出到终端Ruby有一些在终端上打印输出的方法。">
   
-
-  <!-- http://t.co/dKP3o1e -->
-  <meta name="HandheldFriendly" content="True">
-  <meta name="MobileOptimized" content="320">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    <link rel="alternate" href="/atom.xml" title="龍昌博客" type="application/atom+xml">
   
-  <link rel="canonical" href="http://www.xefan.com/archives/83949.html">
-  <link href="/favicon.png" rel="icon">
-  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <link href="/atom.xml" rel="alternate" title="龍昌博客" type="application/atom+xml">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="//lib.sinaapp.com/js/jquery/1.9.1/jquery-1.9.1.min.js"></script>
-  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
-  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
-<!--<link href="//fonts.useso.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">&#8211;>
-<!--<link href="//fonts.useso.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">&#8211;>
-
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css">
   
 
 </head>
 
-<body   >
-  <header role="banner"><hgroup>
-  <h1><a href="/">龍昌博客</a></h1>
-  
-    <h2>从Pythoneer转向Rubist</h2>
-  
-</hgroup>
-
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">龍昌博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">从Pythoneer转向Rubist</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+          <a class="main-nav-link" href="/gbook">留言板</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.xefan.com"></form>
+      </div>
+    </div>
+  </div>
 </header>
-  <nav role="navigation"><ul class="subscription" data-subscription="rss">
-  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
-  
-</ul>
-  
-<form action="https://www.google.com/search" method="get">
-  <fieldset role="search">
-    <input type="hidden" name="q" value="site:www.xefan.com" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
-  </fieldset>
-</form>
-  
-<ul class="main-navigation">
-  <li><a href="/">Home</a></li>
-  <li><a href="/blog/archives">Archives</a></li>
- <li><a href="/about/">About</a></li>  <li><a href="/gbook/">留言板</a></li> 
-</ul>
+      <div class="outer">
+        <section id="main"><article id="post-/archives/83949.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83949.html" class="article-date">
+  <time datetime="2013-11-18T00:00:00.000Z" itemprop="datePublished">2013-11-18</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Ruby栏目/">Ruby栏目</a>
+  </div>
 
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      [翻译]Ruby教程15——输入&amp;输出
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p></p><h1>Ruby的输入&amp;输出</h1><p></p>
+<p>这部分的教程我们讨论Ruby的输入和输出操作。输入是程序从键盘、文件或者其他程序读取数据。输出是程序产生数据。可以输出到屏幕、文件或者其他程序。</p><br><p>输入&amp;输出是一个大的话题。稍后我们通过一些例子来大概介绍一下这个主题。Ruby中的一些类有些方法会执行输入&amp;输出操作。例如Kernel、IO、Dir或者File。</p><br><h2>输出到终端</h2><br><p>Ruby有一些在终端上打印输出的方法。这些方法是Kernel模块的一部分。Kernel模块的方法对于所有的Ruby对象都是有效的。</p><br><pre><code>#!/usr/bin/ruby<br><br>print “Apple “<br>print “Apple\n”<br><br>puts “Orange”<br>puts “Orange”<br></code></pre><br><p><em>print</em>和<em>puts</em>方法会将文本输出到终端。它们的不同是会在最后加上一个换行符。</p><br><pre><code>print “Apple “<br>print “Apple\n”<br></code></pre><br><p><em>print</em>在终端上打印两个连续的”Apple”字符串。如果我们想换一行，我们就必须显示的包含一个换行符。换行符是’\n’。<em>print</em>方法实际上是调用了对象的<em>to_s</em>方法。</p><br><pre><code>puts “Orange”<br>puts “Orange”<br></code></pre><br><p><em>puts</em>方法在终端上打印两个字符串。每一个都各在一行。这个方法会自己添加换行符。</p><br><p>$ ./printing.rb<br>Apple Apple<br><br>Orange<br><br>Orange  </p><br><p><em>printing.rb</em>脚本的输出结果。</p><br><p>根据Ruby的文档，<em>print</em>方法与<em>$stdout.print</em>是等效的。<em>$stdout</em>是全局变量，保存的标准输出流。</p><br><pre><code>#!/usr/bin/ruby<br><br>$stdout.print “Ruby language\n”<br>$stdout.puts “Python language”<br></code></pre><br><p>我们使用$stdout变量打印两行内容。</p><br><p>Ruby有另外三种输出方法。</p><br><pre><code>#!/usr/bin/ruby<br><br>p “Lemon”<br>p “Lemon”<br><br>printf “There are %d apples\n”, 3<br><br>putc ‘K’<br>putc 0xA<br></code></pre><br><p>这个例子中，我们展示了p、printf和putc方法。</p><br><pre><code>p “Lemon”<br></code></pre><br><p><em>p</em>会调用对象的<em>inspect</em>方法。这个方法对于调试很有用。</p><br><pre><code>printf “There are %d apples\n”, 3<br></code></pre><br><p><em>printf</em>方法因C语言而出名。它能够将字符串格式化。</p><br><pre><code>putc ‘K’<br>putc 0xA<br></code></pre><br><p><em>putc</em>方法在终端上打印一个字符。第二行是打印一个换行符。0xA是换行符的十六进制代码。</p><br><p>$ ./printing3.rb <br><br>“Lemon”<br><br>“Lemon”<br><br>There are 3 apples<br><br>K  </p><br><p>printing3.rb的输出。</p><br><p>使用Kernel的方法在终端上打印数据是简短方便的方式。接下来的例子展示了更多在终端上打印数据的正式方法。</p><br><pre><code>ios = IO.new STDOUT.fileno<br>ios.write “ZetCode\n”<br>ios.close<br></code></pre><br><p>这个例子我们打开标准输出流并往其中写入字符串。</p><br><pre><code>ios = IO.new STDOUT.fileno<br></code></pre><br><p><em>new</em>方法返回一个可写的数据流。这个方法传入一个文件描述符数字。<em>STDOUT.fileno</em>返回了标准输出流的文件描述符。我们也可以直接写2。</p><br><pre><code>ios.write “ZetCode\n”<br></code></pre><br><p>我们往打开的数据流写入字符串。</p><br><pre><code>ios.close<br></code></pre><br><p>关闭输出流。</p><br><p>在Unix系统中标准的终端输出是连接到一个特殊的文件/dev/tty。将其打开并写入数据，既是写到终端上。</p><br><pre><code>#!/usr/bin/ruby<br><br>fd = IO.sysopen “/dev/tty”, “w”<br>ios = IO.new(fd, “w”)<br>ios.puts “ZetCode”<br>ios.close<br></code></pre><br><p>写入到/dev/tty文件的一个例子。这仅能够在Unix上运行。</p><br><pre><code>fd = IO.sysopen “/dev/tty”, “w”<br></code></pre><br><p><em>sysopen</em>方法打开指定目录的文件，返回最后的文件描述符。</p><br><pre><code>ios = IO.new(fd, “w”)<br></code></pre><br><p>文件描述符数字用于打开一个数据流。</p><br><pre><code>ios.puts “ZetCode”<br>ios.close<br></code></pre><br><p>往数据流中写入字符串然后关闭它。</p><br><h2>从终端输入</h2><br><p>这一节我们将创建一些处理输入的代码例子。</p><br><p>$stdin是一个全局变量保存了标准输入流。它可以用于从终端输入数据。</p><br><pre><code>#!/usr/bin/ruby<br><br>inp = $stdin.read<br>puts inp<br></code></pre><br><p>上面的代码，我们使用<em>read</em>方法从终端读取输入。</p><br><pre><code>inp = $stdin.read<br></code></pre><br><p><em>read</em>方法从标准输入读取数据直到文件结尾。EOF在Unix中是使用Ctrl + D产生，在Windows中是Ctrl + Z。</p><br><p>$ ./reading.rb<br><br>Ruby language<br><br>Ruby language  </p><br><p>我们启动了程序，这个脚本会读取数据直到我们按下Ctrl + D 或者 Ctrl + Z。</p><br><p>$ echo “ZetCode” | ./reading.rb<br><br>ZetCode  </p><br><p>$ ./input.rb &lt; stones <br><br>Garnet<br><br>Topaz<br><br>Opal<br><br>Amethyst<br><br>Ruby<br><br>Jasper<br><br>Pyrite<br><br>Malachite<br><br>Quartz  </p><br><p>如果我们使用重定向，脚本可以从其他程序或者文件中读取数据。</p><br><p>通常从终端读取数据是使用<em>gets</em>方法。</p><br><pre><code>#!/usr/bin/ruby<br><br>print “Enter your name: “<br>name = gets<br>puts “Hello #{name}”<br></code></pre><br><p>使用<em>gets</em>方法读取用户输入的一行数据。</p><br><pre><code>name = gets<br></code></pre><br><p><em>gets</em>方法从标准输入读取数据并分配给<em>name</em>变量。</p><br><pre><code>puts “Hello #{name}”<br></code></pre><br><p>打印输入的数据。</p><br><p>$ ./readline.rb<br><br>Enter your name: Jan<br><br>Hello Jan  </p><br><p>输出结果。</p><br><p>接下来的两个脚本我们讨论<em>chomp</em>方法。它是字符串方法，用于移除字符串结尾的空白。当我们执行输入操作时它很有用。这个方法名和用法来自Perl语言。</p><br><pre><code>#!/usr/bin/ruby<br><br>print “Enter a string: “<br>inp = gets<br><br>puts “The string has #{inp.size} characters”<br></code></pre><br><p>读取一个用户输入的字符串，并计算它的长度。</p><br><p>$ ./nochomp.rb <br><br>Enter a string: Ruby<br><br>The string has 5 characters  </p><br><p>这个提示表示了这个字符串有5个字符，因为它统计的换行符。</p><br><p>为了得到正确的结果，我们需要移除换行符。这正是<em>chomp</em>方法的作用。</p><br><pre><code>#!/usr/bin/ruby<br><br>print “Enter a string: “<br>inp = gets.chomp<br><br>puts “The string has #{inp.size} characters”<br></code></pre><br><p>这次我们使用<em>chomp</em>方法截掉了换行符。</p><br><p>$ ./chomp.rb <br><br>Enter a string: Ruby<br><br>The string has 4 characters  </p><br><p><em>Ruby</em>字符串有4个字符。</p><br><h2>文件</h2><br><p>从Ruby官方文档我们知道<em>IO</em>类是所有输入输出的基类。<em>File</em>类只是<em>IO</em>类的一个子类。这两个类是紧密相关的。</p><br><pre><code>#!/usr/bin/ruby<br><br>f = File.open(‘output.txt’, ‘w’)<br>f.puts “The Ruby tutorial”<br>f.close<br></code></pre><br><p>第一个例子我们打开一个文件并往里面写入一些数据。</p><br><pre><code>f = File.open(‘output.txt’, ‘w’)<br></code></pre><br><p>以写模式打开’output.txt’文件。<em>open</em>方法返回数据流。</p><br><pre><code>f.puts “The Ruby tutorial”<br></code></pre><br><p>往上面打开的数据流写入数据。<em>puts</em>方法也可用于往文件写入数据。</p><br><pre><code>f.close<br></code></pre><br><p>最后关闭数据流。</p><br><p>$ ./simplewrite.rb<br><br>$ cat output.txt <br><br>The Ruby tutorial  </p><br><p>执行脚本并显示output.txt文件的内容。</p><br><p>以下是一个类似的例子显示了额外的方法。</p><br><pre><code>#!/usr/bin/ruby<br><br>File.open(‘langs’, ‘w’) do |f|<br><br>    f.puts “Ruby”<br>    f.write “Java\n”<br>    f &lt;&lt; “Python\n”<br><br>end<br></code></pre><br><p>如果<em>open</em>方法之后是一个代码块，Ruby会将打开的数据流传递给这个代码块。最后这个文件会自动关闭。</p><br><pre><code>f.puts “Ruby”<br>f.write “Java\n”<br>f &lt;&lt; “Python\n”<br></code></pre><br><p>我们使用了三个方法写文件。</p><br><p>$ ./simplewrite2.rb<br><br>$ cat langs <br><br>Ruby<br><br>Java<br><br>Python  </p><br><p>执行这个脚本并查看里面的内容。</p><br><p>第二个例子我们显示一些<em>File</em>类的方法。</p><br><pre><code>#!/usr/bin/ruby<br><br>puts File.exists? ‘tempfile’<br><br>f = File.new ‘tempfile’, ‘w’<br>puts File.mtime ‘tempfile’<br>puts f.size<br><br>File.rename ‘tempfile’, ‘tempfile2’<br><br>f.close<br></code></pre><br><p>这个例子创建了一个新文件’tempfile’并调用了一些方法。</p><br><pre><code>puts File.exists? ‘tempfile’<br></code></pre><br><p><em>exists?</em>方法检查给定的文件是否存在。这行返回false，因为我们还没有创建这个文件。</p><br><pre><code>f = File.new ‘tempfile’, ‘w’<br></code></pre><br><p>创建文件。</p><br><pre><code>puts File.mtime ‘tempfile’<br></code></pre><br><p><em>mtime</em>方法返回这个文件的最后修改时间。</p><br><pre><code>puts f.size<br></code></pre><br><p>查看文件的大小。这里返回0,因为我们还没有往文件写入数据。</p><br><pre><code>File.rename ‘tempfile’, ‘tempfile2’<br></code></pre><br><p>最后我们使用<em>rename</em>将文件重命名。</p><br><p>$ ./testfile.rb<br><br>false<br><br>2011-11-05 16:19:36 +0100<br><br>0  </p><br><p>输出结果。</p><br><p>接下来我们从磁盘文件读取内容。</p><br><pre><code>#!/usr/bin/ruby<br><br>f = File.open(“stones”)<br><br>while line = f.gets do<br>    puts line<br>end<br><br>f.close<br></code></pre><br><p>这是一个简单的脚本，打开<em>stones</em>文件并在终端上打印它的内容。</p><br><pre><code>f = File.open(“stones”)<br></code></pre><br><p>打开’stones’文件，默认是只读模式。</p><br><pre><code>while line = f.gets do<br>    puts line<br>end<br></code></pre><br><p><em>gets</em>方法从I/O数据流读取一行数据。当读到文件结尾时while代码块退出。</p><br><p>$ ./readlines2.rb<br><br>Garnet<br><br>Topaz<br><br>Opal<br><br>Amethyst<br><br>Ruby<br><br>Jasper<br><br>Pyrite<br><br>Malachite<br><br>Quartz  </p><br><p>例子输出结果。</p><br><p>下一个例子将从文件读取数据。</p><br><pre><code>#!/usr/bin/ruby<br><br>fname = ‘alllines.rb’<br><br>File.readlines(fname).each do |line|<br>    puts line<br>end<br></code></pre><br><p>这个脚本显示了另一个读取文件内容的方式。这个例子将它自己的代码打印在终端上。</p><br><pre><code>File.readlines(fname).each do |line|<br>    puts line<br>end<br></code></pre><br><p><em>readlines</em>读取指定文件的每一行内容，并作为数据返回。我们使用<em>each</em>方法遍历数组，并将其在终端上打印。</p><br><pre><code>$ ./alllines.rb<br>#!/usr/bin/ruby<br><br>fname = ‘alllines.rb’<br><br>File.readlines(fname).each do |line|<br>    puts line<br>end<br></code></pre><br><p>输出结果。</p><br><h2>目录</h2><br><p>在这一节我们使用目录。Ruby中有一个Dir类可以操作目录。</p><br><pre><code>#!/usr/bin/ruby<br><br>Dir.mkdir “tmp”<br>puts Dir.exists? “tmp”<br><br>puts Dir.pwd<br>Dir.chdir “tmp”<br>puts Dir.pwd<br><br>Dir.chdir ‘..’<br>puts Dir.pwd<br>Dir.rmdir “tmp”<br>puts Dir.exists? “tmp”<br></code></pre><br><p>这个脚本我们使用了Dir类的四个方法。</p><br><pre><code>Dir.mkdir “tmp”<br></code></pre><br><p><em>mkdir</em>方法创建一个新目录’tmp’。</p><br><pre><code>puts Dir.exists? “tmp”<br></code></pre><br><p>使用<em>exists?</em>方法检查一个目录是否存在。</p><br><pre><code>puts Dir.pwd<br></code></pre><br><p><em>pwd</em>方法打印当前的工作目录。这是我们启动脚本的目录。</p><br><pre><code>Dir.chdir ‘..’<br></code></pre><br><p><em>chdir</em>方法切换目录。’..’目录是当前工作目录的父目录。</p><br><pre><code>Dir.rmdir “tmp”<br>puts Dir.exists? “tmp”<br></code></pre><br><p>最后我们使用<em>rmdir</em>方法移除目录。这时<em>exists?</em>方法返回false。</p><br><p>$ ./dirs.rb<br><br>true<br><br>/home/vronskij/programming/ruby/io<br><br>/home/vronskij/programming/ruby/io/tmp<br><br>/home/vronskij/programming/ruby/io<br><br>false  </p><br><p>例子的输出结果。<br>第二个例子我们检索目录所有的条目，包括文件和子目录。</p><br><pre><code>#!/usr/bin/ruby<br><br>fls = Dir.entries ‘.’<br>puts fls.inspect<br></code></pre><br><p><em>entries</em> 方法返回指定目录的所有条目。</p><br><pre><code>fls = Dir.entries ‘.’<br>puts fls.inspect<br></code></pre><br><p>我们得到了当前目录下的文件和目录数组。’.’代表当前工作目录。<em>inspect</em>方法使得数组更加可读。</p><br><p>$ ./allfiles.rb<br><br>[“putc.rb”, “simplewrite.rb”, “readlines2.rb”, “fileexists.rb~” …  </p><br><p>输出结果。</p><br><p>第三个例子使用了home目录。每个计算机用户都有一个分配给他的唯一的目录，称为home目录。它是用于存放用户自己的文件。</p><br><pre><code>#!/usr/bin/ruby<br><br>puts Dir.home<br>puts Dir.home ‘root’<br></code></pre><br><p>这个脚本打印两个home目录。</p><br><pre><code>puts Dir.home<br></code></pre><br><p>如果没有指定用户名则返回当前用户的home目录。当前用户是指定启动这个脚本文件的用户。</p><br><pre><code>puts Dir.home ‘root’<br></code></pre><br><p>这里我们指定了一个用户。</p><br><p>$ ./homedir.rb<br><br>/home/vronskij<br><br>/root  </p><br><p>输出结果。</p><br><h2>执行外部程序</h2><br><p>Ruby有一些方式可以执行外部程序。我们的例子中我们使用了Linux中有名的命令。Windows或者Mac读取可以使用他们自己系统的命令。</p><br><pre><code>#!/usr/bin/ruby<br><br>data = system ‘ls’<br>puts data<br></code></pre><br><p>调用<em>ls</em>命令列出目录内容。</p><br><pre><code>data = system ‘ls’<br></code></pre><br><p><em>system</em>命令在一个子shell中执行外部程序。这个方法是属于Kernel Ruby 模块的。</p><br><p>$ ./system.rb<br><br>allfiles.rb   characters.rb  fileexists.rb   homedir.rb~ …  </p><br><p>输出结果。</p><br><p>我们展示另外两个执行外部程序的方式。</p><br><pre><code>#!/usr/bin/ruby<br><br>out = <code>pwd</code><br>puts out<br><br>out = %x[uptime]<br>puts out<br><br>out = %x[ls | grep ‘readline’]<br>puts out<br></code></pre><br><p>执行外部程序我们可以使用反引号<code>`和%x[]字符。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;out =</code>pwd`<br><br></p><p>这里我们使用反引号执行<em>pwd</em>命令。这个命令返回当前的工作目录。</p><br><pre><code>out = %x[uptime]<br></code></pre><br><p>这里我得到<em>uptime</em>命令的输出，它显示系统运行了多久。</p><br><pre><code>out = %x[ls | grep ‘readline’]<br></code></pre><br><p>我们也可以使用复合命令。</p><br><p>$ ./system2.rb<br><br>/home/vronskij/programming/ruby/io<br><br> 22:50:50 up  5:32,  1 user,  load average: 0.46, 0.44, 0.45<br><br>readline.rb<br><br>readline.rb~<br><br>readlines2.rb<br><br>readlines2.rb~  </p><br><p>输出结果。</p><br><p>我们可以使用<em>open</em>方法执行命令。这个方法是属于Kernel模块的。它创建一个IO对象连接到指定的数据流、文件或者子进程。如果我们想要连接到子进程，我们将打开路径以管道符(|)开头。</p><br><pre><code>#!/usr/bin/ruby<br><br>f = open(“|ls -l |head -3”)<br>out = f.read<br>puts out<br>f.close<br><br>puts $?.success?<br></code></pre><br><p>这个例子我们打印了<em>ls -l | head -3</em>命令的结果。我们也还检查了子进程的状态。</p><br><pre><code>f = open(“|ls -l |head -3”)<br></code></pre><br><p>连接到子进程。</p><br><pre><code>out = f.read<br>puts out<br></code></pre><br><p>读取并打印子进程的数据。</p><br><pre><code>f.close<br></code></pre><br><p>关闭文件句柄。</p><br><pre><code>puts $?.success?<br></code></pre><br><p><em>$?</em>是一个特殊的变量，设置为上次执行过的子进程。如果子进程成功退出<em>success?</em>方法返回true。</p><br><p>$ ./system3.rb<br><br>total 148<br><br>-rwxr-xr-x 1 vronskij vronskij   57 2011-10-30 23:33 allfiles.rb<br><br>-rwxr-xr-x 1 vronskij vronskij   58 2011-10-30 23:33 allfiles.rb~<br><br>true  </p><br><p>输出结果。</p><br><h2>重定向标准输出</h2><br><p>Ruby对标准输入、标准输出和标准错误输出都有预定义的全局变量。<em>$stdout</em> 是标准输出的变量名。</p><br><pre><code>#!/usr/bin/ruby<br><br>$stdout = File.open “output.log”, “a”<br><br>puts “Ruby”<br>puts “Java”<br><br>$stdout.close<br>$stdout = STDOUT<br><br>puts “Python”<br></code></pre><br><p>上面的例子我们将输出重定向到output.log文件。</p><br><pre><code>$stdout = File.open “output.log”, “a”<br></code></pre><br><p>这行创建一个新的标准输出。现在标准输出流向ouput.log文件。这个文件以追加方式打开，如果文件不存在则创建，否则打开并将数据追加到文件尾部。</p><br><pre><code>puts “Ruby”<br>puts “Java”<br></code></pre><br><p>打印两个字符串。这些字符串不会像平常一样在终端上显示了。而是追加到output.log文件中。</p><br><pre><code>$stdout.close<br></code></pre><br><p>关闭文件句柄。</p><br><pre><code>$stdout = STDOUT<br><br>puts “Python”<br></code></pre><br><p>使用预定义的常量<em>STDOUT</em>重新创建正常的标准输出。”Python”字符串在终端上打印。</p><br><p>这部分的教程我们使用了输入和输出操作。</p><br><hr><br><p>原文地址： <a href="http://zetcode.com/lang/rubytutorial/io/" target="_blank" rel="external">http://zetcode.com/lang/rubytutorial/io/</a><br><br>翻译：龙昌  admin@longchangjin.cn<br><br>完整教程：<a href="https://github.com/wusuopu/Ruby-tutorial" target="_blank" rel="external">https://github.com/wusuopu/Ruby-tutorial</a> </p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com//archives/83949.html" data-id="ciy7g0ec600ipjhne1jnvdytm" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ruby/">Ruby</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/翻译/">翻译</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/archives/83954.html" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          [翻译]Ruby GTK教程1——介绍
+        
+      </div>
+    </a>
+  
+  
+    <a href="/archives/83942.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">[翻译]Ruby教程13——面向对象2</div>
+    </a>
+  
 </nav>
-  <div id="main">
-    <div id="content">
-      <div>
-<article class="hentry" role="article">
+
   
-  <header>
-    
-      <h1 class="entry-title">[翻译]Ruby教程15——输入&输出</h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2013-11-18T00:00:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>18</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
-        
-           | <a href="#disqus_thread"
-             data-disqus-identifier="http://www.xefan.com">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-<div class="entry-content"><h1>Ruby的输入&amp;输出</h1>
-
-
-<p>这部分的教程我们讨论Ruby的输入和输出操作。输入是程序从键盘、文件或者其他程序读取数据。输出是程序产生数据。可以输出到屏幕、文件或者其他程序。</p>
-
-
-<p>输入&amp;输出是一个大的话题。稍后我们通过一些例子来大概介绍一下这个主题。Ruby中的一些类有些方法会执行输入&amp;输出操作。例如Kernel、IO、Dir或者File。</p>
-
-
-<h2>输出到终端</h2>
-
-
-<p>Ruby有一些在终端上打印输出的方法。这些方法是Kernel模块的一部分。Kernel模块的方法对于所有的Ruby对象都是有效的。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-print "Apple "
-print "Apple\n"
-
-puts "Orange"
-puts "Orange"
-</code></pre>
-
-
-<p><em>print</em>和<em>puts</em>方法会将文本输出到终端。它们的不同是会在最后加上一个换行符。</p>
-
-
-<pre><code>print "Apple "
-print "Apple\n"
-</code></pre>
-
-
-<p><em>print</em>在终端上打印两个连续的&#8221;Apple&#8221;字符串。如果我们想换一行，我们就必须显示的包含一个换行符。换行符是&#8217;\n&#8217;。<em>print</em>方法实际上是调用了对象的<em>to_s</em>方法。</p>
-
-
-<pre><code>puts "Orange"
-puts "Orange"
-</code></pre>
-
-
-<p><em>puts</em>方法在终端上打印两个字符串。每一个都各在一行。这个方法会自己添加换行符。</p>
-
-
-<p>$ ./printing.rb 
-Apple Apple<br>
-Orange<br>
-Orange  </p>
-
-
-<p><em>printing.rb</em>脚本的输出结果。</p>
-
-
-<p>根据Ruby的文档，<em>print</em>方法与<em>$stdout.print</em>是等效的。<em>$stdout</em>是全局变量，保存的标准输出流。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-$stdout.print "Ruby language\n"
-$stdout.puts "Python language"
-</code></pre>
-
-
-<p>我们使用$stdout变量打印两行内容。</p>
-
-
-<p>Ruby有另外三种输出方法。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-p "Lemon"
-p "Lemon"
-
-printf "There are %d apples\n", 3
-
-putc 'K'
-putc 0xA
-</code></pre>
-
-
-<p>这个例子中，我们展示了p、printf和putc方法。</p>
-
-
-<pre><code>p "Lemon"
-</code></pre>
-
-
-<p><em>p</em>会调用对象的<em>inspect</em>方法。这个方法对于调试很有用。</p>
-
-
-<pre><code>printf "There are %d apples\n", 3
-</code></pre>
-
-
-<p><em>printf</em>方法因C语言而出名。它能够将字符串格式化。</p>
-
-
-<pre><code>putc 'K'
-putc 0xA
-</code></pre>
-
-
-<p><em>putc</em>方法在终端上打印一个字符。第二行是打印一个换行符。0xA是换行符的十六进制代码。</p>
-
-
-<p>$ ./printing3.rb <br>
-&#8220;Lemon&#8221;<br>
-&#8220;Lemon&#8221;<br>
-There are 3 apples<br>
-K  </p>
-
-
-<p>printing3.rb的输出。</p>
-
-
-<p>使用Kernel的方法在终端上打印数据是简短方便的方式。接下来的例子展示了更多在终端上打印数据的正式方法。</p>
-
-
-<pre><code>ios = IO.new STDOUT.fileno
-ios.write "ZetCode\n"
-ios.close
-</code></pre>
-
-
-<p>这个例子我们打开标准输出流并往其中写入字符串。</p>
-
-
-<pre><code>ios = IO.new STDOUT.fileno
-</code></pre>
-
-
-<p><em>new</em>方法返回一个可写的数据流。这个方法传入一个文件描述符数字。<em>STDOUT.fileno</em>返回了标准输出流的文件描述符。我们也可以直接写2。</p>
-
-
-<pre><code>ios.write "ZetCode\n"
-</code></pre>
-
-
-<p>我们往打开的数据流写入字符串。</p>
-
-
-<pre><code>ios.close
-</code></pre>
-
-
-<p>关闭输出流。</p>
-
-
-<p>在Unix系统中标准的终端输出是连接到一个特殊的文件/dev/tty。将其打开并写入数据，既是写到终端上。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-fd = IO.sysopen "/dev/tty", "w"
-ios = IO.new(fd, "w")
-ios.puts "ZetCode"
-ios.close
-</code></pre>
-
-
-<p>写入到/dev/tty文件的一个例子。这仅能够在Unix上运行。</p>
-
-
-<pre><code>fd = IO.sysopen "/dev/tty", "w"
-</code></pre>
-
-
-<p><em>sysopen</em>方法打开指定目录的文件，返回最后的文件描述符。</p>
-
-
-<pre><code>ios = IO.new(fd, "w")
-</code></pre>
-
-
-<p>文件描述符数字用于打开一个数据流。</p>
-
-
-<pre><code>ios.puts "ZetCode"
-ios.close
-</code></pre>
-
-
-<p>往数据流中写入字符串然后关闭它。</p>
-
-
-<h2>从终端输入</h2>
-
-
-<p>这一节我们将创建一些处理输入的代码例子。</p>
-
-
-<p>$stdin是一个全局变量保存了标准输入流。它可以用于从终端输入数据。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-inp = $stdin.read
-puts inp
-</code></pre>
-
-
-<p>上面的代码，我们使用<em>read</em>方法从终端读取输入。</p>
-
-
-<pre><code>inp = $stdin.read
-</code></pre>
-
-
-<p><em>read</em>方法从标准输入读取数据直到文件结尾。EOF在Unix中是使用Ctrl + D产生，在Windows中是Ctrl + Z。</p>
-
-
-<p>$ ./reading.rb<br>
-Ruby language<br>
-Ruby language  </p>
-
-
-<p>我们启动了程序，这个脚本会读取数据直到我们按下Ctrl + D 或者 Ctrl + Z。</p>
-
-
-<p>$ echo &#8220;ZetCode&#8221; | ./reading.rb<br>
-ZetCode  </p>
-
-
-<p>$ ./input.rb &lt; stones <br>
-Garnet<br>
-Topaz<br>
-Opal<br>
-Amethyst<br>
-Ruby<br>
-Jasper<br>
-Pyrite<br>
-Malachite<br>
-Quartz  </p>
-
-
-<p>如果我们使用重定向，脚本可以从其他程序或者文件中读取数据。</p>
-
-
-<p>通常从终端读取数据是使用<em>gets</em>方法。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-print "Enter your name: "
-name = gets
-puts "Hello #{name}"
-</code></pre>
-
-
-<p>使用<em>gets</em>方法读取用户输入的一行数据。</p>
-
-
-<pre><code>name = gets
-</code></pre>
-
-
-<p><em>gets</em>方法从标准输入读取数据并分配给<em>name</em>变量。</p>
-
-
-<pre><code>puts "Hello #{name}"
-</code></pre>
-
-
-<p>打印输入的数据。</p>
-
-
-<p>$ ./readline.rb<br>
-Enter your name: Jan<br>
-Hello Jan  </p>
-
-
-<p>输出结果。</p>
-
-
-<p>接下来的两个脚本我们讨论<em>chomp</em>方法。它是字符串方法，用于移除字符串结尾的空白。当我们执行输入操作时它很有用。这个方法名和用法来自Perl语言。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-print "Enter a string: "
-inp = gets
-
-puts "The string has #{inp.size} characters"
-</code></pre>
-
-
-<p>读取一个用户输入的字符串，并计算它的长度。</p>
-
-
-<p>$ ./nochomp.rb <br>
-Enter a string: Ruby<br>
-The string has 5 characters  </p>
-
-
-<p>这个提示表示了这个字符串有5个字符，因为它统计的换行符。</p>
-
-
-<p>为了得到正确的结果，我们需要移除换行符。这正是<em>chomp</em>方法的作用。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-print "Enter a string: "
-inp = gets.chomp
-
-puts "The string has #{inp.size} characters"
-</code></pre>
-
-
-<p>这次我们使用<em>chomp</em>方法截掉了换行符。</p>
-
-
-<p>$ ./chomp.rb <br>
-Enter a string: Ruby<br>
-The string has 4 characters  </p>
-
-
-<p><em>Ruby</em>字符串有4个字符。</p>
-
-
-<h2>文件</h2>
-
-
-<p>从Ruby官方文档我们知道<em>IO</em>类是所有输入输出的基类。<em>File</em>类只是<em>IO</em>类的一个子类。这两个类是紧密相关的。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-f = File.open('output.txt', 'w')
-f.puts "The Ruby tutorial"
-f.close
-</code></pre>
-
-
-<p>第一个例子我们打开一个文件并往里面写入一些数据。</p>
-
-
-<pre><code>f = File.open('output.txt', 'w')
-</code></pre>
-
-
-<p>以写模式打开&#8217;output.txt&#8217;文件。<em>open</em>方法返回数据流。</p>
-
-
-<pre><code>f.puts "The Ruby tutorial"
-</code></pre>
-
-
-<p>往上面打开的数据流写入数据。<em>puts</em>方法也可用于往文件写入数据。</p>
-
-
-<pre><code>f.close
-</code></pre>
-
-
-<p>最后关闭数据流。</p>
-
-
-<p>$ ./simplewrite.rb<br>
-$ cat output.txt <br>
-The Ruby tutorial  </p>
-
-
-<p>执行脚本并显示output.txt文件的内容。</p>
-
-
-<p>以下是一个类似的例子显示了额外的方法。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-File.open('langs', 'w') do |f|
-
-    f.puts "Ruby"
-    f.write "Java\n"
-    f &lt;&lt; "Python\n"
-
-end
-</code></pre>
-
-
-<p>如果<em>open</em>方法之后是一个代码块，Ruby会将打开的数据流传递给这个代码块。最后这个文件会自动关闭。</p>
-
-
-<pre><code>f.puts "Ruby"
-f.write "Java\n"
-f &lt;&lt; "Python\n"
-</code></pre>
-
-
-<p>我们使用了三个方法写文件。</p>
-
-
-<p>$ ./simplewrite2.rb<br>
-$ cat langs <br>
-Ruby<br>
-Java<br>
-Python  </p>
-
-
-<p>执行这个脚本并查看里面的内容。</p>
-
-
-<p>第二个例子我们显示一些<em>File</em>类的方法。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-puts File.exists? 'tempfile'
-
-f = File.new 'tempfile', 'w'
-puts File.mtime 'tempfile'
-puts f.size
-
-File.rename 'tempfile', 'tempfile2'
-
-f.close
-</code></pre>
-
-
-<p>这个例子创建了一个新文件&#8217;tempfile&#8217;并调用了一些方法。</p>
-
-
-<pre><code>puts File.exists? 'tempfile'
-</code></pre>
-
-
-<p><em>exists?</em>方法检查给定的文件是否存在。这行返回false，因为我们还没有创建这个文件。</p>
-
-
-<pre><code>f = File.new 'tempfile', 'w'
-</code></pre>
-
-
-<p>创建文件。</p>
-
-
-<pre><code>puts File.mtime 'tempfile'
-</code></pre>
-
-
-<p><em>mtime</em>方法返回这个文件的最后修改时间。</p>
-
-
-<pre><code>puts f.size
-</code></pre>
-
-
-<p>查看文件的大小。这里返回0,因为我们还没有往文件写入数据。</p>
-
-
-<pre><code>File.rename 'tempfile', 'tempfile2'
-</code></pre>
-
-
-<p>最后我们使用<em>rename</em>将文件重命名。</p>
-
-
-<p>$ ./testfile.rb<br>
-false<br>
-2011-11-05 16:19:36 +0100<br>
-0  </p>
-
-
-<p>输出结果。</p>
-
-
-<p>接下来我们从磁盘文件读取内容。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-f = File.open("stones")
-
-while line = f.gets do
-    puts line
-end
-
-f.close
-</code></pre>
-
-
-<p>这是一个简单的脚本，打开<em>stones</em>文件并在终端上打印它的内容。</p>
-
-
-<pre><code>f = File.open("stones")
-</code></pre>
-
-
-<p>打开&#8217;stones&#8217;文件，默认是只读模式。</p>
-
-
-<pre><code>while line = f.gets do
-    puts line
-end
-</code></pre>
-
-
-<p><em>gets</em>方法从I/O数据流读取一行数据。当读到文件结尾时while代码块退出。</p>
-
-
-<p>$ ./readlines2.rb<br>
-Garnet<br>
-Topaz<br>
-Opal<br>
-Amethyst<br>
-Ruby<br>
-Jasper<br>
-Pyrite<br>
-Malachite<br>
-Quartz  </p>
-
-
-<p>例子输出结果。</p>
-
-
-<p>下一个例子将从文件读取数据。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-fname = 'alllines.rb'
-
-File.readlines(fname).each do |line|
-    puts line
-end
-</code></pre>
-
-
-<p>这个脚本显示了另一个读取文件内容的方式。这个例子将它自己的代码打印在终端上。</p>
-
-
-<pre><code>File.readlines(fname).each do |line|
-    puts line
-end
-</code></pre>
-
-
-<p><em>readlines</em>读取指定文件的每一行内容，并作为数据返回。我们使用<em>each</em>方法遍历数组，并将其在终端上打印。</p>
-
-
-<pre><code>$ ./alllines.rb
-#!/usr/bin/ruby
-
-fname = 'alllines.rb'
-
-File.readlines(fname).each do |line|
-    puts line
-end
-</code></pre>
-
-
-<p>输出结果。</p>
-
-
-<h2>目录</h2>
-
-
-<p>在这一节我们使用目录。Ruby中有一个Dir类可以操作目录。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-Dir.mkdir "tmp"
-puts Dir.exists? "tmp"
-
-puts Dir.pwd
-Dir.chdir "tmp"
-puts Dir.pwd
-
-Dir.chdir '..'
-puts Dir.pwd
-Dir.rmdir "tmp"
-puts Dir.exists? "tmp"
-</code></pre>
-
-
-<p>这个脚本我们使用了Dir类的四个方法。</p>
-
-
-<pre><code>Dir.mkdir "tmp"
-</code></pre>
-
-
-<p><em>mkdir</em>方法创建一个新目录&#8217;tmp&#8217;。</p>
-
-
-<pre><code>puts Dir.exists? "tmp"
-</code></pre>
-
-
-<p>使用<em>exists?</em>方法检查一个目录是否存在。</p>
-
-
-<pre><code>puts Dir.pwd
-</code></pre>
-
-
-<p><em>pwd</em>方法打印当前的工作目录。这是我们启动脚本的目录。</p>
-
-
-<pre><code>Dir.chdir '..'
-</code></pre>
-
-
-<p><em>chdir</em>方法切换目录。&#8217;..&#8217;目录是当前工作目录的父目录。</p>
-
-
-<pre><code>Dir.rmdir "tmp"
-puts Dir.exists? "tmp"
-</code></pre>
-
-
-<p>最后我们使用<em>rmdir</em>方法移除目录。这时<em>exists?</em>方法返回false。</p>
-
-
-<p>$ ./dirs.rb<br>
-true<br>
-/home/vronskij/programming/ruby/io<br>
-/home/vronskij/programming/ruby/io/tmp<br>
-/home/vronskij/programming/ruby/io<br>
-false  </p>
-
-
-<p>例子的输出结果。
-第二个例子我们检索目录所有的条目，包括文件和子目录。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-fls = Dir.entries '.'
-puts fls.inspect
-</code></pre>
-
-
-<p><em>entries</em> 方法返回指定目录的所有条目。</p>
-
-
-<pre><code>fls = Dir.entries '.'
-puts fls.inspect
-</code></pre>
-
-
-<p>我们得到了当前目录下的文件和目录数组。&#8217;.&#8217;代表当前工作目录。<em>inspect</em>方法使得数组更加可读。</p>
-
-
-<p>$ ./allfiles.rb<br>
-[&#8220;putc.rb&#8221;, &#8220;simplewrite.rb&#8221;, &#8220;readlines2.rb&#8221;, &#8220;fileexists.rb~&#8221; &#8230;  </p>
-
-
-<p>输出结果。</p>
-
-
-<p>第三个例子使用了home目录。每个计算机用户都有一个分配给他的唯一的目录，称为home目录。它是用于存放用户自己的文件。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-puts Dir.home
-puts Dir.home 'root'
-</code></pre>
-
-
-<p>这个脚本打印两个home目录。</p>
-
-
-<pre><code>puts Dir.home
-</code></pre>
-
-
-<p>如果没有指定用户名则返回当前用户的home目录。当前用户是指定启动这个脚本文件的用户。</p>
-
-
-<pre><code>puts Dir.home 'root'
-</code></pre>
-
-
-<p>这里我们指定了一个用户。</p>
-
-
-<p>$ ./homedir.rb<br>
-/home/vronskij<br>
-/root  </p>
-
-
-<p>输出结果。</p>
-
-
-<h2>执行外部程序</h2>
-
-
-<p>Ruby有一些方式可以执行外部程序。我们的例子中我们使用了Linux中有名的命令。Windows或者Mac读取可以使用他们自己系统的命令。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-data = system 'ls'
-puts data
-</code></pre>
-
-
-<p>调用<em>ls</em>命令列出目录内容。</p>
-
-
-<pre><code>data = system 'ls'
-</code></pre>
-
-
-<p><em>system</em>命令在一个子shell中执行外部程序。这个方法是属于Kernel Ruby 模块的。</p>
-
-
-<p>$ ./system.rb<br>
-allfiles.rb   characters.rb  fileexists.rb   homedir.rb~ &#8230;  </p>
-
-
-<p>输出结果。</p>
-
-
-<p>我们展示另外两个执行外部程序的方式。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-out = `pwd`
-puts out
-
-out = %x[uptime]
-puts out
-
-out = %x[ls | grep 'readline']
-puts out
-</code></pre>
-
-
-<p>执行外部程序我们可以使用反引号&#8220;和%x[]字符。</p>
-
-
-<pre><code>out = `pwd`
-</code></pre>
-
-
-<p>这里我们使用反引号执行<em>pwd</em>命令。这个命令返回当前的工作目录。</p>
-
-
-<pre><code>out = %x[uptime]
-</code></pre>
-
-
-<p>这里我得到<em>uptime</em>命令的输出，它显示系统运行了多久。</p>
-
-
-<pre><code>out = %x[ls | grep 'readline']
-</code></pre>
-
-
-<p>我们也可以使用复合命令。</p>
-
-
-<p>$ ./system2.rb<br>
-/home/vronskij/programming/ruby/io<br>
- 22:50:50 up  5:32,  1 user,  load average: 0.46, 0.44, 0.45<br>
-readline.rb<br>
-readline.rb~<br>
-readlines2.rb<br>
-readlines2.rb~  </p>
-
-
-<p>输出结果。</p>
-
-
-<p>我们可以使用<em>open</em>方法执行命令。这个方法是属于Kernel模块的。它创建一个IO对象连接到指定的数据流、文件或者子进程。如果我们想要连接到子进程，我们将打开路径以管道符(|)开头。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-f = open("|ls -l |head -3")
-out = f.read
-puts out
-f.close
-
-puts $?.success?
-</code></pre>
-
-
-<p>这个例子我们打印了<em>ls -l | head -3</em>命令的结果。我们也还检查了子进程的状态。</p>
-
-
-<pre><code>f = open("|ls -l |head -3")
-</code></pre>
-
-
-<p>连接到子进程。</p>
-
-
-<pre><code>out = f.read
-puts out
-</code></pre>
-
-
-<p>读取并打印子进程的数据。</p>
-
-
-<pre><code>f.close
-</code></pre>
-
-
-<p>关闭文件句柄。</p>
-
-
-<pre><code>puts $?.success?
-</code></pre>
-
-
-<p><em>$?</em>是一个特殊的变量，设置为上次执行过的子进程。如果子进程成功退出<em>success?</em>方法返回true。</p>
-
-
-<p>$ ./system3.rb<br>
-total 148<br>
--rwxr-xr-x 1 vronskij vronskij   57 2011-10-30 23:33 allfiles.rb<br>
--rwxr-xr-x 1 vronskij vronskij   58 2011-10-30 23:33 allfiles.rb~<br>
-true  </p>
-
-
-<p>输出结果。</p>
-
-
-<h2>重定向标准输出</h2>
-
-
-<p>Ruby对标准输入、标准输出和标准错误输出都有预定义的全局变量。<em>$stdout</em> 是标准输出的变量名。</p>
-
-
-<pre><code>#!/usr/bin/ruby
-
-$stdout = File.open "output.log", "a"
-
-puts "Ruby"
-puts "Java"
-
-$stdout.close
-$stdout = STDOUT
-
-puts "Python"
-</code></pre>
-
-
-<p>上面的例子我们将输出重定向到output.log文件。</p>
-
-
-<pre><code>$stdout = File.open "output.log", "a"
-</code></pre>
-
-
-<p>这行创建一个新的标准输出。现在标准输出流向ouput.log文件。这个文件以追加方式打开，如果文件不存在则创建，否则打开并将数据追加到文件尾部。</p>
-
-
-<pre><code>puts "Ruby"
-puts "Java"
-</code></pre>
-
-
-<p>打印两个字符串。这些字符串不会像平常一样在终端上显示了。而是追加到output.log文件中。</p>
-
-
-<pre><code>$stdout.close
-</code></pre>
-
-
-<p>关闭文件句柄。</p>
-
-
-<pre><code>$stdout = STDOUT
-
-puts "Python"
-</code></pre>
-
-
-<p>使用预定义的常量<em>STDOUT</em>重新创建正常的标准输出。&#8221;Python&#8221;字符串在终端上打印。</p>
-
-
-<p>这部分的教程我们使用了输入和输出操作。</p>
-
-
-<hr>
-
-
-<p>原文地址： <a href="http://zetcode.com/lang/rubytutorial/io/">http://zetcode.com/lang/rubytutorial/io/</a><br>
-翻译：龙昌  admin@longchangjin.cn<br>
-完整教程：<a href="https://github.com/wusuopu/Ruby-tutorial">https://github.com/wusuopu/Ruby-tutorial</a> </p>
-
-</div>
-
-
-  <footer>
-    <p class="meta">
-      
-  
-
-<span class="byline author vcard">Posted by <span class="fn">龍昌</span></span>
-
-      
-
-
-
-
-<time class='entry-date' datetime='2013-11-18T00:00:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>18</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
-    </p>
-    <p class="meta">
-      Categories: 
-
-<span class="categories">
-  
-    <a class='category' href='/categories/ruby栏目/index.html'>ruby栏目</a>
-  
-</span>
-
-
-    </p>
-    <p class="meta">
-      Tags: 
-
-<span class="tags">
-  
-    <a class='tag' href='/tags/Ruby/index.html'>Ruby</a>, <a class='tag' href='/tags/翻译/index.html'>翻译</a>
-  
-</span>
-
-
-    </p>
-    
-      <div class="sharing">
-  
-  
-  
-</div>
-
-    
-    <p class="meta">
-      
-        <a class="basic-alignment left" href="/archives/83945.html" title="Previous Post: [翻译]Ruby教程14——正则表达式">&laquo; [翻译]Ruby教程14——正则表达式</a>
-      
-      
-        <a class="basic-alignment right" href="/archives/83954.html" title="Next Post: [翻译]Ruby GTK教程1——介绍">[翻译]Ruby GTK教程1——介绍 &raquo;</a>
-      
-    </p>
-  </footer>
 </article>
 
-  <section>
-    <h1>Comments</h1>
-    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-</div>
-  </section>
 
-</div>
+<section id="comments">
+  <!-- 多说评论框 start -->
+  <div class="ds-thread" data-thread-key="83949" data-title="[翻译]Ruby教程15——输入&amp;输出" data-url="http://www.xefan.com//archives/83949.html"></div>
+  <!-- 多说评论框 end -->
+  <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+  <script type="text/javascript">
+  var duoshuoQuery = {short_name:'longchang'};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0] 
+       || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+    </script>
+  <!-- 多说公共JS代码 end -->
+</section>
 
-<aside class="sidebar">
+</section>
+        
+          <aside id="sidebar">
   
-    <section>
-  <h1>Subscription</h1>
-  <!--以下是QQ邮件列表订阅嵌入代码--><script >var nId = "e7ee5da6d322dc7157c25cfd8a7700bb23a056dd1fb18cb4",nWidth="auto",sColor="light",sText="请输入邮件地址：" ;</script><script src="http://list.qq.com/zh_CN/htmledition/js/qf/page/qfcode.js" charset="gb18030"></script>
-</section>
-<section>
-  <h1>Recent Posts</h1>
-  <ul id="recent_posts">
     
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84166.html">通过串口连接raspberry Pi</a>
-      </li>
-    
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84165.html">使用CodePush对ReactNative进行热更新</a>
-      </li>
-    
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84164.html">ReactNative获取设备屏幕尺寸</a>
-      </li>
-    
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84163.html">ReactNative Jsbundle管理</a>
-      </li>
-    
-      <li class="post">
-        <a href="http://www.xefan.com/archives/84162.html">ReactNative自动设置开发服务器IP</a>
-      </li>
-    
-  </ul>
-</section>
-<section>
-  <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/categories/linux栏目/index.html'>linux栏目 (48)</a></li><li><a href='/categories/python栏目/index.html'>python栏目 (34)</a></li><li><a href='/categories/ruby栏目/index.html'>ruby栏目 (32)</a></li><li><a href='/categories/web开发/index.html'>web开发 (20)</a></li><li><a href='/categories/前端相关/index.html'>前端相关 (10)</a></li><li><a href='/categories/嵌入式栏目/index.html'>嵌入式栏目 (12)</a></li><li><a href='/categories/开源软件/index.html'>开源软件 (20)</a></li><li><a href='/categories/教程/index.html'>教程 (16)</a></li><li><a href='/categories/数据库/index.html'>数据库 (10)</a></li><li><a href='/categories/数据结构和算法/index.html'>数据结构和算法 (16)</a></li><li><a href='/categories/编程开发/index.html'>编程开发 (43)</a></li><li><a href='/categories/网络日志/index.html'>网络日志 (11)</a></li><li><a href='/categories/资源分享/index.html'>资源分享 (24)</a></li></ul>
-</section>
-<section>
-  <h1>Tag Cloud</h1>
-    <span id="tag-cloud"><a href='/tags/access/index.html' style='font-size: 105.3731343283582%'>access(6)</a> <a href='/tags/adobe/index.html' style='font-size: 100.8955223880597%'>adobe(1)</a> <a href='/tags/ajax/index.html' style='font-size: 102.68656716417911%'>ajax(3)</a> <a href='/tags/android/index.html' style='font-size: 100.8955223880597%'>Android(1)</a> <a href='/tags/angular/index.html' style='font-size: 106.26865671641791%'>angular(7)</a> <a href='/tags/apache/index.html' style='font-size: 100.8955223880597%'>apache(1)</a> <a href='/tags/arch/index.html' style='font-size: 106.26865671641791%'>Arch(7)</a> <a href='/tags/arm/index.html' style='font-size: 107.16417910447761%'>ARM(8)</a> <a href='/tags/asp/index.html' style='font-size: 106.26865671641791%'>asp(7)</a> <a href='/tags/c/index.html' style='font-size: 111.64179104477611%'>C(13)</a> <a href='/tags/css/index.html' style='font-size: 101.7910447761194%'>css(2)</a> <a href='/tags/django/index.html' style='font-size: 102.68656716417911%'>Django(3)</a> <a href='/tags/dreamweaver/index.html' style='font-size: 100.8955223880597%'>Dreamweaver(1)</a> <a href='/tags/fedora/index.html' style='font-size: 101.7910447761194%'>Fedora(2)</a> <a href='/tags/firefox/index.html' style='font-size: 102.68656716417911%'>firefox(3)</a> <a href='/tags/flash/index.html' style='font-size: 100.8955223880597%'>Flash(1)</a> <a href='/tags/ftp/index.html' style='font-size: 100.8955223880597%'>ftp(1)</a> <a href='/tags/gcc/index.html' style='font-size: 105.3731343283582%'>gcc(6)</a> <a href='/tags/gentoo/index.html' style='font-size: 101.7910447761194%'>Gentoo(2)</a> <a href='/tags/git/index.html' style='font-size: 103.58208955223881%'>git(4)</a> <a href='/tags/gobject/index.html' style='font-size: 105.3731343283582%'>GObject(6)</a> <a href='/tags/grub/index.html' style='font-size: 100.8955223880597%'>grub(1)</a> <a href='/tags/gtk/index.html' style='font-size: 115.22388059701493%'>gtk(17)</a> <a href='/tags/gulp/index.html' style='font-size: 100.8955223880597%'>gulp(1)</a> <a href='/tags/hash/index.html' style='font-size: 100.8955223880597%'>Hash(1)</a> <a href='/tags/ibus/index.html' style='font-size: 100.8955223880597%'>ibus(1)</a> <a href='/tags/js/index.html' style='font-size: 109.85074626865672%'>js(11)</a> <a href='/tags/linux/index.html' style='font-size: 160.0%'>Linux(67)</a> <a href='/tags/mac/index.html' style='font-size: 100.8955223880597%'>Mac(1)</a> <a href='/tags/mongodb/index.html' style='font-size: 110.74626865671642%'>mongodb(12)</a> <a href='/tags/mysql/index.html' style='font-size: 103.58208955223881%'>mysql(4)</a> <a href='/tags/nginx/index.html' style='font-size: 100.8955223880597%'>nginx(1)</a> <a href='/tags/node/index.html' style='font-size: 100.8955223880597%'>node(1)</a> <a href='/tags/php/index.html' style='font-size: 108.95522388059702%'>php(10)</a> <a href='/tags/ps/index.html' style='font-size: 105.3731343283582%'>PS(6)</a> <a href='/tags/pygame/index.html' style='font-size: 110.74626865671642%'>pygame(12)</a> <a href='/tags/python/index.html' style='font-size: 145.67164179104478%'>python(51)</a> <a href='/tags/qt/index.html' style='font-size: 101.7910447761194%'>Qt(2)</a> <a href='/tags/raspberry-pi/index.html' style='font-size: 100.8955223880597%'>Raspberry pi(1)</a> <a href='/tags/react/index.html' style='font-size: 103.58208955223881%'>react(4)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>redis(1)</a> <a href='/tags/redis/index.html' style='font-size: 100.8955223880597%'>Redis(1)</a> <a href='/tags/ruby/index.html' style='font-size: 129.55223880597015%'>Ruby(33)</a> <a href='/tags/scrapy/index.html' style='font-size: 102.68656716417911%'>Scrapy(3)</a> <a href='/tags/shell/index.html' style='font-size: 100.8955223880597%'>shell(1)</a> <a href='/tags/tq2440/index.html' style='font-size: 104.4776119402985%'>TQ2440(5)</a> <a href='/tags/ubuntu/index.html' style='font-size: 106.26865671641791%'>ubuntu(7)</a> <a href='/tags/usb/index.html' style='font-size: 102.68656716417911%'>USB(3)</a> <a href='/tags/vim/index.html' style='font-size: 123.28358208955224%'>vim(26)</a> <a href='/tags/virtualbox/index.html' style='font-size: 102.68656716417911%'>VirtualBox(3)</a> <a href='/tags/vmware/index.html' style='font-size: 100.8955223880597%'>vmware(1)</a> <a href='/tags/w3m/index.html' style='font-size: 100.8955223880597%'>w3m(1)</a> <a href='/tags/web开发/index.html' style='font-size: 113.43283582089552%'>Web开发(15)</a> <a href='/tags/windows/index.html' style='font-size: 106.26865671641791%'>windows(7)</a> <a href='/tags/wordpress/index.html' style='font-size: 100.8955223880597%'>WordPress(1)</a> <a href='/tags/xcode/index.html' style='font-size: 100.8955223880597%'>Xcode(1)</a> <a href='/tags/xml/index.html' style='font-size: 100.8955223880597%'>xml(1)</a> <a href='/tags/免费/index.html' style='font-size: 100.8955223880597%'>免费(1)</a> <a href='/tags/内核/index.html' style='font-size: 100.8955223880597%'>内核(1)</a> <a href='/tags/匹配算法/index.html' style='font-size: 105.3731343283582%'>匹配算法(6)</a> <a href='/tags/单片机/index.html' style='font-size: 101.7910447761194%'>单片机(2)</a> <a href='/tags/嵌入式/index.html' style='font-size: 100.8955223880597%'>嵌入式(1)</a> <a href='/tags/开源软件/index.html' style='font-size: 108.05970149253731%'>开源软件(9)</a> <a href='/tags/排序算法/index.html' style='font-size: 108.05970149253731%'>排序算法(9)</a> <a href='/tags/文件空间/index.html' style='font-size: 100.8955223880597%'>文件空间(1)</a> <a href='/tags/无线网/index.html' style='font-size: 100.8955223880597%'>无线网(1)</a> <a href='/tags/正则式/index.html' style='font-size: 100.8955223880597%'>正则式(1)</a> <a href='/tags/注册机/index.html' style='font-size: 101.7910447761194%'>注册机(2)</a> <a href='/tags/游戏/index.html' style='font-size: 108.95522388059702%'>游戏(10)</a> <a href='/tags/电脑技巧/index.html' style='font-size: 108.05970149253731%'>电脑技巧(9)</a> <a href='/tags/空间/index.html' style='font-size: 100.8955223880597%'>空间(1)</a> <a href='/tags/算法/index.html' style='font-size: 114.32835820895522%'>算法(16)</a> <a href='/tags/红旗/index.html' style='font-size: 100.8955223880597%'>红旗(1)</a> <a href='/tags/经典语录/index.html' style='font-size: 100.8955223880597%'>经典语录(1)</a> <a href='/tags/网络日志/index.html' style='font-size: 105.3731343283582%'>网络日志(6)</a> <a href='/tags/翻译/index.html' style='font-size: 123.28358208955224%'>翻译(26)</a> <a href='/tags/视频教程/index.html' style='font-size: 108.95522388059702%'>视频教程(10)</a> <a href='/tags/资源分享/index.html' style='font-size: 110.74626865671642%'>资源分享(12)</a> <a href='/tags/转载/index.html' style='font-size: 101.7910447761194%'>转载(2)</a> <a href='/tags/随笔/index.html' style='font-size: 100.8955223880597%'>随笔(1)</a> </span>
-</section>
-<section>
-  <h1>Link</h1>
-    <ul id="category-list">
-      <li><a target="_blank" title="我的Github" href="https://github.com/wusuopu">@Github</a></li>
-      <li><a target="_blank" title="我的微博" href="http://www.weibo.com/u/1768691343">@Weibo</a></li>
-      <li><a target="_blank" title="我的Twitter" href="https://twitter.com/longchangjin">@Twitter</a></li>
-      <li><a target="_blank" title="我的豆瓣" href="http://www.douban.com/people/lchj/">@Douban</a></li>
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Linux栏目/">Linux栏目</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Python栏目/">Python栏目</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Ruby栏目/">Ruby栏目</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Ruby栏目/Web开发/">Web开发</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/Web开发/">Web开发</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Web开发/Python栏目/">Python栏目</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/前端相关/">前端相关</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/嵌入式栏目/">嵌入式栏目</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/开源软件/">开源软件</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/教程/">教程</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据库/">数据库</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据结构和算法/">数据结构和算法</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/编程开发/">编程开发</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/网络日志/">网络日志</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/资源分享/">资源分享</a></li></ul>
+    </div>
+  </div>
 
-      <li><a target="_blank" title="" href="http://www.vimer.cn/">Vimer的程序世界</a></li>
-      <li><a target="_blank" title="" href="http://pythoner.net/">python开发者社区</a></li>
-      <li><a target="_blank" title="" href="http://simple-is-better.com/">python.cn(news, jobs)</a></li>
-      <li><a target="_blank" title="" href="http://gtk.awaysoft.com/">GTK+ 中文社区</a></li>
-    </ul>
-</section>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ARM/">ARM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/">Android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Arch/">Arch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/">C</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Django/">Django</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Dreamweaver/">Dreamweaver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Fedora/">Fedora</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flash/">Flash</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GObject/">GObject</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Gentoo/">Gentoo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hash/">Hash</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mac/">Mac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PS/">PS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Qt/">Qt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Raspberry-pi/">Raspberry pi</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redis/">Redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Ruby/">Ruby</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scrapy/">Scrapy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TQ2440/">TQ2440</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/USB/">USB</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/VirtualBox/">VirtualBox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web开发/">Web开发</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WordPress/">WordPress</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Xcode/">Xcode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/access/">access</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/adobe/">adobe</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ajax/">ajax</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apache/">apache</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asp/">asp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css/">css</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/firefox/">firefox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ftp/">ftp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gcc/">gcc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/grub/">grub</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gtk/">gtk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gulp/">gulp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ibus/">ibus</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pygame/">pygame</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vmware/">vmware</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/w3m/">w3m</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/windows/">windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xml/">xml</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/免费/">免费</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内核/">内核</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/匹配算法/">匹配算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/单片机/">单片机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/嵌入式/">嵌入式</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/开源软件/">开源软件</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/排序算法/">排序算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/文件空间/">文件空间</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/无线网/">无线网</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/正则式/">正则式</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/注册机/">注册机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/游戏/">游戏</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/电脑技巧/">电脑技巧</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/空间/">空间</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/算法/">算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/红旗/">红旗</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/经典语录/">经典语录</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络日志/">网络日志</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/翻译/">翻译</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/视频教程/">视频教程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/资源分享/">资源分享</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/转载/">转载</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/随笔/">随笔</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/ARM/" style="font-size: 13.68px;">ARM</a> <a href="/tags/Android/" style="font-size: 10px;">Android</a> <a href="/tags/Arch/" style="font-size: 13.16px;">Arch</a> <a href="/tags/C/" style="font-size: 16.32px;">C</a> <a href="/tags/Django/" style="font-size: 11.05px;">Django</a> <a href="/tags/Dreamweaver/" style="font-size: 10px;">Dreamweaver</a> <a href="/tags/Fedora/" style="font-size: 10.53px;">Fedora</a> <a href="/tags/Flash/" style="font-size: 10px;">Flash</a> <a href="/tags/GObject/" style="font-size: 12.63px;">GObject</a> <a href="/tags/Gentoo/" style="font-size: 10.53px;">Gentoo</a> <a href="/tags/Hash/" style="font-size: 10px;">Hash</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Mac/" style="font-size: 10px;">Mac</a> <a href="/tags/PS/" style="font-size: 12.63px;">PS</a> <a href="/tags/Qt/" style="font-size: 10.53px;">Qt</a> <a href="/tags/Raspberry-pi/" style="font-size: 10px;">Raspberry pi</a> <a href="/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/tags/Ruby/" style="font-size: 18.95px;">Ruby</a> <a href="/tags/Scrapy/" style="font-size: 11.05px;">Scrapy</a> <a href="/tags/TQ2440/" style="font-size: 12.11px;">TQ2440</a> <a href="/tags/USB/" style="font-size: 11.05px;">USB</a> <a href="/tags/VirtualBox/" style="font-size: 11.05px;">VirtualBox</a> <a href="/tags/Web开发/" style="font-size: 16.84px;">Web开发</a> <a href="/tags/WordPress/" style="font-size: 10px;">WordPress</a> <a href="/tags/Xcode/" style="font-size: 10px;">Xcode</a> <a href="/tags/access/" style="font-size: 12.63px;">access</a> <a href="/tags/adobe/" style="font-size: 10px;">adobe</a> <a href="/tags/ajax/" style="font-size: 11.05px;">ajax</a> <a href="/tags/angular/" style="font-size: 13.16px;">angular</a> <a href="/tags/apache/" style="font-size: 10px;">apache</a> <a href="/tags/asp/" style="font-size: 13.16px;">asp</a> <a href="/tags/css/" style="font-size: 10.53px;">css</a> <a href="/tags/firefox/" style="font-size: 11.05px;">firefox</a> <a href="/tags/ftp/" style="font-size: 10px;">ftp</a> <a href="/tags/gcc/" style="font-size: 12.63px;">gcc</a> <a href="/tags/git/" style="font-size: 11.58px;">git</a> <a href="/tags/grub/" style="font-size: 10px;">grub</a> <a href="/tags/gtk/" style="font-size: 17.89px;">gtk</a> <a href="/tags/gulp/" style="font-size: 10px;">gulp</a> <a href="/tags/ibus/" style="font-size: 10px;">ibus</a> <a href="/tags/js/" style="font-size: 15.26px;">js</a> <a href="/tags/mongodb/" style="font-size: 15.79px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 11.58px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/php/" style="font-size: 14.74px;">php</a> <a href="/tags/pygame/" style="font-size: 15.79px;">pygame</a> <a href="/tags/python/" style="font-size: 19.47px;">python</a> <a href="/tags/react/" style="font-size: 11.58px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/ubuntu/" style="font-size: 13.16px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 18.42px;">vim</a> <a href="/tags/vmware/" style="font-size: 10px;">vmware</a> <a href="/tags/w3m/" style="font-size: 10px;">w3m</a> <a href="/tags/windows/" style="font-size: 13.16px;">windows</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/免费/" style="font-size: 10px;">免费</a> <a href="/tags/内核/" style="font-size: 10px;">内核</a> <a href="/tags/匹配算法/" style="font-size: 12.63px;">匹配算法</a> <a href="/tags/单片机/" style="font-size: 10.53px;">单片机</a> <a href="/tags/嵌入式/" style="font-size: 10px;">嵌入式</a> <a href="/tags/开源软件/" style="font-size: 14.21px;">开源软件</a> <a href="/tags/排序算法/" style="font-size: 14.21px;">排序算法</a> <a href="/tags/文件空间/" style="font-size: 10px;">文件空间</a> <a href="/tags/无线网/" style="font-size: 10px;">无线网</a> <a href="/tags/正则式/" style="font-size: 10px;">正则式</a> <a href="/tags/注册机/" style="font-size: 10.53px;">注册机</a> <a href="/tags/游戏/" style="font-size: 14.74px;">游戏</a> <a href="/tags/电脑技巧/" style="font-size: 14.21px;">电脑技巧</a> <a href="/tags/空间/" style="font-size: 10px;">空间</a> <a href="/tags/算法/" style="font-size: 17.37px;">算法</a> <a href="/tags/红旗/" style="font-size: 10px;">红旗</a> <a href="/tags/经典语录/" style="font-size: 10px;">经典语录</a> <a href="/tags/网络日志/" style="font-size: 12.63px;">网络日志</a> <a href="/tags/翻译/" style="font-size: 18.42px;">翻译</a> <a href="/tags/视频教程/" style="font-size: 14.74px;">视频教程</a> <a href="/tags/资源分享/" style="font-size: 15.79px;">资源分享</a> <a href="/tags/转载/" style="font-size: 10.53px;">转载</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05/">May 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/02/">February 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/11/">November 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">October 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">September 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/08/">August 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/07/">July 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/05/">May 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04/">April 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">March 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">January 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/12/">December 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">June 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">May 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">April 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">January 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">October 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/09/">September 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/08/">August 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/07/">July 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/05/">May 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/04/">April 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/03/">March 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/02/">February 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/12/">December 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/11/">November 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/10/">October 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/09/">September 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/08/">August 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/07/">July 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/05/">May 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/04/">April 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/03/">March 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/02/">February 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/01/">January 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/12/">December 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/11/">November 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/10/">October 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/09/">September 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/08/">August 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/07/">July 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/06/">June 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/05/">May 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/04/">April 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/03/">March 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/12/">December 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/11/">November 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/10/">October 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/09/">September 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/08/">August 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/07/">July 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/05/">May 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/12/">December 2008</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/07/">July 2008</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/archives/84166.html">通过串口连接raspberry pi</a>
+          </li>
+        
+          <li>
+            <a href="/archives/84165.html">使用CodePush对ReactNative进行热更新</a>
+          </li>
+        
+          <li>
+            <a href="/archives/84164.html">ReactNative获取设备屏幕尺寸</a>
+          </li>
+        
+          <li>
+            <a href="/archives/84163.html">ReactNative jsbundle管理</a>
+          </li>
+        
+          <li>
+            <a href="/archives/84162.html">ReactNative自动设置开发服务器IP</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    <div class="widget-wrap">
+  <h3 class="widget-title">Link</h3>
+    <div class="widget">
+      <ul id="category-list">
+        <li><a target="_blank" title="我的Github" href="https://github.com/wusuopu">@Github</a></li>
+        <li><a target="_blank" title="我的微博" href="http://www.weibo.com/u/1768691343">@Weibo</a></li>
+        <li><a target="_blank" title="我的Twitter" href="https://twitter.com/longchangjin">@Twitter</a></li>
+        <li><a target="_blank" title="我的豆瓣" href="http://www.douban.com/people/lchj/">@Douban</a></li>
+
+        <li><a target="_blank" title="" href="http://www.vimer.cn/">Vimer的程序世界</a></li>
+        <li><a target="_blank" title="" href="http://pythoner.net/">python开发者社区</a></li>
+        <li><a target="_blank" title="" href="http://simple-is-better.com/">python.cn(news, jobs)</a></li>
+        <li><a target="_blank" title="" href="http://gtk.awaysoft.com/">GTK+ 中文社区</a></li>
+      </ul>
+    </div>
+</div>
 
   
 </aside>
-
-
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 龍昌<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>
-  <footer role="contentinfo"><p>
-  Copyright &copy; 2016 - 龍昌 -
-  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
-</p>
+</footer>
 <div style="display:none;"><script src="http://s94.cnzz.com/stat.php?id=1259846&web_id=1259846&show=pic" language="JavaScript"></script></div>
 
-</footer>
+    </div>
+    <nav id="mobile-nav">
   
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+    <a href="/gbook" class="mobile-nav-link">留言板</a>
+  
+</nav>
+    
 
-<script type="text/javascript">
-      var disqus_shortname = 'longchang';
-      
-        
-        // var disqus_developer = 1;
-        var disqus_identifier = 'http://www.xefan.com/archives/83949.html';
-        var disqus_url = 'http://www.xefan.com/archives/83949.html';
-        var disqus_script = 'embed.js';
-      
-    (function () {
-      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
-      //dsq.src = '/javascripts/disqus/' + disqus_script;
-      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    }());
-</script>
+<script src="/js/jquery.min.js"></script>
 
 
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
 
 
+<script src="/js/script.js"></script>
 
-
-
-
-
-
-
+  </div>
 </body>
 </html>
