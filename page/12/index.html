@@ -69,6 +69,60 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-/archives/83871.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83871.html" class="article-date">
+  <time datetime="2013-07-14T00:00:00.000Z" itemprop="datePublished">2013-07-14</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/数据结构和算法/">数据结构和算法</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/83871.html">字符串匹配算法（五）——Horspool算法</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Horspool算法是Boyer-Moore算法的一个简化版，全名叫做Boyer-Moore-Horspool算法。</p>
+<p>Horspool算法的基本思想是将文本串text中匹配窗口的最后一个字符跟模式串pattern中的最后一个字符比较。如果相等，继续从后向前对主串和模式串进行比较，直到完全相等或者在某个字符处不匹配为止 。如果不匹配，则根据文本串匹配窗口中的最后一个字符β在模式串中的下一个出现位置将窗口向右移动；若字符β没有在模式串中出现，则直接将整个模式串滑过这一位。</p>
+<p>同样的举个例子来说明一下。假定文本串text为：”HERE IS A SIMPLE EXAMPLE”，长度为n；模式串pattern为：”EXAMPLE”，长度为m；现在要在text中搜索看看是否包含pattern。</p>
+<p>1).</p>
+<p><pre><br>HERE I<span style="color: #ff0000;">S</span> A SIMPLE EXAMPLE<br>EXAMPL<span style="color: #ff0000;">E</span><br></pre><br>‘S’与’E’匹配失败，并且’S’没有在pattern中出现，所以直接将pattern滑过’S’这一位。</p>
+<p>2).</p>
+<p><pre><br>HERE IS A SIM<span style="color: #ff0000;">P</span>LE EXAMPLE<br>       EXAMPL<span style="color: #ff0000;">E</span><br></pre><br>这时’P’与’E’匹配失败，但是’P’在模式串pattern中出现了，所以把pattern向右移，使得text中的’P’与pattern中的’P’对齐。</p>
+<p>3).</p>
+<p><pre><br>HERE IS A SIM<span style="color: #00ff00;">P</span>L<span style="color: #ff0000;">E</span> EXAMPLE<br>         EXAM<span style="color: #00ff00;">P</span>L<span style="color: #ff0000;">E</span><br></pre><br>然后重复执行之前的操作。</p>
+<p>用C语言实现如下。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;limits.h&gt;</span></span></div><div class="line"> </div><div class="line"><span class="comment">/* Returns a pointer to the first occurrence of "needle"</span></div><div class="line"> * within "haystack", or NULL if not found. Works like</div><div class="line"> * memmem().</div><div class="line"> */</div><div class="line"> </div><div class="line"><span class="comment">/* <span class="doctag">Note:</span> In this example needle is a C string. The ending</span></div><div class="line"> * 0x00 will be cut off, so you could call this example with</div><div class="line"> * boyermoore_horspool_memmem(haystack, hlen, "abc", sizeof("abc"))</div><div class="line"> */</div><div class="line"><span class="function"><span class="keyword">const</span> <span class="keyword">unsigned</span> <span class="keyword">char</span> *</span></div><div class="line"><span class="title">boyermoore_horspool_memmem</span><span class="params">(<span class="keyword">const</span> <span class="keyword">unsigned</span> <span class="keyword">char</span>* haystack, <span class="keyword">size_t</span> hlen,</span></div><div class="line">                           <span class="keyword">const</span> <span class="keyword">unsigned</span> <span class="keyword">char</span>* needle,   <span class="keyword">size_t</span> nlen)</div><div class="line">&#123;</div><div class="line">    <span class="keyword">int</span> index = <span class="number">0</span>;</div><div class="line">    <span class="keyword">size_t</span> scan = <span class="number">0</span>;</div><div class="line">    <span class="keyword">size_t</span> bad_char_skip[UCHAR_MAX + <span class="number">1</span>]; <span class="comment">/* Officially called:</span></div><div class="line">                                          * bad character shift */</div><div class="line"> </div><div class="line">    <span class="comment">/* Sanity checks on the parameters */</span></div><div class="line">    <span class="keyword">if</span> (nlen &lt;= <span class="number">0</span> || !haystack || !needle)</div><div class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</div><div class="line"> </div><div class="line">    <span class="comment">/* ---- Preprocess ---- */</span></div><div class="line">    <span class="comment">/* Initialize the table to default value */</span></div><div class="line">    <span class="comment">/* When a character is encountered that does not occur</span></div><div class="line">     * in the needle, we can safely skip ahead for the whole</div><div class="line">     * length of the needle.</div><div class="line">     */</div><div class="line">    <span class="keyword">for</span> (scan = <span class="number">0</span>; scan &lt;= UCHAR_MAX; scan = scan + <span class="number">1</span>)</div><div class="line">        bad_char_skip[scan] = nlen;</div><div class="line"> </div><div class="line">    <span class="comment">/* C arrays have the first byte at [0], therefore:</span></div><div class="line">     * [nlen - 1] is the last byte of the array. */</div><div class="line">    <span class="keyword">size_t</span> last = nlen - <span class="number">1</span>;</div><div class="line"> </div><div class="line">    <span class="comment">/* Then populate it with the analysis of the needle */</span></div><div class="line">    <span class="keyword">for</span> (scan = <span class="number">0</span>; scan &lt; last; scan = scan + <span class="number">1</span>)</div><div class="line">        bad_char_skip[needle[scan]] = last - scan;</div><div class="line"> </div><div class="line">    <span class="comment">/* ---- Do the matching ---- */</span></div><div class="line"> </div><div class="line">    <span class="comment">/* Search the haystack, while the needle can still be within it. */</span></div><div class="line">    <span class="keyword">while</span> (hlen &gt;= nlen)</div><div class="line">    &#123;</div><div class="line">        <span class="comment">/* scan from the end of the needle */</span></div><div class="line">        <span class="keyword">for</span> (scan = last; haystack[scan] == needle[scan]; scan = scan - <span class="number">1</span>)</div><div class="line">            <span class="keyword">if</span> (scan == <span class="number">0</span>) <span class="comment">/* If the first byte matches, we've found it. */</span></div><div class="line">            &#123;</div><div class="line">                <span class="built_in">printf</span>(<span class="string">"index: %d\n"</span>, index<span class="number">-1</span>);</div><div class="line">                <span class="keyword">return</span> haystack;</div><div class="line">            &#125;</div><div class="line"> </div><div class="line">        <span class="comment">/* otherwise, we need to skip some bytes and start again.</span></div><div class="line">           Note that here we are getting the skip value based on the last byte</div><div class="line">           of needle, no matter where we didn't match. So if needle is: "abcd"</div><div class="line">           then we are skipping based on 'd' and that value will be 4, and</div><div class="line">           for "abcdd" we again skip on 'd' but the value will be only 1.</div><div class="line">           The alternative of pretending that the mismatched character was</div><div class="line">           the last character is slower in the normal case (E.g. finding</div><div class="line">           "abcd" in "...azcd..." gives 4 by using 'd' but only</div><div class="line">           4-2==2 using 'z'. */</div><div class="line">        hlen     -= bad_char_skip[haystack[last]];</div><div class="line">        index += bad_char_skip[haystack[last]];</div><div class="line">        haystack += bad_char_skip[haystack[last]];</div><div class="line">    &#125;</div><div class="line"> </div><div class="line">    <span class="keyword">return</span> <span class="literal">NULL</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">char</span> text[] = <span class="string">"HERE IS A SILMPLE EXAMPLE"</span>;</div><div class="line">    <span class="keyword">char</span> pattern[] = <span class="string">"EXAMPLE"</span>;</div><div class="line">    <span class="keyword">char</span> *result = boyermoore_horspool_memmem(text, <span class="built_in">strlen</span>(text), pattern, <span class="built_in">strlen</span>(pattern));</div><div class="line">    <span class="keyword">if</span> (result)</div><div class="line">    &#123;</div><div class="line">        <span class="built_in">printf</span>(<span class="string">"result: %s\n"</span>, result);</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">        <span class="built_in">printf</span>(<span class="string">"failed!\n"</span>);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83871.html" data-id="ciy8jhspd00ghkcnefzv0iqs6" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/匹配算法/">匹配算法</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/算法/">算法</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-/archives/83859.html" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/83859.html" class="article-date">
@@ -194,7 +248,7 @@ j        1234567
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com//archives/83859.html" data-id="ciy7g0eb600gdjhne3zhzafsw" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83859.html" data-id="ciy8jhspc00gdkcnevu36hzr2" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/匹配算法/">匹配算法</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/算法/">算法</a></li></ul>
@@ -242,57 +296,10 @@ j        1234567
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com//archives/83857.html" data-id="ciy7g0eb400gajhnehh8j4qur" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83857.html" data-id="ciy8jhsp900g7kcnevrc47oj6" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/排序算法/">排序算法</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/算法/">算法</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-/archives/83851.html" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/archives/83851.html" class="article-date">
-  <time datetime="2013-07-11T00:00:00.000Z" itemprop="datePublished">2013-07-11</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/数据结构和算法/">数据结构和算法</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/archives/83851.html">字符串匹配算法（一）——朴素算法</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>写python代码写习惯了，再来用C代码处理字符串感觉很痛苦。在python中有find、index等函数可以进行字符串匹配，而用C语言就只能自己写了。</p>
-<p>朴素算法思路比较简单，就是将源字符串与目标字符串挨个进行比较，看看在目标字符串中是否包含了源字符串。该算法的匹配时间为O((n-m+1)m)。</p>
-<p>C语言实现如下：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">native_matcher</span><span class="params">(<span class="keyword">char</span> *t, <span class="keyword">char</span> *p, <span class="keyword">int</span> len1, <span class="keyword">int</span> len2)</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">int</span> i, j, idx;</div><div class="line">    idx = <span class="number">0</span>;</div><div class="line">    <span class="keyword">for</span> (i=<span class="number">0</span>; i&lt;len1; i++) &#123;</div><div class="line">        <span class="keyword">for</span> (j=<span class="number">0</span>; j&lt;len2; j++) &#123;</div><div class="line">            <span class="keyword">if</span> (p[j] != t[j+i]) &#123;</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">if</span> (j == len2) &#123;</div><div class="line">            <span class="keyword">return</span> i;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">char</span> t[] = <span class="string">"BBC ABCDAB ABCDABCDABDE"</span>;</div><div class="line">    <span class="keyword">char</span> p[] = <span class="string">"ABCDABD"</span>;</div><div class="line">    <span class="keyword">int</span> len1 = <span class="keyword">sizeof</span>(t) - <span class="number">1</span>;</div><div class="line">    <span class="keyword">int</span> len2 = <span class="keyword">sizeof</span>(p) - <span class="number">1</span>;</div><div class="line">    <span class="keyword">int</span> index = native_matcher(t, p, len1, len2);</div><div class="line">    <span class="built_in">printf</span>(<span class="string">"index: %d\n"</span>, index);</div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.xefan.com//archives/83851.html" data-id="ciy7g0eb300g7jhneybnkkpfi" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/匹配算法/">匹配算法</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/算法/">算法</a></li></ul>
 
     </footer>
   </div>
@@ -338,7 +345,54 @@ j        1234567
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com//archives/83853.html" data-id="ciy7g0eb100g4jhnejqlizdag" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83853.html" data-id="ciy8jhsp800g4kcnefu4wlxfd" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/匹配算法/">匹配算法</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/算法/">算法</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-/archives/83851.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83851.html" class="article-date">
+  <time datetime="2013-07-11T00:00:00.000Z" itemprop="datePublished">2013-07-11</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/数据结构和算法/">数据结构和算法</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/83851.html">字符串匹配算法（一）——朴素算法</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>写python代码写习惯了，再来用C代码处理字符串感觉很痛苦。在python中有find、index等函数可以进行字符串匹配，而用C语言就只能自己写了。</p>
+<p>朴素算法思路比较简单，就是将源字符串与目标字符串挨个进行比较，看看在目标字符串中是否包含了源字符串。该算法的匹配时间为O((n-m+1)m)。</p>
+<p>C语言实现如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">native_matcher</span><span class="params">(<span class="keyword">char</span> *t, <span class="keyword">char</span> *p, <span class="keyword">int</span> len1, <span class="keyword">int</span> len2)</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">int</span> i, j, idx;</div><div class="line">    idx = <span class="number">0</span>;</div><div class="line">    <span class="keyword">for</span> (i=<span class="number">0</span>; i&lt;len1; i++) &#123;</div><div class="line">        <span class="keyword">for</span> (j=<span class="number">0</span>; j&lt;len2; j++) &#123;</div><div class="line">            <span class="keyword">if</span> (p[j] != t[j+i]) &#123;</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">if</span> (j == len2) &#123;</div><div class="line">            <span class="keyword">return</span> i;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">char</span> t[] = <span class="string">"BBC ABCDAB ABCDABCDABDE"</span>;</div><div class="line">    <span class="keyword">char</span> p[] = <span class="string">"ABCDABD"</span>;</div><div class="line">    <span class="keyword">int</span> len1 = <span class="keyword">sizeof</span>(t) - <span class="number">1</span>;</div><div class="line">    <span class="keyword">int</span> len2 = <span class="keyword">sizeof</span>(p) - <span class="number">1</span>;</div><div class="line">    <span class="keyword">int</span> index = native_matcher(t, p, len1, len2);</div><div class="line">    <span class="built_in">printf</span>(<span class="string">"index: %d\n"</span>, index);</div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83851.html" data-id="ciy8jhspb00gakcnenp0v72kc" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/匹配算法/">匹配算法</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/算法/">算法</a></li></ul>
@@ -387,7 +441,7 @@ j        1234567
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com//archives/83847.html" data-id="ciy7g0eay00fwjhnekfp04ne4" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83847.html" data-id="ciy8jhsp500fwkcneok9i14ty" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/排序算法/">排序算法</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/算法/">算法</a></li></ul>
@@ -440,7 +494,7 @@ j        1234567
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com//archives/83841.html" data-id="ciy7g0eav00fojhne9ktv8yn4" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83841.html" data-id="ciy8jhsp100fkkcne87ie5nsq" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/排序算法/">排序算法</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/算法/">算法</a></li></ul>
@@ -487,7 +541,7 @@ j        1234567
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com//archives/83849.html" data-id="ciy7g0eb000g0jhnea9v4mkwp" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83849.html" data-id="ciy8jhsp700g0kcneuoahslt6" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/排序算法/">排序算法</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/算法/">算法</a></li></ul>
@@ -536,7 +590,7 @@ j        1234567
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com//archives/83845.html" data-id="ciy7g0eax00fsjhnewyp9og7b" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83845.html" data-id="ciy8jhsp400fskcnechdptzw1" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/排序算法/">排序算法</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/算法/">算法</a></li></ul>
@@ -585,54 +639,7 @@ j        1234567
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com//archives/83838.html" data-id="ciy7g0eat00fkjhne76gpzeqe" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/排序算法/">排序算法</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/算法/">算法</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-/archives/83832.html" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/archives/83832.html" class="article-date">
-  <time datetime="2013-07-09T00:00:00.000Z" itemprop="datePublished">2013-07-09</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/数据结构和算法/">数据结构和算法</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/archives/83832.html">常用的排序算法（二）——插入排序</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>插入排序的平均时间复杂度为O(n<em>n)，最好的情况下为O(n)，最坏情况为O(n</em>n)。</p>
-<p>其基本机理与我们平时打牌时整理手中的牌的做法差不多。把小的牌插到左边，大的牌往右边移。</p>
-<p>用C语言实现如下：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">print_list</span><span class="params">(<span class="keyword">int</span> *<span class="built_in">list</span>, <span class="keyword">int</span> n)</span></span></div><div class="line">&#123;</div><div class="line"></div><div class="line"><span class="keyword">int</span> i;</div><div class="line"><span class="built_in">printf</span>(<span class="string">"[ "</span>);</div><div class="line"><span class="keyword">for</span> (i=<span class="number">0</span>; i&lt;n; i++) &#123;</div><div class="line"><span class="built_in">printf</span>(<span class="string">"%d "</span>, <span class="built_in">list</span>[i]);</div><div class="line">&#125;</div><div class="line"><span class="built_in">printf</span>(<span class="string">"]\n"</span>);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">insertion_sort</span><span class="params">(<span class="keyword">int</span> *base, <span class="keyword">int</span> len)</span></span></div><div class="line">&#123;</div><div class="line"></div><div class="line"><span class="keyword">int</span> i, j, n;</div><div class="line"><span class="keyword">int</span> value;</div><div class="line"><span class="keyword">for</span> (j=<span class="number">1</span>; j&lt;len; j++) &#123;</div><div class="line">i = j - <span class="number">1</span>;</div><div class="line">value = base[j];</div><div class="line"><span class="keyword">while</span> (i&gt;=<span class="number">0</span> &amp;&amp; base[i] &gt; value) &#123;</div><div class="line">base[i+<span class="number">1</span>] = base[i];</div><div class="line">i--;</div><div class="line">&#125;</div><div class="line">base[i+<span class="number">1</span>] = value;</div><div class="line"><span class="built_in">printf</span>(<span class="string">"step %d:"</span>, j);</div><div class="line">print_list(base, len);</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></div><div class="line">&#123;</div><div class="line"><span class="keyword">int</span> a[] = &#123;<span class="number">5</span>, <span class="number">2</span>, <span class="number">4</span>, <span class="number">6</span>, <span class="number">1</span>, <span class="number">3</span>&#125;;</div><div class="line"><span class="keyword">int</span> len = <span class="keyword">sizeof</span>(a) / <span class="keyword">sizeof</span>(<span class="keyword">int</span>);</div><div class="line">insertion_sort(a, len);</div><div class="line"><span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.xefan.com//archives/83832.html" data-id="ciy7g0eas00fhjhnecc8fgtm4" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83838.html" data-id="ciy8jhsp300fokcnevh10mrnw" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/排序算法/">排序算法</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/算法/">算法</a></li></ul>
@@ -679,7 +686,7 @@ j        1234567
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/ARM/" style="font-size: 13.68px;">ARM</a> <a href="/tags/Android/" style="font-size: 10px;">Android</a> <a href="/tags/Arch/" style="font-size: 13.16px;">Arch</a> <a href="/tags/C/" style="font-size: 16.32px;">C</a> <a href="/tags/Django/" style="font-size: 11.05px;">Django</a> <a href="/tags/Dreamweaver/" style="font-size: 10px;">Dreamweaver</a> <a href="/tags/Fedora/" style="font-size: 10.53px;">Fedora</a> <a href="/tags/Flash/" style="font-size: 10px;">Flash</a> <a href="/tags/GObject/" style="font-size: 12.63px;">GObject</a> <a href="/tags/Gentoo/" style="font-size: 10.53px;">Gentoo</a> <a href="/tags/Hash/" style="font-size: 10px;">Hash</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Mac/" style="font-size: 10px;">Mac</a> <a href="/tags/PS/" style="font-size: 12.63px;">PS</a> <a href="/tags/Qt/" style="font-size: 10.53px;">Qt</a> <a href="/tags/Raspberry-pi/" style="font-size: 10px;">Raspberry pi</a> <a href="/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/tags/Ruby/" style="font-size: 18.95px;">Ruby</a> <a href="/tags/Scrapy/" style="font-size: 11.05px;">Scrapy</a> <a href="/tags/TQ2440/" style="font-size: 12.11px;">TQ2440</a> <a href="/tags/USB/" style="font-size: 11.05px;">USB</a> <a href="/tags/VirtualBox/" style="font-size: 11.05px;">VirtualBox</a> <a href="/tags/Web开发/" style="font-size: 16.84px;">Web开发</a> <a href="/tags/WordPress/" style="font-size: 10px;">WordPress</a> <a href="/tags/Xcode/" style="font-size: 10px;">Xcode</a> <a href="/tags/access/" style="font-size: 12.63px;">access</a> <a href="/tags/adobe/" style="font-size: 10px;">adobe</a> <a href="/tags/ajax/" style="font-size: 11.05px;">ajax</a> <a href="/tags/angular/" style="font-size: 13.16px;">angular</a> <a href="/tags/apache/" style="font-size: 10px;">apache</a> <a href="/tags/asp/" style="font-size: 13.16px;">asp</a> <a href="/tags/css/" style="font-size: 10.53px;">css</a> <a href="/tags/firefox/" style="font-size: 11.05px;">firefox</a> <a href="/tags/ftp/" style="font-size: 10px;">ftp</a> <a href="/tags/gcc/" style="font-size: 12.63px;">gcc</a> <a href="/tags/git/" style="font-size: 11.58px;">git</a> <a href="/tags/grub/" style="font-size: 10px;">grub</a> <a href="/tags/gtk/" style="font-size: 17.89px;">gtk</a> <a href="/tags/gulp/" style="font-size: 10px;">gulp</a> <a href="/tags/ibus/" style="font-size: 10px;">ibus</a> <a href="/tags/js/" style="font-size: 15.26px;">js</a> <a href="/tags/mongodb/" style="font-size: 15.79px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 11.58px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/php/" style="font-size: 14.74px;">php</a> <a href="/tags/pygame/" style="font-size: 15.79px;">pygame</a> <a href="/tags/python/" style="font-size: 19.47px;">python</a> <a href="/tags/react/" style="font-size: 11.58px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/ubuntu/" style="font-size: 13.16px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 18.42px;">vim</a> <a href="/tags/vmware/" style="font-size: 10px;">vmware</a> <a href="/tags/w3m/" style="font-size: 10px;">w3m</a> <a href="/tags/windows/" style="font-size: 13.16px;">windows</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/免费/" style="font-size: 10px;">免费</a> <a href="/tags/内核/" style="font-size: 10px;">内核</a> <a href="/tags/匹配算法/" style="font-size: 12.63px;">匹配算法</a> <a href="/tags/单片机/" style="font-size: 10.53px;">单片机</a> <a href="/tags/嵌入式/" style="font-size: 10px;">嵌入式</a> <a href="/tags/开源软件/" style="font-size: 14.21px;">开源软件</a> <a href="/tags/排序算法/" style="font-size: 14.21px;">排序算法</a> <a href="/tags/文件空间/" style="font-size: 10px;">文件空间</a> <a href="/tags/无线网/" style="font-size: 10px;">无线网</a> <a href="/tags/正则式/" style="font-size: 10px;">正则式</a> <a href="/tags/注册机/" style="font-size: 10.53px;">注册机</a> <a href="/tags/游戏/" style="font-size: 14.74px;">游戏</a> <a href="/tags/电脑技巧/" style="font-size: 14.21px;">电脑技巧</a> <a href="/tags/空间/" style="font-size: 10px;">空间</a> <a href="/tags/算法/" style="font-size: 17.37px;">算法</a> <a href="/tags/红旗/" style="font-size: 10px;">红旗</a> <a href="/tags/经典语录/" style="font-size: 10px;">经典语录</a> <a href="/tags/网络日志/" style="font-size: 12.63px;">网络日志</a> <a href="/tags/翻译/" style="font-size: 18.42px;">翻译</a> <a href="/tags/视频教程/" style="font-size: 14.74px;">视频教程</a> <a href="/tags/资源分享/" style="font-size: 15.79px;">资源分享</a> <a href="/tags/转载/" style="font-size: 10.53px;">转载</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
+      <a href="/tags/ARM/" style="font-size: 13.68px;">ARM</a> <a href="/tags/Android/" style="font-size: 10px;">Android</a> <a href="/tags/Arch/" style="font-size: 13.16px;">Arch</a> <a href="/tags/C/" style="font-size: 16.32px;">C</a> <a href="/tags/Django/" style="font-size: 11.05px;">Django</a> <a href="/tags/Dreamweaver/" style="font-size: 10px;">Dreamweaver</a> <a href="/tags/Fedora/" style="font-size: 10.53px;">Fedora</a> <a href="/tags/Flash/" style="font-size: 10px;">Flash</a> <a href="/tags/GObject/" style="font-size: 12.63px;">GObject</a> <a href="/tags/Gentoo/" style="font-size: 10.53px;">Gentoo</a> <a href="/tags/Hash/" style="font-size: 10px;">Hash</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Mac/" style="font-size: 10px;">Mac</a> <a href="/tags/PS/" style="font-size: 12.63px;">PS</a> <a href="/tags/Qt/" style="font-size: 10.53px;">Qt</a> <a href="/tags/Raspberry-pi/" style="font-size: 10px;">Raspberry pi</a> <a href="/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/tags/Ruby/" style="font-size: 18.95px;">Ruby</a> <a href="/tags/Scrapy/" style="font-size: 11.05px;">Scrapy</a> <a href="/tags/TQ2440/" style="font-size: 12.11px;">TQ2440</a> <a href="/tags/USB/" style="font-size: 11.05px;">USB</a> <a href="/tags/VirtualBox/" style="font-size: 11.05px;">VirtualBox</a> <a href="/tags/Web开发/" style="font-size: 16.84px;">Web开发</a> <a href="/tags/WordPress/" style="font-size: 10px;">WordPress</a> <a href="/tags/Xcode/" style="font-size: 10px;">Xcode</a> <a href="/tags/access/" style="font-size: 12.63px;">access</a> <a href="/tags/adobe/" style="font-size: 10px;">adobe</a> <a href="/tags/ajax/" style="font-size: 11.05px;">ajax</a> <a href="/tags/angular/" style="font-size: 13.16px;">angular</a> <a href="/tags/apache/" style="font-size: 10px;">apache</a> <a href="/tags/asp/" style="font-size: 13.16px;">asp</a> <a href="/tags/css/" style="font-size: 10.53px;">css</a> <a href="/tags/firefox/" style="font-size: 11.05px;">firefox</a> <a href="/tags/ftp/" style="font-size: 10px;">ftp</a> <a href="/tags/gcc/" style="font-size: 12.63px;">gcc</a> <a href="/tags/git/" style="font-size: 11.58px;">git</a> <a href="/tags/grub/" style="font-size: 10px;">grub</a> <a href="/tags/gtk/" style="font-size: 17.89px;">gtk</a> <a href="/tags/gulp/" style="font-size: 10px;">gulp</a> <a href="/tags/ibus/" style="font-size: 10px;">ibus</a> <a href="/tags/js/" style="font-size: 15.26px;">js</a> <a href="/tags/mongodb/" style="font-size: 15.79px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 11.58px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/php/" style="font-size: 14.74px;">php</a> <a href="/tags/pygame/" style="font-size: 15.79px;">pygame</a> <a href="/tags/python/" style="font-size: 19.47px;">python</a> <a href="/tags/react/" style="font-size: 11.58px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/ubuntu/" style="font-size: 13.16px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 18.42px;">vim</a> <a href="/tags/vmware/" style="font-size: 10px;">vmware</a> <a href="/tags/w3m/" style="font-size: 10px;">w3m</a> <a href="/tags/windows/" style="font-size: 13.16px;">windows</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/免费/" style="font-size: 10px;">免费</a> <a href="/tags/内核/" style="font-size: 10px;">内核</a> <a href="/tags/匹配算法/" style="font-size: 12.63px;">匹配算法</a> <a href="/tags/单片机/" style="font-size: 10.53px;">单片机</a> <a href="/tags/嵌入式/" style="font-size: 10px;">嵌入式</a> <a href="/tags/开源软件/" style="font-size: 14.21px;">开源软件</a> <a href="/tags/排序算法/" style="font-size: 14.21px;">排序算法</a> <a href="/tags/文件空间/" style="font-size: 10px;">文件空间</a> <a href="/tags/无线网/" style="font-size: 10px;">无线网</a> <a href="/tags/正则式/" style="font-size: 10px;">正则式</a> <a href="/tags/注册机/" style="font-size: 10.53px;">注册机</a> <a href="/tags/游戏/" style="font-size: 14.74px;">游戏</a> <a href="/tags/电脑技巧/" style="font-size: 14.21px;">电脑技巧</a> <a href="/tags/空间/" style="font-size: 10px;">空间</a> <a href="/tags/算法/" style="font-size: 17.37px;">算法</a> <a href="/tags/红旗/" style="font-size: 10px;">红旗</a> <a href="/tags/经典语录/" style="font-size: 10px;">经典语录</a> <a href="/tags/网络日志/" style="font-size: 13.16px;">网络日志</a> <a href="/tags/翻译/" style="font-size: 18.42px;">翻译</a> <a href="/tags/视频教程/" style="font-size: 14.74px;">视频教程</a> <a href="/tags/资源分享/" style="font-size: 15.79px;">资源分享</a> <a href="/tags/转载/" style="font-size: 10.53px;">转载</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
     </div>
   </div>
 
@@ -688,7 +695,7 @@ j        1234567
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05/">May 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/02/">February 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/11/">November 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">October 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">September 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/08/">August 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/07/">July 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/05/">May 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04/">April 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">March 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">January 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/12/">December 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">June 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">May 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">April 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">January 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">October 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/09/">September 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/08/">August 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/07/">July 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/05/">May 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/04/">April 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/03/">March 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/02/">February 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/12/">December 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/11/">November 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/10/">October 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/09/">September 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/08/">August 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/07/">July 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/05/">May 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/04/">April 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/03/">March 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/02/">February 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/01/">January 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/12/">December 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/11/">November 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/10/">October 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/09/">September 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/08/">August 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/07/">July 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/06/">June 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/05/">May 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/04/">April 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/03/">March 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/12/">December 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/11/">November 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/10/">October 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/09/">September 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/08/">August 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/07/">July 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/05/">May 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/12/">December 2008</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/07/">July 2008</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05/">May 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/02/">February 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/11/">November 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">October 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">September 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/08/">August 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/07/">July 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/05/">May 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04/">April 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">March 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">January 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/12/">December 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">June 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">May 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">April 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">January 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">October 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/09/">September 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/08/">August 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/07/">July 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/05/">May 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/04/">April 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/03/">March 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/02/">February 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/12/">December 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/11/">November 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/10/">October 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/09/">September 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/08/">August 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/07/">July 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/05/">May 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/04/">April 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/03/">March 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/02/">February 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/01/">January 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/12/">December 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/11/">November 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/10/">October 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/09/">September 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/08/">August 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/07/">July 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/06/">June 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/05/">May 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/04/">April 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/03/">March 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/12/">December 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/11/">November 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/10/">October 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/09/">September 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/08/">August 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/07/">July 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/05/">May 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/12/">December 2008</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/07/">July 2008</a></li></ul>
     </div>
   </div>
 
@@ -699,6 +706,10 @@ j        1234567
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/archives/84167.html">由octpress迁移到了hexo</a>
+          </li>
         
           <li>
             <a href="/archives/84166.html">通过串口连接raspberry pi</a>
@@ -714,10 +725,6 @@ j        1234567
         
           <li>
             <a href="/archives/84163.html">ReactNative jsbundle管理</a>
-          </li>
-        
-          <li>
-            <a href="/archives/84162.html">ReactNative自动设置开发服务器IP</a>
           </li>
         
       </ul>

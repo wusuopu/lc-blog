@@ -69,6 +69,83 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-/archives/84082.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/84082.html" class="article-date">
+  <time datetime="2014-04-12T00:00:00.000Z" itemprop="datePublished">2014-04-12</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Python栏目/">Python栏目</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/84082.html">使用C语言编写Python扩展1——Hello World</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p></p><p>能够使用C语言编写扩展是Python一大卖点吧，这可以将一些关键的代码使用C来写以提升程序的性能。本文是参考了Python的官方文档整理而来的，同时结合了Python2跟Python3。按照惯例现在先从一个Hello World开始讲解一下写扩展的基本流程。</p><p></p>
+<p></p><p>详细的内容可以参考官方文档：<br><br><a href="https://docs.python.org/2.7/extending/index.html" target="_blank" rel="external">https://docs.python.org/2.7/extending/index.html</a> <br><br><a href="https://docs.python.org/3/extending/index.html" target="_blank" rel="external">https://docs.python.org/3/extending/index.html</a>  </p><p></p>
+<p></p><p><a href="https://docs.python.org/2.7/c-api/index.html" target="_blank" rel="external">https://docs.python.org/2.7/c-api/index.html</a><br><br><a href="https://docs.python.org/3/c-api/index.html" target="_blank" rel="external">https://docs.python.org/3/c-api/index.html</a>  </p><p></p>
+<p></p><p>同时本文中的示例代码可从 <a href="https://github.com/wusuopu/python-c-extension-sample" target="_blank" rel="external">https://github.com/wusuopu/python-c-extension-sample</a> 获取到。  </p><p></p>
+<p></p><p>首先介绍一下我当前的开发环境：<br></p>
+<ul>
+<li>ArchLinux<br></li>
+<li>gcc 4.8.2<br></li>
+<li>glibc 2.19<br></li>
+<li>Python 2.7.6<br></li>
+<li>Python 3.3.5  <p></p><br><h2>开始</h2><br><p>先创建一个新的C代码文件 lc_hello.c。为了能够正常使用python的api，需要导入Python.h这个头文件。</p><br><pre><code>#include &lt;Python.h&gt;<br></code></pre><br><p>然后再定义一个模块的初始化函数。</p><br><pre><code>PyMODINIT_FUNC initlc_hello_world(void)<br>{<br> Py_InitModule(“lc_hello_world”, lc_hello_world_methods);<br> printf(“init lc_hello_world module\n”);<br>}<br></code></pre><br><p>这个函数是用于模块初始化的，即是在第一次使用import语句导入模块时会执行。其函数名必须为initmodule_name这样的格式，在这里我们的模块名为lc_hello_world，所以函数名就是initlc_hello_world。<br><br>在这个函数中又调用了Py_InitModule函数，它执行了模块初始化的操作。Py_InitModule函数传入了两个参数，第一个参数为字符串，表示模块的名称；第二个参数是一个PyMethodDef的结构体数组，表示该模块都具有哪些方法。与Py_InitModule相似的方法还有Py_InitModule3和Py_InitModule4。因此在initlc_hello_world方法之前还需要先定义 lc_hello_world_methods 数组。  </p><br><pre><code>static PyMethodDef lc_hello_world_methods[] = {<br> {“test”, (PyCFunction)test_function, METH_NOARGS, “lc_hello_world extending test”},<br> {“add”, (PyCFunction)add_function, METH_VARARGS, NULL},<br> {NULL, NULL, 0, NULL}<br>};<br></code></pre><br><p>PyMethodDef结构体有四个字段。<br><ul>
+<li>第一个是一个字符串，表示在Python中对应的方法的名称；<br></li>
+<li>第二个是对应的C代码的函数；<br></li>
+<li>第三个是一个标致位，表示该Python方法是否需要参数，METH_NOARGS表示不需要参数，METH_VARARGS表示需要参数；<br></li>
+<li>第四个是一个字符串，它是该方法的<strong>doc</strong>属性，这个不是必须的，可以为NULL。<br><br>PyMethodDef结构体数组最后以 {NULL, NULL, 0, NULL}结尾。（感觉好像不是必须的，但是通常都这么做那我们也这么做吧）  </li></ul></p><br><p><strong>注意</strong>：以上的用法都是针对Python2的，在Python3中又有些不同。<br><br>在Python3中模块的初始化函数的函数名变为了PyInit_module_name这样的形式了，因此这里就需要定义一个函数 PyMODINIT_FUNC PyInit_lc_hello_world。并且还需要返回一个 module 类型的变量。<br><br>其次在Python3中创建module对象的函数也由 Py_InitModule 变为了 PyModule_Create。<br><br>因此在Python3中模块的初始化函数应该定义如下：  </p><br><pre><code>PyMODINIT_FUNC PyInit_lc_hello_world(void)<br>{<br>PyObject <em>m;<br>m = PyModule_Create(&amp;lc_hello_world_module);<br>if (m == NULL)<br>   return NULL;<br>printf(“init lc_hello_world module\n”);<br>return m;<br>}<br></em></code></pre><br><p>PyModule_Create函数需要传入一个 PyModuleDef 类型的指针。<br><br>因此在此之前还需要先定义 lc_hello_world_module 变量。  </p><br><pre><code>static struct PyModuleDef lc_hello_world_module = {<br>PyModuleDef_HEAD_INIT,<br>“lc_hello_world”,        / name of module <em>/<br>NULL,                    /</em> module documentation, may be NULL <em>/<br>-1,                      /</em> size of per-interpreter state of the module, or -1 if the module keeps state in global variables. <em>/<br>lc_hello_world_methods   /</em> A pointer to a table of module-level functions, described by PyMethodDef values. Can be NULL if no functions are present. <em>/<br>};<br></em></code></pre><br><p>在 lc_hello_world_methods 中我们为模块指定了两个方法，接下来我们需要实现这两个方法。  </p><br><pre><code>static PyObject test_function(PyObject <em>self)<br>{<br>PyObject_Print(self, stdout, 0);<br>printf(“lc_hello_world test\n”);<br>Py_INCREF(Py_True);<br>return Py_True;<br>}<br></em></code></pre><br><p>这段代码定义了Python的test方法所对应的C函数。在这个函数中就只执行了一条printf语句，然后就返回了Py_True。<br><br>Py_True即是Python中的True，Py_INCREF函数执行的操作是对Python对象的计数引用值进行加1。与Py_INCREF对应的是Py_DECREF，它是对计数引用减1,并且计数引用为0时就销毁对象并回收内存。  </p><br><pre><code>static PyObject add_function(PyObject <em>self, PyObject </em>args)<br>{<br>int num1, num2;<br>PyObject <em>result=NULL;<br>if (!PyArg_ParseTuple(args, “nn”, &amp;num1, &amp;num2)) {<br>   printf(“传入参数错误！\n”);<br>   return NULL;<br>}<br>result = PyInt_FromLong(num1+num2);<br>return result;<br>}<br></em></code></pre><br><p>这须代码定义了Python的add方法所对应的C函数。该函数需要传入两个整数类型的参数。<br><br>PyArg_ParseTuple是对传入的参数进行解析，关于这个函数的说明请查看Python手册。  </p><br><p><strong>注意</strong>：在Python3中整数都是 long 类型的，因此这里的 PyInt_FromLong 需要改为 PyLong_FromLong，其作用是将C的int类型转为Python的int类型。  </p><br><h2>编译</h2><br><p>扩展模块编写完成后，接下来就是对其进行编译了。先编写一个 setup.py 脚本。  </p><br><pre><code>#!/usr/bin/env python<br>#-- coding:utf-8 -*-</code></pre></li>
+</ul>
+
+
+<p>from setuptools import setup, Extension</p>
+<p>hello_world = Extension(‘lc_hello_world’, sources=[“lc_hello.c”])<br>setup(ext_modules=[hello_world])<br></p>
+<p></p><p>然后再执行命令进行编译：</p><p></p>
+<pre><code>$ python setup.py build
+</code></pre>
+<p>执行成功后会在当前目录下的build目录中生成扩展模块文件。</p>
+<h2>测试</h2>
+<p>最后就是编写一个小程序来测试刚刚的模块是否可用。</p>
+<pre><code>import lc_hello_world
+
+print(lc_hello_world.test.__doc__)
+print(lc_hello_world.add.__doc__)
+print(lc_hello_world.test())
+print(lc_hello_world.add(1, 2))
+print(lc_hello_world.add(1, '2'))    # 这个会报错
+</code></pre>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/84082.html" data-id="ciy8jhsrq00m5kcne9j3c6iwk" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/C/">C</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-/archives/84076.html" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/84076.html" class="article-date">
@@ -100,7 +177,84 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com//archives/84076.html" data-id="ciy7g0edr00m1jhnesoms25qc" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84076.html" data-id="ciy8jhsro00m1kcnek4cd583d" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-/archives/84072.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/84072.html" class="article-date">
+  <time datetime="2014-04-05T00:00:00.000Z" itemprop="datePublished">2014-04-05</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/数据库/">数据库</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/84072.html">mongoengine教程(4)——文件存储</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p></p><p>MongoDB的GridFS支持直接在数据库中存储文件。要在MongoEngine中使用GridFS，只要使用 FileField 对象即可。以下是一个例子：</p><p></p>
+<pre><code>class Animal(Document):
+    genus = StringField()
+    family = StringField()
+    photo = FileField()
+
+marmot = Animal(genus='Marmota', family='Sciuridae')
+
+marmot_photo = open('gtk.png', 'rb')
+marmot.photo.put(marmot_photo, content_type = 'image/png')
+marmot.save()
+</code></pre>
+<p>这个例子将 gtk.png 这个图片存入了数据库中。<br>
+文件的读取也很简单：</p>
+<pre><code>marmot = Animal.objects(genus='Marmota').first()
+photo = marmot.photo.read()
+content_type = marmot.photo.content_type
+</code></pre>
+<p>FileField不仅可以存储文件，还可以用来存储数据流。只是操作上略微不同。</p>
+<p>要存储数据流，首先先创建一个新的文件，然后再往里面写入数据。</p>
+<pre><code>marmot.photo.new_file()
+marmot.photo.write('some_image_data')
+marmot.photo.write('some_more_image_data')
+marmot.photo.close()
+marmot.save()
+</code></pre>
+<p>如果要删除存储在数据库中的文件，只需要调用该文件对象的 delete 方法：</p>
+<pre><code>marmot.photo.delete()
+</code></pre>
+<p>注意：一条文档记录中的FileField字段只保存了对GridFS集合中该文件的ID引用。这意味着如果该文档被删除了，对用的文件不会被删除。因此在删除这类文档时需要小心，以免出现孤立文件。</p>
+<p>对于已存储的文件可以进行替换修改：</p>
+<pre><code>another_marmot = open('python.png', 'rb')
+marmot.photo.replace(another_marmot, content_type='image/png')
+</code></pre>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/84072.html" data-id="ciy8jhsrn00lykcne8xo7arqa" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -207,84 +361,7 @@ num_users = User.objects.count()
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com//archives/84069.html" data-id="ciy7g0edo00lujhnedzk1a5fa" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-/archives/84072.html" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/archives/84072.html" class="article-date">
-  <time datetime="2014-04-05T00:00:00.000Z" itemprop="datePublished">2014-04-05</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/数据库/">数据库</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/archives/84072.html">mongoengine教程(4)——文件存储</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p></p><p>MongoDB的GridFS支持直接在数据库中存储文件。要在MongoEngine中使用GridFS，只要使用 FileField 对象即可。以下是一个例子：</p><p></p>
-<pre><code>class Animal(Document):
-    genus = StringField()
-    family = StringField()
-    photo = FileField()
-
-marmot = Animal(genus='Marmota', family='Sciuridae')
-
-marmot_photo = open('gtk.png', 'rb')
-marmot.photo.put(marmot_photo, content_type = 'image/png')
-marmot.save()
-</code></pre>
-<p>这个例子将 gtk.png 这个图片存入了数据库中。<br>
-文件的读取也很简单：</p>
-<pre><code>marmot = Animal.objects(genus='Marmota').first()
-photo = marmot.photo.read()
-content_type = marmot.photo.content_type
-</code></pre>
-<p>FileField不仅可以存储文件，还可以用来存储数据流。只是操作上略微不同。</p>
-<p>要存储数据流，首先先创建一个新的文件，然后再往里面写入数据。</p>
-<pre><code>marmot.photo.new_file()
-marmot.photo.write('some_image_data')
-marmot.photo.write('some_more_image_data')
-marmot.photo.close()
-marmot.save()
-</code></pre>
-<p>如果要删除存储在数据库中的文件，只需要调用该文件对象的 delete 方法：</p>
-<pre><code>marmot.photo.delete()
-</code></pre>
-<p>注意：一条文档记录中的FileField字段只保存了对GridFS集合中该文件的ID引用。这意味着如果该文档被删除了，对用的文件不会被删除。因此在删除这类文档时需要小心，以免出现孤立文件。</p>
-<p>对于已存储的文件可以进行替换修改：</p>
-<pre><code>another_marmot = open('python.png', 'rb')
-marmot.photo.replace(another_marmot, content_type='image/png')
-</code></pre>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.xefan.com//archives/84072.html" data-id="ciy7g0edp00lyjhnes9zxkgs1" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84069.html" data-id="ciy8jhsrl00lukcnebj0bu63j" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -328,7 +405,7 @@ marmot.photo.replace(another_marmot, content_type='image/png')
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com//archives/84066.html" data-id="ciy7g0edm00lrjhne8h98rjhq" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84066.html" data-id="ciy8jhsrk00lrkcneq33zwqvp" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -372,7 +449,7 @@ marmot.photo.replace(another_marmot, content_type='image/png')
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com//archives/84063.html" data-id="ciy7g0edl00lnjhneks6hpmrx" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84063.html" data-id="ciy8jhsrj00lnkcnewxl4uoix" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -492,7 +569,7 @@ print(db.test.find_one())
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com//archives/84060.html" data-id="ciy7g0edj00lkjhnecixr923d" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84060.html" data-id="ciy8jhsrh00lkkcnese1zvoad" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -592,7 +669,7 @@ db.posts.find_one({"author": "Mike"})
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com//archives/84053.html" data-id="ciy7g0edi00lgjhne2shhxx29" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84053.html" data-id="ciy8jhsrf00ldkcne28prwngi" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -636,7 +713,7 @@ db.posts.find_one({"author": "Mike"})
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com//archives/84057.html" data-id="ciy7g0edf00l9jhnevy6hglti" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84057.html" data-id="ciy8jhsrg00lgkcnegmbgo9lp" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -690,87 +767,11 @@ $ mkgitignore vim,python .gitignore
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com//archives/84048.html" data-id="ciy7g0edd00l5jhneeu05yldf" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84048.html" data-id="ciy8jhsre00l9kcnejdwfck7x" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/git/">git</a></li></ul>
 
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-/archives/84045.html" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/archives/84045.html" class="article-date">
-  <time datetime="2014-03-01T00:00:00.000Z" itemprop="datePublished">2014-03-01</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/资源分享/">资源分享</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/archives/84045.html">Linux下VNC使用</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p></p><h3>安装</h3><p></p>
-<p></p><p>VNC (Virtual Network Computer)是虚拟网络计算机的缩写。VNC 是一款优秀的远程控制工具软件。<br><br>VNC程序有多个软件包可选择，例如执行以下命令进行安装：</p><p></p>
-<pre><code>$ sudo apt-get install vnc4server
-$ sudo pacman -S tigervnc
-</code></pre>
-<h3>启动服务器程序</h3>
-<p>修改$HOME/.vnc/xstartup配置文件，我是用的xfce，配置如下：</p>
-<pre><code>#!/bin/sh
-
-# Uncomment the following two lines for normal desktop:
-# unset SESSION_MANAGER
-# exec /etc/X11/xinit/xinitrc
-
-[ -x /etc/vnc/xstartup ] &amp;&amp; exec /etc/vnc/xstartup
-[ -r $HOME/.Xresources ] &amp;&amp; xrdb $HOME/.Xresources
-xsetroot -solid grey
-vncconfig -iconic &amp;
-startxfce4 &amp;
-</code></pre>
-<p>然后运行服务程序，首次运行需要先设置密码：</p>
-<pre><code>$ vncserver
-</code></pre>
-<h3>启动客户端程序</h3>
-<p>执行如下命令链接vnc服务：</p>
-<pre><code>$ vncviewer &lt;host&gt;:&lt;DISPLAY&gt;
-</code></pre>
-<p>例如要链接到10.0.0.101的1号DISPLAY，则是：</p>
-<pre><code>$ vncviewer 10.0.0.101:1
-</code></pre>
-<p>然后根据提示输入密码即可。</p>
-<h3>退出程序</h3>
-<p>如果要退出客户端程序，直接将程序窗口关闭即可。<br>
-如果要退出服务端程序，则在服务端执行命令：  </p>
-<pre><code>$ vncserver -kill :1
-</code></pre>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.xefan.com//archives/84045.html" data-id="ciy7g0edh00ldjhneasx5jdag" class="article-share-link">Share</a>
-      
-      
     </footer>
   </div>
   
@@ -813,7 +814,7 @@ startxfce4 &amp;
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/ARM/" style="font-size: 13.68px;">ARM</a> <a href="/tags/Android/" style="font-size: 10px;">Android</a> <a href="/tags/Arch/" style="font-size: 13.16px;">Arch</a> <a href="/tags/C/" style="font-size: 16.32px;">C</a> <a href="/tags/Django/" style="font-size: 11.05px;">Django</a> <a href="/tags/Dreamweaver/" style="font-size: 10px;">Dreamweaver</a> <a href="/tags/Fedora/" style="font-size: 10.53px;">Fedora</a> <a href="/tags/Flash/" style="font-size: 10px;">Flash</a> <a href="/tags/GObject/" style="font-size: 12.63px;">GObject</a> <a href="/tags/Gentoo/" style="font-size: 10.53px;">Gentoo</a> <a href="/tags/Hash/" style="font-size: 10px;">Hash</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Mac/" style="font-size: 10px;">Mac</a> <a href="/tags/PS/" style="font-size: 12.63px;">PS</a> <a href="/tags/Qt/" style="font-size: 10.53px;">Qt</a> <a href="/tags/Raspberry-pi/" style="font-size: 10px;">Raspberry pi</a> <a href="/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/tags/Ruby/" style="font-size: 18.95px;">Ruby</a> <a href="/tags/Scrapy/" style="font-size: 11.05px;">Scrapy</a> <a href="/tags/TQ2440/" style="font-size: 12.11px;">TQ2440</a> <a href="/tags/USB/" style="font-size: 11.05px;">USB</a> <a href="/tags/VirtualBox/" style="font-size: 11.05px;">VirtualBox</a> <a href="/tags/Web开发/" style="font-size: 16.84px;">Web开发</a> <a href="/tags/WordPress/" style="font-size: 10px;">WordPress</a> <a href="/tags/Xcode/" style="font-size: 10px;">Xcode</a> <a href="/tags/access/" style="font-size: 12.63px;">access</a> <a href="/tags/adobe/" style="font-size: 10px;">adobe</a> <a href="/tags/ajax/" style="font-size: 11.05px;">ajax</a> <a href="/tags/angular/" style="font-size: 13.16px;">angular</a> <a href="/tags/apache/" style="font-size: 10px;">apache</a> <a href="/tags/asp/" style="font-size: 13.16px;">asp</a> <a href="/tags/css/" style="font-size: 10.53px;">css</a> <a href="/tags/firefox/" style="font-size: 11.05px;">firefox</a> <a href="/tags/ftp/" style="font-size: 10px;">ftp</a> <a href="/tags/gcc/" style="font-size: 12.63px;">gcc</a> <a href="/tags/git/" style="font-size: 11.58px;">git</a> <a href="/tags/grub/" style="font-size: 10px;">grub</a> <a href="/tags/gtk/" style="font-size: 17.89px;">gtk</a> <a href="/tags/gulp/" style="font-size: 10px;">gulp</a> <a href="/tags/ibus/" style="font-size: 10px;">ibus</a> <a href="/tags/js/" style="font-size: 15.26px;">js</a> <a href="/tags/mongodb/" style="font-size: 15.79px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 11.58px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/php/" style="font-size: 14.74px;">php</a> <a href="/tags/pygame/" style="font-size: 15.79px;">pygame</a> <a href="/tags/python/" style="font-size: 19.47px;">python</a> <a href="/tags/react/" style="font-size: 11.58px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/ubuntu/" style="font-size: 13.16px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 18.42px;">vim</a> <a href="/tags/vmware/" style="font-size: 10px;">vmware</a> <a href="/tags/w3m/" style="font-size: 10px;">w3m</a> <a href="/tags/windows/" style="font-size: 13.16px;">windows</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/免费/" style="font-size: 10px;">免费</a> <a href="/tags/内核/" style="font-size: 10px;">内核</a> <a href="/tags/匹配算法/" style="font-size: 12.63px;">匹配算法</a> <a href="/tags/单片机/" style="font-size: 10.53px;">单片机</a> <a href="/tags/嵌入式/" style="font-size: 10px;">嵌入式</a> <a href="/tags/开源软件/" style="font-size: 14.21px;">开源软件</a> <a href="/tags/排序算法/" style="font-size: 14.21px;">排序算法</a> <a href="/tags/文件空间/" style="font-size: 10px;">文件空间</a> <a href="/tags/无线网/" style="font-size: 10px;">无线网</a> <a href="/tags/正则式/" style="font-size: 10px;">正则式</a> <a href="/tags/注册机/" style="font-size: 10.53px;">注册机</a> <a href="/tags/游戏/" style="font-size: 14.74px;">游戏</a> <a href="/tags/电脑技巧/" style="font-size: 14.21px;">电脑技巧</a> <a href="/tags/空间/" style="font-size: 10px;">空间</a> <a href="/tags/算法/" style="font-size: 17.37px;">算法</a> <a href="/tags/红旗/" style="font-size: 10px;">红旗</a> <a href="/tags/经典语录/" style="font-size: 10px;">经典语录</a> <a href="/tags/网络日志/" style="font-size: 12.63px;">网络日志</a> <a href="/tags/翻译/" style="font-size: 18.42px;">翻译</a> <a href="/tags/视频教程/" style="font-size: 14.74px;">视频教程</a> <a href="/tags/资源分享/" style="font-size: 15.79px;">资源分享</a> <a href="/tags/转载/" style="font-size: 10.53px;">转载</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
+      <a href="/tags/ARM/" style="font-size: 13.68px;">ARM</a> <a href="/tags/Android/" style="font-size: 10px;">Android</a> <a href="/tags/Arch/" style="font-size: 13.16px;">Arch</a> <a href="/tags/C/" style="font-size: 16.32px;">C</a> <a href="/tags/Django/" style="font-size: 11.05px;">Django</a> <a href="/tags/Dreamweaver/" style="font-size: 10px;">Dreamweaver</a> <a href="/tags/Fedora/" style="font-size: 10.53px;">Fedora</a> <a href="/tags/Flash/" style="font-size: 10px;">Flash</a> <a href="/tags/GObject/" style="font-size: 12.63px;">GObject</a> <a href="/tags/Gentoo/" style="font-size: 10.53px;">Gentoo</a> <a href="/tags/Hash/" style="font-size: 10px;">Hash</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Mac/" style="font-size: 10px;">Mac</a> <a href="/tags/PS/" style="font-size: 12.63px;">PS</a> <a href="/tags/Qt/" style="font-size: 10.53px;">Qt</a> <a href="/tags/Raspberry-pi/" style="font-size: 10px;">Raspberry pi</a> <a href="/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/tags/Ruby/" style="font-size: 18.95px;">Ruby</a> <a href="/tags/Scrapy/" style="font-size: 11.05px;">Scrapy</a> <a href="/tags/TQ2440/" style="font-size: 12.11px;">TQ2440</a> <a href="/tags/USB/" style="font-size: 11.05px;">USB</a> <a href="/tags/VirtualBox/" style="font-size: 11.05px;">VirtualBox</a> <a href="/tags/Web开发/" style="font-size: 16.84px;">Web开发</a> <a href="/tags/WordPress/" style="font-size: 10px;">WordPress</a> <a href="/tags/Xcode/" style="font-size: 10px;">Xcode</a> <a href="/tags/access/" style="font-size: 12.63px;">access</a> <a href="/tags/adobe/" style="font-size: 10px;">adobe</a> <a href="/tags/ajax/" style="font-size: 11.05px;">ajax</a> <a href="/tags/angular/" style="font-size: 13.16px;">angular</a> <a href="/tags/apache/" style="font-size: 10px;">apache</a> <a href="/tags/asp/" style="font-size: 13.16px;">asp</a> <a href="/tags/css/" style="font-size: 10.53px;">css</a> <a href="/tags/firefox/" style="font-size: 11.05px;">firefox</a> <a href="/tags/ftp/" style="font-size: 10px;">ftp</a> <a href="/tags/gcc/" style="font-size: 12.63px;">gcc</a> <a href="/tags/git/" style="font-size: 11.58px;">git</a> <a href="/tags/grub/" style="font-size: 10px;">grub</a> <a href="/tags/gtk/" style="font-size: 17.89px;">gtk</a> <a href="/tags/gulp/" style="font-size: 10px;">gulp</a> <a href="/tags/ibus/" style="font-size: 10px;">ibus</a> <a href="/tags/js/" style="font-size: 15.26px;">js</a> <a href="/tags/mongodb/" style="font-size: 15.79px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 11.58px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/php/" style="font-size: 14.74px;">php</a> <a href="/tags/pygame/" style="font-size: 15.79px;">pygame</a> <a href="/tags/python/" style="font-size: 19.47px;">python</a> <a href="/tags/react/" style="font-size: 11.58px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/ubuntu/" style="font-size: 13.16px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 18.42px;">vim</a> <a href="/tags/vmware/" style="font-size: 10px;">vmware</a> <a href="/tags/w3m/" style="font-size: 10px;">w3m</a> <a href="/tags/windows/" style="font-size: 13.16px;">windows</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/免费/" style="font-size: 10px;">免费</a> <a href="/tags/内核/" style="font-size: 10px;">内核</a> <a href="/tags/匹配算法/" style="font-size: 12.63px;">匹配算法</a> <a href="/tags/单片机/" style="font-size: 10.53px;">单片机</a> <a href="/tags/嵌入式/" style="font-size: 10px;">嵌入式</a> <a href="/tags/开源软件/" style="font-size: 14.21px;">开源软件</a> <a href="/tags/排序算法/" style="font-size: 14.21px;">排序算法</a> <a href="/tags/文件空间/" style="font-size: 10px;">文件空间</a> <a href="/tags/无线网/" style="font-size: 10px;">无线网</a> <a href="/tags/正则式/" style="font-size: 10px;">正则式</a> <a href="/tags/注册机/" style="font-size: 10.53px;">注册机</a> <a href="/tags/游戏/" style="font-size: 14.74px;">游戏</a> <a href="/tags/电脑技巧/" style="font-size: 14.21px;">电脑技巧</a> <a href="/tags/空间/" style="font-size: 10px;">空间</a> <a href="/tags/算法/" style="font-size: 17.37px;">算法</a> <a href="/tags/红旗/" style="font-size: 10px;">红旗</a> <a href="/tags/经典语录/" style="font-size: 10px;">经典语录</a> <a href="/tags/网络日志/" style="font-size: 13.16px;">网络日志</a> <a href="/tags/翻译/" style="font-size: 18.42px;">翻译</a> <a href="/tags/视频教程/" style="font-size: 14.74px;">视频教程</a> <a href="/tags/资源分享/" style="font-size: 15.79px;">资源分享</a> <a href="/tags/转载/" style="font-size: 10.53px;">转载</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
     </div>
   </div>
 
@@ -822,7 +823,7 @@ startxfce4 &amp;
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05/">May 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/02/">February 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/11/">November 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">October 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">September 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/08/">August 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/07/">July 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/05/">May 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04/">April 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">March 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">January 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/12/">December 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">June 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">May 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">April 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">January 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">October 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/09/">September 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/08/">August 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/07/">July 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/05/">May 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/04/">April 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/03/">March 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/02/">February 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/12/">December 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/11/">November 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/10/">October 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/09/">September 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/08/">August 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/07/">July 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/05/">May 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/04/">April 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/03/">March 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/02/">February 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/01/">January 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/12/">December 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/11/">November 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/10/">October 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/09/">September 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/08/">August 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/07/">July 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/06/">June 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/05/">May 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/04/">April 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/03/">March 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/12/">December 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/11/">November 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/10/">October 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/09/">September 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/08/">August 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/07/">July 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/05/">May 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/12/">December 2008</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/07/">July 2008</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05/">May 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/02/">February 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/11/">November 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">October 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">September 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/08/">August 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/07/">July 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/05/">May 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04/">April 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">March 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">January 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/12/">December 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">June 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">May 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">April 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">January 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">October 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/09/">September 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/08/">August 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/07/">July 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/05/">May 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/04/">April 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/03/">March 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/02/">February 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/12/">December 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/11/">November 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/10/">October 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/09/">September 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/08/">August 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/07/">July 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/05/">May 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/04/">April 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/03/">March 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/02/">February 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/01/">January 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/12/">December 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/11/">November 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/10/">October 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/09/">September 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/08/">August 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/07/">July 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/06/">June 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/05/">May 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/04/">April 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/03/">March 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/12/">December 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/11/">November 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/10/">October 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/09/">September 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/08/">August 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/07/">July 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/05/">May 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/12/">December 2008</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/07/">July 2008</a></li></ul>
     </div>
   </div>
 
@@ -833,6 +834,10 @@ startxfce4 &amp;
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/archives/84167.html">由octpress迁移到了hexo</a>
+          </li>
         
           <li>
             <a href="/archives/84166.html">通过串口连接raspberry pi</a>
@@ -848,10 +853,6 @@ startxfce4 &amp;
         
           <li>
             <a href="/archives/84163.html">ReactNative jsbundle管理</a>
-          </li>
-        
-          <li>
-            <a href="/archives/84162.html">ReactNative自动设置开发服务器IP</a>
           </li>
         
       </ul>
