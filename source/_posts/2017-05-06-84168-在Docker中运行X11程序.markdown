@@ -1,0 +1,41 @@
+---
+layout: 'post'
+title: '在Docker中运行X11程序'
+date: '2017-05-06T11:45:30.987Z'
+comments: true
+post_id: 84168
+permalink: '/archives/84168.html'
+categories:
+tags: ["Docker"]
+---
+
+如果是Linux系统的话，相对比较方便。先构建一个带gui各应的docker image，然后将
+本机的X11 sock挂载到container内，
+`docker run -ti --rm -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix chrome`
+
+如果是mac OS系统的话，相对麻烦一些。
+
+1.安装所需的软件：
+
+```
+brew install socat
+brew cask install xquartz
+```
+
+2.依次运行刚刚安装的两个程序：
+
+```
+socat TCP-LISTEN:6000,reuseaddr,fork UNIX-CLIENT:\"$DISPLAY\"
+open -a XQuartz
+```
+
+3.设置X11， `XQuartz` -> `Preference` -> `Security` -> `Allow connections from network clients`
+
+4.`docker run --rm -e DISPLAY=`ifconfig | grep "inet\ " | tail -1 | cut -d " " -f 2`:0 chrome`
+
+
+对于已经启动了的container，可以在container内执行命令 `export DISPLAY=<ip>:0` 来设置 DISPLAY 从而使用本机的 X11 服务。
+
+倘若当前你的 mac OS 没有连接网络，那么可能就没有ip地址供container内访问。
+此时也许可以执行命令： `sudo ifconfig lo0 alias 10.200.10.1/24` 来手动设置一个ip。
+然后在container内再设置 `export DISPLAY=10.200.10.1:0` 。
