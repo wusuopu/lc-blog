@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.xefan.com/"/>
-  <updated>2017-01-22T10:44:58.000Z</updated>
+  <updated>2017-05-19T09:54:11.000Z</updated>
   <id>http://www.xefan.com/</id>
   
   <author>
@@ -14,6 +14,36 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>在Docker中运行X11程序</title>
+    <link href="http://www.xefan.com/archives/84168.html"/>
+    <id>http://www.xefan.com/archives/84168.html</id>
+    <published>2017-05-06T19:45:30.987Z</published>
+    <updated>2017-05-19T09:54:11.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>如果是Linux系统的话，相对比较方便。先构建一个带gui各应的docker image，然后将<br>本机的X11 sock挂载到container内，<br><code>docker run -ti --rm -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix chrome</code></p>
+<p>如果是mac OS系统的话，相对麻烦一些。</p>
+<p>1.安装所需的软件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">brew install socat</div><div class="line">brew cask install xquartz</div></pre></td></tr></table></figure>
+<p>2.依次运行刚刚安装的两个程序：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">socat TCP-LISTEN:6000,reuseaddr,fork UNIX-CLIENT:\&quot;$DISPLAY\&quot;</div><div class="line">open -a XQuartz</div></pre></td></tr></table></figure>
+<p>3.设置X11， <code>XQuartz</code> -&gt; <code>Preference</code> -&gt; <code>Security</code> -&gt; <code>Allow connections from network clients</code></p>
+<p>4.<code>docker run --rm -e DISPLAY=</code>ifconfig | grep “inet\ “ | tail -1 | cut -d “ “ -f 2<code>:0 chrome</code></p>
+<p>对于已经启动了的container，可以在container内执行命令 <code>export DISPLAY=&lt;ip&gt;:0</code> 来设置 DISPLAY 从而使用本机的 X11 服务。</p>
+<p>倘若当前你的 mac OS 没有连接网络，那么可能就没有ip地址供container内访问。<br>此时也许可以执行命令： <code>sudo ifconfig lo0 alias 10.200.10.1/24</code> 来手动设置一个ip。<br>然后在container内再设置 <code>export DISPLAY=10.200.10.1:0</code> 。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;如果是Linux系统的话，相对比较方便。先构建一个带gui各应的docker image，然后将&lt;br&gt;本机的X11 sock挂载到container内，&lt;br&gt;&lt;code&gt;docker run -ti --rm -e DISPLAY=$DISPLAY -v /tmp/.X
+    
+    </summary>
+    
+    
+      <category term="Docker" scheme="http://www.xefan.com/tags/Docker/"/>
+    
+  </entry>
   
   <entry>
     <title>由octpress迁移到了hexo</title>
@@ -742,37 +772,6 @@
     <summary type="html">
     
       &lt;h2 id=&quot;双向绑定&quot;&gt;&lt;a href=&quot;#双向绑定&quot; class=&quot;headerlink&quot; title=&quot;双向绑定&quot;&gt;&lt;/a&gt;双向绑定&lt;/h2&gt;&lt;p&gt;使用 &lt;code&gt;ngModel&lt;/code&gt; 指令将输入框与 model 进行绑定，如： &lt;code&gt;&amp;lt;input 
-    
-    </summary>
-    
-      <category term="前端相关" scheme="http://www.xefan.com/categories/%E5%89%8D%E7%AB%AF%E7%9B%B8%E5%85%B3/"/>
-    
-    
-      <category term="js" scheme="http://www.xefan.com/tags/js/"/>
-    
-      <category term="angular" scheme="http://www.xefan.com/tags/angular/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>AngularJS学习笔记2——模板</title>
-    <link href="http://www.xefan.com/archives/84148.html"/>
-    <id>http://www.xefan.com/archives/84148.html</id>
-    <published>2015-08-14T22:00:21.000Z</published>
-    <updated>2017-01-21T16:20:19.000Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="ngRepeat"><a href="#ngRepeat" class="headerlink" title="ngRepeat"></a>ngRepeat</h2><p>对于一些需要循环遍历的对象可以使用 <code>ngRepeat</code> 指令。 如：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">&lt;li ng-repeat=&quot;msg in messages&quot;&gt;&#123;&#123;$index&#125;&#125; &#123;&#123;msg&#125;&#125;&lt;/li&gt;</div><div class="line"></div><div class="line">// 对于 messages 数组进行遍历</div><div class="line">$scope.messages =  [</div><div class="line">  &quot;第一条消息&quot;,</div><div class="line">  &quot;第二条消息&quot;,</div><div class="line">  &quot;第三条消息&quot;,</div><div class="line">  &quot;第四条消息&quot;,</div><div class="line">  &quot;第五条消息&quot;</div><div class="line">];</div></pre></td></tr></table></figure>
-<h2 id="ngSwitch"><a href="#ngSwitch" class="headerlink" title="ngSwitch"></a>ngSwitch</h2><p>使用 <code>ngSwitch</code> 指令在不同条件下显示不同内容。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">&lt;div ng-controller=&quot;ExampleController&quot;&gt;</div><div class="line">  &lt;select ng-model=&quot;selection&quot; ng-options=&quot;item for item in items&quot;&gt;</div><div class="line">  &lt;/select&gt;</div><div class="line">  &lt;code&gt;selection=&#123;&#123;selection&#125;&#125;&lt;/code&gt;</div><div class="line">  &lt;hr/&gt;</div><div class="line">  &lt;div class=&quot;animate-switch-container&quot;</div><div class="line">    ng-switch=&quot;selection&quot;&gt;</div><div class="line">      &lt;div class=&quot;animate-switch&quot; ng-switch-when=&quot;settings&quot;&gt;Settings Div&lt;/div&gt;</div><div class="line">      &lt;div class=&quot;animate-switch&quot; ng-switch-when=&quot;home&quot;&gt;Home Span&lt;/div&gt;</div><div class="line">      &lt;div class=&quot;animate-switch&quot; ng-switch-default&gt;default&lt;/div&gt;</div><div class="line">  &lt;/div&gt;</div><div class="line">&lt;/div&gt;</div><div class="line"></div><div class="line">&lt;script type=&quot;text/javascript&quot;&gt;</div><div class="line">angular.module(&apos;myApp&apos;, []).controller(&apos;ExampleController&apos;, [&apos;$scope&apos;, function($scope) &#123;</div><div class="line">  $scope.items = [&apos;settings&apos;, &apos;home&apos;, &apos;other&apos;];</div><div class="line">  $scope.selection = $scope.items[0];</div><div class="line">&#125;]);</div><div class="line">&lt;/script&gt;</div></pre></td></tr></table></figure>
-<h2 id="Filter"><a href="#Filter" class="headerlink" title="Filter"></a>Filter</h2><p>使用 <code>filter</code> 指令过滤需要的内容，基本形式： <code>{{ expression | filter }}</code><br>如果有用过其他模板引擎的话（如：Jinja）应该很好理解的。</p>
-<p>angularjs 提供了一些内置的过滤器：date, json, lowercase, uppercase 等。</p>
-<h2 id="ngIf"><a href="#ngIf" class="headerlink" title="ngIf"></a>ngIf</h2><p>基本形式： <code>&lt;ANY ng-if=&quot;expression&quot;&gt; ... &lt;/ANY&gt;</code><br>当 <code>expression</code> 的值为真时才会输出该标签。</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;ngRepeat&quot;&gt;&lt;a href=&quot;#ngRepeat&quot; class=&quot;headerlink&quot; title=&quot;ngRepeat&quot;&gt;&lt;/a&gt;ngRepeat&lt;/h2&gt;&lt;p&gt;对于一些需要循环遍历的对象可以使用 &lt;code&gt;ngRepeat&lt;/code&gt; 指令。 如：
     
     </summary>
     
