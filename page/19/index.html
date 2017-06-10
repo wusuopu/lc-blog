@@ -58,7 +58,7 @@
         
           <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Zoeken"></a>
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.xefan.com"></form>
@@ -68,6 +68,217 @@
 </header>
       <div class="outer">
         <section id="main">
+  
+    <article id="post-/archives/83610.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83610.html" class="article-date">
+  <time datetime="2011-09-17T00:00:00.000Z" itemprop="datePublished">2011-09-17</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/嵌入式栏目/">嵌入式栏目</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/83610.html">I2C串口总线驱动程序(汇编语言)</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div></pre></td><td class="code"><pre><div class="line">;I2C串口总线驱动程序</div><div class="line">;作者：龙昌</div><div class="line">;博客：http://www.xefan.com</div><div class="line">;请根据自己的实际情况定义SCL和SDA</div><div class="line"></div><div class="line">;延时4.7us以上，我的是12MHz的晶振，请根据自己的晶振频率相应增删NOP条数</div><div class="line">_NOP:   NOP</div><div class="line">        NOP</div><div class="line">        NOP</div><div class="line">        NOP</div><div class="line">        NOP</div><div class="line">        RET</div><div class="line"></div><div class="line">;发送开始信号</div><div class="line">I2CB:   SETB SDA</div><div class="line">        NOP</div><div class="line">        SETB SCL</div><div class="line">        ACALL _NOP</div><div class="line">        CLR SDA</div><div class="line">        ACALL _NOP</div><div class="line">        CLR SCL</div><div class="line">        RET</div><div class="line"></div><div class="line">;发送结束信号</div><div class="line">I2CE:   CLR SDA</div><div class="line">        NOP</div><div class="line">        SETB SCL</div><div class="line">        ACALL _NOP</div><div class="line">        SETB SDA</div><div class="line">        ACALL _NOP</div><div class="line">        CLR SCL</div><div class="line">        RET</div><div class="line"></div><div class="line">;发送应答(ACK)</div><div class="line">MACK:   CLR SDA</div><div class="line">        NOP</div><div class="line">        SETB SCL</div><div class="line">        ACALL _NOP</div><div class="line">        CLR SCL</div><div class="line">        RET</div><div class="line"></div><div class="line">;发送非应答(/ACK)</div><div class="line">MNACK:  SETB SDA</div><div class="line">        NOP</div><div class="line">        SETB SCL</div><div class="line">        ACALL _NOP</div><div class="line">        CLR SCL</div><div class="line">        RET</div><div class="line"></div><div class="line">;发送一个字节数据，要发送的数据存放在A寄存器中</div><div class="line">SendB:  MOV R5,#8</div><div class="line">SendB1: RLC A</div><div class="line">        MOV SDA,C</div><div class="line">        NOP</div><div class="line">        SETB SCL</div><div class="line">        ACALL _NOP</div><div class="line">        CLR SCL</div><div class="line">        DJNZ R5,SendB1</div><div class="line">        ;接收ACK</div><div class="line">        SETB SDA</div><div class="line">        NOP</div><div class="line">        SETB SCL</div><div class="line">        NOP</div><div class="line">        NOP</div><div class="line">        MOV C,SDA</div><div class="line">        MOV ACK,C</div><div class="line">        CLR SCL</div><div class="line">        RET</div><div class="line"></div><div class="line">;接收一个字节的数据，接收完后存放在A寄存器中</div><div class="line">RecvB:  MOV R5,#8</div><div class="line">RecvB1: SETB SDA</div><div class="line">        NOP</div><div class="line">        SETB SCL</div><div class="line">        NOP</div><div class="line">        NOP</div><div class="line">        MOV C,SDA</div><div class="line">        RLC A</div><div class="line">        CLR SCL</div><div class="line">        DJNZ R5,RecvB1</div><div class="line">        RET</div></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83610.html" data-id="cj3refrvu00al8iq3ua1ulf7e" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/单片机/">单片机</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-/archives/83603.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83603.html" class="article-date">
+  <time datetime="2011-09-17T00:00:00.000Z" itemprop="datePublished">2011-09-17</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Python栏目/">Python栏目</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/83603.html">Pygame学习笔记10：鼠标</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><strong>鼠标</strong></p>
+<p>当显示模式设置后，事件队列就会开始收到鼠标事件。当按下和释放鼠标的按键时，会产生 pygame.MOUSEBUTTONDOWN和pygame.MOUSEBUTTONUP事件。这些事件包含一个button属性表示哪些键被按下。滚动鼠标滚轮会产生pygame.MOUSEBUTTONDOWN事件。当向上滚动滚轮时button的值是4，向下滚动时button的值是5。除此外还有一个pos属性，表示按键按下或释放时鼠标指针的位置。当移动鼠标时，会产生pygame.MOUSEMOTION事件。鼠标移动事件会被分解成一组较小的精确的移动事件。当鼠标移动时，会有很多事件被放在队列中。鼠标移动事件没有被正确的清除，常常是事件队列被填满的主要原因。鼠标移动事件包括一个buttons属性，表示鼠标移动时，鼠标键的状态。还有一个pos属性，表示鼠标指针的位置。还有一个rel属性表示当前位置相对于上一次事件发生时指针位置的偏移量。</p>
+<p>除了可以通过事件来接受鼠标输入外，还可以直接调用函数检查鼠标的状态。pygame.mouse.get_pressed可以获得当前所有鼠标按键的状态。pygame.mouse.get_pos获得当前鼠标的位置。pygame.mouse.get_rel获得当前鼠标位置相对于前一个位置的位移。</p>
+<p>用pygame.mouse.set_visible可以隐藏鼠标的指针。如果鼠标指针被隐藏，输入被当前的display捕获，鼠标会进入虚拟输入模式，这种模式下鼠标的相对位移不会收到屏幕边界的影响。</p>
+<p>通过pygame.mouse.set_cursor可以设置鼠标指针的形状。</p>
+<p><em>pygame.mouse.set_cursor(size, hotspot, xormasks, andmasks): return None</em></p>
+<p>当鼠标指针可见时，它会显示为给定的位域数组指定的黑白色的位图。size是包含指针高度和宽度的列表。hotspot是表示指针的热点位置的列表。xormasks是序列包含指针异或数据位域的序列，andmask是一组包含指针位域数据的序列。宽度必须是8的倍数，位域数组必须是size给定的正确的大小。</p>
+<p>pygame.cursors模块包括了几个内置的指针形状。可以这样使用</p>
+<p><em>pygame.mouse.set_cursor(*pygame.cursors.arrow)</em></p>
+<p>可以使用的指针形状有：</p>
+<p>pygame.cursors.arrow<br>pygame.cursors.diamond<br>pygame.cursors.broken_x<br>pygame.cursors.tri_left<br>pygame.cursors.tri_right  </p>
+<p>偶自己写的一个扫雷小游戏，全鼠标操作的。下载地址：<a href="http://app.xefan.com/小游戏/扫雷/" target="_blank">http://app.xefan.com/小游戏/扫雷/</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83603.html" data-id="cj3refrvl00a08iq332bs2vm7" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pygame/">pygame</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-/archives/83599.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83599.html" class="article-date">
+  <time datetime="2011-09-17T00:00:00.000Z" itemprop="datePublished">2011-09-17</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/嵌入式栏目/">嵌入式栏目</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/83599.html">STC89C5XX单片机看门狗说明</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>下面是关于STC89C5XX-51 单片机看门狗的描述</p>
+<p>WDT_CONTR 位置0xE1; [-] [-] [EN_WDT] [CLR_WDT] [IDLE_WDT] [PS2] [PS1] [PS0]</p>
+<p>EN_WDT: 看门狗允许位，置 1 启动看门狗，看门狗不能自动启动，需要设置该位后启动，一旦启动不能关闭(只能系统重新上电和看门狗复位可以关闭)</p>
+<p>CLR_WDT: 看门狗计数器清零位，置1 清零看门狗计数器，当计数器开始重新计数，硬件清零该位。</p>
+<p>IDLE_WDT: 单片机IDLE 模式看门狗允许位，当IDLE_WDT=1时，单片机在 IDLE 模式(空闲模式)依然启用看门狗</p>
+<p>PS2~PS0: 看门狗定时器预分频器，下表中 Prescale 表示预分频数</p>
+<p>PS2    PS1    PS0    Prescale<br>0       0       0       2<br>0       0       1       4<br>0       1       0       8<br>0       1       1       16<br>1       0       0       32<br>1       0       1       64<br>1       1       0       128<br>1      1      1      256</p>
+<p>看门狗溢出时间：(N<em>Prescale</em>32768)/晶振频率，其中 N 表示指令周期数 N=12 表示 12 时钟周期模式；N=6 表示6时钟周期模式。如N=12，晶振频率为12MHz，PS2~PS0为100时，溢出时间=(12<em>32</em>32768)/12=1048576us，差不多是1s。</p>
+<p>例如：给WDT_CONTR写入0×34，即是激活看门狗，同时预分频数设为32。喂狗过程也是一样的。</p>
+<p>顺便说一下ATMEL-51单片机的看门狗</p>
+<p>下面是关于ATMEL-51单片机看门狗的描述</p>
+<p>【看门狗计数器】(watchdog timer)是一个14位的计数器，它以机器周期（晶振频率/12）增加，当计数值计满(16383/0×3FFF)了就使单片机软复位；当启动了【看门狗计数器】之后，我们需要在它计数没有满之前复位计数器强制它不能够溢出，这个过程称作喂狗。</p>
+<p>一般设置是给 WDTRST 先写入0×1E 再写入0xE1激活看门狗；喂狗过程也是一样的，给 WDTRST 先写入0×1E 再写入0xE1。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83599.html" data-id="cj3refrvk009w8iq36s1zrbro" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/单片机/">单片机</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-/archives/83597.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83597.html" class="article-date">
+  <time datetime="2011-09-17T00:00:00.000Z" itemprop="datePublished">2011-09-17</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Python栏目/">Python栏目</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/83597.html">Pygame学习笔记8：视频</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><strong>视频</strong></p>
+<p>要在游戏中播放片头动画、过场动画等视频画面，可以使用pygame.movie模块。</p>
+<p>要播放视频中的音乐，pygame.movie模块需要对音频接口的完全控制，不能初始化mixer模块。因此要这样完成初始化</p>
+<p><em>pygame.init()</em><br><em> pygame.mixer.quit()</em></p>
+<p>或者只初始化</p>
+<p><em>pygame.display.init()</em></p>
+<p>用movie = pygame.movie.Movie(’filename’)指定文件名载入视频。视频的格式可以为mpeg1。视频文件不会马上全部载入内存，而是在播放的时候一点一点的载入内存。</p>
+<p>用movie.set_display(pygame.display.set_mode((640,480)))指定播放的surface。</p>
+<p>用movie.set_volume(value)指定播放的音量。音量的值value的取值范围为0.0到1.0。</p>
+<p>用movie.play()播放视频。这个函数会立即返回，视频在后台播放。这个函数可以带一个参数loops，指定重复次数。</p>
+<p>正在播放的视频可以用movie.stop()停止播放。还可以用movie.pause()暂停播放。可以使用movie.skip(seconds)使视频前进seconds秒钟。</p>
+<p>如有不懂的可以参考Pygame的官方例子，在Python安装目录下的\lib\site-packages\pygame\examples\movieplayer.py文件。</p>
+<p>不过偶用官方的这个例子在Linux下播放mpeg1文件一切正常，但是在Windows下却只有声音没有画面，偶也不知道是何故。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83597.html" data-id="cj3refrvj009t8iq3cvtjqa8e" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pygame/">pygame</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
   
     <article id="post-/archives/83601.html" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
@@ -243,7 +454,7 @@ K_EURO                euro
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83601.html" data-id="cj2d7lucn00a368q3cq84npdg" class="article-share-link">Delen</a>
+      <a data-url="http://www.xefan.com/archives/83601.html" data-id="cj3refrvp00a88iq3xtyubjwa" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pygame/">pygame</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -320,163 +531,7 @@ JOYBUTTONDOWN joy, button
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83605.html" data-id="cj2d7lucm009z68q31bgg33y4" class="article-share-link">Delen</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pygame/">pygame</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-/archives/83599.html" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/archives/83599.html" class="article-date">
-  <time datetime="2011-09-17T00:00:00.000Z" itemprop="datePublished">2011-09-17</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/嵌入式栏目/">嵌入式栏目</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/archives/83599.html">STC89C5XX单片机看门狗说明</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>下面是关于STC89C5XX-51 单片机看门狗的描述</p>
-<p>WDT_CONTR 位置0xE1; [-] [-] [EN_WDT] [CLR_WDT] [IDLE_WDT] [PS2] [PS1] [PS0]</p>
-<p>EN_WDT: 看门狗允许位，置 1 启动看门狗，看门狗不能自动启动，需要设置该位后启动，一旦启动不能关闭(只能系统重新上电和看门狗复位可以关闭)</p>
-<p>CLR_WDT: 看门狗计数器清零位，置1 清零看门狗计数器，当计数器开始重新计数，硬件清零该位。</p>
-<p>IDLE_WDT: 单片机IDLE 模式看门狗允许位，当IDLE_WDT=1时，单片机在 IDLE 模式(空闲模式)依然启用看门狗</p>
-<p>PS2~PS0: 看门狗定时器预分频器，下表中 Prescale 表示预分频数</p>
-<p>PS2    PS1    PS0    Prescale<br>0       0       0       2<br>0       0       1       4<br>0       1       0       8<br>0       1       1       16<br>1       0       0       32<br>1       0       1       64<br>1       1       0       128<br>1      1      1      256</p>
-<p>看门狗溢出时间：(N<em>Prescale</em>32768)/晶振频率，其中 N 表示指令周期数 N=12 表示 12 时钟周期模式；N=6 表示6时钟周期模式。如N=12，晶振频率为12MHz，PS2~PS0为100时，溢出时间=(12<em>32</em>32768)/12=1048576us，差不多是1s。</p>
-<p>例如：给WDT_CONTR写入0×34，即是激活看门狗，同时预分频数设为32。喂狗过程也是一样的。</p>
-<p>顺便说一下ATMEL-51单片机的看门狗</p>
-<p>下面是关于ATMEL-51单片机看门狗的描述</p>
-<p>【看门狗计数器】(watchdog timer)是一个14位的计数器，它以机器周期（晶振频率/12）增加，当计数值计满(16383/0×3FFF)了就使单片机软复位；当启动了【看门狗计数器】之后，我们需要在它计数没有满之前复位计数器强制它不能够溢出，这个过程称作喂狗。</p>
-<p>一般设置是给 WDTRST 先写入0×1E 再写入0xE1激活看门狗；喂狗过程也是一样的，给 WDTRST 先写入0×1E 再写入0xE1。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83599.html" data-id="cj2d7lucl009v68q3snvkwyb1" class="article-share-link">Delen</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/单片机/">单片机</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-/archives/83610.html" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/archives/83610.html" class="article-date">
-  <time datetime="2011-09-17T00:00:00.000Z" itemprop="datePublished">2011-09-17</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/嵌入式栏目/">嵌入式栏目</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/archives/83610.html">I2C串口总线驱动程序(汇编语言)</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div></pre></td><td class="code"><pre><div class="line">;I2C串口总线驱动程序</div><div class="line">;作者：龙昌</div><div class="line">;博客：http://www.xefan.com</div><div class="line">;请根据自己的实际情况定义SCL和SDA</div><div class="line"></div><div class="line">;延时4.7us以上，我的是12MHz的晶振，请根据自己的晶振频率相应增删NOP条数</div><div class="line">_NOP:   NOP</div><div class="line">        NOP</div><div class="line">        NOP</div><div class="line">        NOP</div><div class="line">        NOP</div><div class="line">        RET</div><div class="line"></div><div class="line">;发送开始信号</div><div class="line">I2CB:   SETB SDA</div><div class="line">        NOP</div><div class="line">        SETB SCL</div><div class="line">        ACALL _NOP</div><div class="line">        CLR SDA</div><div class="line">        ACALL _NOP</div><div class="line">        CLR SCL</div><div class="line">        RET</div><div class="line"></div><div class="line">;发送结束信号</div><div class="line">I2CE:   CLR SDA</div><div class="line">        NOP</div><div class="line">        SETB SCL</div><div class="line">        ACALL _NOP</div><div class="line">        SETB SDA</div><div class="line">        ACALL _NOP</div><div class="line">        CLR SCL</div><div class="line">        RET</div><div class="line"></div><div class="line">;发送应答(ACK)</div><div class="line">MACK:   CLR SDA</div><div class="line">        NOP</div><div class="line">        SETB SCL</div><div class="line">        ACALL _NOP</div><div class="line">        CLR SCL</div><div class="line">        RET</div><div class="line"></div><div class="line">;发送非应答(/ACK)</div><div class="line">MNACK:  SETB SDA</div><div class="line">        NOP</div><div class="line">        SETB SCL</div><div class="line">        ACALL _NOP</div><div class="line">        CLR SCL</div><div class="line">        RET</div><div class="line"></div><div class="line">;发送一个字节数据，要发送的数据存放在A寄存器中</div><div class="line">SendB:  MOV R5,#8</div><div class="line">SendB1: RLC A</div><div class="line">        MOV SDA,C</div><div class="line">        NOP</div><div class="line">        SETB SCL</div><div class="line">        ACALL _NOP</div><div class="line">        CLR SCL</div><div class="line">        DJNZ R5,SendB1</div><div class="line">        ;接收ACK</div><div class="line">        SETB SDA</div><div class="line">        NOP</div><div class="line">        SETB SCL</div><div class="line">        NOP</div><div class="line">        NOP</div><div class="line">        MOV C,SDA</div><div class="line">        MOV ACK,C</div><div class="line">        CLR SCL</div><div class="line">        RET</div><div class="line"></div><div class="line">;接收一个字节的数据，接收完后存放在A寄存器中</div><div class="line">RecvB:  MOV R5,#8</div><div class="line">RecvB1: SETB SDA</div><div class="line">        NOP</div><div class="line">        SETB SCL</div><div class="line">        NOP</div><div class="line">        NOP</div><div class="line">        MOV C,SDA</div><div class="line">        RLC A</div><div class="line">        CLR SCL</div><div class="line">        DJNZ R5,RecvB1</div><div class="line">        RET</div></pre></td></tr></table></figure>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83610.html" data-id="cj2d7lucs00ah68q351l7ks2z" class="article-share-link">Delen</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/单片机/">单片机</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-/archives/83597.html" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/archives/83597.html" class="article-date">
-  <time datetime="2011-09-17T00:00:00.000Z" itemprop="datePublished">2011-09-17</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/Python栏目/">Python栏目</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/archives/83597.html">Pygame学习笔记8：视频</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p><strong>视频</strong></p>
-<p>要在游戏中播放片头动画、过场动画等视频画面，可以使用pygame.movie模块。</p>
-<p>要播放视频中的音乐，pygame.movie模块需要对音频接口的完全控制，不能初始化mixer模块。因此要这样完成初始化</p>
-<p><em>pygame.init()</em><br><em> pygame.mixer.quit()</em></p>
-<p>或者只初始化</p>
-<p><em>pygame.display.init()</em></p>
-<p>用movie = pygame.movie.Movie(’filename’)指定文件名载入视频。视频的格式可以为mpeg1。视频文件不会马上全部载入内存，而是在播放的时候一点一点的载入内存。</p>
-<p>用movie.set_display(pygame.display.set_mode((640,480)))指定播放的surface。</p>
-<p>用movie.set_volume(value)指定播放的音量。音量的值value的取值范围为0.0到1.0。</p>
-<p>用movie.play()播放视频。这个函数会立即返回，视频在后台播放。这个函数可以带一个参数loops，指定重复次数。</p>
-<p>正在播放的视频可以用movie.stop()停止播放。还可以用movie.pause()暂停播放。可以使用movie.skip(seconds)使视频前进seconds秒钟。</p>
-<p>如有不懂的可以参考Pygame的官方例子，在Python安装目录下的\lib\site-packages\pygame\examples\movieplayer.py文件。</p>
-<p>不过偶用官方的这个例子在Linux下播放mpeg1文件一切正常，但是在Windows下却只有声音没有画面，偶也不知道是何故。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83597.html" data-id="cj2d7luck009s68q39ckybqjv" class="article-share-link">Delen</a>
+      <a data-url="http://www.xefan.com/archives/83605.html" data-id="cj3refrvn00a48iq3glsn9l6z" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pygame/">pygame</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -545,7 +600,7 @@ JOYBUTTONDOWN joy, button
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83596.html" data-id="cj2d7lucj009o68q33u9t0euo" class="article-share-link">Delen</a>
+      <a data-url="http://www.xefan.com/archives/83596.html" data-id="cj3refrvh009m8iq3t1spwo49" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pygame/">pygame</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -605,7 +660,7 @@ JOYBUTTONDOWN joy, button
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83594.html" data-id="cj2d7luch009l68q37gxbhyut" class="article-share-link">Delen</a>
+      <a data-url="http://www.xefan.com/archives/83594.html" data-id="cj3refrvi009p8iq30tshu6n7" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pygame/">pygame</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -684,7 +739,7 @@ JOYBUTTONDOWN joy, button
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83586.html" data-id="cj2d7lucf009h68q3fn958g9r" class="article-share-link">Delen</a>
+      <a data-url="http://www.xefan.com/archives/83586.html" data-id="cj3refrvf009i8iq326y8rj9t" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pygame/">pygame</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -751,103 +806,7 @@ JOYBUTTONDOWN joy, button
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83584.html" data-id="cj2d7lucd009e68q3dbqpkou4" class="article-share-link">Delen</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pygame/">pygame</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-/archives/83581.html" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/archives/83581.html" class="article-date">
-  <time datetime="2011-08-15T00:00:00.000Z" itemprop="datePublished">2011-08-15</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/Python栏目/">Python栏目</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/archives/83581.html">Pygame学习笔记3：绘图</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p><strong>绘图</strong></p>
-<p>除了可以把事先画好的图片blit到Surface上以外，还可以在Surface上自行在Surface上绘制一些简单的图形，比如点、线、方、圆等。这个功能主要由pygame.draw模块完成。</p>
-<p>首先导入pygame.draw模块。</p>
-<p><em>import pygame.draw</em></p>
-<p>如果已经用了import pygame，则pygame.draw模块也被自动导入了。</p>
-<p>然后准备好要在上面绘制图形的Surface，比如</p>
-<p><em>surface = pygame.display.set_mode((640, 480))</em></p>
-<p>pygame.draw中函数的第一个参数总是一个surface，然后是颜色，再后会是一系列的坐标等。稍有些计算机绘图经验的人就会知道，计算机里的坐标，(0，0)代表左上角。而返回值是一个Rect对象，包含了绘制的领域，这样你就可以很方便的更新那个部分了。</p>
-<p>函数<span> </span> 作用</p>
-<p>rect<span> </span> 绘制矩形</p>
-<p>polygon<span> </span>绘制多边形（三个及三个以上的边）</p>
-<p>circle<span> </span> 绘制圆</p>
-<p>ellipse<span> </span> 绘制椭圆</p>
-<p>arc<span> </span> 绘制圆弧</p>
-<p>line<span> </span> 绘制线</p>
-<p>lines<span> </span> 绘制一系列的线</p>
-<p>aaline<span> </span> 绘制一根平滑的线</p>
-<p>aalines<span> </span> 绘制一系列平滑的线</p>
-<p><strong>pygame.draw.rect</strong></p>
-<p>用法：pygame.draw.rect(Surface, color, Rect, width=0)</p>
-<p>pygame.draw.rect在surface上画一个矩形，除了surface和color，rect接受一个矩形的坐标和线宽参数，如果线宽是0或省略，则填充。我们有一个另外的方法来画矩形——fill方法</p>
-<p><strong>pygame.draw.polygon</strong></p>
-<p>用法：pygame.draw.polygon(Surface, color, pointlist, width=0)</p>
-<p>polygon就是多边形，用法类似rect，第一、第二、第四的参数都是相同的，只不过polygon会接受一系列坐标的列表，代表了各个顶点。</p>
-<p><strong>pygame.draw.circle</strong></p>
-<p>用法：pygame.draw.circle(Surface, color, pos, radius, width=0)</p>
-<p>很简单，画一个圆。与其他不同的是，它接收一个圆心坐标和半径参数。</p>
-<p><strong>pygame.draw.ellipse</strong></p>
-<p>用法：pygame.draw.ellipse(Surface, color, Rect, width=0)</p>
-<p>你可以把一个ellipse想象成一个被压扁的圆，事实上，它是可以被一个矩形装起来的。pygame.draw.ellipse的第三个参数就是这个椭圆的外接矩形。</p>
-<p><strong>pygame.draw.arc</strong></p>
-<p>用法：pygame.draw.arc(Surface, color, Rect, start_angle, stop_angle, width=1)</p>
-<p>arc是椭圆的一部分，所以它的参数也就比椭圆多一点。但它是不封闭的，因此没有fill方法。start_angle和stop_angle为开始和结束的角度。</p>
-<p><strong>pygame.draw.line</strong></p>
-<p>用法：pygame.draw.line(Surface, color, start_pos, end_pos, width=1)</p>
-<p>相信所有的人都能看明白。</p>
-<p><strong>pygame.draw.lines</strong></p>
-<p>用法：pygame.draw.lines(Surface, color, closed, pointlist, width=1)</p>
-<p>closed是一个布尔变量，指明是否需要多画一条线来使这些线条闭合（感觉就和polygone一样了），pointlist是一个点的数组。</p>
-<p>pygame.draw.aaline画抗锯齿的线段。</p>
-<p>pygame.draw.aalines可以画多条连续的抗锯齿线段。</p>
-<p>用法跟python.draw.line和pygame.draw.lines相似。</p>
-<p><strong>点操作</strong></p>
-<p>画点的方法和其它方法不太一样，用Surface.set_at方法完成画点的操作，比如：</p>
-<p><em>surface.set_at((100, 100), (255,255,255))</em></p>
-<p>第一个参数是点的坐标，第二个参数是颜色。</p>
-<p>除了可以在Surface上画点，还可以用Surface.get_at读取Surface上像素的值。比如</p>
-<p><em>color = surface.get_at((100, 100))</em></p>
-<p>这个函数返回给定点的颜色值。</p>
-<p><strong>填充区域</strong></p>
-<p>Surface.fill方法可以用一种颜色填充一个矩形区域。比如</p>
-<p><em>surface.fill((255,0,0), (100, 200, 100, 100))</em></p>
-<p>第一个参数指定要填充的颜色，第二个参数指定填充的矩形区域。如果没有给定第二个参数，整个Surface会被填充。第二个参数会限制备填充的区域。这个函数会返回受影响的Surface区域。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83581.html" data-id="cj2d7lucb009a68q3hut4x7iy" class="article-share-link">Delen</a>
+      <a data-url="http://www.xefan.com/archives/83584.html" data-id="cj3refrve009f8iq3cimo8968" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pygame/">pygame</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -863,7 +822,7 @@ JOYBUTTONDOWN joy, button
 
 
   <nav id="page-nav">
-    <a class="extend prev" rel="prev" href="/page/18/">&laquo;Vorige</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/17/">17</a><a class="page-number" href="/page/18/">18</a><span class="page-number current">19</span><a class="page-number" href="/page/20/">20</a><a class="page-number" href="/page/21/">21</a><span class="space">&hellip;</span><a class="page-number" href="/page/30/">30</a><a class="extend next" rel="next" href="/page/20/">Volgende&raquo;</a>
+    <a class="extend prev" rel="prev" href="/page/18/">&laquo;Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/17/">17</a><a class="page-number" href="/page/18/">18</a><span class="page-number current">19</span><a class="page-number" href="/page/20/">20</a><a class="page-number" href="/page/21/">21</a><span class="space">&hellip;</span><a class="page-number" href="/page/30/">30</a><a class="extend next" rel="next" href="/page/20/">Next&raquo;</a>
   </nav>
 
 </section>
@@ -872,7 +831,7 @@ JOYBUTTONDOWN joy, button
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Categorieën</h3>
+    <h3 class="widget-title">Categories</h3>
     <div class="widget">
       <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Linux栏目/">Linux栏目</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Python栏目/">Python栏目</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Ruby栏目/">Ruby栏目</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Ruby栏目/Web开发/">Web开发</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/Web开发/">Web开发</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Web开发/Python栏目/">Python栏目</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/前端相关/">前端相关</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/嵌入式栏目/">嵌入式栏目</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/开源软件/">开源软件</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/教程/">教程</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据库/">数据库</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据结构和算法/">数据结构和算法</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/编程开发/">编程开发</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/网络日志/">网络日志</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/资源分享/">资源分享</a></li></ul>
     </div>
@@ -882,7 +841,7 @@ JOYBUTTONDOWN joy, button
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Labels</h3>
+    <h3 class="widget-title">Tags</h3>
     <div class="widget">
       <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ARM/">ARM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/">Android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Arch/">Arch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/">C</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Django/">Django</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker/">Docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Dreamweaver/">Dreamweaver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Fedora/">Fedora</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flash/">Flash</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GObject/">GObject</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Gentoo/">Gentoo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hash/">Hash</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mac/">Mac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PS/">PS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Qt/">Qt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Raspberry-pi/">Raspberry pi</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redis/">Redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Ruby/">Ruby</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scrapy/">Scrapy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TQ2440/">TQ2440</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/USB/">USB</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/VirtualBox/">VirtualBox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web开发/">Web开发</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WordPress/">WordPress</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Xcode/">Xcode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/access/">access</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/adobe/">adobe</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ajax/">ajax</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apache/">apache</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asp/">asp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css/">css</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/firefox/">firefox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ftp/">ftp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gcc/">gcc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/grub/">grub</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gtk/">gtk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gulp/">gulp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ibus/">ibus</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pygame/">pygame</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vmware/">vmware</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/w3m/">w3m</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/windows/">windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xml/">xml</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/免费/">免费</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内核/">内核</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/匹配算法/">匹配算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/单片机/">单片机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/嵌入式/">嵌入式</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/开源软件/">开源软件</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/排序算法/">排序算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/文件空间/">文件空间</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/无线网/">无线网</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/正则式/">正则式</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/注册机/">注册机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/游戏/">游戏</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/电脑技巧/">电脑技巧</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/空间/">空间</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/算法/">算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/红旗/">红旗</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/经典语录/">经典语录</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络日志/">网络日志</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/翻译/">翻译</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/视频教程/">视频教程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/资源分享/">资源分享</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/转载/">转载</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/随笔/">随笔</a></li></ul>
     </div>
@@ -901,9 +860,9 @@ JOYBUTTONDOWN joy, button
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Archieven</h3>
+    <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05/">May 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/02/">February 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/11/">November 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">October 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">September 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/08/">August 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/07/">July 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/05/">May 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04/">April 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">March 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">January 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/12/">December 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">June 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">May 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">April 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">January 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">October 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/09/">September 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/08/">August 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/07/">July 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/05/">May 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/04/">April 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/03/">March 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/02/">February 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/12/">December 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/11/">November 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/10/">October 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/09/">September 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/08/">August 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/07/">July 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/05/">May 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/04/">April 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/03/">March 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/02/">February 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/01/">January 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/12/">December 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/11/">November 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/10/">October 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/09/">September 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/08/">August 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/07/">July 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/06/">June 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/05/">May 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/04/">April 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/03/">March 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/12/">December 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/11/">November 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/10/">October 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/09/">September 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/08/">August 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/07/">July 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/05/">May 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/12/">December 2008</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/07/">July 2008</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05/">May 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/02/">February 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/11/">November 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">October 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">September 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/08/">August 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/07/">July 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/05/">May 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04/">April 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">March 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">January 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/12/">December 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">June 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">May 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">April 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">January 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">October 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/09/">September 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/08/">August 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/07/">July 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/05/">May 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/04/">April 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/03/">March 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/02/">February 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/12/">December 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/11/">November 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/10/">October 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/09/">September 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/08/">August 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/07/">July 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/05/">May 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/04/">April 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/03/">March 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/02/">February 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/01/">January 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/12/">December 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/11/">November 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/10/">October 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/09/">September 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/08/">August 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/07/">July 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/06/">June 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/05/">May 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/04/">April 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/03/">March 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/12/">December 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/11/">November 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/10/">October 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/09/">September 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/08/">August 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/07/">July 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/05/">May 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/12/">December 2008</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/07/">July 2008</a></li></ul>
     </div>
   </div>
 
@@ -911,9 +870,13 @@ JOYBUTTONDOWN joy, button
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Recente berichten</h3>
+    <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/archives/84169.html">HAProxy+Nginx+gunicorn获取真实ip</a>
+          </li>
         
           <li>
             <a href="/archives/84168.html">在Docker中运行X11程序</a>
@@ -931,10 +894,6 @@ JOYBUTTONDOWN joy, button
             <a href="/archives/84165.html">使用CodePush对ReactNative进行热更新</a>
           </li>
         
-          <li>
-            <a href="/archives/84164.html">ReactNative获取设备屏幕尺寸</a>
-          </li>
-        
       </ul>
     </div>
   </div>
@@ -949,10 +908,10 @@ JOYBUTTONDOWN joy, button
         <li><a target="_blank" title="我的Twitter" href="https://twitter.com/longchangjin">@Twitter</a></li>
         <li><a target="_blank" title="我的豆瓣" href="http://www.douban.com/people/lchj/">@Douban</a></li>
 
-        <li><a target="_blank" title="" href="http://www.vimer.cn/">Vimer的程序世界</a></li>
         <li><a target="_blank" title="" href="http://pythoner.net/">python开发者社区</a></li>
         <li><a target="_blank" title="" href="http://simple-is-better.com/">python.cn(news, jobs)</a></li>
         <li><a target="_blank" title="" href="http://gtk.awaysoft.com/">GTK+ 中文社区</a></li>
+        <li><a target="_blank" title="小智LOGO - LOGO在线制作神器 - 3分钟完成公司LOGO设计" href="http://xzlogo.com/">小智LOGO</a></li>
       </ul>
     </div>
 </div>

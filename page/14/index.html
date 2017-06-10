@@ -58,7 +58,7 @@
         
           <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Zoeken"></a>
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.xefan.com"></form>
@@ -68,6 +68,64 @@
 </header>
       <div class="outer">
         <section id="main">
+  
+    <article id="post-/archives/83809.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83809.html" class="article-date">
+  <time datetime="2013-01-03T00:00:00.000Z" itemprop="datePublished">2013-01-03</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Linux栏目/">Linux栏目</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/83809.html">Arch Linux 2012.12.01安装方法</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>自从上次我的Arch系统崩溃之后我就改用其它系统了，距离现在已有小半年了。突然发现Arch又更新了，于是下下来体验一下。<br>在新版的ArchLinux中已经不在使用AIF(Arch Installation Framwork)了，而是使用新的脚本工具(Arch Install Scripts)，<a href="https://github.com/falconindy/arch-install-scripts" target="_blank" rel="external">https://github.com/falconindy/arch-install-scripts</a></p>
+<p>新版的安装过程是通过网络安装，因此整个过程需要联网才行。</p>
+<p>1、首先为Arch分配一个分区，然后挂载到/mnt目录。如果使用多个分区，还需要创建它们并正确挂载（/mnt/boot, /mnt/home, …），这样genfstab才能自动检测到它们。</p>
+<p>2、安装基本系统<br>先编辑/etc/pacman.d/mirrorlist选择首先镜像。<br>然后使用pacstrap脚本安装基本系统。<br><code># pacstrap /mnt base base-devel</code></p>
+<p>3、安装引导器<br>安装一个Bootloader，Grub或者Syslinux。<br>(1)安装GRUB:<br>如果是BIOS用户执行命令：<br><code># pacstrap /mnt grub-bios</code><br>如果是EFI用户执行命令：<br><code># pacstrap /mnt grub-efi-x86_64</code></p>
+<p>(2)安装Syslinux：<br><code>#pacstrap /mnt syslinux</code></p>
+<p>4、配置系统<br>(1)生成fstab文件<br><code># genfstab -p /mnt &amp;gt;&amp;gt; /mnt/etc/fstab</code></p>
+<p>(2)chroot到新安装的系统中去<br><code># arch-chroot /mnt</code></p>
+<p>(3)进行一些系统配置<br>设置主机名：修改/etc/hostname文件，将主机名写入里面。<br>设置时区： cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime<br>设置locale： 修改/etc/locale.gen文件，然后再执行命令locale-gen<br>创建一个初始的RAM disk： mkinitcpio -p linux<br>设置root用户的密码： passwd root<br>配置引导器，在我的电脑上是依次执行如下命令，这个请结合自己的情况进行设置：<br><code># grub-install --no-floppy /dev/sda</code><br><code># grub-mkconfig -o /boot/grub/grub.cfg</code>  </p>
+<p>其余的根据自己的需要再进行设置。</p>
+<p>5、重启进入新系统<br>先退出chroot，然后卸载之前挂载在/mnt的分区。<br><code># umount /mnt</code><br>然后重启进入新系统并以root用户登陆。<br>现在一个基本的Arch系统就已经安装好了，接下来可以根据自己的需要来安装相应的软件。</p>
+<p>6、安装应用软件<br>Arch系统刚安装好后发现居然连ifconfig命令都没有，可以使用如下命令安装：<br><code># pacman -S net-tools dnsutils inetutils iproute2</code></p>
+<p>安装Yaourt<br>在/etc/pacman.conf中添加以下内容：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[archlinuxfr]</div><div class="line">Server = http://repo.archlinux.fr/$arch</div></pre></td></tr></table></figure></p>
+<p>然后再执行命令: pacman -Syu yaourt</p>
+<p>安装Xorg：<br><code># pacman -S xorg-server xorg-xinit xorg-utils xorg-server-utils</code><br>安装显示驱动(根据自己的情况选择安装相应的驱动)：<br><code># pacman -S xf86-video-fbdev</code><br>安装evdev，支持大部分即插即用设备<br><code># pacman -S xf86-input-evdev</code><br>安装默认的测试环境：<br><code># pacman -S xorg-twm xorg-xclock xterm</code><br>然后启动X会话，如果能够看到一个终端和一个时钟就表示已经安装成功了：<br><code>$ startx</code></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83809.html" data-id="cj3refryg00ep8iq37m8x1pfu" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Arch/">Arch</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
   
     <article id="post-/archives/83806.html" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
@@ -103,7 +161,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83806.html" data-id="cj2d7lufc00en68q35jkrepwb" class="article-share-link">Delen</a>
+      <a data-url="http://www.xefan.com/archives/83806.html" data-id="cj3refryd00em8iq37t0ogq8g" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vim/">vim</a></li></ul>
@@ -157,7 +215,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83797.html" data-id="cj2d7luf900eg68q3yd5tfu2t" class="article-share-link">Delen</a>
+      <a data-url="http://www.xefan.com/archives/83797.html" data-id="cj3refry900eb8iq3x1f1ak3e" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vim/">vim</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/正则式/">正则式</a></li></ul>
@@ -205,7 +263,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83795.html" data-id="cj2d7luf800ed68q3yoxgs3h5" class="article-share-link">Delen</a>
+      <a data-url="http://www.xefan.com/archives/83795.html" data-id="cj3refryc00ei8iq315hneew6" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vim/">vim</a></li></ul>
@@ -254,7 +312,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83793.html" data-id="cj2d7luf500ea68q3pmgwa8v2" class="article-share-link">Delen</a>
+      <a data-url="http://www.xefan.com/archives/83793.html" data-id="cj3refry800e98iq3uveqsbau" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vim/">vim</a></li></ul>
@@ -301,7 +359,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83791.html" data-id="cj2d7luf300e868q3rlrigpx7" class="article-share-link">Delen</a>
+      <a data-url="http://www.xefan.com/archives/83791.html" data-id="cj3refry600e58iq3qmn1pgzt" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/firefox/">firefox</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vim/">vim</a></li></ul>
@@ -348,7 +406,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83788.html" data-id="cj2d7luf100e468q3u7i4na1z" class="article-share-link">Delen</a>
+      <a data-url="http://www.xefan.com/archives/83788.html" data-id="cj3refry500e28iq3jshsb6tx" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vim/">vim</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/w3m/">w3m</a></li></ul>
@@ -394,7 +452,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83786.html" data-id="cj2d7luf000e168q3y8bect9q" class="article-share-link">Delen</a>
+      <a data-url="http://www.xefan.com/archives/83786.html" data-id="cj3refryb00ef8iq3alngy1i3" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/git/">git</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vim/">vim</a></li></ul>
@@ -483,7 +541,7 @@ Ctrl + z：挂起命令
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83783.html" data-id="cj2d7luey00dy68q3wpi89t0t" class="article-share-link">Delen</a>
+      <a data-url="http://www.xefan.com/archives/83783.html" data-id="cj3refry100dt8iq38szphouk" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/shell/">shell</a></li></ul>
@@ -533,7 +591,7 @@ Ctrl + z：挂起命令
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83779.html" data-id="cj2d7luew00dw68q3fxb7a1yk" class="article-share-link">Delen</a>
+      <a data-url="http://www.xefan.com/archives/83779.html" data-id="cj3refry300dz8iq3ghrj838y" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/firefox/">firefox</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vim/">vim</a></li></ul>
@@ -546,88 +604,10 @@ Ctrl + z：挂起命令
 
 
   
-    <article id="post-/archives/83776.html" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/archives/83776.html" class="article-date">
-  <time datetime="2012-05-30T00:00:00.000Z" itemprop="datePublished">2012-05-30</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/编程开发/">编程开发</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/archives/83776.html">[转载]GObject 学习笔记：GObject 的子类继承</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>在文档 [1] 中，我们构造了一个 KbBibtex 类，其构造过程看似挺复杂，但实际上只需要动手尝试一下，即可明白 GObject 子类化的各项步骤的意义与作用。许多事物之所以被认为复杂，是因为大家在观望。</p>
-<p>本文沿用文档 [1] 中的那个 KbBibtex 示例，学习如何对其进行子类化，构造新类，即面向对象程序设计方法中类的继承。</p>
-<p><b>文献有很多种类</b></p>
-<p>写过论文的人都知道，参考文献的形式有许多种类，例如期刊论文、技术报告、专著等，并非所有的文献格式都能表示文档 [1] 所给出的 KbBibtex 对象属性，即：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">KbBibtexPrivate</span> <span class="title">KbBibtexPrivate</span>;</span></div><div class="line"><span class="class"><span class="keyword">struct</span> _<span class="title">KbBibtexPrivate</span> &#123;</span></div><div class="line">        GString *title;</div><div class="line">        GString *author;</div><div class="line">        GString *publisher;</div><div class="line">        guint   year;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
-<p>对于期刊论文而言，也许我们期望的数据结构是：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">KbBibtexPrivate</span> <span class="title">KbBibtexPrivate</span>;</span></div><div class="line"><span class="class"><span class="keyword">struct</span> _<span class="title">KbBibtexPrivate</span> &#123;</span></div><div class="line">        GString *title;</div><div class="line">        GString *author;</div><div class="line">        GString *journal;</div><div class="line">        GString *volume;</div><div class="line">        GString *number;</div><div class="line">        GString *pages;</div><div class="line">        guint   year;</div><div class="line">        GString *publisher;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
-<p>对于技术报告，需求又要变成：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">KbBibtexPrivate</span> <span class="title">KbBibtexPrivate</span>;</span></div><div class="line"><span class="class"><span class="keyword">struct</span> _<span class="title">KbBibtexPrivate</span> &#123;</span></div><div class="line">        GString *title;</div><div class="line">        GString *author;</div><div class="line">        GString *institution;</div><div class="line">        guint   year;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
-<p>这样的变化非常之多。因此，设计一个“万能”的 KbBibtex 类，使之可以表示任何文献类型，看上去会很美好。</p>
-<p><b>类的继承</b></p>
-<p>因为期刊论文这种对象只比文档 [1] 中的 KbBibtex 对象多出 4 个属性，即 journal、volume、number、pages，其他属性皆与 KbBibtex 对象相同。</p>
-<p>在程序猿的职业生涯中也许不断听到这样的警告：Don’t Repeat Yourself（不要重复）！所以面向对象程序设计方法会告诉我们，既然 KbBibtex 对象已经拥有了一部分期刊论文对象所需要的属性，后者与前者都属于 KbBibtex 类（因为它们都是文献类型），那么只需设计一个期刊论文类，让它可以继承 KbBibtex 类的所以所拥有的一切，那么就可以不用 DRY 了。</p>
-<p>那么怎么来实现？和 GObject 子类化过程相似，只需建立一个 kb-article.h 头文件，与继承相关的代码如下：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"kb-bibtex.h"</span></span></div><div class="line"> </div><div class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">KbArticle</span> <span class="title">KbArticle</span>;</span></div><div class="line"><span class="class"><span class="keyword">struct</span> _<span class="title">KbArticle</span> &#123;</span></div><div class="line">        KbBibtex parent;</div><div class="line">&#125;;</div><div class="line"> </div><div class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">KbArticleClass</span> <span class="title">KbArticleClass</span>;</span></div><div class="line"><span class="class"><span class="keyword">struct</span> _<span class="title">KbArticleClass</span> &#123;</span></div><div class="line">        KbBibtexClass parent_class;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
-<p>然后，再建立一个 kb-article.c 源文件，其中与继承相关的代码如下：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">G_DEFINE_TYPE (KbArticle, kb_article, KB_TYPE_BIBTEX);</div></pre></td></tr></table></figure>
-<p>另外，KbBibtex 对象的 kb_bibtex_printf 方法也需要被 KbArticle 对象继承，这只需在 kb_article_printf 函数中调用 kb_bibtex_printf 即可实现，例如：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span></span></div><div class="line"><span class="title">kb_article_printf</span> <span class="params">(KbArticle *self)</span></div><div class="line">&#123;</div><div class="line">        kb_bibtex_printf (&amp;self-&gt;parent);</div><div class="line"> </div><div class="line">        <span class="comment">/* 剩下代码是 KbArticle 对象的 kb_article_printf 方法的具体实现 */</span></div><div class="line">        ... ...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>当然，kb-article.h 和 kb-article.c 中剩余代码需要类似文档 [1] 中实现 KbBibtex 类那样去实现 KbArticle 类。这部分代码，我希望你能动手去尝试一下。下面，我仅给出测试 KbArticle 类的 main.c 源文件内容：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"kb-article.h"</span></span></div><div class="line"> </div><div class="line"><span class="function"><span class="keyword">int</span></span></div><div class="line"><span class="title">main</span> <span class="params">(<span class="keyword">void</span>)</span></div><div class="line">&#123;</div><div class="line">        g_type_init ();</div><div class="line">         </div><div class="line">        KbArticle *entry = g_object_new (KB_TYPE_ARTICLE,</div><div class="line">                                         <span class="string">"title"</span>, <span class="string">"Breaking paragraphs into lines"</span>,</div><div class="line">                                         <span class="string">"author"</span>, <span class="string">"Knuth, D.E. and Plass, M.F."</span>,</div><div class="line">                                         <span class="string">"publisher"</span>, <span class="string">"Wiley Online Library"</span>,</div><div class="line">                                         <span class="string">"journal"</span>, <span class="string">"Software: Practice and Experience"</span>,</div><div class="line">                                         <span class="string">"volume"</span>, <span class="string">"11"</span>,</div><div class="line">                                         <span class="string">"number"</span>, <span class="string">"11"</span>,</div><div class="line">                                         <span class="string">"year"</span>, <span class="number">1981</span>,</div><div class="line">                                         <span class="string">"pages"</span>, <span class="string">"1119-1184"</span>,</div><div class="line">                                         <span class="literal">NULL</span>);</div><div class="line">        kb_article_printf (entry);</div><div class="line"> </div><div class="line">        g_object_unref (entry);</div><div class="line">        <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>测试结果表明，一切尽在掌握之中：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">$ ./test</div><div class="line">    Title: Breaking paragraphs into lines</div><div class="line">   Author: Knuth, D.E. and Plass, M.F.</div><div class="line">Publisher: Wiley Online Library</div><div class="line">     Year: 1981</div><div class="line">  Journal: Software: Practice and Experience</div><div class="line">   Volume: 11</div><div class="line">   Number: 11</div><div class="line">    Pages: 1119-1184</div></pre></td></tr></table></figure></p>
-<p><b>继承真的很美好？</b></p>
-<p>通过类的继承来实现一部分的代码复用真的是很惬意。但是，《C 专家编程》一书的作者却不这么认为，为了说明类的继承通常很难解决现实问题，他运用了一个比喻，将程序比作一本书，并将程序库比作一个图书馆。当你基于一个程序库去写你个人的程序之时，好比你在利用图书馆中的藏书去写你个人的书，显然你不可能很轻松的在那些藏书中复印一部分拼凑出一本书。</p>
-<p>就本文开头所举的例子而言，就无法通过继承文档 [1] 所设计的 KbBibtex 类来建立技术报告类，因为技术报告对象是没有 publisher 属性的。</p>
-<p>也许你会说，那是 KbBibtex 类设计的太烂了。嗯，我承认这一点，但是你不可能要求别人在设计程序库时候知道你想要什么，就像你不能去抱怨为什么图书馆里的藏书怎么不是为你写书而准备的一样。</p>
-<p>基类设计的失误，对于它的所有子类是一场巨大的灾难。要避免这种灾难，还是认真考虑自己所要解决的问题吧。其实很多问题都可以不需要使用继承便可以很好的解决，还有许多问题不需要继承很多的层次也可以很好的解决。</p>
-<p>对于本文的问题，不采用继承的实现会更好。比如我们可以这样来改造 KbBibtex 类：</p>
-<pre><code>将 Bibtex 文献所有格式的属性都设为 KbBibtex 的类属性
-为 Bibtex 对象拥有一个链表或数组之类的线性表容器，或者效率更高的 Hash 表容器（GLib 库均已提供），容器的第一个单元存储 Bibtex 对象对应的文献类型，其他单元则存储文献的属性。
-在 kb_bibtex_set_property 与 kb_bibtex_get_property 函数中，实现 Bibtex 类属性与 Bibtex 对象属性的数据交换。
-</code></pre><p>仅此而已。</p>
-<p>如果说继承是美好的，那么平坦一些会更美好。如果你不愿意选择平坦，那么可以选择接口（Interface），这是下一篇文档的主题。</p>
-<p>~ End ~</p>
-<p>原文出处：<a href="http://garfileo.is-programmer.com" target="_blank" rel="external">http://garfileo.is-programmer.com</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83776.html" data-id="cj2d7luev00ds68q3az2uctid" class="article-share-link">Delen</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/GObject/">GObject</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
 
 
   <nav id="page-nav">
-    <a class="extend prev" rel="prev" href="/page/13/">&laquo;Vorige</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/12/">12</a><a class="page-number" href="/page/13/">13</a><span class="page-number current">14</span><a class="page-number" href="/page/15/">15</a><a class="page-number" href="/page/16/">16</a><span class="space">&hellip;</span><a class="page-number" href="/page/30/">30</a><a class="extend next" rel="next" href="/page/15/">Volgende&raquo;</a>
+    <a class="extend prev" rel="prev" href="/page/13/">&laquo;Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/12/">12</a><a class="page-number" href="/page/13/">13</a><span class="page-number current">14</span><a class="page-number" href="/page/15/">15</a><a class="page-number" href="/page/16/">16</a><span class="space">&hellip;</span><a class="page-number" href="/page/30/">30</a><a class="extend next" rel="next" href="/page/15/">Next&raquo;</a>
   </nav>
 
 </section>
@@ -636,7 +616,7 @@ Ctrl + z：挂起命令
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Categorieën</h3>
+    <h3 class="widget-title">Categories</h3>
     <div class="widget">
       <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Linux栏目/">Linux栏目</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Python栏目/">Python栏目</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Ruby栏目/">Ruby栏目</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Ruby栏目/Web开发/">Web开发</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/Web开发/">Web开发</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Web开发/Python栏目/">Python栏目</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/前端相关/">前端相关</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/嵌入式栏目/">嵌入式栏目</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/开源软件/">开源软件</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/教程/">教程</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据库/">数据库</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据结构和算法/">数据结构和算法</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/编程开发/">编程开发</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/网络日志/">网络日志</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/资源分享/">资源分享</a></li></ul>
     </div>
@@ -646,7 +626,7 @@ Ctrl + z：挂起命令
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Labels</h3>
+    <h3 class="widget-title">Tags</h3>
     <div class="widget">
       <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ARM/">ARM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/">Android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Arch/">Arch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/">C</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Django/">Django</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker/">Docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Dreamweaver/">Dreamweaver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Fedora/">Fedora</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flash/">Flash</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GObject/">GObject</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Gentoo/">Gentoo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hash/">Hash</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mac/">Mac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PS/">PS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Qt/">Qt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Raspberry-pi/">Raspberry pi</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redis/">Redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Ruby/">Ruby</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scrapy/">Scrapy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TQ2440/">TQ2440</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/USB/">USB</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/VirtualBox/">VirtualBox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web开发/">Web开发</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WordPress/">WordPress</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Xcode/">Xcode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/access/">access</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/adobe/">adobe</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ajax/">ajax</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apache/">apache</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asp/">asp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css/">css</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/firefox/">firefox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ftp/">ftp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gcc/">gcc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/grub/">grub</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gtk/">gtk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gulp/">gulp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ibus/">ibus</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pygame/">pygame</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vmware/">vmware</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/w3m/">w3m</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/windows/">windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xml/">xml</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/免费/">免费</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内核/">内核</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/匹配算法/">匹配算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/单片机/">单片机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/嵌入式/">嵌入式</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/开源软件/">开源软件</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/排序算法/">排序算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/文件空间/">文件空间</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/无线网/">无线网</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/正则式/">正则式</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/注册机/">注册机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/游戏/">游戏</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/电脑技巧/">电脑技巧</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/空间/">空间</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/算法/">算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/红旗/">红旗</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/经典语录/">经典语录</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络日志/">网络日志</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/翻译/">翻译</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/视频教程/">视频教程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/资源分享/">资源分享</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/转载/">转载</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/随笔/">随笔</a></li></ul>
     </div>
@@ -665,9 +645,9 @@ Ctrl + z：挂起命令
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Archieven</h3>
+    <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05/">May 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/02/">February 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/11/">November 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">October 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">September 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/08/">August 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/07/">July 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/05/">May 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04/">April 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">March 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">January 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/12/">December 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">June 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">May 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">April 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">January 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">October 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/09/">September 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/08/">August 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/07/">July 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/05/">May 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/04/">April 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/03/">March 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/02/">February 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/12/">December 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/11/">November 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/10/">October 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/09/">September 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/08/">August 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/07/">July 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/05/">May 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/04/">April 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/03/">March 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/02/">February 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/01/">January 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/12/">December 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/11/">November 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/10/">October 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/09/">September 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/08/">August 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/07/">July 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/06/">June 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/05/">May 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/04/">April 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/03/">March 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/12/">December 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/11/">November 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/10/">October 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/09/">September 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/08/">August 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/07/">July 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/05/">May 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/12/">December 2008</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/07/">July 2008</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05/">May 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/02/">February 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/11/">November 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">October 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">September 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/08/">August 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/07/">July 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/05/">May 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04/">April 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">March 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">January 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/12/">December 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">June 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">May 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">April 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">January 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">October 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/09/">September 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/08/">August 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/07/">July 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/05/">May 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/04/">April 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/03/">March 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/02/">February 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/12/">December 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/11/">November 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/10/">October 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/09/">September 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/08/">August 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/07/">July 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/05/">May 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/04/">April 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/03/">March 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/02/">February 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/01/">January 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/12/">December 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/11/">November 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/10/">October 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/09/">September 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/08/">August 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/07/">July 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/06/">June 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/05/">May 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/04/">April 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/03/">March 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/12/">December 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/11/">November 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/10/">October 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/09/">September 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/08/">August 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/07/">July 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/05/">May 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/12/">December 2008</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/07/">July 2008</a></li></ul>
     </div>
   </div>
 
@@ -675,9 +655,13 @@ Ctrl + z：挂起命令
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Recente berichten</h3>
+    <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/archives/84169.html">HAProxy+Nginx+gunicorn获取真实ip</a>
+          </li>
         
           <li>
             <a href="/archives/84168.html">在Docker中运行X11程序</a>
@@ -695,10 +679,6 @@ Ctrl + z：挂起命令
             <a href="/archives/84165.html">使用CodePush对ReactNative进行热更新</a>
           </li>
         
-          <li>
-            <a href="/archives/84164.html">ReactNative获取设备屏幕尺寸</a>
-          </li>
-        
       </ul>
     </div>
   </div>
@@ -713,10 +693,10 @@ Ctrl + z：挂起命令
         <li><a target="_blank" title="我的Twitter" href="https://twitter.com/longchangjin">@Twitter</a></li>
         <li><a target="_blank" title="我的豆瓣" href="http://www.douban.com/people/lchj/">@Douban</a></li>
 
-        <li><a target="_blank" title="" href="http://www.vimer.cn/">Vimer的程序世界</a></li>
         <li><a target="_blank" title="" href="http://pythoner.net/">python开发者社区</a></li>
         <li><a target="_blank" title="" href="http://simple-is-better.com/">python.cn(news, jobs)</a></li>
         <li><a target="_blank" title="" href="http://gtk.awaysoft.com/">GTK+ 中文社区</a></li>
+        <li><a target="_blank" title="小智LOGO - LOGO在线制作神器 - 3分钟完成公司LOGO设计" href="http://xzlogo.com/">小智LOGO</a></li>
       </ul>
     </div>
 </div>

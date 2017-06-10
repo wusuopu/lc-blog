@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.xefan.com/"/>
-  <updated>2017-05-19T09:54:11.000Z</updated>
+  <updated>2017-06-10T14:48:06.000Z</updated>
   <id>http://www.xefan.com/</id>
   
   <author>
@@ -14,6 +14,35 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>HAProxy+Nginx+gunicorn获取真实ip</title>
+    <link href="http://www.xefan.com/archives/84169.html"/>
+    <id>http://www.xefan.com/archives/84169.html</id>
+    <published>2017-06-10T22:31:24.730Z</published>
+    <updated>2017-06-10T14:48:06.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>之前在部署在 nginx + uwsgi 应用时都是通过如下方法来获取真实的客户端ip的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">upstream app_server &#123;</div><div class="line">    server unix:///tmp/gunicorn.sock fail_timeout=0;</div><div class="line">&#125;</div><div class="line"></div><div class="line">server &#123;</div><div class="line">    listen       80;</div><div class="line">    server_name  localhost;</div><div class="line">    location / &#123;</div><div class="line">        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;</div><div class="line">        proxy_set_header Host $http_host;</div><div class="line">        proxy_redirect off;</div><div class="line"></div><div class="line">        proxy_pass   http://app_server;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这样在 uwsgi 的应用程序中只需要读取 http headers 中的 X-Forwarded-For 字段即可。</p>
+<p>但是最近由于运维架构的是采用 haproxy + nginx + uwsgi 是形式，导致了在 uwsgi 应用程序中获取到的 ip 都是 haproxy 的。<br>为了要获取到真实的ip地址，需要由 haproxy 将 ip 传给 nginx，再由 nginx 传给 uwsgi。<br>在网上搜索了半天 haproxy 的相关配置，感觉太复杂了。因此还是决定从 nginx 入手。</p>
+<p>经过实验将 nginx 的配置改为如下即可：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">proxy_set_header X-Forwarded-For $http_x_forwarded_for;</div><div class="line">proxy_set_header Host $http_host;</div><div class="line">proxy_redirect off;</div></pre></td></tr></table></figure>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;之前在部署在 nginx + uwsgi 应用时都是通过如下方法来获取真实的客户端ip的：&lt;/p&gt;
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;
+    
+    </summary>
+    
+      <category term="Python栏目" scheme="http://www.xefan.com/categories/Python%E6%A0%8F%E7%9B%AE/"/>
+    
+    
+      <category term="python" scheme="http://www.xefan.com/tags/python/"/>
+    
+  </entry>
   
   <entry>
     <title>在Docker中运行X11程序</title>
@@ -727,51 +756,6 @@
     <summary type="html">
     
       &lt;h2 id=&quot;依赖注入&quot;&gt;&lt;a href=&quot;#依赖注入&quot; class=&quot;headerlink&quot; title=&quot;依赖注入&quot;&gt;&lt;/a&gt;依赖注入&lt;/h2&gt;&lt;p&gt;之前有遇到过 angularjs 的代码压缩之后就报错了，通过查文档得知是因为 angularjs 是通过变量名来查找相应服
-    
-    </summary>
-    
-      <category term="前端相关" scheme="http://www.xefan.com/categories/%E5%89%8D%E7%AB%AF%E7%9B%B8%E5%85%B3/"/>
-    
-    
-      <category term="js" scheme="http://www.xefan.com/tags/js/"/>
-    
-      <category term="angular" scheme="http://www.xefan.com/tags/angular/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>AngularJS学习笔记3——表单</title>
-    <link href="http://www.xefan.com/archives/84149.html"/>
-    <id>http://www.xefan.com/archives/84149.html</id>
-    <published>2015-08-18T18:32:35.000Z</published>
-    <updated>2017-01-21T16:20:19.000Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="双向绑定"><a href="#双向绑定" class="headerlink" title="双向绑定"></a>双向绑定</h2><p>使用 <code>ngModel</code> 指令将输入框与 model 进行绑定，如： <code>&lt;input type=&quot;text&quot; ng-model=&quot;text&quot; name=&quot;text&quot; /&gt;</code><br>当输入框或者 model 的值其中一方改变都会影响另一方。</p>
-<h2 id="表单验证"><a href="#表单验证" class="headerlink" title="表单验证"></a>表单验证</h2><p>之前表单验证都是用的 jquery-validation 这个插件，这需要编写大量的 js 代码用于逻辑控制，<br>现在改用 angularjs 之后方便了许多，不过还是要编写大量的视图代码。</p>
-<p>一个简单的例子： <a href="https://github.com/wusuopu/angularjs-practice/blob/master/static/form/validate.html" target="_blank" rel="external">https://github.com/wusuopu/angularjs-practice/blob/master/static/form/validate.html</a></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">&lt;form action=&quot;#&quot; name=&quot;user_form&quot; ng-submit=&quot;submitForm(user_form.$valid, $event)&quot; novalidate&gt;</div><div class="line"></div><div class="line">    &lt;div class=&quot;form-group&quot; ng-class=&quot;&#123;&apos;has-error&apos; : user_form.name.$invalid &amp;&amp; user_form.name.$dirty, &apos;has-success&apos; : user_form.name.$valid&#125;&quot;&gt;</div><div class="line">        &lt;label&gt;Name&lt;/label&gt;</div><div class="line">        &lt;input type=&quot;text&quot; name=&quot;name&quot; class=&quot;form-control&quot; ng-model=&quot;formData.name&quot; required&gt;</div><div class="line">        &lt;p ng-show=&quot;user_form.name.$invalid &amp;&amp; user_form.name.$dirty&quot; class=&quot;help-block&quot;&gt;You name is required.&lt;/p&gt;</div><div class="line">    &lt;/div&gt;</div><div class="line">.....</div><div class="line">&lt;/form&gt;</div></pre></td></tr></table></figure>
-<p>首先为 form 表单设置 <code>name</code> 属性，并设置 <code>novalidate</code> 属性禁止浏览器使用 HTML5 自带的验证功能。<br>然后对于需要验证的字段添加相应的验证属性，angularjs 内建的验证规则如下：</p>
-<ul>
-<li>email</li>
-<li>max</li>
-<li>maxlength</li>
-<li>min</li>
-<li>minlength</li>
-<li>number</li>
-<li>pattern</li>
-<li>required</li>
-<li>url</li>
-<li>date</li>
-<li>datetimelocal</li>
-<li>time</li>
-<li>week</li>
-<li>month</li>
-</ul>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;双向绑定&quot;&gt;&lt;a href=&quot;#双向绑定&quot; class=&quot;headerlink&quot; title=&quot;双向绑定&quot;&gt;&lt;/a&gt;双向绑定&lt;/h2&gt;&lt;p&gt;使用 &lt;code&gt;ngModel&lt;/code&gt; 指令将输入框与 model 进行绑定，如： &lt;code&gt;&amp;lt;input 
     
     </summary>
     
