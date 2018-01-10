@@ -69,9 +69,9 @@
       <div class="outer">
         <section id="main">
   
-    <article id="post-/archives/83446.html" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-/archives/83448.html" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/archives/83446.html" class="article-date">
+    <a href="/archives/83448.html" class="article-date">
   <time datetime="2010-10-30T00:00:00.000Z" itemprop="datePublished">2010-10-30</time>
 </a>
     
@@ -87,7 +87,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/archives/83446.html">在Windows下安装gcc</a>
+      <a class="article-title" href="/archives/83448.html">在Windows下安装GTK</a>
     </h1>
   
 
@@ -95,25 +95,41 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p><strong>GCC简介</strong></p>
-<p>GCC是GNU公社的一个项目。是一个用于编程开发的自由编译器。最初，GCC只是一个C语言编译器，他是GNU C Compiler 的英文缩写。随着众多自由开发者的加入和GCC自身的发展，如今的GCC以经是一个包含众多语言的编译器了。其中包括 C,C++,Ada,Object C和Java等。所以，GCC也由原来的GNU C Compiler变为GNU Compiler Collection。也就是 GNU编译器家族 的意思。当然，如今的GCC借助于他的特性，具有了交叉编译器的功能，即在一个平台下编译另一个平台的代码。</p>
-<p>GCC是一个原本用于Unix系统下编程的编译器。不过，现在GCC也有了许多Win32下的移植版本。</p>
-<p><strong>GCC for Windows</strong></p>
-<p>Windows下的gcc有MinGW、Cygwin、Dev C++等等。这几个版本都很不错，不过我还是比较喜欢Dev C++。</p>
-<p><strong>MinGW</strong>( <a href="http://www.mingw.org" target="_blank" rel="external">http://www.mingw.org</a> )和<strong>Cygwin</strong>( <a href="http://www.cygwin.com" target="_blank" rel="external">http://www.cygwin.com</a> )在安装过程中需要联网下载所需的文件，而服务器基本上都是在国外，所以这个过程非常的慢。曾经有一次安装Cygwin花了偶一个多小时的时间…………</p>
-<p>这就是偶为什么选择Dev C++的原因。</p>
-<p><strong>Dev C++</strong>( <a href="https://sourceforge.net/projects/dev-cpp/" target="_blank" rel="external">https://sourceforge.net/projects/dev-cpp/</a> )使用MingW32/GCC编译器，遵循C/C++标准。开发环境包括多页面窗口、工程编辑器以及调试器等。</p>
-<p><span style="color: #0000ff">devcpp-4.9.9.2_setup.exe</span>下载：</p>
-<p><a href="http://sourceforge.net/projects/dev-cpp/files/Binaries/Dev-C%2B%2B%204.9.9.2/devcpp-4.9.9.2_setup.exe/download" target="_blank" rel="external">http://sourceforge.net/projects/dev-cpp/files/Binaries/Dev-C%2B%2B%204.9.9.2/devcpp-4.9.9.2_setup.exe/download</a></p>
-<p><em>Dev C++如图：</em><br><img class="aligncenter" title="Dev C++" src="http://img208.poco.cn/mypoco/myphoto/20101030/12/5545129120101030123110078.jpg" alt="" width="771" height="441"></p>
+        <p><strong>GTK 简介 </strong></p>
+<p>GTK (GIMP Toolkit) 是一套用于创建图形用户界面的工具包。它遵循 LGPL许可证，所以可以用它来开发开源软件、自由软件，甚至是封闭源代码的商业软件，而不用花费任何费用来购买许可证和使用权。当前，GTK 已经被成功地应用到 了大量的自由软件及商业软件中，已经取得了很大的成功。<br>GTK是跨平台的，它能够运行于Linux/Unix/Windows/MacOS及嵌入式系统</p>
+<p>下面就来介绍一下在Windows一搭建GTK开发环境。<br>首先需要先安装C/C++开发环境，GTK支持Cygwin、MSYS、Dec-Cpp、MSVC这几种。这里偶用的是Dev-Cpp。在前一篇文章《在Windows下安装gcc》（ <a href="http://www.xefan.com/archives/83446.html">http://www.xefan.com/archives/83446.html</a> ）介绍了Dev-Cpp的安装。</p>
+<p><strong>下载、安装GTK</strong></p>
+<p>下载地址：<a href="http://gladewin32.sourceforge.net/" target="_blank" rel="external">http://gladewin32.sourceforge.net/</a></p>
+<p>由于我们是用于开发，所以就选择下载<strong><em>Gtk+ 2.12.9 Development Environment Revision 2</em></strong>这个。下载完后安装gtk-dev-2.12.9-win32-2.exe，安装过程全部按照默然的就可以了，留意一下的是选择IDE的时候确定一下是Dev-Cpp就可以了。安装完毕后系统环境变量和Dev-Cpp的目录设置应该都已经设置好了。<br>1、查看系统环境变量：右键单击“我的电脑”–&gt;“属性”–&gt;“高级”–&gt;“环境变量”–&gt;“系统变量”，可以看到Path增加了“%GTK_BASEPATH%bin”。</p>
+<p>2、查看Dev-Cpp的目录设置：“工具”–&gt;“编译器选项”–&gt;“目录”，选择“库”可以看到“C:GTKbin”;选择“C包含文件”可以看到“C:GTKINCLUDE”……</p>
+<p>接下来我们进行测试一下，打开 Dev-C++，建立一个新的工程，添加一个新文件：</p>
+<pre>#include &lt;gtk/gtk.h&gt;
+int main(int argc, char *argv[])
+{
+GtkWidget *window;
+gtk_init(&amp;argc, &amp;argv);
+window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+gtk_window_set_title(GTK_WINDOW(window), "Hello World");
+gtk_widget_show(window);
+gtk_main();
+return 0 ;
+}</pre>
+
+<p>这个时候还不能编译，需要修改工程属性，在”工程-&gt;工程属性-&gt;参数” 或 “工具-&gt;编译选项”中的链接器框里面填入：  </p>
+<ul> -lgtk-win32-2.0 -lgdk-win32-2.0 -latk-1.0 -lgdk_pixbuf-2.0 -lpangowin32-1.0 -lgdi32 -lpango-1.0 -lgobject-2.0 -lgmodule-2.0 -lglib-2.0 -lintl -liconv</ul>
+
+<p>在编译选项里面填入：  </p>
+<p><ul> -mms-bitfields</ul><br>就可以编译通过了。</p>
+<p>在运行以后，你会发现出现一个空白窗口，标题为 Hello World。</p>
+<p><img class="aligncenter" title="Dev Cpp-GTK" src="http://img208.poco.cn/mypoco/myphoto/20101030/13/5545129120101030135311028.jpg" alt="" width="533" height="446"></p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83446.html" data-id="cj3refrtz006o8iq3rrshmxjj" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83448.html" data-id="cjc95ct160073n4q3xzalkx7w" class="article-share-link">Share</a>
       
       
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gcc/">gcc</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/windows/">windows</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gcc/">gcc</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gtk/">gtk</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/windows/">windows</a></li></ul>
 
     </footer>
   </div>
@@ -158,7 +174,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83443.html" data-id="cj3refrty006k8iq3n4fsn1u9" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83443.html" data-id="cjc95ct11006mn4q3cmhqmeur" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/电脑技巧/">电脑技巧</a></li></ul>
@@ -203,7 +219,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83441.html" data-id="cj3refrtx006h8iq33rwp9tm6" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83441.html" data-id="cjc95ct0t006gn4q32i6vf26m" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ubuntu/">ubuntu</a></li></ul>
@@ -272,7 +288,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83435.html" data-id="cj3refrtw006e8iq3ml7bz6h2" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83435.html" data-id="cjc95ct0u006kn4q3vzxl6m8m" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vim/">vim</a></li></ul>
@@ -337,7 +353,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83433.html" data-id="cj3refrts00688iq325fe0hb7" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83433.html" data-id="cjc95ct0s006dn4q3ni8c3j60" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/USB/">USB</a></li></ul>
@@ -386,7 +402,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83431.html" data-id="cj3refrtv006c8iq3xxanl5ay" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83431.html" data-id="cjc95ct0r006an4q3gue90wsw" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/USB/">USB</a></li></ul>
@@ -444,7 +460,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83429.html" data-id="cj3refrtr00658iq3ihs9vyor" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83429.html" data-id="cjc95ct0q0067n4q3iqof51nm" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ftp/">ftp</a></li></ul>
@@ -509,7 +525,7 @@ $ make
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83425.html" data-id="cj3refrtq00618iq367w12tb3" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83425.html" data-id="cjc95ct0p0063n4q3kt0t67o3" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/无线网/">无线网</a></li></ul>
@@ -561,7 +577,7 @@ $ make
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83423.html" data-id="cj3refrtp005y8iq3mv0fwty2" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83423.html" data-id="cjc95ct0o0060n4q38p4lompm" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li></ul>
@@ -615,7 +631,7 @@ $ make
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83418.html" data-id="cj3refrtm005u8iq3fiujhslr" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83418.html" data-id="cjc95ct0n005wn4q3r48zrcly" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/资源分享/">资源分享</a></li></ul>
@@ -733,7 +749,7 @@ $ make
   
   <div class="outer">
     <div id="footer-info" class="inner">
-      &copy; 2017 龍昌<br>
+      &copy; 2018 龍昌<br>
       Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>

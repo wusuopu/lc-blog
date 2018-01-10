@@ -69,9 +69,9 @@
       <div class="outer">
         <section id="main">
   
-    <article id="post-/archives/84053.html" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-/archives/84057.html" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/archives/84053.html" class="article-date">
+    <a href="/archives/84057.html" class="article-date">
   <time datetime="2014-03-29T00:00:00.000Z" itemprop="datePublished">2014-03-29</time>
 </a>
     
@@ -87,7 +87,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/archives/84053.html">pymongo教程(1)——概述</a>
+      <a class="article-title" href="/archives/84057.html">pymongo教程(2)——聚合操作</a>
     </h1>
   
 
@@ -95,68 +95,12 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p></p><p>MongoDB是使用C++开发的一款文档型数据库，PyMongo是MongoDB的Python驱动。</p><p></p>
-<p></p><h2>安装</h2><p></p>
-<p></p><h3>使用pip安装</h3><p></p>
-<pre><code>$ [sudo] pip install pymongo
-</code></pre>
-<p>如果要安装特定的版本则：</p>
-<pre><code>$ [sudo] pip install pymongo==2.6.3
-</code></pre>
-<h3>通过源代码安装</h3>
-<pre><code>$ git clone git://github.com/mongodb/mongo-python-driver.git pymongo
-$ cd pymongo/
-$ [sudo] python setup.py install
-</code></pre>
-<p>注意：使用C的扩展会对性能提升会有帮助。但是在uwsgi中会出现警告，则可以选择只安装python驱动，而不安装C扩展。</p>
-<pre><code>$ [sudo] python setup.py --no_ext install
-</code></pre>
-<p>注意： 如果你使用的是Python3的话，PyMongo只支持 Python 3.1以上的版本。</p>
-<h2>使用</h2>
-<p>首先启动 mongodb 服务器：</p>
-<pre><code>$ mongod
-</code></pre>
-<h3>连接服务器</h3>
-<p>然后执行python程序连接服务器：</p>
-<pre><code>from pymongo import MongoClient
-client = MongoClient()
-</code></pre>
-<p>以上会连接到默认的主机和端口（localhost:27017），也可以指定主机名和端口：</p>
-<pre><code>client = MongoClient('localhost', 27017)
-</code></pre>
-<p>或者：</p>
-<pre><code>client = MongoClient('mongodb://localhost:27017/')
-</code></pre>
-<h3>访问数据库</h3>
-<pre><code>db = client.test_database
-</code></pre>
-<p>如果数据库的名称不能直接使用属性名的风格访问，那么就需要使用字典的风格：</p>
-<pre><code>db = client['test-database']
-</code></pre>
-<h3>访问数据集合</h3>
-<p>与访问数据库相似：</p>
-<pre><code>collection = db.test_collection
-collection = db['test-collection']
-</code></pre>
-<h3>插入数据</h3>
-<p>在MongoDB中数据是以类似JSON格式进行保存的，在PyMongo中则是使用字典风格。然后可以数据集合对象的 insert() 方法进行插入数据。</p>
-<pre><code>import datetime
-post = {"author": "Mike",
-        "text": "My first blog post!",
-        "tags": ["mongodb", "python", "pymongo"],
-        "date": datetime.datetime.utcnow()}
-post_id = db.posts.insert(post)
-</code></pre>
-<h3>查询数据</h3>
-<p>可以数据集合对象的 find() 方法进行查询数据。</p>
-<pre><code>db.posts.find({"author": "Mike"})
-db.posts.find_one({"author": "Mike"})
-</code></pre>
+        <p>在MongoDB中常用的聚合操作有 aggregation、map/reduce和group 。</p><br><p>首先先添加一些测试数据：</p><br><pre><code>db.things.insert({“x”: 1, “tags”: [“dog”, “cat”]})<br>db.things.insert({“x”: 2, “tags”: [“cat”]})<br>db.things.insert({“x”: 2, “tags”: [“mouse”, “cat”, “dog”]})<br>db.things.insert({“x”: 3, “tags”: []})<br></code></pre><br><h2>aggregation</h2><br><p>以下例子是统计 tags 字段内的各个值的出现的次数。</p><br><pre><code>from bson.son import SON<br>db.things.aggregate([<br>    {“$unwind”: “$tags”},<br>    {“$group”: {“_id”: “$tags”, “count”: {“$sum”: 1}}},<br>    {“$sort”: SON([(“count”, -1), (“_id”, -1)])}<br>])<br><br>{‘ok’: 1.0, ‘result’: [{‘count’: 3, ‘_id’: ‘cat’}, {‘count’: 2, ‘_id’: ‘dog’}, {‘count’: 1, ‘_id’: ‘mouse’}]}<br></code></pre><br><p>注意：aggregate操作要求服务器程序为 2.1.0 以上的版本。PyMongo 驱动程序为 2.3 以上的版本。</p><br><h2>Map/Reduce</h2><br><p>上面的操作同样也可以使用 Map/Reduce 完成。</p><br><pre><code>from bson.code import Code<br>mapper = Code(“””<br>    function () {<br>      this.tags.forEach(function(z) {<br>        emit(z, 1);<br>      });<br>    }<br>“””)<br><br>reducer = Code(“””<br>    function (key, values) {<br>      var total = 0;<br>      for (var i = 0; i &lt; values.length; i++) {<br>        total += values[i];<br>      }<br>      return total;<br>    }<br>“””)<br><br>result = db.things.map_reduce(mapper, reducer, “myresults”)<br>for doc in result.find():<br>    print(doc)<br><br>{u’_id’: u’cat’, u’value’: 3.0}<br>{u’_id’: u’dog’, u’value’: 2.0}<br>{u’_id’: u’mouse’, u’value’: 1.0}<br></code></pre><br><p>map和reduce都是一个javascript的函数； map_reduce 方法会将统计结果保存到一个临时的数据集合中。</p><br><h2>Group</h2><br><p>group 操作与SQL的 GROUP BY 相似，同时比 Map/Reduce 要简单。</p><br><pre><code>reducer = Code(“””<br>    function(obj, prev){<br>      prev.count++;<br>    }<br>“””)<br><br>results = db.things.group(key={“x”:1}, condition={}, initial={“count”: 0}, reduce=reducer)<br>for doc in results:<br>    print(doc)<br><br>{‘x’: 1.0, ‘count’: 1.0}<br>{‘x’: 2.0, ‘count’: 2.0}<br>{‘x’: 3.0, ‘count’: 1.0}<br></code></pre><br><p>注意：在MongoDB的集群环境中不支持 group 操作，可以使用 aggregation 或者 map/reduce 代替。</p><br><p>完整的MongoDB聚合文档： <a href="http://docs.mongodb.org/manual/aggregation/" target="_blank" rel="external">http://docs.mongodb.org/manual/aggregation/</a></p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84053.html" data-id="cj3refs1u00l18iq34tn8n1kg" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84057.html" data-id="cjc95ct7300ltn4q3wplfxn2u" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -210,7 +154,7 @@ $ mkgitignore vim,python .gitignore
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84048.html" data-id="cj3refs2500lk8iq3a1g41xmm" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84048.html" data-id="cjc95ct7200lqn4q3d4rebtbq" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/git/">git</a></li></ul>
@@ -288,7 +232,7 @@ startxfce4 &amp;
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84045.html" data-id="cj3refs1q00kr8iq3dtl943nv" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84045.html" data-id="cjc95ct7100lmn4q3s16j7nnb" class="article-share-link">Share</a>
       
       
     </footer>
@@ -346,7 +290,7 @@ test
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84042.html" data-id="cj3refs1t00ky8iq3x6uohfm0" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84042.html" data-id="cjc95ct6w00lbn4q362s9k51u" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mongodb/">mongodb</a></li></ul>
@@ -436,7 +380,7 @@ $ source ~/.nvm/nvm.sh
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84039.html" data-id="cj3refs1r00ku8iq3d3t6vqzo" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84039.html" data-id="cjc95ct6u00l7n4q3q63agqrg" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/node/">node</a></li></ul>
@@ -480,7 +424,7 @@ $ source ~/.nvm/nvm.sh
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84036.html" data-id="cj3refs1i00kd8iq3jabxwh3w" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84036.html" data-id="cjc95ct6y00len4q3mh6gh8yb" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -524,7 +468,7 @@ $ source ~/.nvm/nvm.sh
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84032.html" data-id="cj3refs1o00kn8iq3lozer1hk" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84032.html" data-id="cjc95ct6t00l4n4q3nt4i1j9e" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web开发/">Web开发</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/css/">css</a></li></ul>
@@ -592,7 +536,7 @@ $ source ~/.nvm/nvm.sh
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84027.html" data-id="cj3refs1m00kk8iq389i5rwil" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84027.html" data-id="cjc95ct6q00kxn4q3aapvpdzn" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gcc/">gcc</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/资源分享/">资源分享</a></li></ul>
@@ -636,7 +580,7 @@ $ source ~/.nvm/nvm.sh
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84024.html" data-id="cj3refs1j00kg8iq36k1swp9b" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84024.html" data-id="cjc95ct6o00ktn4q3bxeqkitq" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gcc/">gcc</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/资源分享/">资源分享</a></li></ul>
@@ -682,7 +626,7 @@ $ source ~/.nvm/nvm.sh
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84018.html" data-id="cj3refs1f00k98iq3zehuvul2" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84018.html" data-id="cjc95ct6s00l0n4q3oj7g437y" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web开发/">Web开发</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/css/">css</a></li></ul>
@@ -800,7 +744,7 @@ $ source ~/.nvm/nvm.sh
   
   <div class="outer">
     <div id="footer-info" class="inner">
-      &copy; 2017 龍昌<br>
+      &copy; 2018 龍昌<br>
       Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>

@@ -98,12 +98,12 @@
         <p>写python代码写习惯了，再来用C代码处理字符串感觉很痛苦。在python中有find、index等函数可以进行字符串匹配，而用C语言就只能自己写了。</p>
 <p>朴素算法思路比较简单，就是将源字符串与目标字符串挨个进行比较，看看在目标字符串中是否包含了源字符串。该算法的匹配时间为O((n-m+1)m)。</p>
 <p>C语言实现如下：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">native_matcher</span><span class="params">(<span class="keyword">char</span> *t, <span class="keyword">char</span> *p, <span class="keyword">int</span> len1, <span class="keyword">int</span> len2)</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">int</span> i, j, idx;</div><div class="line">    idx = <span class="number">0</span>;</div><div class="line">    <span class="keyword">for</span> (i=<span class="number">0</span>; i&lt;len1; i++) &#123;</div><div class="line">        <span class="keyword">for</span> (j=<span class="number">0</span>; j&lt;len2; j++) &#123;</div><div class="line">            <span class="keyword">if</span> (p[j] != t[j+i]) &#123;</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">if</span> (j == len2) &#123;</div><div class="line">            <span class="keyword">return</span> i;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">char</span> t[] = <span class="string">"BBC ABCDAB ABCDABCDABDE"</span>;</div><div class="line">    <span class="keyword">char</span> p[] = <span class="string">"ABCDABD"</span>;</div><div class="line">    <span class="keyword">int</span> len1 = <span class="keyword">sizeof</span>(t) - <span class="number">1</span>;</div><div class="line">    <span class="keyword">int</span> len2 = <span class="keyword">sizeof</span>(p) - <span class="number">1</span>;</div><div class="line">    <span class="keyword">int</span> index = native_matcher(t, p, len1, len2);</div><div class="line">    <span class="built_in">printf</span>(<span class="string">"index: %d\n"</span>, index);</div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">native_matcher</span><span class="params">(<span class="keyword">char</span> *t, <span class="keyword">char</span> *p, <span class="keyword">int</span> len1, <span class="keyword">int</span> len2)</span></span></div><div class="line"><span class="function"></span>&#123;</div><div class="line">    <span class="keyword">int</span> i, j, idx;</div><div class="line">    idx = <span class="number">0</span>;</div><div class="line">    <span class="keyword">for</span> (i=<span class="number">0</span>; i&lt;len1; i++) &#123;</div><div class="line">        <span class="keyword">for</span> (j=<span class="number">0</span>; j&lt;len2; j++) &#123;</div><div class="line">            <span class="keyword">if</span> (p[j] != t[j+i]) &#123;</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">if</span> (j == len2) &#123;</div><div class="line">            <span class="keyword">return</span> i;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></div><div class="line"><span class="function"></span>&#123;</div><div class="line">    <span class="keyword">char</span> t[] = <span class="string">"BBC ABCDAB ABCDABCDABDE"</span>;</div><div class="line">    <span class="keyword">char</span> p[] = <span class="string">"ABCDABD"</span>;</div><div class="line">    <span class="keyword">int</span> len1 = <span class="keyword">sizeof</span>(t) - <span class="number">1</span>;</div><div class="line">    <span class="keyword">int</span> len2 = <span class="keyword">sizeof</span>(p) - <span class="number">1</span>;</div><div class="line">    <span class="keyword">int</span> index = native_matcher(t, p, len1, len2);</div><div class="line">    <span class="built_in">printf</span>(<span class="string">"index: %d\n"</span>, index);</div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83851.html" data-id="cj3refrz700g78iq3y2q3ozlp" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83851.html" data-id="cjc95ct4x00ggn4q33s48c6di" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/匹配算法/">匹配算法</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/算法/">算法</a></li></ul>
@@ -114,19 +114,19 @@
     
 <nav id="article-nav">
   
-    <a href="/archives/83853.html" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/archives/83859.html" id="article-nav-newer" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Newer</strong>
       <div class="article-nav-title">
         
-          字符串匹配算法（二）——Rabin-Karp算法
+          字符串匹配算法（三）——KMP算法
         
       </div>
     </a>
   
   
-    <a href="/archives/83847.html" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/archives/83853.html" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">常用的排序算法（七）——希尔排序</div>
+      <div class="article-nav-title">字符串匹配算法（二）——Rabin-Karp算法</div>
     </a>
   
 </nav>
@@ -253,7 +253,7 @@
   
   <div class="outer">
     <div id="footer-info" class="inner">
-      &copy; 2017 龍昌<br>
+      &copy; 2018 龍昌<br>
       Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>
