@@ -9,4 +9,5 @@ post_id: 3
 permalink: /gbook/
 ---
 
-有事请在此留言。
+<del>有事请在此留言。</del>
+多说评论插件已不能使用了，有事请[到此](https://github.com/wusuopu/wusuopu.github.io/issues)留言。
