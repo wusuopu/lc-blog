@@ -72,7 +72,7 @@
     <article id="post-/archives/83695.html" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/83695.html" class="article-date">
-  <time datetime="2012-02-22T00:00:00.000Z" itemprop="datePublished">2012-02-22</time>
+  <time datetime="2012-02-22T18:31:00.000Z" itemprop="datePublished">2012-02-22</time>
 </a>
     
   <div class="article-category">
@@ -162,7 +162,57 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83695.html" data-id="cjc95ct3500can4q32xuvapd6" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83695.html" data-id="cjo5f578q00cbf808qgc1snuh" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/C/">C</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-/archives/83692.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83692.html" class="article-date">
+  <time datetime="2012-02-22T09:54:43.000Z" itemprop="datePublished">2012-02-22</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/编程开发/">编程开发</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/83692.html">Linux进程通信——使用信号</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>函数：signal 设置某一信号对应的动作<br>头文件： #include &lt;signal.h&gt;<br>函数原型： void (<em>signal(int signum, void (</em>handler) (int))) (int)；<br>signal：信号编号<br>handler：信号处理函数，若该参数不是函数指针则必须为以下两个常数之一：<br>SIG_IGN：忽略信号<br>SIG_DFL：重设为预设的处理方式<br>返回：成功则返回先前的信号处理函数指针，错误则返回SIG_ERR(-1)  </p>
+<p>函数：pause 让进程暂停直到信号出现<br>头文件：#include &lt;unistd.h&gt;<br>函数原型： int pause(void)；<br>只返回-1  </p>
+<p>函数： kill 传送信号<br>头文件：  </p>
+<p>  #include &lt;signal.h&gt;  </p>
+<p>  #include &lt;sys/types.h&gt;<br>函数原型： int kill(pid_t pid, int sig)；<br>pid：接收信号的进程号；当pid=0时为相同进程组的所有进程；当pid=-1时为系统内所有进程；当pid&gt;0时为指定进程；当pid&lt;-1时为进程组识别码为pid绝对值的所有进程。<br>sig：要传送的信号<br>返回：成功返回0，错误返回-1  </p>
+<p>例子：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/****************************************</span></div><div class="line"><span class="comment"> *</span></div><div class="line"><span class="comment"> *设置信号处理</span></div><div class="line"><span class="comment"> *等待2秒后向进程本身传送一个SIGALRM信号</span></div><div class="line"><span class="comment"> *龙昌博客：http://www.xefan.com</span></div><div class="line"><span class="comment"> *</span></div><div class="line"><span class="comment"> ****************************************/</span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;signal.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">func</span><span class="params">(<span class="keyword">int</span> sig_no)</span></span></div><div class="line"><span class="function"></span>&#123;</div><div class="line">    <span class="keyword">if</span> (sig_no == SIGALRM)</div><div class="line">    &#123;</div><div class="line">        <span class="built_in">printf</span>(<span class="string">"get SIGALRM\n"</span>);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></div><div class="line"><span class="function"></span>&#123;</div><div class="line">    <span class="built_in">printf</span>(<span class="string">"%d waiting for signal..\n"</span>, getpid());</div><div class="line">    alarm(<span class="number">2</span>);</div><div class="line">    signal(SIGALRM, func);</div><div class="line">    raise(SIGALRM);</div><div class="line">    pause();</div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83692.html" data-id="cjo5f578f00bqf8080jdpjbxo" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/C/">C</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li></ul>
@@ -178,7 +228,7 @@
     <article id="post-/archives/83689.html" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/83689.html" class="article-date">
-  <time datetime="2012-02-21T00:00:00.000Z" itemprop="datePublished">2012-02-21</time>
+  <time datetime="2012-02-21T18:16:12.000Z" itemprop="datePublished">2012-02-21</time>
 </a>
     
   <div class="article-category">
@@ -214,7 +264,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83689.html" data-id="cjc95ct3300c5n4q3xfmox09m" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83689.html" data-id="cjo5f578l00c0f8081th44xt0" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/C/">C</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li></ul>
@@ -230,7 +280,7 @@
     <article id="post-/archives/83686.html" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/83686.html" class="article-date">
-  <time datetime="2012-02-21T00:00:00.000Z" itemprop="datePublished">2012-02-21</time>
+  <time datetime="2012-02-21T10:03:01.000Z" itemprop="datePublished">2012-02-21</time>
 </a>
     
   <div class="article-category">
@@ -258,10 +308,11 @@
 <p>函数：<br>int pipe(int fd[2]);  创建无名管道。<br>fd[2]：管道两个文件描述符，fd[0]代表读端（管道头），fd[1]代表写端（管道尾）。<br>创建成功返回0，失败返回-1。</p>
 <p>创建成功之后可以像操作普通文件一样使用read、write进行读写操作。<br>例子：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**********************************</span></div><div class="line"><span class="comment"> *</span></div><div class="line"><span class="comment"> * 使用无名管道进行进程通信</span></div><div class="line"><span class="comment"> * 龙昌博客：http://www.xefan.com</span></div><div class="line"><span class="comment"> *</span></div><div class="line"><span class="comment">***********************************/</span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></div><div class="line"><span class="function"></span>&#123;</div><div class="line">    <span class="keyword">int</span> pfd[<span class="number">2</span>];</div><div class="line">    <span class="keyword">pid_t</span> pid;</div><div class="line">    <span class="keyword">char</span> buf[<span class="number">100</span>];</div><div class="line">    <span class="keyword">int</span> num;</div><div class="line"></div><div class="line">    <span class="built_in">memset</span>(buf, <span class="number">0</span>, <span class="keyword">sizeof</span>(buf));</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (pipe(pfd) &lt; <span class="number">0</span>)  <span class="comment">//创建无名管道</span></div><div class="line">    &#123;</div><div class="line">        perror(<span class="string">"pipe"</span>);</div><div class="line">        <span class="built_in">exit</span>(<span class="number">-1</span>);</div><div class="line">    &#125;</div><div class="line">    <span class="comment">//父进程向管道写数据，子进程从管道读数据</span></div><div class="line">    <span class="keyword">if</span> ((pid=fork()) == <span class="number">0</span>)</div><div class="line">    &#123;</div><div class="line">        sleep(<span class="number">1</span>);</div><div class="line">        <span class="keyword">if</span> ((num=read(pfd[<span class="number">0</span>], buf, <span class="number">100</span>)) &gt; <span class="number">0</span>)</div><div class="line">        &#123;</div><div class="line">            <span class="built_in">printf</span>(<span class="string">"%d numbers read, %s\n"</span>, num, buf);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (pid &gt; <span class="number">0</span>)</div><div class="line">    &#123;</div><div class="line">        <span class="keyword">if</span> (write(pfd[<span class="number">1</span>], <span class="string">"Hello"</span>, <span class="number">5</span>) &lt; <span class="number">0</span>)</div><div class="line">        &#123;</div><div class="line">            perror(<span class="string">"write"</span>);</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">if</span> (write(pfd[<span class="number">1</span>], <span class="string">" Pipe"</span>, <span class="number">5</span>) &lt; <span class="number">0</span>)</div><div class="line">        &#123;</div><div class="line">            perror(<span class="string">"write"</span>);</div><div class="line">        &#125;</div><div class="line">        waitpid(pid, <span class="literal">NULL</span>, <span class="number">0</span>);</div><div class="line">    &#125;</div><div class="line">    close(pfd[<span class="number">0</span>]);</div><div class="line">    close(pfd[<span class="number">1</span>]);</div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83686.html" data-id="cjc95ct3100c1n4q3784fioa0" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83686.html" data-id="cjo5f578m00c3f808cjtwg0e6" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/C/">C</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li></ul>
@@ -277,7 +328,7 @@
     <article id="post-/archives/83680.html" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/83680.html" class="article-date">
-  <time datetime="2012-02-20T00:00:00.000Z" itemprop="datePublished">2012-02-20</time>
+  <time datetime="2012-02-20T18:25:20.000Z" itemprop="datePublished">2012-02-20</time>
 </a>
     
   <div class="article-category">
@@ -315,7 +366,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83680.html" data-id="cjc95ct2z00bun4q3nrefhbow" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83680.html" data-id="cjo5f578h00buf80844fzqpbn" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/C/">C</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li></ul>
@@ -331,7 +382,7 @@
     <article id="post-/archives/83668.html" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/83668.html" class="article-date">
-  <time datetime="2011-12-29T00:00:00.000Z" itemprop="datePublished">2011-12-29</time>
+  <time datetime="2011-12-29T22:55:04.000Z" itemprop="datePublished">2011-12-29</time>
 </a>
     
   <div class="article-category">
@@ -368,7 +419,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83668.html" data-id="cjc95ct2y00brn4q3p9s8f43u" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83668.html" data-id="cjo5f578j00bwf808usvl37i0" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Qt/">Qt</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/windows/">windows</a></li></ul>
@@ -384,7 +435,7 @@
     <article id="post-/archives/83665.html" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/83665.html" class="article-date">
-  <time datetime="2011-11-27T00:00:00.000Z" itemprop="datePublished">2011-11-27</time>
+  <time datetime="2011-11-27T11:36:20.000Z" itemprop="datePublished">2011-11-27</time>
 </a>
     
   <div class="article-category">
@@ -424,7 +475,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83665.html" data-id="cjc95ct2x00bnn4q3dbbu7c9s" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83665.html" data-id="cjo5f578d00bnf808a6wd0c6r" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gtk/">gtk</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/windows/">windows</a></li></ul>
@@ -440,7 +491,7 @@
     <article id="post-/archives/83663.html" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/83663.html" class="article-date">
-  <time datetime="2011-11-25T00:00:00.000Z" itemprop="datePublished">2011-11-25</time>
+  <time datetime="2011-11-25T21:35:27.000Z" itemprop="datePublished">2011-11-25</time>
 </a>
     
   <div class="article-category">
@@ -480,7 +531,7 @@ http://www.xefan.com
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83663.html" data-id="cjc95ct2w00bkn4q3ls062noi" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83663.html" data-id="cjo5f578b00bjf808hiniow7n" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gcc/">gcc</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/windows/">windows</a></li></ul>
@@ -496,7 +547,7 @@ http://www.xefan.com
     <article id="post-/archives/83661.html" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/83661.html" class="article-date">
-  <time datetime="2011-11-23T00:00:00.000Z" itemprop="datePublished">2011-11-23</time>
+  <time datetime="2011-11-23T19:56:27.000Z" itemprop="datePublished">2011-11-23</time>
 </a>
     
   <div class="article-category">
@@ -529,7 +580,7 @@ http://www.xefan.com
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83661.html" data-id="cjc95ct2u00bgn4q3f1dyyias" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83661.html" data-id="cjo5f578800bcf808jfwfqmav" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Arch/">Arch</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li></ul>
@@ -545,7 +596,7 @@ http://www.xefan.com
     <article id="post-/archives/83658.html" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/83658.html" class="article-date">
-  <time datetime="2011-11-22T00:00:00.000Z" itemprop="datePublished">2011-11-22</time>
+  <time datetime="2011-11-22T23:26:39.000Z" itemprop="datePublished">2011-11-22</time>
 </a>
     
   <div class="article-category">
@@ -588,58 +639,10 @@ printable = yes
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83658.html" data-id="cjc95ct2s00ben4q3pxb16yvg" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83658.html" data-id="cjo5f578a00bgf808ew60k4vk" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-/archives/83656.html" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/archives/83656.html" class="article-date">
-  <time datetime="2011-11-07T00:00:00.000Z" itemprop="datePublished">2011-11-07</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/Linux栏目/">Linux栏目</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/archives/83656.html">Arch+xfce自动挂载</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>我的是Arch Linux的系统，用的xfce4的桌面。</p>
-<p>网上的方法是通过编写rules文件用udev来自动挂载，不过rules太复杂了，看了半天没看懂。</p>
-<p>我用的方法是安装gvfs，命令：<br><code>#pacman -S gvfs</code></p>
-<p>然后重启一下系统，现在就可以自动挂载移动硬盘、U盘、光盘了，并且之前一直隐藏的“回收站”也显示了。</p>
-<p><a href="https://wiki.archlinux.org/index.php/Xfce#Removable_Devices" target="_blank" rel="external">https://wiki.archlinux.org/index.php/Xfce#Removable_Devices</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83656.html" data-id="cjc95ct2p00b4n4q3cy004ky5" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Arch/">Arch</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li></ul>
 
     </footer>
   </div>
@@ -692,7 +695,7 @@ printable = yes
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05/">May 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/02/">February 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/11/">November 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">October 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">September 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/08/">August 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/07/">July 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/05/">May 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04/">April 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">March 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">January 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/12/">December 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">June 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">May 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">April 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">January 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">October 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/09/">September 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/08/">August 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/07/">July 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/05/">May 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/04/">April 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/03/">March 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/02/">February 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/12/">December 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/11/">November 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/10/">October 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/09/">September 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/08/">August 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/07/">July 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/05/">May 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/04/">April 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/03/">March 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/02/">February 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/01/">January 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/12/">December 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/11/">November 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/10/">October 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/09/">September 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/08/">August 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/07/">July 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/06/">June 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/05/">May 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/04/">April 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/03/">March 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/12/">December 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/11/">November 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/10/">October 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/09/">September 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/08/">August 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/07/">July 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/05/">May 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/12/">December 2008</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/07/">July 2008</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">November 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05/">May 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/02/">February 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/11/">November 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">October 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">September 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/08/">August 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/07/">July 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/05/">May 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04/">April 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">March 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">January 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/12/">December 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">June 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">May 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">April 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">January 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">October 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/09/">September 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/08/">August 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/07/">July 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/05/">May 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/04/">April 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/03/">March 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/02/">February 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/12/">December 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/11/">November 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/10/">October 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/09/">September 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/08/">August 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/07/">July 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/05/">May 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/04/">April 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/03/">March 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/02/">February 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/01/">January 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/12/">December 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/11/">November 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/10/">October 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/09/">September 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/08/">August 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/07/">July 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/06/">June 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/05/">May 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/04/">April 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/03/">March 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/12/">December 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/11/">November 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/10/">October 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/09/">September 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/08/">August 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/07/">July 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/05/">May 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/12/">December 2008</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/07/">July 2008</a></li></ul>
     </div>
   </div>
 
@@ -703,6 +706,10 @@ printable = yes
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/archives/84170.html">使用pytest测试flask应用</a>
+          </li>
         
           <li>
             <a href="/archives/84169.html">HAProxy+Nginx+gunicorn获取真实ip</a>
@@ -718,10 +725,6 @@ printable = yes
         
           <li>
             <a href="/archives/84166.html">通过串口连接raspberry pi</a>
-          </li>
-        
-          <li>
-            <a href="/archives/84165.html">使用CodePush对ReactNative进行热更新</a>
           </li>
         
       </ul>

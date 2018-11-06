@@ -69,10 +69,55 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-/archives/83909.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83909.html" class="article-date">
+  <time datetime="2013-11-06T20:50:14.000Z" itemprop="datePublished">2013-11-06</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Ruby栏目/">Ruby栏目</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/83909.html">[翻译]Ruby教程5——对象</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p></p><h1>Ruby中的对象</h1><p></p>
+<p>在这章的教程中我们将简要的介绍下Ruby语言对象的概念。更多的内容将会在面向对象的章节中学习。由于Ruby的许多特性可以会使新手们迷惑，尤其是已经学习过其他编程语言的，因此才编写了这个关于对象的预备章节。</p><br><p>Ruby是一门面向对象的编程语言。这意味着我们可以在Ruby语言中使用对象。对于语言程序员来说Ruby程序就是一些字符流。这些符号就是Ruby的关键字、操作符、变量符号和字面量。从语言的角度来看Ruby程序是由对象组成的。这些对象在Ruby脚本程序执行进程来创建和修改。</p><br><p>有两种类型的对象：内置对象和自定义对象。内置对象是所有程序员都可以使用的预定义对象。它们由Ruby语言的内核或者变量库提示。自定义对象是由应用程序开发者在他们的应用程序域中创建的。</p><br><p>所有的对象都必须在使用之前创建。我们把创建对象叫做对象实例化。对象是由数据和方法组成，数据是对象静态的部分，方法是动态的形式。对象的修改以及与其他对象通信都是通过方法进行的。</p><br><pre><code>#!/usr/bin/ruby<br>puts “Ruby language”<br></code></pre><br><p>以上是一个简单的Ruby脚本。如果我们熟悉Pascal或者C之类的程序语言，我们可以看到一个名为<em>puts</em>的关键字或者是一个函数和一个字符串参数<em>“Ruby language”</em>。</p><br><p>看起来有点不同，Ruby是一门纯面向对象语言。<em>“Ruby language”</em>确实是一个字符串，常见的一种数据类型。但是它也是一个对象。与所有的对象一样，我们可以调用它们的方法。这与其他的语言有点不同。<em>puts</em>是一个方法。方法是定义在一个对象中的函数。方法是不能独自存在的。实际上<em>puts</em>方法是<em>Kernel</em>模块的一部分。</p><br><pre><code>#!/usr/bin/ruby<br>Kernel.puts “Ruby language”<br>Kernel.puts “Ruby language”.size<br></code></pre><br><p>在以上的脚本中我们写了两行代码。</p><br><pre><code>Kernel.puts “Ruby language”<br></code></pre><br><p><em>Kernel</em>是可以省略的，在第一个例子中我们调用<em>puts</em>方法就没有使用<em>Kernel</em>。这样可以少打些字节约时间。实际上它是对于<em>Kernel.puts</em>这个正式调用的简写。正如在C#中的Console.writeln和Java中的System.println。因此方法必须与一个对象相关联，或者如果是类方法就必须与类相关联。</p><br><pre><code>Kernel.puts “Ruby language”.size<br></code></pre><br><p>在这行代码中我们在终端上打印了<em>“Ruby language”</em>这个字符串的长度。对于有其他编程语言经验的程序员来说可能会困惑。在其他语言中字符串是一个原始数据类型，不能修改，并且没有自己的方法。在Ruby中字符串是一个完整的对象，有自己的方法。<em>size</em>方法其中一个，用于返回这个字符串的长度。</p><br><p>$ ./simple2.rb<br><br>Ruby language<br><br>13  </p><br><p>以上是这个例子的输出。</p><br><hr><br><p>接下来的例子我们看看整数。与字符串相似一个数字也是一个对象。</p><br><pre><code>#!/usr/bin/ruby<br>puts 6.object_id<br>puts 6.even?<br>puts 6.zero?<br>puts 6.class<br></code></pre><br><p>这个例子中我们定义了一个数字<em>6</em>。然后调用了一些这个数字的方法。</p><br><pre><code>puts 6.object_id<br></code></pre><br><p>这里<em>6</em>是一个对象，<em>object_id</em>是一个方法。这个方法返回了与这个对象相关联的id号。每个对象都拥有一个id号。如果我们要在对象上调用一个方法，就必须在他们之间加点号。</p><br><pre><code>puts 6.even?<br>puts 6.zero?<br></code></pre><br><p>这里我们对<em>6</em>这个对象调用了两个方法。如果一个数是偶数，那么<em>even?</em>返回<em>true</em>；如果一个数等于0,那么<em>zero?</em>返回<em>true</em>。注意这两个方法都是以问号能结尾的。在Ruby中约定了如果一个方法返回值是布尔类型，那么方法名以问号结尾。</p><br><pre><code>puts 6.class<br></code></pre><br><p><em>class</em>方法告诉我们当前正在处理的这个对象是什么类型的。在这里<em>6</em>是一个<em>Fixnum</em>类型。</p><br><p>$ ./objectnumber.rb<br><br>13<br><br>true<br><br>false<br><br>Fixnum  </p><br><p>以上是这个例子的输出结果。</p><br><h2>创建对象</h2><br><p>我们之前提到了在Ruby是对象使用之前必须先创建。对象可以被隐式创建或者显式创建。使用字面量符号创建对象是隐式创建；使用<em>new</em>关键字创建对象是显式创建。自定义对象都是显式创建的。自定义对象必须是从某个特定的类创建的。类是对象的模块，一个类可以创建多个对象。</p><br><pre><code>#!/usr/bin/ruby<br>class Being<br>end<br><br>puts 67<br>puts “ZetCode”<br><br>s = String.new “ZetCode”<br>puts s<br><br># n1 = Fixnum.new 67<br># puts n1<br><br>b = Being.new<br>puts b<br></code></pre><br><p>这个例子演示了Ruby中的对象创建。</p><br><pre><code>class Being<br>end<br></code></pre><br><p>这里是一个名为<em>Being</em>的对象模块。对象模块使用<em>class</em>关键字创建。自定义对象模块通常放在代码文件的顶部，或者分开放在另外的文件中。</p><br><pre><code>puts 67<br>puts “ZetCode”<br></code></pre><br><p>这两行代码我们用到了两个对象。<em>Fixnum</em>类型的<em>67</em>和<em>String</em>类型的<em>“ZetCode”</em>。<em>67</em>和<em>“ZetCode”</em>是使用字面符号创建了。字面符号是一个文本，表示了一个类型的特定值。这两个对象是Ruby解释器幕后创建的。在源代码中Ruby的一些对象是使用他们特定的字面符号创建的。</p><br><pre><code>s = String.new “ZetCode”<br>puts s<br></code></pre><br><p>这是正式的方法创建字符串对象。它与之前的隐式创建是等价的。</p><br><pre><code># n1 = Fixnum.new 67<br># puts n1<br></code></pre><br><p>不是所有的内置对象都可以使用<em>new</em>方法来创建。以上代码就不能编译通过。<em>Fixnum</em>对象只能通过字面符号来创建。</p><br><pre><code>b = Being.new<br>puts b<br></code></pre><br><p>这里我们创建了自定义对象的一个实例。<em>puts</em>方法输出了这个对象的简短描述。</p><br><p>$ ./ocreation.rb<br><br>67<br><br>ZetCode<br><br>ZetCode<br><br>#&lt;Being:0x9944d9c&gt;  </p><br><p>以上是输出结果。</p><br><hr><br><p>继续介绍一些正式的对象创建。  </p><br><pre><code>#!/usr/bin/ruby<br><br>s1 = String.new “Ruby”<br>puts s1.size<br>puts s1.downcase<br><br>a1 = Array.new<br>a1.push 1, 2, 3<br>puts a1.include? 3<br>puts a1.empty?<br><br>r1 = Range.new 1, 6<br>puts r1.class<br>puts r1.include? 4<br></code></pre><br><p>在这个例子中，我们创建三个内建对象并且调用了几个它们的方法。</p><br><pre><code>s1 = String.new “Ruby”<br>puts s1.size<br>puts s1.downcase<br></code></pre><br><p>创建一个字符串对象，并且调用了它的两个方法。<em>size</em>方法返回这个字符串的长度。<em>downcase</em>方法将这个字符串转为小写。</p><br><pre><code>a1 = Array.new<br>a1.push 1, 2, 3<br>puts a1.include? 3<br>puts a1.empty?<br></code></pre><br><p>这里创建了一个数组，并往其中添加了三个数字。然后调用了两个数组的方法。<em>include?</em>方法用于检查一个特定的值（在这个例子中是3）是否在数组内。<em>empty?</em>方法返回一个布尔类型的值表明这个数组是否为空。</p><br><pre><code>r1 = Range.new 1, 6<br>puts r1.class<br>puts r1.include? 4<br></code></pre><br><p>创建了一个<em>Range</em>类型的实例对象。它包含了1到6的数字。<em>class</em>方法返回这个对象的类型名称。在这个例子中<em>include?</em>方法检查数字<em>4</em>是否在这个范围内。</p><br><p>$ ./formal.rb<br><br>4<br><br>ruby<br><br>true<br><br>false<br><br>Range<br><br>true  </p><br><p>这个例子的运行输出结果。</p><br><h2>对象字面符</h2><br><p>前面提到了一些内建对象可以使用对象字面符创建。接下来的例子展示了一些对象字面符。</p><br><pre><code>#!/usr/bin/ruby<br><br>4.times { puts “Ruby” }<br><br>puts “Ruby”.size<br>puts “Ruby”.downcase<br><br>puts [1, 2, 3].include? 3<br>puts [1, 2, 3].empty?<br><br>puts :name.class<br>puts :name.frozen?<br><br>puts (1..6).class<br>puts (1..6).include? 4<br></code></pre><br><p>在这个例子中我们使用字面符创建了<em>Fixnum</em>、<em>Strings</em>、<em>Arrays</em>、 <em>Symbols</em>和<em>Ranges</em>对象。</p><br><pre><code>4.times { puts “Ruby” }<br></code></pre><br><p>我们可以直接对一个整数字面符号调用方法。这行代码将在终端上打印4次”Ruby”字符串。</p><br><pre><code>puts “Ruby”.size<br>puts “Ruby”.downcase<br></code></pre><br><p>我们对使用字面符号创建的字符串调用了两个方法。</p><br><pre><code>puts [1, 2, 3].include? 3<br>puts [1, 2, 3].empty?<br></code></pre><br><p>这里我们使用字面符号创建了两个数组。然后使用<em>include?</em>方法检查一个特定的数字是否是这个数组里；使用<em>empty?</em>方法检查这个数组是否为空。</p><br><pre><code>puts :name.class<br>puts :name.frozen?<br></code></pre><br><p>使用以冒号开头的字面符号创建了符号对象，并且调用的它的两个方法。</p><br><pre><code>puts (1..6).class<br>puts (1..6).include? 4<br></code></pre><br><p>使用字面符号创建了两个范围对象，并且调用了他们的两个方法。<em>class</em>方法返回这个类的名称，<em>include?</em>方法检查给定的数字是否是这个范围内。</p><br><p>$ ./literals.rb<br><br>Ruby<br><br>Ruby<br><br>Ruby<br><br>Ruby<br><br>4<br><br>ruby<br><br>true<br><br>false<br><br>Symbol<br><br>false<br><br>Range<br><br>true  </p><br><p>以上是例子的输出结果。</p><br><h2>对象层级</h2><br><p>在许多面向对象语言中对象是层级形式的。Ruby中也有对象层级。与树形层级相似，我们也有父对象和子对象。对象从它的父对象中继承数据和行为。层级的顶级是根对象，称为<em>Object</em>。在Ruby中每个对象都至少有一个父对象。也就是就每个对象都继承至<em>Object</em>对象的基类。</p><br><p>根据Ruby的官方文档，<em>Object</em>是Ruby的类层级的根。它的所有方法在所有的类中都是一样的，除非显示的覆盖了。</p><br><pre><code>#!/usr/bin/ruby<br><br>puts 4.is_a? Object<br>puts “Ruby”.is_a? Object<br>puts [2, 3].is_a? Object<br>puts :name.is_a? Object<br>puts (1..2).is_a? Object<br></code></pre><br><p>以上例子的代码展示了所有对象都是继承至根对象<em>Object</em>。</p><br><pre><code>puts 4.is_a? Object<br></code></pre><br><p>使用<em>is_a?</em>方法检查一个数字是否为特定的类型，也就是说它是否继承至给定的对象类型。</p><br><p>$ ./mother.rb <br><br>true<br><br>true<br><br>true<br><br>true<br><br>true  </p><br><p>所有方法都返回<em>true</em>，意味着所有的对象都继承至母类。</p><br><hr><br><p>即使是基本的Ruby对象，它们的继承层级也可能是很复杂的。</p><br><pre><code>#!/usr/bin/ruby<br><br>puts 6.class<br><br>puts 6.is_a? BasicObject<br>puts 6.is_a? Object<br>puts 6.is_a? Numeric<br>puts 6.is_a? Integer<br>puts 6.is_a? Fixnum<br><br>puts 6.is_a? Bignum<br>puts 6.is_a? String<br></code></pre><br><p>这个例子展示了小数字的继承层级。</p><br><pre><code>puts 6.class<br></code></pre><br><p>我们发现数字6的类型是<em>Fixnum</em>。</p><br><pre><code>puts 6.is_a? BasicObject<br>puts 6.is_a? Object<br>puts 6.is_a? Numeric<br>puts 6.is_a? Integer<br>puts 6.is_a? Fixnum<br></code></pre><br><p>以上这些代码全都返回<em>true</em>。数字6是<em>Fixnum</em>类型。从Ruby文档中我们发现另外四个对象是<em>Fuxnum</em>对象的父类。</p><br><pre><code>puts 6.is_a? Bignum<br>puts 6.is_a? String<br></code></pre><br><p>$ ./inheritance.rb<br><br>Fixnum<br><br>true<br><br>true<br><br>true<br><br>true<br><br>true<br><br>false<br><br>false  </p><br><p>以上是输出结果。</p><br><hr><br><p>这节的最后再举个例子展示下自定义对象的继承。</p><br><pre><code>#!/usr/bin/ruby<br><br>class Being<br><br>    def to_s<br>        “This is Being”<br>    end<br><br>    def get_id<br>        9<br>    end<br>end<br><br>class Living &lt; Being<br><br>    def to_s<br>        “This is Living”<br>    end<br>end<br><br>l = Living.new<br><br>puts l<br>puts l.get_id<br>puts l.is_a? Being<br>puts l.is_a? Object<br>puts l.is_a? BasicObject<br></code></pre><br><p>在这个例子中我们创建了两个对象。<em>Being</em>和<em>Living</em>。<em>Living</em>对象继承至<em>Being</em>。第一个是父对象，第二介是子对象。</p><br><pre><code>class Being<br><br>    def to_s<br>        “This is Being”<br>    end<br><br>    def get_id<br>        9<br>    end<br>end<br></code></pre><br><p>这里定义了一个Ruby的自定义对象。定义内容是<em>class</em>和<em>end</em>关键字之间。在定义里我们创建了两个方法。当<em>puts</em>方法接了一个对象作为参数时，会调用它的<em>to_s</em>方法。它通常返回这个对象的字符串描述。</p><br><pre><code>class Living &lt; Being<br><br>    def to_s<br>        “This is Living”<br>    end<br>end<br></code></pre><br><p>定义了一个<em>Living</em>对象，这个对象继承至<em>Being</em>对象。<em>&lt;</em>操作符用于创建继承关系。<em>to_s</em>方法被覆盖了。</p><br><pre><code>l = Living.new<br></code></pre><br><p>我们创建了一个Living实例对象。自定义对象使用<em>new</em>关键字创建。</p><br><pre><code>puts l<br></code></pre><br><p><em>puts</em>方法调用<em>Living</em>对象的<em>to_s</em>方法。只有当<em>Living</em>类没有定义<em>to_s</em>方法时，<em>Being</em>类的<em>to_s</em>方法才会被调用。</p><br><pre><code>puts l.get_id<br></code></pre><br><p><em>Living</em>对象没有定义<em>get_id</em>方法。在这种情况下就检查它的父类是否有此方法。在这里<em>Being</em>有这个方法，并且被调用。</p><br><pre><code>puts l.is_a? Being<br></code></pre><br><p>这行将返回<em>true</em>。<em>Living</em>对象是<em>Being</em>类型的，因为它继承至<em>Being</em>类。</p><br><pre><code>puts l.is_a? Object<br>puts l.is_a? BasicObject<br></code></pre><br><p>我们的<em>Living</em>自定义对象中，没有特别显示的指定与<em>Object</em>或者<em>BasicObject</em>的关系。然而这两行也返回<em>true</em>。这是因为在Ruby中所有对象都是自动设置为这两个对象的后代。这是Ruby解释器在幕后完成的。</p><br><p>$ ./custominher.rb<br><br>This is Living<br><br>9<br><br>true<br><br>true<br><br>true  </p><br><p>以上是输出结果。</p><br><h2>Ruby的顶级环境</h2><br><p>Ruby中有一个特殊的对象引用到Ruby的顶级环境，这是定义在其他上下文之外的默认执行环境。顶级环境名字是<em>main</em>。它是一个<em>Object</em>类型的实例对象。以下<em>main</em>分配了一个局部空间，所有的局部变量有属于它。</p><br><pre><code>#!/usr/bin/ruby<br><br>n1 = 3<br>n2 = 5<br><br>puts local_variables<br><br>Kernel.puts self<br>puts self.class<br></code></pre><br><p>这是描述Ruby顶级环境的第一个例子。</p><br><pre><code>n1 = 3<br>n2 = 5<br></code></pre><br><p>我们定义了两个数字类型的变量，这些变量是顶级环境的局部变量。</p><br><pre><code>puts local_variables<br></code></pre><br><p>这里我们输出所有的局部变量。<em>local_variables</em>是<em>Kernel</em>模块的一个方法，它包含了每个顶级环境的对象。</p><br><pre><code>Kernel.puts self<br></code></pre><br><p><em>self</em>是Ruby的伪变量。它返回当前对象的接收者。这行将在终端打印<em>“main”</em>。这是顶级环境的名字。<em>Kernel.puts</em>代码部分的<em>Kernel</em>可以省略。完整的名字表示的<em>puts</em>方法属于<em>Kernel</em>模块。</p><br><pre><code>puts self.class<br></code></pre><br><p>这行打印了顶级环境的类型。我们得到顶级环境的对象类型。它是<em>Object</em>类型，Ruby类层级的根。</p><br><p>$ ./toplevel.rb<br><br>n1<br><br>n2 <br><br>main <br><br>Object  </p><br><p>这是这个例子的输出结果。<em>n1</em>、<em>n2</em>是顶级环境所分配的局部变量。<em>main</em>是Ruby顶级执行环境的名字。最后<em>Object</em>是顶级环境的类型。</p><br><hr><br><p>我们再展示另一个关于Ruby顶级环境的例子。</p><br><pre><code>#!/usr/bin/ruby<br><br>@name = “Jane”<br>@age = 17<br><br>def info<br>   “#{@name} is #{@age} years old”<br>end<br><br>puts self.instance_variables<br>puts self.private_methods.include? :info<br><br>puts info<br></code></pre><br><p>我们展示的属于顶级环境的实例变量和方法。</p><br><pre><code>@name = “Jane”<br>@age = 17<br></code></pre><br><p>我们定义了两个实例变量。在Ruby中实例变量以<em>@</em>符号开头。实例变量属于指定的对象实例。在这里是属于Ruby的顶级环境。</p><br><pre><code>def info<br>   “#{@name} is #{@age} years old”<br>end<br></code></pre><br><p>这里定义了一个方法。每个方法都必须属于一个对象。这个方法是属于顶级环境的。所有顶级环境的方法都是私有的。私有方法的访问是受制的。</p><br><pre><code>puts self.instance_variables<br></code></pre><br><p><em>instance_variables</em>方法打印<em>self</em>的所有实例变量。</p><br><pre><code>puts self.private_methods.include? :info<br></code></pre><br><p>所有的顶级环境的方法都自动设为私有。<em>private_methods</em>返回该对象所有的私有方法。由于内容太多，我们就调用<em>include?</em>方法来检查<em>info</em>方法是否是其中一个。注意我们是通过符号名来引用<em>info</em>的。</p><br><p>$ ./toplevel2.rb<br><br>@name<br><br>@age<br><br>true<br><br>Jane is 17 years old  </p><br><p>以上是例子的输出结果。</p><br><p>这章包含了Ruby对象的基本内容。</p><br><hr><br><p>原文地址： <a href="http://zetcode.com/lang/rubytutorial/objects/" target="_blank" rel="external">http://zetcode.com/lang/rubytutorial/objects/</a><br><br>翻译：龙昌  admin@longchangjin.cn<br><br>完整教程：<a href="https://github.com/wusuopu/Ruby-tutorial" target="_blank" rel="external">https://github.com/wusuopu/Ruby-tutorial</a>  </p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83909.html" data-id="cjo5f57ia00scf808ptkf3wvp" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ruby/">Ruby</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/翻译/">翻译</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-/archives/83905.html" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/83905.html" class="article-date">
-  <time datetime="2013-11-05T00:00:00.000Z" itemprop="datePublished">2013-11-05</time>
+  <time datetime="2013-11-05T20:18:38.000Z" itemprop="datePublished">2013-11-05</time>
 </a>
     
   <div class="article-category">
@@ -104,7 +149,7 @@ p $&#39;
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83905.html" data-id="cjc95ct5h00i0n4q3ol2fqrbp" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83905.html" data-id="cjo5f57i700s9f8083z1ht0zw" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ruby/">Ruby</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/翻译/">翻译</a></li></ul>
@@ -120,7 +165,7 @@ p $&#39;
     <article id="post-/archives/83902.html" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/83902.html" class="article-date">
-  <time datetime="2013-11-04T00:00:00.000Z" itemprop="datePublished">2013-11-04</time>
+  <time datetime="2013-11-04T20:48:35.000Z" itemprop="datePublished">2013-11-04</time>
 </a>
     
   <div class="article-category">
@@ -149,52 +194,7 @@ p $&#39;
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83902.html" data-id="cjc95ct5g00hwn4q3xctm81qs" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ruby/">Ruby</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/翻译/">翻译</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-/archives/83895.html" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/archives/83895.html" class="article-date">
-  <time datetime="2013-11-02T00:00:00.000Z" itemprop="datePublished">2013-11-02</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/Ruby栏目/">Ruby栏目</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/archives/83895.html">[翻译]Ruby教程1——Ruby语言介绍</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p></p><h1>Ruby</h1><p></p>
-<p>在这部分Ruby教程中，我们将介绍Ruby编程语言。</p><br><h2>目标</h2><br><p>这个教程的目标是让你入门Ruby。这个教程覆盖了Ruby的主要内容，包括变量、表达式、集合、流程控制结构以及其他的一些主要特性。同样也会描述一些高级的概念，例如面向对象和正则表达式。这不会完全地覆盖这个语言。</p><br><h2>Ruby</h2><br><p>Ruby是一门动态的、反射的、通用的面向对象编程语言。它的源作者是一个日本程序员——松本行弘 (まつもとゆきひろ)。Ruby第一次发表是在1995年。</p><br><p>Ruby支持多种程序范式。包括面向对象、反射、命令式的和反射的编程。Ruby语言主要是受到Perl、Smalltalk、Eiffel和Lisp的影响。不同于java、C#以及C，Ruby没有官方的规范。取而代之的是用原始的C实现的Ruby语言作为实际参考。同时也还存在一些用其他方法实现的Ruby语言，如：JRuby、IronRuby或者MacRuby。</p><br><p>Ruby的官方网站是: <a href="htp://ruby-lang.org" target="_blank" rel="external">ruby-lang.org</a></p><br><h2>人气</h2><br><p>如今有上百种编程语言，而Ruby属于最流行的一个。在<a href="http://langpop.com" target="_blank" rel="external">langpop.com</a>和<a href="http://www.tiobe.com/index.php/content/paperinfo/tpci/index.html" target="_blank" rel="external">tiobe</a>网站Ruby都排在第10名左右。Ruby on Rails——一个非常流行的web应用框架是使用Ruby开发第一个杀手级的应用。</p><br><h2>交互式的解释器</h2><br><p>我们可以通过脚本或者交互式的解释器来运行Ruby语句。在这个教程中我们将使用交互式的Ruby会话来展示一些小的代码片段。大的代码例子将放在Ruby脚本中。</p><br><blockquote><br><p>$ irb<br><br>  irb(main):001:0&gt; puts RUBY_VERSION<br><br>  2.0.0<br><br>  =&gt; nil  </p><br></blockquote><br><p>这是一个Ruby交互会式会话的例子。我们在终端中打印了一个特别的常量RUBY<em>VERSION，它被设置为当前使用的Ruby的版本。<br><br>译注：原文的作者使用的是ruby 1.8.7，而如今ruby最新版已经是2.0.0了，因此我在翻译的时候也结合了当前新的内容。</em></p><br><h2>Ruby脚本</h2><br><p>我们开始我们的第一个简单的Ruby脚本例子。  </p><br><blockquote><br><p>#!/usr/bin/ruby<br><br> # first.rb<br><br> puts “This is Ruby”  </p><br></blockquote><br><p>这个脚本我们将在终端上打印一条消息。</p><br><blockquote><br><p>#!/usr/bin/ruby</p><br></blockquote><br><p>UNIX下的每一个脚本都是以shebang符号开始的。shebang是脚本中开始的前两个字符：<strong>#!</strong>。shebang后面是执行我们脚本的解释器的路径。/usr/bin是Ruby解释器最常用的位置。它也可以定位在/usr/local/bin或者其他什么地方。</p><br><blockquote><br><p># first.rb  </p><br></blockquote><br><p>在Ruby中注释是以#开始。</p><br><blockquote><br><p>puts “This is Ruby” </p><br></blockquote><br><p>puts方法是将字符串打印到终端。</p><br><blockquote><br><p>$ which ruby<br><br> /usr/bin/ruby  </p><br></blockquote><br><p>Ruby解释器的路径可以使用which命令找到。</p><br><blockquote><br><p>$ chmod +x first.rb<br><br> $ ./first.rb<br><br> This is Ruby  </p><br></blockquote><br><p>通过chmod命令，我们给脚本增加可执行的权限。</p><br><h2>资源</h2><br><p>以下资源在编写该教程时会使用到：<br><br><em> <a href="http://www.ruby-lang.org/" target="_blank" rel="external">ruby-lang.org</a><br><br></em> <a href="http://ruby-doc.org/" target="_blank" rel="external">ruby-doc.org</a><br><br><em> &lt;a href=”<a href="http://en.wikipedia.org/wiki/Ruby" target="_blank" rel="external">http://en.wikipedia.org/wiki/Ruby</a></em>(programming_language)”&gt;Ruby article on wikipedia.org<br><br> <a href="http://ruby.runpaint.org/" target="_blank" rel="external">ruby.runpaint.org</a></p><br><p>在这章的教程中我们介绍了Ruby语言。  </p><br><hr><br><p>原文地址： <a href="http://zetcode.com/lang/rubytutorial/ruby/" target="_blank" rel="external">http://zetcode.com/lang/rubytutorial/ruby/</a><br><br>翻译：龙昌  admin@longchangjin.cn<br><br>完整教程：<a href="https://github.com/wusuopu/Ruby-tutorial" target="_blank" rel="external">https://github.com/wusuopu/Ruby-tutorial</a>  </p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83895.html" data-id="cjc95ct5d00hqn4q3gg7cc1oc" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83902.html" data-id="cjo5f57i300s8f808gf4jcrxa" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ruby/">Ruby</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/翻译/">翻译</a></li></ul>
@@ -210,7 +210,7 @@ p $&#39;
     <article id="post-/archives/83899.html" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/83899.html" class="article-date">
-  <time datetime="2013-11-02T00:00:00.000Z" itemprop="datePublished">2013-11-02</time>
+  <time datetime="2013-11-02T22:11:14.000Z" itemprop="datePublished">2013-11-02</time>
 </a>
     
   <div class="article-category">
@@ -239,7 +239,7 @@ p $&#39;
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83899.html" data-id="cjc95ct5e00htn4q3t6emb74v" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83899.html" data-id="cjo5f57i000s5f8085zsutpjx" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ruby/">Ruby</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/翻译/">翻译</a></li></ul>
@@ -252,10 +252,100 @@ p $&#39;
 
 
   
+    <article id="post-/archives/83895.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83895.html" class="article-date">
+  <time datetime="2013-11-02T19:37:43.000Z" itemprop="datePublished">2013-11-02</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Ruby栏目/">Ruby栏目</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/83895.html">[翻译]Ruby教程1——Ruby语言介绍</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p></p><h1>Ruby</h1><p></p>
+<p>在这部分Ruby教程中，我们将介绍Ruby编程语言。</p><br><h2>目标</h2><br><p>这个教程的目标是让你入门Ruby。这个教程覆盖了Ruby的主要内容，包括变量、表达式、集合、流程控制结构以及其他的一些主要特性。同样也会描述一些高级的概念，例如面向对象和正则表达式。这不会完全地覆盖这个语言。</p><br><h2>Ruby</h2><br><p>Ruby是一门动态的、反射的、通用的面向对象编程语言。它的源作者是一个日本程序员——松本行弘 (まつもとゆきひろ)。Ruby第一次发表是在1995年。</p><br><p>Ruby支持多种程序范式。包括面向对象、反射、命令式的和反射的编程。Ruby语言主要是受到Perl、Smalltalk、Eiffel和Lisp的影响。不同于java、C#以及C，Ruby没有官方的规范。取而代之的是用原始的C实现的Ruby语言作为实际参考。同时也还存在一些用其他方法实现的Ruby语言，如：JRuby、IronRuby或者MacRuby。</p><br><p>Ruby的官方网站是: <a href="htp://ruby-lang.org" target="_blank" rel="external">ruby-lang.org</a></p><br><h2>人气</h2><br><p>如今有上百种编程语言，而Ruby属于最流行的一个。在<a href="http://langpop.com" target="_blank" rel="external">langpop.com</a>和<a href="http://www.tiobe.com/index.php/content/paperinfo/tpci/index.html" target="_blank" rel="external">tiobe</a>网站Ruby都排在第10名左右。Ruby on Rails——一个非常流行的web应用框架是使用Ruby开发第一个杀手级的应用。</p><br><h2>交互式的解释器</h2><br><p>我们可以通过脚本或者交互式的解释器来运行Ruby语句。在这个教程中我们将使用交互式的Ruby会话来展示一些小的代码片段。大的代码例子将放在Ruby脚本中。</p><br><blockquote><br><p>$ irb<br><br>  irb(main):001:0&gt; puts RUBY_VERSION<br><br>  2.0.0<br><br>  =&gt; nil  </p><br></blockquote><br><p>这是一个Ruby交互会式会话的例子。我们在终端中打印了一个特别的常量RUBY<em>VERSION，它被设置为当前使用的Ruby的版本。<br><br>译注：原文的作者使用的是ruby 1.8.7，而如今ruby最新版已经是2.0.0了，因此我在翻译的时候也结合了当前新的内容。</em></p><br><h2>Ruby脚本</h2><br><p>我们开始我们的第一个简单的Ruby脚本例子。  </p><br><blockquote><br><p>#!/usr/bin/ruby<br><br> # first.rb<br><br> puts “This is Ruby”  </p><br></blockquote><br><p>这个脚本我们将在终端上打印一条消息。</p><br><blockquote><br><p>#!/usr/bin/ruby</p><br></blockquote><br><p>UNIX下的每一个脚本都是以shebang符号开始的。shebang是脚本中开始的前两个字符：<strong>#!</strong>。shebang后面是执行我们脚本的解释器的路径。/usr/bin是Ruby解释器最常用的位置。它也可以定位在/usr/local/bin或者其他什么地方。</p><br><blockquote><br><p># first.rb  </p><br></blockquote><br><p>在Ruby中注释是以#开始。</p><br><blockquote><br><p>puts “This is Ruby” </p><br></blockquote><br><p>puts方法是将字符串打印到终端。</p><br><blockquote><br><p>$ which ruby<br><br> /usr/bin/ruby  </p><br></blockquote><br><p>Ruby解释器的路径可以使用which命令找到。</p><br><blockquote><br><p>$ chmod +x first.rb<br><br> $ ./first.rb<br><br> This is Ruby  </p><br></blockquote><br><p>通过chmod命令，我们给脚本增加可执行的权限。</p><br><h2>资源</h2><br><p>以下资源在编写该教程时会使用到：<br><br><em> <a href="http://www.ruby-lang.org/" target="_blank" rel="external">ruby-lang.org</a><br><br></em> <a href="http://ruby-doc.org/" target="_blank" rel="external">ruby-doc.org</a><br><br><em> &lt;a href=”<a href="http://en.wikipedia.org/wiki/Ruby" target="_blank" rel="external">http://en.wikipedia.org/wiki/Ruby</a></em>(programming_language)”&gt;Ruby article on wikipedia.org<br><br> <a href="http://ruby.runpaint.org/" target="_blank" rel="external">ruby.runpaint.org</a></p><br><p>在这章的教程中我们介绍了Ruby语言。  </p><br><hr><br><p>原文地址： <a href="http://zetcode.com/lang/rubytutorial/ruby/" target="_blank" rel="external">http://zetcode.com/lang/rubytutorial/ruby/</a><br><br>翻译：龙昌  admin@longchangjin.cn<br><br>完整教程：<a href="https://github.com/wusuopu/Ruby-tutorial" target="_blank" rel="external">https://github.com/wusuopu/Ruby-tutorial</a>  </p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83895.html" data-id="cjo5f57hy00s3f808jpnfejxx" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ruby/">Ruby</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/翻译/">翻译</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-/archives/83890.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83890.html" class="article-date">
+  <time datetime="2013-10-07T17:14:00.000Z" itemprop="datePublished">2013-10-07</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Python栏目/">Python栏目</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/83890.html">Scrapy框架学习笔记3—— Scrapy与mongodb结合</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>创建一个新的Item Pipeline，并将其添加到settings.py的ITEM_PIPELINES列表中。<br>在process_item方法中将item的数据保存到mongodb中。<br>scrapy的Item与dict相似，而mongodb中的数据是心bson格式保存的。因此Item的数据应该可以直接存储到mongodb中而几乎不用做额外的处理。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyMongoDBPipeline</span><span class="params">(object)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, mongodb_server, mongodb_port, mongodb_db, mongodb_collection)</span>:</span></div><div class="line">        connection = pymongo.Connection(mongodb_server, mongodb_port)</div><div class="line">        self.mongodb_db = mongodb_db</div><div class="line">        self.db = connection[mongodb_db]</div><div class="line">        self.mongodb_collection = mongodb_collection</div><div class="line">        self.collection = self.db[mongodb_collection]</div><div class="line"></div><div class="line"><span class="meta">    @classmethod</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">from_crawler</span><span class="params">(cls, crawler)</span>:</span></div><div class="line">        <span class="comment"># 连接mongodb</span></div><div class="line">        <span class="keyword">return</span> cls(<span class="string">'localhost'</span>, <span class="number">27017</span>, <span class="string">'scrapy'</span>, <span class="string">'items'</span>)</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process_item</span><span class="params">(self, item, spider)</span>:</span></div><div class="line">        result = self.collection.insert(dict(item))</div><div class="line">        log.msg(<span class="string">"Item %s wrote to MongoDB database %s/%s"</span> % (result, self.mongodb_db, self.mongodb_collection),</div><div class="line">                level=log.DEBUG, spider=spider)</div><div class="line">        <span class="keyword">return</span> item</div></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83890.html" data-id="cjo5f57hu00s2f808aayd4br6" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Scrapy/">Scrapy</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-/archives/83887.html" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/83887.html" class="article-date">
-  <time datetime="2013-10-07T00:00:00.000Z" itemprop="datePublished">2013-10-07</time>
+  <time datetime="2013-10-07T17:04:40.000Z" itemprop="datePublished">2013-10-07</time>
 </a>
     
   <div class="article-category">
@@ -291,7 +381,7 @@ p $&#39;
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83887.html" data-id="cjc95ct5a00hjn4q30kyei9gr" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83887.html" data-id="cjo5f57c100h4f808uclsc2rd" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Django/">Django</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Scrapy/">Scrapy</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -304,55 +394,10 @@ p $&#39;
 
 
   
-    <article id="post-/archives/83890.html" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/archives/83890.html" class="article-date">
-  <time datetime="2013-10-07T00:00:00.000Z" itemprop="datePublished">2013-10-07</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/Python栏目/">Python栏目</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/archives/83890.html">Scrapy框架学习笔记3—— Scrapy与mongodb结合</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>创建一个新的Item Pipeline，并将其添加到settings.py的ITEM_PIPELINES列表中。<br>在process_item方法中将item的数据保存到mongodb中。<br>scrapy的Item与dict相似，而mongodb中的数据是心bson格式保存的。因此Item的数据应该可以直接存储到mongodb中而几乎不用做额外的处理。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyMongoDBPipeline</span><span class="params">(object)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, mongodb_server, mongodb_port, mongodb_db, mongodb_collection)</span>:</span></div><div class="line">        connection = pymongo.Connection(mongodb_server, mongodb_port)</div><div class="line">        self.mongodb_db = mongodb_db</div><div class="line">        self.db = connection[mongodb_db]</div><div class="line">        self.mongodb_collection = mongodb_collection</div><div class="line">        self.collection = self.db[mongodb_collection]</div><div class="line"></div><div class="line"><span class="meta">    @classmethod</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">from_crawler</span><span class="params">(cls, crawler)</span>:</span></div><div class="line">        <span class="comment"># 连接mongodb</span></div><div class="line">        <span class="keyword">return</span> cls(<span class="string">'localhost'</span>, <span class="number">27017</span>, <span class="string">'scrapy'</span>, <span class="string">'items'</span>)</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process_item</span><span class="params">(self, item, spider)</span>:</span></div><div class="line">        result = self.collection.insert(dict(item))</div><div class="line">        log.msg(<span class="string">"Item %s wrote to MongoDB database %s/%s"</span> % (result, self.mongodb_db, self.mongodb_collection),</div><div class="line">                level=log.DEBUG, spider=spider)</div><div class="line">        <span class="keyword">return</span> item</div></pre></td></tr></table></figure>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83890.html" data-id="cjc95ct5b00hmn4q3nft9qnu2" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Scrapy/">Scrapy</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
     <article id="post-/archives/83883.html" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/83883.html" class="article-date">
-  <time datetime="2013-10-07T00:00:00.000Z" itemprop="datePublished">2013-10-07</time>
+  <time datetime="2013-10-07T16:47:27.000Z" itemprop="datePublished">2013-10-07</time>
 </a>
     
   <div class="article-category">
@@ -411,7 +456,7 @@ Item通常是在Spider的parse方法里使用，它用来保存解析到的数�
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83883.html" data-id="cjc95ct5800hcn4q3omia2xqr" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83883.html" data-id="cjo5f57bz00h0f808kokndl5y" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Scrapy/">Scrapy</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -427,7 +472,7 @@ Item通常是在Spider的parse方法里使用，它用来保存解析到的数�
     <article id="post-/archives/83880.html" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/83880.html" class="article-date">
-  <time datetime="2013-08-24T00:00:00.000Z" itemprop="datePublished">2013-08-24</time>
+  <time datetime="2013-08-24T22:52:05.000Z" itemprop="datePublished">2013-08-24</time>
 </a>
     
   <div class="article-category">
@@ -465,7 +510,7 @@ Item通常是在Spider的parse方法里使用，它用来保存解析到的数�
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83880.html" data-id="cjc95ct5700h8n4q301p8hkuv" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83880.html" data-id="cjo5f57bw00gxf80802qz0kau" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vim/">vim</a></li></ul>
@@ -481,7 +526,7 @@ Item通常是在Spider的parse方法里使用，它用来保存解析到的数�
     <article id="post-/archives/83877.html" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/83877.html" class="article-date">
-  <time datetime="2013-08-11T00:00:00.000Z" itemprop="datePublished">2013-08-11</time>
+  <time datetime="2013-08-11T20:40:58.000Z" itemprop="datePublished">2013-08-11</time>
 </a>
     
   <div class="article-category">
@@ -516,80 +561,10 @@ Item通常是在Spider的parse方法里使用，它用来保存解析到的数�
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83877.html" data-id="cjc95ct5500h5n4q3fv510e7r" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83877.html" data-id="cjo5f57bp00gqf808hc1j55l7" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/git/">git</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vim/">vim</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-/archives/83875.html" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/archives/83875.html" class="article-date">
-  <time datetime="2013-07-20T00:00:00.000Z" itemprop="datePublished">2013-07-20</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/数据结构和算法/">数据结构和算法</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/archives/83875.html">md5的一个碰撞例子</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>md5作为计算机安全领域广泛使用的一种散列函数，被用于检测信息是否完整一致。</p>
-<p>然而在2004年8月17日的美国加州圣巴巴拉，正在召开的国际密码学会议（Crypto’2004）上来自山东大学的王小云教授做了破译MD5、HAVAL-128、 MD4和RIPEMD算法的报告。她公布了MD系列算法的破解结果。</p>
-<p>各位好奇的可以在网上搜索王小云老师的那篇论文，反正我是看不懂的。不过倒是找到了一个md5碰撞的例子，于是就拿来分享一下。</p>
-<p>比如有两个文件test1、test2，文件的十六进制内容分别如下：</p>
-<pre>
-% xxd test1            
-0000000: 0e30 6561 559a a787 d00b c6f7 0bbd fe34  .0eaU..........4
-0000010: 04cf 0365 9e70 4f85 34c0 0ffb 659c 4c87  ...e.pO.4...e.L.
-0000020: 40cc 942f eb2d a115 a3f4 155c bb86 0749  @../.-.....\...I
-0000030: 7386 656d 7d1f 34a4 2059 d78f 5a8d d1ef  s.em}.4. Y..Z...
-
-% xxd test2
-0000000: 0e30 6561 559a a787 d00b c6f7 0bbd fe34  .0eaU..........4
-0000010: 04cf 0365 9e74 4f85 34c0 0ffb 659c 4c87  ...e.tO.4...e.L.
-0000020: 40cc 942f eb2d a115 a3f4 15dc bb86 0749  @../.-.........I
-0000030: 7386 656d 7d1f 34a4 2059 d78f 5a8d d1ef  s.em}.4. Y..Z...
-</pre>
-
-<p>如果想得到文件的原始内容，可以把上面的输出信息保存为一个文本文件（如test.txt），然后再执行命令 xxd -r test1.txt &gt; test 即可。<br>从上面可以看到这两个文件的内容明显是不一样的，那么现在就来计算一下这两个文件的md5值吧。</p>
-<pre>
-% md5sum test1
-cee9a457e790cf20d4bdaa6d69f01e41  test1
-% md5sum test2
-cee9a457e790cf20d4bdaa6d69f01e41  test2
-</pre>
-
-<p>从计算结果可以看到，虽然这两个文件内容不同，但是它们的md5值却是相同的。这个就是所谓的碰撞。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83875.html" data-id="cjc95ct5400h1n4q3effoh9v4" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Hash/">Hash</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/算法/">算法</a></li></ul>
 
     </footer>
   </div>
@@ -642,7 +617,7 @@ cee9a457e790cf20d4bdaa6d69f01e41  test2
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05/">May 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/02/">February 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/11/">November 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">October 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">September 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/08/">August 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/07/">July 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/05/">May 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04/">April 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">March 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">January 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/12/">December 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">June 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">May 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">April 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">January 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">October 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/09/">September 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/08/">August 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/07/">July 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/05/">May 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/04/">April 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/03/">March 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/02/">February 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/12/">December 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/11/">November 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/10/">October 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/09/">September 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/08/">August 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/07/">July 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/05/">May 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/04/">April 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/03/">March 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/02/">February 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/01/">January 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/12/">December 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/11/">November 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/10/">October 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/09/">September 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/08/">August 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/07/">July 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/06/">June 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/05/">May 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/04/">April 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/03/">March 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/12/">December 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/11/">November 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/10/">October 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/09/">September 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/08/">August 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/07/">July 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/05/">May 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/12/">December 2008</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/07/">July 2008</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">November 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05/">May 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/02/">February 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/11/">November 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">October 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">September 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/08/">August 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/07/">July 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/05/">May 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04/">April 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">March 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">January 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/12/">December 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">June 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">May 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">April 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">January 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">October 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/09/">September 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/08/">August 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/07/">July 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/05/">May 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/04/">April 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/03/">March 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/02/">February 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/12/">December 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/11/">November 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/10/">October 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/09/">September 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/08/">August 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/07/">July 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/05/">May 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/04/">April 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/03/">March 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/02/">February 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/01/">January 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/12/">December 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/11/">November 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/10/">October 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/09/">September 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/08/">August 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/07/">July 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/06/">June 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/05/">May 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/04/">April 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/03/">March 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/12/">December 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/11/">November 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/10/">October 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/09/">September 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/08/">August 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/07/">July 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/05/">May 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/12/">December 2008</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/07/">July 2008</a></li></ul>
     </div>
   </div>
 
@@ -653,6 +628,10 @@ cee9a457e790cf20d4bdaa6d69f01e41  test2
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/archives/84170.html">使用pytest测试flask应用</a>
+          </li>
         
           <li>
             <a href="/archives/84169.html">HAProxy+Nginx+gunicorn获取真实ip</a>
@@ -668,10 +647,6 @@ cee9a457e790cf20d4bdaa6d69f01e41  test2
         
           <li>
             <a href="/archives/84166.html">通过串口连接raspberry pi</a>
-          </li>
-        
-          <li>
-            <a href="/archives/84165.html">使用CodePush对ReactNative进行热更新</a>
           </li>
         
       </ul>
