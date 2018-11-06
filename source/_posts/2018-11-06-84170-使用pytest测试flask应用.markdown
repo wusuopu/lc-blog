@@ -1,0 +1,161 @@
+---
+layout: 'post'
+title: '使用pytest测试flask应用'
+date: '2018-11-06T07:12:52.301Z'
+comments: true
+post_id: '84170'
+permalink: '/archives/84170.html'
+categories: ['Python栏目']
+tags: ['python']
+---
+
+python 本身就有 unittest 单元测试框架，但是觉得它并不是很好用，我更倾向于使用 pytest 。
+
+下面通过一个例子来介绍如何使用 pytest 对 flask 应用进行单元测试。
+
+首先新建一个 flask 应用，并针对根路径创建一条路由。代码如下：
+
+```python
+# server.py
+app = flask.Flask(__name__)
+
+@app.route('/')
+def home():
+    return 'ok'
+```
+
+然后针对首页编写单元测试，代码如下：
+
+```python
+# tests/test_app.py
+
+def test_home_page(client):
+    rv = client.get('/')
+    assert rv.status_code == 200
+    assert rv.data == b'ok'
+```
+
+然后执行命令运行该测试用例： `pytest -s tests/test_app.py`
+
+在 pytest 中编写测试用例就只需要新建一个以 `test_` 开头的函数即可。
+
+以上是针对flask路由作的最基本测试。接下来编写一个新的路由，该页面只有用户登录之后才能访问。代码如下：
+
+```python
+# server.py
+@app.route('/member')
+@flask_security.decorators.login_required
+def member():
+    user = flask_security.core.current_user
+    return str(user.id)
+```
+
+要对该路由进行测试，则需要先创建一个用户。
+```python
+# tests/test_app.py
+def setup_module(module):
+    App.testing = True
+    fixture.setup()
+
+
+def teardown_module(module):
+    """
+    """
+```
+上面的 `setup_module` 和 `teardown_module` 函数分别是在所有的测试用例执行之前与执行之后执行。在这里我们通过 `setup_module` 在执行测试之前先创建一个用户。然后再创建一个 pytest 的 fixture:
+```python
+# tests/conftest.py
+
+@pytest.fixture
+def auth_client(client):
+    with client.session_transaction() as sess:
+        sess['user_id'] = str(fixture.users[0].id)
+
+    yield client
+```
+这里创建了一个 `auth_client` fixture，之后所有以 `auth_client` 发起的请求都是登录状态的。
+
+最后再针对 `/member` 路由编写两个测试用例，分别是未登录状态与登录状态下的。
+```python
+def test_member_page_without_login(client):
+    """
+    没有登录则跳转到登录页面
+    """
+    rv = client.get('/member')
+    assert rv.headers['Location'] == 'http://localhost/login?next=%2Fmember'
+    assert rv.status_code == 302
+
+
+def test_member_page_with_login(auth_client):
+    """
+    已经登录则返回当前用户id
+    """
+    rv = auth_client.get('/member')
+    assert rv.status_code == 200
+    assert rv.data.decode('utf8') == str(fixture.users[0].id)
+```
+
+以上就是一个简单的 flask 应用了。但是有时一个稍微复杂一点的应用会用到一些第三方的api。这时针对这种情况编写测试用例时就需要用到 mock 功能了。再编写一个新的路由页面：
+```python
+# server.py
+
+@app.route('/movies')
+def movies():
+    data = utils.fetch_movies()
+    if not data:
+        return '', 500
+    return flask.jsonify(data)
+```
+
+```python
+# utils.py
+
+def fetch_movies():
+    try:
+        url = 'http://api.douban.com/v2/movie/top250?start=0&count=1'
+        res = requests.get(url, timeout=5)
+        return res.json()
+    except Exception as e:
+        return {}
+```
+
+请求该路由会返回豆瓣top250的电影信息。然后再编写两个测试用例分别模拟api调用成功与失败的情况。
+```python
+# tests/test_app.py
+def test_movies_api(client):
+    """
+    调用豆瓣api成功的情况
+    """
+    fetch_movies_patch = mock.patch('utils.fetch_movies')
+
+    func = fetch_movies_patch.start()
+    func.return_value = {'start': 0, 'count': 0, 'subjects': []}
+
+    rv = client.get('/movies')
+    assert rv.status_code == 200
+    assert func.called
+
+    fetch_movies_patch.stop()
+
+
+def test_movies_api_with_error(client):
+    """
+    调用豆瓣api出错的情况
+    """
+    fetch_movies_patch = mock.patch('utils.fetch_movies')
+
+    func = fetch_movies_patch.start()
+    func.return_value = None
+
+    rv = client.get('/movies')
+    assert rv.status_code == 500
+    assert func.called
+
+    fetch_movies_patch.stop()
+```
+
+这里使用 python 的 mock 模块来模拟让某个函数返回固定的结果。
+
+
+完整的代码请访问： https://github.com/wusuopu/flask-test-example
+
