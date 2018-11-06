@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 使用C语言编写Python扩展1——Hello World
-data: 2014-04-12 10:01:10 +0000
+date: 2014-04-12 10:01:10 +0000
 comments: true
 post_id: 84082
 permalink: /archives/84082.html

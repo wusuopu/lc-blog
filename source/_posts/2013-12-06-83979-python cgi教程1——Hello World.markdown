@@ -1,7 +1,7 @@
 ---
 layout: post
 title: python cgi教程1——Hello World
-data: 2013-12-06 13:26:30 +0000
+date: 2013-12-06 13:26:30 +0000
 comments: true
 post_id: 83979
 permalink: /archives/83979.html

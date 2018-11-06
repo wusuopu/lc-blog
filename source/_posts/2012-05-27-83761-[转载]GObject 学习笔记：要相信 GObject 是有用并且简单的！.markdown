@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "[转载]GObject 学习笔记：要相信 GObject 是有用并且简单的！"
-data: 2012-05-27 01:28:47 +0000
+date: 2012-05-27 01:28:47 +0000
 comments: true
 post_id: 83761
 permalink: /archives/83761.html

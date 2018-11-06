@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 将PIL的Image类型转化为pygtk的Image类型
-data: 2012-04-14 11:44:02 +0000
+date: 2012-04-14 11:44:02 +0000
 comments: true
 post_id: 83718
 permalink: /archives/83718.html

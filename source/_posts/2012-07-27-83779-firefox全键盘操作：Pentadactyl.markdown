@@ -1,7 +1,7 @@
 ---
 layout: post
 title: firefox全键盘操作：Pentadactyl
-data: 2012-07-27 10:01:34 +0000
+date: 2012-07-27 10:01:34 +0000
 comments: true
 post_id: 83779
 permalink: /archives/83779.html

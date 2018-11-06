@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Scrapy框架学习笔记3—— Scrapy与mongodb结合
-data: 2013-10-07 09:14:00 +0000
+date: 2013-10-07 09:14:00 +0000
 comments: true
 post_id: 83890
 permalink: /archives/83890.html

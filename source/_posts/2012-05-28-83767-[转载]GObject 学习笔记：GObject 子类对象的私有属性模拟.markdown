@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "[转载]GObject 学习笔记：GObject 子类对象的私有属性模拟"
-data: 2012-05-28 12:54:39 +0000
+date: 2012-05-28 12:54:39 +0000
 comments: true
 post_id: 83767
 permalink: /archives/83767.html

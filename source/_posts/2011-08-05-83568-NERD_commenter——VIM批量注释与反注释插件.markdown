@@ -1,7 +1,7 @@
 ---
 layout: post
 title: NERD_commenter——VIM批量注释与反注释插件
-data: 2011-08-05 13:26:02 +0000
+date: 2011-08-05 13:26:02 +0000
 comments: true
 post_id: 83568
 permalink: /archives/83568.html

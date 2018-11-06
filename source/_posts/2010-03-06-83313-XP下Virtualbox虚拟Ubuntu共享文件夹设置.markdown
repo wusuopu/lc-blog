@@ -1,7 +1,7 @@
 ---
 layout: post
 title: XP下Virtualbox虚拟Ubuntu共享文件夹设置
-data: 2010-03-06 12:59:20 +0000
+date: 2010-03-06 12:59:20 +0000
 comments: true
 post_id: 83313
 permalink: /archives/83313.html

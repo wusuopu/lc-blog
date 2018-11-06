@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "[转载]GObject 学习笔记：GObject 子类私有属性的外部访问"
-data: 2012-05-29 05:31:41 +0000
+date: 2012-05-29 05:31:41 +0000
 comments: true
 post_id: 83770
 permalink: /archives/83770.html

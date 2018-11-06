@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 使用virtualenv安装多个版本python
-data: 2014-01-22 11:01:41 +0000
+date: 2014-01-22 11:01:41 +0000
 comments: true
 post_id: 84036
 permalink: /archives/84036.html

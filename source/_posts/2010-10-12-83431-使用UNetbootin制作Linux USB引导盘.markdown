@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 使用UNetbootin制作Linux USB引导盘
-data: 2010-10-12 13:26:04 +0000
+date: 2010-10-12 13:26:04 +0000
 comments: true
 post_id: 83431
 permalink: /archives/83431.html

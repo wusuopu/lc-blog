@@ -1,7 +1,7 @@
 ---
 layout: post
 title: GameConqueror——Linux下的游戏作弊器
-data: 2010-05-30 13:01:24 +0000
+date: 2010-05-30 13:01:24 +0000
 comments: true
 post_id: 83361
 permalink: /archives/83361.html

@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Scrapy框架学习笔记2—— Scrapy与Django结合
-data: 2013-10-07 09:04:40 +0000
+date: 2013-10-07 09:04:40 +0000
 comments: true
 post_id: 83887
 permalink: /archives/83887.html

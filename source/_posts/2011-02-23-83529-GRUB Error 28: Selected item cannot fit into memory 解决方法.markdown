@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "GRUB Error 28: Selected item cannot fit into memory 解决方法"
-data: 2011-02-23 12:37:57 +0000
+date: 2011-02-23 12:37:57 +0000
 comments: true
 post_id: 83529
 permalink: /archives/83529.html

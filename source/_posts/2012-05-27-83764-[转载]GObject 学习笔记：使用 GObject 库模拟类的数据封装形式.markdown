@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "[转载]GObject 学习笔记：使用 GObject 库模拟类的数据封装形式"
-data: 2012-05-27 11:20:47 +0000
+date: 2012-05-27 11:20:47 +0000
 comments: true
 post_id: 83764
 permalink: /archives/83764.html

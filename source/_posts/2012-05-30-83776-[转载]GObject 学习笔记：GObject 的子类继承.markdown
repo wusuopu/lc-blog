@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "[转载]GObject 学习笔记：GObject 的子类继承"
-data: 2012-05-30 04:10:35 +0000
+date: 2012-05-30 04:10:35 +0000
 comments: true
 post_id: 83776
 permalink: /archives/83776.html

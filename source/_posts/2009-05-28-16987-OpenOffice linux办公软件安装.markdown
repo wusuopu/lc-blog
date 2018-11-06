@@ -1,7 +1,7 @@
 ---
 layout: post
 title: OpenOffice linux办公软件安装
-data: 2009-05-28 07:10:12 +0000
+date: 2009-05-28 07:10:12 +0000
 comments: true
 post_id: 16987
 permalink: /archives/16987.html

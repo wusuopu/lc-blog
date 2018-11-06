@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 配置coffeescript的vim环境
-data: 2014-10-24 13:42:10 +0000
+date: 2014-10-24 13:42:10 +0000
 comments: true
 post_id: 84130
 permalink: /archives/84130.html

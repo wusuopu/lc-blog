@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 让firefox在线播放用mplayer，而不是totem
-data: 2010-09-18 12:58:38 +0000
+date: 2010-09-18 12:58:38 +0000
 comments: true
 post_id: 83408
 permalink: /archives/83408.html

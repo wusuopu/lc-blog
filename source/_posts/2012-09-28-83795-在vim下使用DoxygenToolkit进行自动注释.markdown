@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 在vim下使用DoxygenToolkit进行自动注释
-data: 2012-09-28 12:26:40 +0000
+date: 2012-09-28 12:26:40 +0000
 comments: true
 post_id: 83795
 permalink: /archives/83795.html

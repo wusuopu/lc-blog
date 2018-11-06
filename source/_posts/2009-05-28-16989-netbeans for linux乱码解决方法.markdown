@@ -1,7 +1,7 @@
 ---
 layout: post
 title: netbeans for linux乱码解决方法
-data: 2009-05-28 07:11:36 +0000
+date: 2009-05-28 07:11:36 +0000
 comments: true
 post_id: 16989
 permalink: /archives/16989.html

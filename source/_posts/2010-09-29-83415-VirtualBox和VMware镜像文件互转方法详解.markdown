@@ -1,7 +1,7 @@
 ---
 layout: post
 title: VirtualBox和VMware镜像文件互转方法详解
-data: 2010-09-29 13:56:18 +0000
+date: 2010-09-29 13:56:18 +0000
 comments: true
 post_id: 83415
 permalink: /archives/83415.html

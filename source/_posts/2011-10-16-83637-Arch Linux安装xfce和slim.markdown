@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Arch Linux安装xfce和slim
-data: 2011-10-16 12:24:20 +0000
+date: 2011-10-16 12:24:20 +0000
 comments: true
 post_id: 83637
 permalink: /archives/83637.html

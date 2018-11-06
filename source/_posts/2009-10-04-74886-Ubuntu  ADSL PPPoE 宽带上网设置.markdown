@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Ubuntu  ADSL PPPoE 宽带上网设置
-data: 2009-10-04 06:49:37 +0000
+date: 2009-10-04 06:49:37 +0000
 comments: true
 post_id: 74886
 permalink: /archives/74886.html

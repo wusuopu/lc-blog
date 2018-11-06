@@ -1,7 +1,7 @@
 ---
 layout: post
 title: PyInstaller——python打包工具
-data: 2011-03-28 14:44:52 +0000
+date: 2011-03-28 14:44:52 +0000
 comments: true
 post_id: 83540
 permalink: /archives/83540.html

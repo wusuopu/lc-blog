@@ -1,7 +1,7 @@
 ---
 layout: post
 title: nginx + php + FastCGI配置
-data: 2014-08-01 13:38:39 +0000
+date: 2014-08-01 13:38:39 +0000
 comments: true
 post_id: 84121
 permalink: /archives/84121.html

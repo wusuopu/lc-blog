@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 视频播放器 VLC media player
-data: 2010-09-18 21:06:46 +0000
+date: 2010-09-18 21:06:46 +0000
 comments: true
 post_id: 83411
 permalink: /archives/83411.html

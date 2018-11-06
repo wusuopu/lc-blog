@@ -1,7 +1,7 @@
 ---
 layout: post
 title: python cgi教程6——Session
-data: 2013-12-07 12:39:56 +0000
+date: 2013-12-07 12:39:56 +0000
 comments: true
 post_id: 84001
 permalink: /archives/84001.html

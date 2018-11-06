@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 制作Linux+DOS+WinPE USB引导盘
-data: 2010-10-13 13:01:09 +0000
+date: 2010-10-13 13:01:09 +0000
 comments: true
 post_id: 83433
 permalink: /archives/83433.html

@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Okular——Linux下PDF阅读器
-data: 2011-02-22 13:49:01 +0000
+date: 2011-02-22 13:49:01 +0000
 comments: true
 post_id: 83527
 permalink: /archives/83527.html

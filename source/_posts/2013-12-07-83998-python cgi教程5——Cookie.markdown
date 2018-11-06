@@ -1,7 +1,7 @@
 ---
 layout: post
 title: python cgi教程5——Cookie
-data: 2013-12-07 08:49:31 +0000
+date: 2013-12-07 08:49:31 +0000
 comments: true
 post_id: 83998
 permalink: /archives/83998.html

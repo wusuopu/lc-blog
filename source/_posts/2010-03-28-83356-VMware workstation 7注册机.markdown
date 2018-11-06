@@ -1,7 +1,7 @@
 ---
 layout: post
 title: VMware workstation 7注册机
-data: 2010-03-28 12:49:16 +0000
+date: 2010-03-28 12:49:16 +0000
 comments: true
 post_id: 83356
 permalink: /archives/83356.html
