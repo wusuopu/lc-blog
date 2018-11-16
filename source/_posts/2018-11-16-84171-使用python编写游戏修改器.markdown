@@ -1,0 +1,71 @@
+---
+layout: 'post'
+title: '使用python编写游戏修改器'
+date: '2018-11-16T09:25:37.797Z'
+comments: true
+post_id: '84171'
+permalink: '/archives/84171.html'
+categories: ['Python栏目']
+tags: ['python']
+---
+
+最近比较怀旧，在玩一个比较老的PC游戏。由于游戏难度太高了，于是就打算自己写一个修改器。
+通过查阅资料，在 Windows 下的修改器主要需要用到四个函数：OpenProcess, CloseHandle, WriteProcessMemory, ReadProcessMemory。
+
+这几个都是C++的函数，在Python中可以通过ctypes来直接调用。
+然后接下来介绍一下基本的操作流程。
+
+1.通过 任务管理器 或者其他方式得到需要修改的游戏进程。然后通过 `OpenProcess` 注入该进程。
+```python
+PROCESS_QUERY_INFORMATION = 0x0400
+PROCESS_VM_OPERATION = 0x0008
+PROCESS_VM_READ = 0x0010
+PROCESS_VM_WRITE = 0x0020
+
+hProcess = ctypes.windll.kernel32.OpenProcess(
+    PROCESS_QUERY_INFORMATION|PROCESS_VM_READ|PROCESS_VM_OPERATION|PROCESS_VM_WRITE,
+    False, pid
+)
+```
+
+2.然后可以通过 `ReadProcessMemory` 来扫描游戏的内存找到需要修改的数值项的内存地址。
+```python
+buf = ctypes.c_int32()
+nread = ctypes.c_size_t()
+ret = ctypes.windll.kernel32.ReadProcessMemory(
+    hProcess,
+    base_addr,
+    ctypes.byref(buf),
+    ctypes.sizeof(buf),
+    ctypes.byref(nread)
+)
+```
+这里是读取 `base_addr` 地址之后的4个字节的内容。可以通过循环来遍历游戏的内存，找到需要修改的地址。
+当然，为了方便也可以直接使用 Cheat Engine 之类的软件来查找，然后把找到的内存地址记录下来即可。
+<a href="/wp-content/uploads/2018/11/ce.png"><img src="/wp-content/uploads/2018/11/ce.png" /></a>
+
+3.得到需要修改的内存地址之后，就可以 `WriteProcessMemory` 来修改该地址保存的值。
+```python
+buf = ctypes.c_int32(value)
+nread = ctypes.c_size_t()
+ret = ctypes.windll.kernel32.WriteProcessMemory(
+  hProcess,
+  base_addr,
+  ctypes.byref(buf),
+  ctypes.sizeof(buf),
+  ctypes.byref(nwrite)
+)
+```
+这里是往 `base_addr` 这个地址写入值为 `value` 的4字节内容。
+
+
+4.最后如果不再需要修改了的话，就通过 `CloseHandle` 关闭该注入操作。
+```python
+ctypes.windll.kernel32.CloseHandle(hProcess)
+```
+
+以上都是针对 Windows 系统的，对于 Linux 系统的话 可以通过 `ptrace` (http://man7.org/linux/man-pages/man2/ptrace.2.html) 操作实现。由于我没有 Linux 的游戏就没有研究了。
+
+上面修改器的完整源代码，如有需要可通过以下链接获取：
+https://github.com/wusuopu/cheat_engine_caesar3
+
