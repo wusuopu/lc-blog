@@ -69,6 +69,74 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-/archives/83613.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83613.html" class="article-date">
+  <time datetime="2011-09-17T20:00:23.000Z" itemprop="datePublished">2011-09-17</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/嵌入式栏目/">嵌入式栏目</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/83613.html">Ubuntu 10.10 crosstool ARM交叉编译</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>弄了两天，经过了N次失败后现在终于编译成功了，赶紧做个笔记。</p>
+<p>1、下载crosstool(<a href="http://www.kegel.com/crosstool/crosstool-0.43.tar.gz" target="_blank" rel="external">http://www.kegel.com/crosstool/crosstool-0.43.tar.gz</a>)</p>
+<p>2、下载编译过程中需要用到的源代码，虽然crosstool也会自动下载不过速度很慢，建议还是自己先下载好，源代码的版本根据自己的情况选择：<br>binutils-2.15 <a href="http://ftp.gnu.org/gnu/binutils/" target="_blank" rel="external">http://ftp.gnu.org/gnu/binutils/</a><br>gcc-3.4.5 <a href="http://ftp.gnu.org/gnu/gcc/" target="_blank" rel="external">http://ftp.gnu.org/gnu/gcc/</a><br>glibc-2.3.6 ftp://ftp.gnu.org/gnu/glibc/<br>glibc-linuxthreads-2.3.6 ftp://ftp.gnu.org/gnu/glibc/  </p>
+<p>linux-2.6.10 <a href="http://ftp.cc.uoc.gr/mirrors/ftp.kernel.org/pub/linux/kernel/v2.6/linux-2.6.10.tar.gz" target="_blank" rel="external">http://ftp.cc.uoc.gr/mirrors/ftp.kernel.org/pub/linux/kernel/v2.6/linux-2.6.10.tar.gz</a><br>linux-libc-headers-2.6.12.0 <a href="http://ep09.pld-linux.org/~mmazur/linux-libc-headers/linux-libc-headers-2.6.12.0.tar.bz2" target="_blank" rel="external">http://ep09.pld-linux.org/~mmazur/linux-libc-headers/linux-libc-headers-2.6.12.0.tar.bz2</a>  </p>
+<p>将以上七个压缩包放在同一个目录下。</p>
+<p>3、编译过程依赖这几个软件，没有的请自行安装。Bison、flex 、build-essential、patch 、libncurses5-de<br>还有gcc的编译依赖于gmp、mpfr、mpc这几个软件，没有的请先安装。<br>mpc-0.9.tar.gz <a href="http://www.multiprecision.org/mpc/download/mpc-0.9.tar.gz" target="_blank" rel="external">http://www.multiprecision.org/mpc/download/mpc-0.9.tar.gz</a><br>mpfr-3.0.1.tar.bz2 <a href="http://www.mpfr.org/mpfr-current/mpfr-3.0.1.tar.bz2" target="_blank" rel="external">http://www.mpfr.org/mpfr-current/mpfr-3.0.1.tar.bz2</a><br>gmp-5.0.2.tar.bz2 ftp://ftp.gmplib.org/pub/gmp-5.0.2/gmp-5.0.2.tar.bz2<br>这几个软件之间也存在依赖关系，请按顺序依次安装gmp、mpfr、mpc  </p>
+<p>4、修改配置<br>1)、ubuntu10.10自己的GCC是4.4版本，使用这个版本的进行编译会出错，建议使用gcc-4.1。<br>sudo apt-get install gcc-4.1<br>sudo rm /usr/bin/gcc<br>sudo ln -s /usr/bin/gcc-4.1 /usr/bin/gcc  </p>
+<p>2)、修改sh，ubuntu10.10默认的sh是用的dash<br>如果运行 ls -la /bin/sh 看到链接是dash，则需要修改一下。不改的话编译会出错。<br>我是直接运行命令 sudo ln -sf /bin/bash /bin/sh 修改。改完后重启下，或者切换工作台以使其生效。  </p>
+<p>3)、修改编译脚本<br>解压crosstool然后进入解压目录，这里我选择demo-arm.sh这个脚本。<br>cp demo-arm.sh arm.sh</p>
+<p>修改arm.sh<br>vi arm.sh  </p>
+<pre><code>TARBALLS_DIR=(刚刚下载的源码存放目录)  
+RESULT_TOP=(生成工具链要安装到的目录)  
+eval `cat arm.dat gcc-3.4.5-glibc-2.3.6.dat` sh all.sh –notest #这个根据自己的情况选择
+</code></pre><p>然后修改gcc-3.4.5-glibc-2.3.6.dat这个文件<br>BINUTILS_DIR=binutils-2.15<br>GCC_DIR=gcc-3.4.5<br>GLIBC_DIR=glibc-2.3.6<br>LINUX_DIR=linux-2.6.10<br>LINUX_SANITIZED_HEADER_DIR=linux-libc-headers-2.6.12.0<br>GLIBCTHREADS_FILENAME=glibc-linuxthreads-2.3.6  </p>
+<p>再修改arm.dat这个文件  </p>
+<pre><code>KERNELCONFIG=`pwd`/arm.config  
+TARGET=arm-linux #生成的工具链名称  
+TARGET_CFLAGS=”-O”  
+</code></pre><p>还有ubuntu10.10自带的ar、ld是2.20版本的，而这个编译时需要的是2.13~2.19版本的，所以会出错。<br>解决方法：<br>(1)、像上面的gcc一样，再安装个低版本的ls、ar。<br>(2)、如果不想再另外安装就可以用这个方法。修改glibc-2.3.6.tar.bz2这个压缩包内的configure文件。将3920行和3981行处的”2.1[3-9])<em>”改为”2.[1-2][0-9]</em>)”。  </p>
+<p>5、开始编译<br>都配置好了之后就可以开始了<br>./arm.sh<br>漫长的等待开始了……，我的是奔腾双核处理器，整个过程花了半个多小时  </p>
+<p>6、测试<br>现在用刚刚编译安装好的arm-linux-gcc来编译一个C程序试试。<br>先将arm-linux-gcc的安装目录添加到环境变量中。  </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//文件名:hello.c</span></div><div class="line"> <span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></div><div class="line"> &#123;</div><div class="line"> <span class="built_in">printf</span>(&amp;quot;www.xefam.com&amp;quot;);</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<p>$ arm-linux-gcc -o hello hello.c<br>$ file hello<br>hello: ELF 32-bit LSB executable, ARM, version 1, dynamically linked (uses shared libs), for GNU/Linux 2.4.3, not stripped<br>这就说明这个已经成功了！</p>
+<p>7、现在可以恢复之前的系统配置了<br>将gcc修为gcc-4.4<br>将sh修改dash  </p>
+<p>如果嫌麻烦不想自己编译的可以直接下载已经编译好的来用，下面这个就是我编译好：<br>gcc-3.4.5-glibc-2.3.6.tar.gz <a href="http://115.com/file/e65akpi1" target="_blank" rel="external">http://115.com/file/e65akpi1</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83613.html" data-id="cjojwghaa00ad1i08exkn7pmf" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ARM/">ARM</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gcc/">gcc</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-/archives/83610.html" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/83610.html" class="article-date">
@@ -100,7 +168,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83610.html" data-id="cjo5f577n00adf808rs1rl8mh" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83610.html" data-id="cjojwgha900aa1i08gion4v30" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/单片机/">单片机</a></li></ul>
@@ -157,7 +225,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83607.html" data-id="cjo5f577l00aaf808rv9nepdj" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83607.html" data-id="cjojwgha700a61i08w3n1ed09" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/嵌入式/">嵌入式</a></li></ul>
@@ -234,7 +302,7 @@ JOYBUTTONDOWN joy, button
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83605.html" data-id="cjo5f577i00a6f808ceb0rncs" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83605.html" data-id="cjojwgha500a31i08xsz8cjmq" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pygame/">pygame</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -289,7 +357,7 @@ JOYBUTTONDOWN joy, button
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83603.html" data-id="cjo5f577g00a3f808a82nk5qi" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83603.html" data-id="cjojwgha300a01i08k2e8pq3r" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pygame/">pygame</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -476,7 +544,7 @@ K_EURO                euro
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83601.html" data-id="cjo5f577f00a0f8084joldhq8" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83601.html" data-id="cjojwgha2009w1i08c5iz8p14" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pygame/">pygame</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -532,7 +600,7 @@ K_EURO                euro
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83599.html" data-id="cjo5f577c009tf808eesisoqp" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83599.html" data-id="cjojwgh9z009o1i08l6yy39tk" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/单片机/">单片机</a></li></ul>
@@ -588,7 +656,7 @@ K_EURO                euro
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83597.html" data-id="cjo5f577d009wf808pvx5ne6d" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83597.html" data-id="cjojwgh9x009h1i081qf1c8y7" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pygame/">pygame</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -657,7 +725,7 @@ K_EURO                euro
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83596.html" data-id="cjo5f577b009pf808xts3op56" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83596.html" data-id="cjojwgh9y009l1i08fpgw4yhy" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pygame/">pygame</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -717,86 +785,7 @@ K_EURO                euro
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83594.html" data-id="cjo5f577a009mf808bt6mrjwh" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pygame/">pygame</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-/archives/83586.html" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/archives/83586.html" class="article-date">
-  <time datetime="2011-08-17T21:17:20.000Z" itemprop="datePublished">2011-08-17</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/Python栏目/">Python栏目</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/archives/83586.html">Pygame学习笔记5：事件</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p><strong>事件系统</strong></p>
-<p>Pygame通过一个事件系统与用户进行交互，以及处理一些系统发生的事件。事件系统包括一个事件队列，其中每一项都是一个Event对象。所有的用户输入和一些系统事件，都会形成一个Event对象被添加到事件队列中。pygame.event模块提供了很多函数去访问和控制这个队列。<br>Event对象有各种不同的类型，比如KEYDOWN(键盘键按下)、MOUSEBUTTONDOWN(鼠标键按下)等，通过Event.type属性来区分。不同的类型的Event对象还有不同的其它属性。通过Event.dict属性来查看。常用的类型和对应的属性有：</p>
-<p>事件              产生途径              参数</p>
-<p>QUIT             用户按下关闭按钮      none</p>
-<p>ATIVEEVENT     Pygame被激活或者隐藏  gain, state</p>
-<p>KEYDOWN       键盘被按下             unicode, key, mod</p>
-<p>KEYUP           键盘被放开             key, mod</p>
-<p>MOUSEMOTION   鼠标移动               pos, rel, buttons</p>
-<p>MOUSEBUTTONDOWN    鼠标按下        pos, button</p>
-<p>MOUSEBUTTONUP  鼠标放开              pos, button</p>
-<p>JOYAXISMOTION   游戏手柄(Joystick or pad)移动   joy, axis, value</p>
-<p>JOYBALLMOTION   游戏球(Joy ball)?移动    joy, axis, value</p>
-<p>JOYHATMOTION    游戏手柄(Joystick)?移动   joy, axis, value</p>
-<p>JOYBUTTONDOWN   游戏手柄按下         joy, button</p>
-<p>JOYBUTTONUP   游戏手柄放开            joy, button</p>
-<p>VIDEORESIZE    Pygame窗口缩放         size, w, h</p>
-<p>VIDEOEXPOSE   Pygame窗口部分公开(expose)?  none</p>
-<p>USEREVENT     触发了一个用户事件        code</p>
-<p>pygame.event.get函数可以从队列获取所有的消息，并把它们从队列中删除。</p>
-<p>pygame.event.poll()提取并删除一个事件，如果队列是空的，这个函数会马上返回一个pygame.NOEVENT。</p>
-<p>pygame.event.wait()提取一个事件，如果没有事件则会等待直到有事件发生。</p>
-<p>pygame.event.clear()可以清空整个队列。</p>
-<p>如果只关心某些类型的事件，可以用pygame.event.get(type)，只取得队列中某种类型的事件。也可以用一个类型的列表，只取得某些类型的事件。pygame.event.peek(type)函数可以检查列表中是否有某种或者某些类型的事件，如果有就返回True。除此以外还可以用pygame.event.set_blocked阻止某些类型的事件进入事件队列，使用pygame.event.set_allowed来只允许某些类型的事件进入队列。</p>
-<p>pygame.event.post函数可以往队列中添加一个事件。</p>
-<p>用pygame.event.Event可以创建一个事件，比如：</p>
-<p>e = pygame.event.Event(pygame.USEREVENT)</p>
-<p>然后可以通过</p>
-<p>pygame.event.post(e)</p>
-<p>把这个事件添加到队列中，等待处理。在创建事件时可以添加自定义的属性。</p>
-<p>在窗口方式下运行，通常只有活动的窗口才能获得用户键盘、鼠标的事件。如果希望在窗口方式下，不是活动状态也能获得事件，可以通过</p>
-<p><em>pygame.event.set_grab(True)</em></p>
-<p>来捕获所有输入。不过这样会阻止其它程序获得用户输入，使得除了这个游戏以外其它程序都不能正常运行。要解除这样的状态，可以执行</p>
-<p><em>pygame.event.set_grab(False)</em></p>
-<p><strong><span style="text-decoration: underline">注意：这个慎用！！！</span></strong><br><br></p>
-<p>可以使用如下代码来测试事件：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#!/usr/bin/env python</span></div><div class="line"></div><div class="line"><span class="keyword">import</span> pygame</div><div class="line"></div><div class="line">pygame.init()</div><div class="line"></div><div class="line">screen = pygame.display.set_mode((<span class="number">640</span>, <span class="number">480</span>), <span class="number">0</span>, <span class="number">32</span>)</div><div class="line"></div><div class="line">pygame.display.update()</div><div class="line"></div><div class="line"><span class="keyword">while</span> <span class="keyword">True</span>:</div><div class="line"></div><div class="line">    <span class="keyword">for</span> event <span class="keyword">in</span> pygame.event.get():</div><div class="line"></div><div class="line">        <span class="keyword">print</span> str(event)</div><div class="line"></div><div class="line">        <span class="keyword">if</span> event.type == pygame.QUIT:</div><div class="line"></div><div class="line">            exit()</div></pre></td></tr></table></figure>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83586.html" data-id="cjo5f5778009ff8089b49smov" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83594.html" data-id="cjojwgha1009s1i08vocvhl62" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pygame/">pygame</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -865,6 +854,10 @@ K_EURO                euro
       <ul>
         
           <li>
+            <a href="/archives/84171.html">使用python编写游戏修改器</a>
+          </li>
+        
+          <li>
             <a href="/archives/84170.html">使用pytest测试flask应用</a>
           </li>
         
@@ -878,10 +871,6 @@ K_EURO                euro
         
           <li>
             <a href="/archives/84167.html">由octpress迁移到了hexo</a>
-          </li>
-        
-          <li>
-            <a href="/archives/84166.html">通过串口连接raspberry pi</a>
           </li>
         
       </ul>

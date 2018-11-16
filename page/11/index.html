@@ -69,6 +69,51 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-/archives/83913.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83913.html" class="article-date">
+  <time datetime="2013-11-07T20:27:33.000Z" itemprop="datePublished">2013-11-07</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Ruby栏目/">Ruby栏目</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/83913.html">[翻译]Ruby教程6——数据类型</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p></p><h1>数据类型</h1><p></p>
+<p>在这一章的教程中我们开始讨论数据类型。</p><br><p>所有类别的计算机程序，包括电子表格、文本编辑器、计算器和聊天软件都使用数据。现代计算机语言中各种数据类型是必不可少的。一种数据类型是一些可操作的值的集合。</p><br><p>Ruby中有一些数据类型，这些类型都是基于类的。以下是Ruby中公认的数据类型：  </p><br><ul><br><li>布尔(Booleans)  </li><br><li>符号(Symbols)  </li><br><li>数字(Numbers)  </li><br><li>字符串(Strings)</li><br><li>数组(Arrays)  </li><br><li>哈希(Hashes)</li><br></ul><br><p>下面的例子中我们展示Ruby中所有重要的数据类型。</p><br><pre><code>#!/usr/bin/ruby<br><br>h = { :name =&gt; “Jane”, :age =&gt; 17 }<br><br>p true.class, false.class<br>p “Ruby”.class<br>p 1.class<br>p 4.5.class<br>p 3_463_456_457.class<br>p :age.class<br>p [1, 2, 3].class<br>p h.class<br></code></pre><br><p>我们将它们的类型名打印出来，类型是用于创建对象的模块。  </p><br><pre><code>p true.class, false.class<br></code></pre><br><p><em>true</em>和<em>false</em>对象展示的布尔类型。</p><br><pre><code>p “Ruby”.class<br></code></pre><br><p>这个是字符串。</p><br><pre><code>p 1.class<br>p 4.5.class<br>p 3_463_456_457.class<br></code></pre><br><p>这些是数字。</p><br><pre><code>p :age.class<br></code></pre><br><p>这个是符号标志，Ruby的一种特殊数据类型。</p><br><pre><code>p [1, 2, 3].class<br>p h.class<br></code></pre><br><p>这是两个容器，数组和哈希表。</p><br><p>$ ./types.rb<br><br>TrueClass<br><br>FalseClass<br><br>String<br><br>Fixnum<br><br>Float<br><br>Bignum<br><br>Symbol<br><br>Array<br><br>Hash  </p><br><p>这个程序列出了属于Ruby的类型。</p><br><h2>布尔值</h2><br><p>在我们的世界里存在着对偶关系。天与地、水与火、男与女、爱与恨。这些就是我们自然中的“布尔”。在Ruby里，布尔类型只有一种，具有两个值：<em>true</em>(真)与<em>false</em>(假)。布尔是一种基本的数据类型，它在计算机程序中非常普遍。</p><br><p>高兴的父母等待着孩子的诞生。他们可能会给孩子取个名字。如果是男孩就叫John，如果是女孩就叫Victoria。</p><br><pre><code>#!/usr/bin/ruby<br><br># kid.rb<br><br>bool = [true, false]<br><br>male = bool[rand(2)]<br><br><br>if male<br>    puts “We will use name John”<br>else<br>    puts “We will use name Victoria”<br>end<br></code></pre><br><p>在这个程序中我们使用随机数来模拟这种情况。</p><br><pre><code>bool = [true, false]<br></code></pre><br><p>我们创建一个名为<em>bool</em>的变量，它是一个数组包含了两个布尔值。这个数组是使用方括号创建的。</p><br><pre><code>male = bool[rand(2)]<br></code></pre><br><p>我们使用<em>rand()</em>方法生成一个随机数。这个方法返回0或1。返回的数用于数组的索引。</p><br><pre><code>if male<br>    puts “We will use name John”<br>else<br>    puts “We will use name Victoria”<br>end<br></code></pre><br><p>根据<em>male</em>变量我们打印一条信息。如果<em>male</em>是<em>true</em>则名字选择John，否则选择Vactoria。类似<em>is/else</em>的结构控制语句是根据布尔值来选择的。</p><br><p>$ ./kid.rb <br><br>We will use name Victoria <br><br>$ ./kid.rb <br><br>We will use name Victoria<br><br>$ ./kid.rb <br><br>We will use name John<br><br>$ ./kid.rb <br><br>We will use name John<br><br>$ ./kid.rb <br><br>We will use name John  </p><br><p>程序运行多次的结果如上。</p><br><h2>符号标志</h2><br><p>符号标志代表其他对象。使用符号标志而不是字符串，是因为可能保存一些资源。一个符号标志是<em>Symbol</em>类的一个实例对象。符号标志通常是在标识符的前面加上冒号，比如 :name。一些对象具有<em>to_sym</em>方法，用于将这些对象转化为符号标志。</p><br><p>Ruby的符号标志在程序运行时是不可改变的。它通常用于当作哈希表的键，因为一个键不需要完整的字符串功能。</p><br><pre><code>#!/usr/bin/ruby<br><br>p :name<br>p :name.class<br>p :name.methods.size<br>p “Jane”.methods.size<br><br>p :name.object_id<br>p :name.object_id<br>p “name”.object_id<br>p “name”.object_id<br></code></pre><br><p>第一个例子展示了符号标志的基本操作。</p><br><pre><code>p :name<br>p :name.class<br></code></pre><br><p>在终端上打印一个符号标志和它的类型。符号标志的类型是<em>Symbol</em>。</p><br><pre><code>p :name.methods.size<br>p “Jane”.methods.size<br></code></pre><br><p>比较字符串实例与符号标志实例分配的方法数量。字符串的方法数是符号标志的两位多。</p><br><pre><code>p :name.object_id<br>p :name.object_id<br>p “name”.object_id<br>p “name”.object_id<br></code></pre><br><p>相同的符号标志具有相同的id，相同的字符串的id却不同。</p><br><p>$ ./symbols.rb<br><br>:name<br><br>Symbol<br><br>79<br><br>162<br><br>10328<br><br>10328<br><br>77344750<br><br>77344730  </p><br><p>程序输出结果。</p><br><hr><br><p>符号标志也可以作为常量标志，类似于C/C++中的枚举类型。</p><br><pre><code>#!/usr/bin/ruby<br><br>light = :on<br><br>if light == :on<br>    puts “The light is on”<br>else<br>    puts “The light is off”<br>end<br><br>light = :off<br><br>if light == :on<br>    puts “The light is on”<br>else<br>    puts “The light is off”<br>end<br></code></pre><br><p>电灯不是开就是关。对于这两种情况定义了符号标志。</p><br><pre><code>light = :on<br></code></pre><br><p>灯是开的。</p><br><pre><code>if light == :on<br>    puts “The light is on”<br>else<br>    puts “The light is off”<br>end<br></code></pre><br><p>程序的逻辑依赖于<em>light</em>变量的状态。</p><br><hr><br><p>符号标志通常在哗然容器中作为键。这比字符串更加有效。</p><br><pre><code>#!/usr/bin/ruby<br><br>domains = {:sk =&gt; “Slovakia”, :no =&gt; “Norway”, :hu =&gt; “Hungary”}<br><br>puts domains[:sk]<br>puts domains[:no]<br>puts domains[:hu]<br></code></pre><br><p>在这个脚本中创建了一个名为<em>domains</em>的哈希表。它的键全是符号标志。</p><br><pre><code>puts domains[:sk]<br>puts domains[:no]<br>puts domains[:hu]<br></code></pre><br><p>在哈希表中键是用于访问值的。接下来我们打印出这个哈希表的值。</p><br><p>$ ./symbols3.rb<br><br>Slovakia<br><br>Norway<br><br>Hungary  </p><br><p>以上是例子的输出结果。</p><br><hr><br><p>Ruby解释器将内部引用存储为符号标志。</p><br><pre><code>#!/usr/bin/ruby<br><br>class Being<br><br>    def initialize<br>        @is = true<br>    end<br><br>    def say<br>        “I am being”<br>    end<br>end<br><br>b = Being.new<br><br>p b.method :say<br>p b.instance_variable_get :@is<br></code></pre><br><p>定义了一个<em>Being</em>类。该类有一个自定义实例变量<em>@is</em>和一个方法<em>say</em>。这两个实体在Ruby中保存为符号标志。</p><br><pre><code>p b.method :say<br></code></pre><br><p><em>method</em>方法用于在<em>b</em>对象在查找给定名字的方法。我们查找的是<em>:say</em>符号。</p><br><pre><code>p b.instance_variable_get :@is<br></code></pre><br><p>使用<em>instance_variable_get</em>检查<em>@is</em>是不是<em>b</em>对象的一个实例变量。在内部变量存储为<em>:@is</em>符号。</p><br><p>$ ./symbols4.rb   </p><br><h1><method: being#say=""></method:></h1><br><p>true  </p><br><p>输出结果。</p><br><hr><br><p>所有的符号都存储在符号表中。下一个例子我们来看看这个表。<em>Symbol</em>类的<em>all_symbols</em>方法返回了一个数组包含这个表的全部符号。</p><br><pre><code>#!/usr/bin/ruby<br><br>def info<br>  “info method”<br>end<br><br>@v = “Ruby”<br>@@n = “16”<br><br>p Symbol.all_symbols.include? :info<br>p Symbol.all_symbols.include? :@v<br>p Symbol.all_symbols.include? :@@n<br></code></pre><br><p>在这个Ruby脚本中创建了一个方法、一个实例变量和一个类变量。我们检查这些实体是否存储在符号表中。</p><br><pre><code>p Symbol.all_symbols.include? :info<br></code></pre><br><p>检查<em>:info</em>符号是否在符号表中。这行返回的是<em>true</em>。</p><br><p>$ ./symbols5.rb<br><br>true<br><br>true<br><br>true  </p><br><p>三个符号都在符号表中。</p><br><h2>整数</h2><br><p>整数是实数的一个子集。它没有分数或者小数。整数属于集合Z = {…, -2, -1, 0, 1, 2, …} 。这个集合是无限的。</p><br><p>在计算机语言中，整数是原始的数据类型。实际中计算机仅支持整数的一个子集，因为计算机的能力有限。整数用于统计离散的实体。我们有3、4、6个人，但是不能有3.33个人。我们有3.33千克。</p><br><p>在Ruby中整数是<em>Fixnum</em>或者<em>Bignum</em>类的实例对象。不同于其他语言，如Java或者C，在Ruby中整数是一个对象。这两种类型的大小不同。<em>Fixnum</em>类型的整数有一些限制，这些限制与机器有关。<em>Bignum</em>的值表示范围比<em>Fixnum</em>大。如果一些操作超出了<em>Fixnum</em>的范围，它会自动的转换成<em>Bignum</em>。程序员通常不需要关心整数的类型。</p><br><pre><code>#!/usr/bin/ruby<br><br>p -2<br>p 121<br>p 123265<br>p -34253464356<br>p 34867367893463476<br><br>p 1.class<br>p 23453246.class<br>p 234532423563456346.class<br>p 2345324235632363463456456346.class<br><br>p 5 / 2<br>p 5.div 2<br></code></pre><br><p>这个例子中我们处理的一些整数。</p><br><pre><code>p -2<br>p 121<br>p 123265<br>p -34253464356<br>p 34867367893463476<br></code></pre><br><p>这是一些不同大小的正数和负数。</p><br><pre><code>p 1.class<br>p 23453246.class<br>p 234532423563456346.class<br>p 2345324235632363463456456346.class<br></code></pre><br><p>打印出这些数的类型。前两个整数是<em>Fixnum</em>类型，其余两个是<em>Bignum</em>类型。</p><br><pre><code>p 5 / 2<br>p 5.div 2<br></code></pre><br><p>这两行展示的整数的相除。当两个数相除时我们使用了相除操作符/方法,结果也是一个整数。</p><br><p>$ ./integers.rb<br><br>-2<br><br>121<br><br>123265<br><br>-34253464356<br><br>34867367893463476<br><br>Fixnum<br><br>Fixnum<br><br>Bignum<br><br>Bignum<br><br>2<br><br>2  </p><br><p>例子的输出结果。</p><br><hr><br><p>在Ruby中整数可以有不同的表现符号。十进制、十六进制、八进制和二进制数都是可用的。十六进制数以0x字符开头，八进制以0字符开头，二进制以0b字符开头。</p><br><pre><code>#!/usr/bin/ruby<br><br>puts 122<br>puts 0x7a<br>puts 0172<br>puts 0b1111010<br></code></pre><br><p>这个例子中我们打印了十进制数<em>122</em>的所有表现形式。</p><br><p>$ ./inotations.rb<br><br>122<br><br>122<br><br>122<br><br>122  </p><br><p>以上是输出结果。</p><br><hr><br><p>我们使用整数的话，那么就是用于处理离散的实体。也许我们用于统计苹果的数量。</p><br><pre><code>#!/usr/bin/ruby<br><br>baskets = 16<br>apples_in_basket = 24<br><br>total = baskets <em> apples_in_basket<br><br>puts “There are total of #{total} apples”<br></em></code></pre><br><p>在这个程序中我们使用整数统计苹果的总数。</p><br><p>$ ./apples.rb<br><br>There are total of 384 apples  </p><br><p>以上是程序的输出。</p><br><hr><br><p>大数字读起来比较困难。如果我们有一个数245342395423452，我们发现很难快速的将它读出来。计算机之外大的数字是用空格或者逗号分隔开来。为了可读性，Ruby允许数字包含下划线。Ruby解释器会忽略整数中的下划线。</p><br><pre><code>#!/usr/bin/ruby<br><br>p 23482345629<br>p 23_482_345_629<br><br>p 23482345629 == 23_482_345_629<br></code></pre><br><p>这个例子演示了下划线的使用。</p><br><pre><code>p 23482345629 == 23_482_345_629<br></code></pre><br><p>这行展示了两个数据是相等的。</p><br><p>$ ./underscore.rb<br><br>23482345629<br><br>23482345629<br><br>true  </p><br><p>例子的输出结果。</p><br><h2>浮点数</h2><br><p>在计算中浮点数表示实数。实例意味着连续的数量，如：重量、高度和速度。Ruby中小数是<em>Float</em>或者<em>BigDecimal</em>类对象。<em>BigDecimal</em>类是Ruby的核心类，是Ruby标准库的一部分。此外我们还可以使用<em>Rational</em>对象。</p><br><p>我们需要理解数字是不业精确的。Ruby的官方文档清楚地说道浮点数对象表示的是不精确的实数。</p><br><pre><code>#!/usr/bin/ruby<br><br>p 15.4<br>p 0.3455<br>p -343.4563<br><br>p 12.5.class<br>p -12.5.class<br>p (5.0 / 2).class<br><br>p 5.fdiv 2<br>p 12.to_f<br></code></pre><br><p>上面的这个例子我们使用了浮点数。</p><br><pre><code>p 15.4<br>p 0.3455<br>p -343.4563<br></code></pre><br><p>这里我们打印三个小数的值。小数包含了小数点字符。</p><br><pre><code>p 12.5.class<br>p -12.5.class<br>p (5.0 / 2).class<br></code></pre><br><p>以上展示的数字的类型，全都是浮点数。最后一个整数与浮点数相除结果为浮点数。</p><br><pre><code>p 5.fdiv 2<br>p 12.to_f<br></code></pre><br><p>这里我们创建浮点数除法<em>fdiv</em>和转换方法<em>to_f</em>来创建浮点数。</p><br><p>$ ./decimals.rb<br><br>15.4<br><br>0.3455<br><br>-343.4563<br><br>Float<br><br>Float<br><br>Float<br><br>2.5<br><br>12.0  </p><br><p>以上为转出结果。</p><br><hr><br><p>一个小数默认最多只显示小数点后16个数字。我们可以使用<em>sprintf</em>或者<em>printf</em>方法来控制浮点数的格式。</p><br><pre><code>#!/usr/bin/ruby<br><br>p 1/3.0<br>p 1.fdiv 2<br><br>puts sprintf “%.4f” % (1/3.0)<br>puts sprintf “%.7f” % (5/3.0)<br></code></pre><br><p>格式化小数。</p><br><pre><code>p 1/3.0<br>p 13.fdiv 4<br>p 1.fdiv 2<br></code></pre><br><p>第一行打印的小数在小数点后有16个数字。第二行打印的有两个。第三行打印的有一个。</p><br><pre><code>puts sprintf “%.4f” % (1/3.0)<br>puts sprintf “%.7f” % (5/3.0)<br></code></pre><br><p>这里我们使用<em>sprintf</em>方法控制小数点后面的数字个数。<em>sprintf</em>方法的格式说明符是精确的。它是一个数字接着<em>%</em>符号。<em>f</em>是一个转换说明符，表示处理的是一个浮点数。</p><br><p>$ ./formatfloat.rb<br><br>0.3333333333333333<br><br>3.25<br><br>0.5<br><br>0.3333<br><br>1.6666667  </p><br><p>以上是输出结果。</p><br><hr><br><p>Ruby支持使用科学的记数法来表示一个浮点数。这也称为指数记数法，它是将非常大或者非常小的数转换成正常的小数形式。</p><br><pre><code>#!/usr/bin/ruby<br><br>p 1.2e-3<br>p 0.0012<br><br>p 1.5E-4<br>p 0.00015<br></code></pre><br><p>这个例子展示了两个使用科学记数表示的小数。</p><br><p>$ ./scientific.rb<br><br>0.0012<br><br>0.0012<br><br>0.00015<br><br>0.00015  </p><br><p>这是以上程序的输出。</p><br><hr><br><p>前面我们主说过浮点数的值稍微有些不精确。在很多计算中，普通的浮点小数已经足够精确了，如：我们的体重是60kg还是60.000024kg并不重要。对于其他计算，包括科学和工程应用，精确度是非常重要的。</p><br><p>Ruby有一个<em>BigDecimal</em>标准库。这个类对于非常大或者非常精准的浮点数提供了任意的精度。</p><br><pre><code>#!/usr/bin/ruby<br><br>require ‘bigdecimal’<br><br>sum = 0<br><br>1000.times do<br>    sum = sum + 0.0001<br>end<br><br>p sum<br><br><br>sum = BigDecimal.new(“0”)<br><br>1000.times do<br>    sum = sum + BigDecimal.new(“0.0001”)<br>end<br><br>puts sum.to_s(‘F’)<br>puts sum.to_s(‘E’)<br></code></pre><br><p>在这个例子中我们比较了<em>Float</em>与<em>BigDecimal</em>的精度。 </p><br><pre><code>require ‘bigdecimal’<br></code></pre><br><p><em>BigDecimal</em>类必须导入。</p><br><pre><code>sum = 0<br><br>1000.times do<br>    sum = sum + 0.0001<br>end<br><br>p sum<br></code></pre><br><p>通过循环对一个很小的浮点数求和。最后会出现一点误差。</p><br><pre><code>sum = BigDecimal.new(“0”)<br><br>1000.times do<br>    sum = sum + BigDecimal.new(“0.0001”)<br>end<br></code></pre><br><p>然后再对<em>BigDecimal</em>做同样的事情。</p><br><pre><code>puts sum.to_s(‘F’)<br>puts sum.to_s(‘E’)<br></code></pre><br><p>将<em>sum</em>浮点数打印为工程记数形式。</p><br><p>$ ./bigdecimal.rb<br><br>0.10000000000000184<br><br>0.1<br><br>0.1E0  </p><br><p>输出结果表示<em>BigDecimal</em>比<em>Float</em>更精确。</p><br><hr><br><p>如果一个短路运动员100m跑9.87s，那么他的时速是多少？</p><br><pre><code>#!/usr/bin/ruby<br><br>distance = 0.1<br>time = 9.87 / 3600<br><br>speed = distance / time<br><br>puts “The average speed of a sprinter is #{speed} km/h”<br></code></pre><br><p>这个例子必需使用浮点数。</p><br><pre><code>distance = 0.1<br></code></pre><br><p>100m等于0.1km。</p><br><pre><code>time = 9.87 / 3600<br></code></pre><br><p>9.87s等于9.87/6060 h。</p><br><pre><code>speed = distance / time<br></code></pre><br><p>要计算速度，我们用距离除以时间。</p><br><p>$ ./speed.rb<br><br>The average speed of a sprinter is 36.4741641337386 km/h  </p><br><p>以上是<em>speed.rb</em>脚本的输出。</p><br><h2>有理数</h2><br><p>Ruby支持有理数。有理数是一个确切的数。使用有理数可以避免舍入错误。Ruby中有理数是<em>Rational</em>类的对象。我们可以使用某些对象的<em>to_r</em>方法来创建有理数。</p><br><p>有理数可以用于表示两个整数相除的分数，a/b（b!=0）。如果b为1,每个整数都是一个有理数。</p><br><pre><code>#!/usr/bin/ruby<br><br>puts 2.to_r<br>puts “23”.to_r<br>puts 2.6.to_r<br><br>p Rational 0<br>p Rational 1/5.0<br>p Rational 0.5<br></code></pre><br><p>这个例子展示了一些有理数。</p><br><pre><code>puts 2.to_r<br></code></pre><br><p>变量我们使用<em>to_r</em>方法将整数2转化为有理数2/1。</p><br><pre><code>p Rational 0.5<br></code></pre><br><p>使用<em>Rational</em>方法创建一个有理数》</p><br><p>$ ./rational.rb<br><br>2/1<br><br>23/1<br><br>5854679515581645/2251799813685248<br><br>(0/1)<br><br>(3602879701896397/18014398509481984)<br><br>(1/2)  </p><br><p>例子的输出结果。</p><br><h2>空值</h2><br><p>Ruby有一个特殊的值<em>nil</em>。它表示空值。<em>nil</em>是<em>NilClass</em>类的单实例，仅有一个<em>nil</em>。</p><br><pre><code>#!/usr/bin/ruby<br><br>puts nil<br>p nil<br><br>p $val<br><br>p [1, 2, 3][4]<br><br>p $val1 == $val2<br></code></pre><br><p><em>nil</em>的一个例子。</p><br><pre><code>puts nil<br>p nil<br></code></pre><br><p>在终端上打印<em>nil</em>的值。<em>puts</em>方法打印空字符串，<em>p</em>方法打印<em>‘nil’</em>字符串。</p><br><pre><code>p $val<br></code></pre><br><p>当我们引用一个没有定义的全局变量时会返回<em>nil</em>值。</p><br><pre><code>p [1, 2, 3][3]<br></code></pre><br><p>这行代码我们引用了一个3元素数组的第4个元素，结果返回<em>nil</em>。Ruby中的许多方法对于无效的值都返回<em>nil</em>。</p><br><pre><code>p $val1 == $val2<br></code></pre><br><p>这行返回<em>true</em>，这实际上是因为<em>nil</em>是<em>NilClass</em>的单实例对象。</p><br><p>$ ./nilvalue.rb  </p><br><p>nil<br><br>nil<br><br>nil<br><br>true  </p><br><p>输出结果。</p><br><h2>字符串</h2><br><p>字符串在计算机程序代表文本数据。Ruby字符串是一个序列化的unicode字符。字符串是<em>String</em>的一个对象。字符串的字面量是字符加上双引号或者单引号。</p><br><p>字符串是一个非常重要的数据类型。它需要专门用一章来介绍。这里我们仅包含一个小例子。</p><br><pre><code>#!/usr/bin/ruby<br><br>p “Ruby”<br>p ‘Python’<br><br>p “Ruby”.size<br>p “Ruby”.upcase<br><br>p 23.to_s<br></code></pre><br><p>这个例子中我们使用了Ruby的字符串。我们使用<em>p</em>方法是为了在输出中看到数据类型。</p><br><pre><code>p “Ruby”<br>p ‘Python’<br></code></pre><br><p>在终端中打印两个字符串的字面值。第一个字面量是使用双引号，第二个是单引号。</p><br><pre><code>p “Ruby”.size<br>p “Ruby”.upcase<br></code></pre><br><p>这两行调用了两个字符串的方法。<em>size</em>方法返回字符串的长度，在这里是4个字符。<em>upcase</em>方法是将字符串转为大写。</p><br><pre><code>p 23.to_s<br></code></pre><br><p><em>to_s</em>方法是将整数转为字符串。</p><br><p>$ ./strings.rb<br><br>“Ruby”<br><br>“Python”<br><br>4<br><br>“RUBY”<br><br>“23”  </p><br><p>在输出中我们看到字符串是在引号内。这就是我们使用<em>p</em>方法的结果，<em>print</em>和<em>puts</em>方法都不会带上引号。</p><br><h2>数组和哈希表</h2><br><p>数组和哈希表是对象的集合。他们将对象集合在一起。</p><br><p>数组是对象的有序集合。哈希表是键-值对的集合。我们将会用单独的一章来介绍数组和哈希表。以下仅是一个预览的例子。</p><br><pre><code>#!/usr/bin/ruby<br><br>nums = [1, 2, 3, 4]<br><br>puts “There are #{nums.size} items in the array”<br><br>nums.each do |num|<br>    puts num<br>end<br><br><br>domains = { :de =&gt; “Germany”, :sk =&gt; “Slovakia”,<br>            :us =&gt; “United States”, :no =&gt; “Norway” }<br><br>puts domains.keys<br>puts domains.values<br></code></pre><br><p>这是一个Ruby数组和哈希表的例子。</p><br><pre><code>nums = [1, 2, 3, 4]<br><br>puts “There are #{nums.size} items in the array”<br><br>nums.each do |num|<br>    puts num<br>end<br></code></pre><br><p>这里创建一个有4项内容的数组。第二行统计了这个数组数据项的数量，并合并到了消息中。随后我们使用<em>each</em>方法将每个元素打印在终端上。</p><br><pre><code>domains = { :de =&gt; “Germany”, :sk =&gt; “Slovakia”,<br>            :us =&gt; “United States”, :no =&gt; “Norway” }<br><br>puts domains.keys<br>puts domains.values<br></code></pre><br><p>创建了Ruby的哈希表，然后打印它的键和值。</p><br><p>$ ./arrayshashes.rb<br><br>There are 4 items in the array<br><br>1<br><br>2<br><br>3<br><br>4<br><br>de<br><br>sk<br><br>us<br><br>no<br><br>Germany<br><br>Slovakia<br><br>United States<br><br>Norway  </p><br><p>例子的输出结果。</p><br><h2>类型转换</h2><br><p>我们经常是一次使用多种数据类型。在编程中从一种数据类型转换为其他类型是很平常的。类型转换或者类型的引用会将一个实体从一个类型转换成另一个类型。有两种类型转换的方式：隐式和显式。隐式类型转换又称为强制转换，是被编译器自动的转换。Ruby只有显式转换。</p><br><p>Ruby有内建的转换方法。如：<em>to_i</em>、<em>to_s</em>或者<em>to_f</em>。内核模块有一些公共的方法用来转换，如<em>Interger</em>、<em>String</em>或者<em>Float</em>。这些方法还要与Ruby的类混淆。</p><br><p>#!/usr/bin/ruby</p><br><pre><code>p Array(1..6)<br>p Complex 6<br>p Float 12<br>p Integer “34”<br>p Rational 6<br>p String 22<br></code></pre><br><p>这里我们展示了内核模块的转换方法。</p><br><p>$ ./convertmethods.rb<br><br>[1, 2, 3, 4, 5, 6]<br><br>(6+0i)<br><br>12.0<br><br>34<br><br>(6/1)<br><br>“22”  </p><br><p>例子的输出结果。</p><br><hr><br><pre><code>#!/usr/bin/ruby<br><br>p “12”.to_i<br>p 12.5.to_i<br>p nil.to_i<br><br>p 12.to_f<br>p “11”.to_f<br>p nil.to_f<br></code></pre><br><p>以上例子我们展示了数字的转换。一些对象具有<em>to_i</em>和<em>to_f</em>方法将对象转换成整数和浮点数。</p><br><pre><code>p “12”.to_i<br>p 12.5.to_i<br>p nil.to_i<br></code></pre><br><p>这里我们将字符串、小数和nil转换成整数。</p><br><pre><code>p 12.to_f<br>p “11”.to_f<br>p nil.to_f<br></code></pre><br><p>这三行将整数、字符串和nil转换成小数。</p><br><p>$ ./conversions.rb<br><br>12<br><br>12<br><br>0<br><br>12.0<br><br>11.0<br><br>0.0  </p><br><p>例子的输出结果。</p><br><hr><br><p>第二个例子展示了一些字符串的转换。</p><br><pre><code>#!/usr/bin/ruby<br><br>p “12”.to_i<br>p “13”.to_f<br>p “12”.to_r<br>p “13”.to_c<br><br>p “Jane”.to_sym<br><br>v = “Ruby Python Tcl PHP Perl”.split<br>p v.class<br></code></pre><br><p>上面的例子中我们将字符串转换为不同类型的对象。</p><br><pre><code>p “12”.to_i<br>p “13”.to_f<br>p “12”.to_r<br>p “13”.to_c<br></code></pre><br><p>这里将字符串转换成整数、小数、有理数和复数。</p><br><pre><code>p “Jane”.to_sym<br></code></pre><br><p>将字符串变为符号标志。</p><br><pre><code>v = “Ruby Python Tcl PHP Perl”.split<br>p v.class<br></code></pre><br><p>使用字符串的<em>split</em>方法将字符串转换成数组。</p><br><p>$ ./stringconv.rb<br><br>12<br><br>13.0<br><br>(12/1)<br><br>(13+0i)<br><br>:Jane<br><br>Array  </p><br><p>输出结果。</p><br><hr><br><p>下面的小例子展示了数组哈希表的转换。</p><br><pre><code>#!/usr/bin/ruby<br><br>h = {:de =&gt; “Germany”, :sk =&gt; “Slovakia”}<br>p h.to_a<br><br>a = [:de, “Germany”, :sk, “Slovakia”,<br>     :hu, “Hungary”, :no, “Norway”]<br>p Hash[<em>a]<br></em></code></pre><br><p>这个例子的代码我们创建了一个哈希表并转换成数组，创建一个数组并转换成哈希表。</p><br><pre><code>h = {:de =&gt; “Germany”, :sk =&gt; “Slovakia”}<br>p h.to_a<br></code></pre><br><p>哈希表转换为数组使用<em>to_a</em>方法。</p><br><pre><code>a = [:de, “Germany”, :sk, “Slovakia”,<br>     :hu, “Hungary”, :no, “Norway”]<br>p Hash[a]<br></code></pre><br><p>将数组转换成哈希表。在这里的上下文中使用了星号操作符。这个风格来自<em>Perl</em>。它将一个数组分割成多个变量。</p><br><p>$ ./h2a.rb<br><br>[[:de, “Germany”], [:sk, “Slovakia”]]<br><br>{:de=&gt;”Germany”, :sk=&gt;”Slovakia”, :hu=&gt;”Hungary”, :no=&gt;”Norway”}  </p><br><p>输出结果。</p><br><p>这章在教程覆盖了数据类型和它们的转换。</p><br><hr><br><p>原文地址： <a href="http://zetcode.com/lang/rubytutorial/datatypes/" target="_blank" rel="external">http://zetcode.com/lang/rubytutorial/datatypes/</a><br><br>翻译：龙昌  admin@longchangjin.cn<br><br>完整教程：<a href="https://github.com/wusuopu/Ruby-tutorial" target="_blank" rel="external">https://github.com/wusuopu/Ruby-tutorial</a>  </p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83913.html" data-id="cjojwgheq00i11i08z46rqhcw" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ruby/">Ruby</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/翻译/">翻译</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-/archives/83909.html" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/83909.html" class="article-date">
@@ -101,7 +146,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83909.html" data-id="cjo5f57ia00scf808ptkf3wvp" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83909.html" data-id="cjojwghee00hx1i08v0vtcb20" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ruby/">Ruby</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/翻译/">翻译</a></li></ul>
@@ -149,7 +194,7 @@ p $&#39;
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83905.html" data-id="cjo5f57i700s9f8083z1ht0zw" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83905.html" data-id="cjojwghdv00hn1i085oqjo9o3" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ruby/">Ruby</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/翻译/">翻译</a></li></ul>
@@ -194,7 +239,7 @@ p $&#39;
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83902.html" data-id="cjo5f57i300s8f808gf4jcrxa" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83902.html" data-id="cjojwghdx00hr1i08zcudjf9m" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ruby/">Ruby</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/翻译/">翻译</a></li></ul>
@@ -239,7 +284,7 @@ p $&#39;
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83899.html" data-id="cjo5f57i000s5f8085zsutpjx" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83899.html" data-id="cjojwghe000hv1i083vp8wgzy" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ruby/">Ruby</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/翻译/">翻译</a></li></ul>
@@ -284,7 +329,7 @@ p $&#39;
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83895.html" data-id="cjo5f57hy00s3f808jpnfejxx" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83895.html" data-id="cjojwghdt00hk1i08vpx63sk9" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ruby/">Ruby</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/翻译/">翻译</a></li></ul>
@@ -329,7 +374,7 @@ p $&#39;
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83890.html" data-id="cjo5f57hu00s2f808aayd4br6" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83890.html" data-id="cjojwghdr00hg1i08c5azl2yc" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Scrapy/">Scrapy</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -381,7 +426,7 @@ p $&#39;
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83887.html" data-id="cjo5f57c100h4f808uclsc2rd" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83887.html" data-id="cjojwghdp00hd1i08eneoe3wm" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Django/">Django</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Scrapy/">Scrapy</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -456,7 +501,7 @@ Item通常是在Spider的parse方法里使用，它用来保存解析到的数�
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83883.html" data-id="cjo5f57bz00h0f808kokndl5y" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83883.html" data-id="cjojwghdn00h91i08yai2vb3q" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Scrapy/">Scrapy</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -510,61 +555,10 @@ Item通常是在Spider的parse方法里使用，它用来保存解析到的数�
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83880.html" data-id="cjo5f57bw00gxf80802qz0kau" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83880.html" data-id="cjojwghdh00gz1i08dwgsztet" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vim/">vim</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-/archives/83877.html" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/archives/83877.html" class="article-date">
-  <time datetime="2013-08-11T20:40:58.000Z" itemprop="datePublished">2013-08-11</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/开源软件/">开源软件</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/archives/83877.html">分享两个vim的git插件</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>1.vim-git</p>
-<p>我只是简单体验发一下，个人觉得这个就是用vim的命令把git的命令包装了一下，还不如直接在终端下操作方便。</p>
-<p>常用命令<br>:GitAdd<br>:GitCommit<br>:GitStatus<br>:GitLog<br>:GitCheckout<br>:GitDiff<br>:GitPull<br>:GitPush  </p>
-<p>快捷键<br>&lt;Leader&gt;gd 等同于 :GitDiff<br>&lt;Leader&gt;gD 等同于 :GitDiff —cached<br>&lt;Leader&gt;gs 等同于 :GitStatus<br>&lt;Leader&gt;gl 等同于 :GitLog<br>&lt;Leader&gt;ga 等同于 :GitAdd<br>&lt;Leader&gt;gA 等同于 :GitAdd &lt;cfile&gt;<br>&lt;Leader&gt;gc 等同于 :GitCommit  </p>
-<p>下载地址：<a href="https://github.com/motemen/git-vim.git" target="_blank" rel="external">https://github.com/motemen/git-vim.git</a></p>
-<p>2.vim-fugitive</p>
-<p>感觉这个比较强大，尤其是配合vimdiff来查看文件的发动非常方便。<br>它的说明文档介绍到如果你的vim版本低于7.2，那么建议同时也把vim-git安装上。</p>
-<p>下载地址：<a href="https://github.com/tpope/vim-fugitive.git" target="_blank" rel="external">https://github.com/tpope/vim-fugitive.git</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83877.html" data-id="cjo5f57bp00gqf808hc1j55l7" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/git/">git</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vim/">vim</a></li></ul>
 
     </footer>
   </div>
@@ -630,6 +624,10 @@ Item通常是在Spider的parse方法里使用，它用来保存解析到的数�
       <ul>
         
           <li>
+            <a href="/archives/84171.html">使用python编写游戏修改器</a>
+          </li>
+        
+          <li>
             <a href="/archives/84170.html">使用pytest测试flask应用</a>
           </li>
         
@@ -643,10 +641,6 @@ Item通常是在Spider的parse方法里使用，它用来保存解析到的数�
         
           <li>
             <a href="/archives/84167.html">由octpress迁移到了hexo</a>
-          </li>
-        
-          <li>
-            <a href="/archives/84166.html">通过串口连接raspberry pi</a>
           </li>
         
       </ul>

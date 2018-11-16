@@ -69,6 +69,184 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-/archives/83990.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83990.html" class="article-date">
+  <time datetime="2013-12-07T14:22:08.000Z" itemprop="datePublished">2013-12-07</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Web开发/">Web开发</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/83990.html">python cgi教程3——表单</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>cgi模块中有一个FieldStorage类可用于表单处理。</p><br><h2>单一字段名</h2><br><p>有一个HTML表单如下：</p>
+
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span><span class="tag">&lt;<span class="name">body</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">method</span>=<span class="string">"get"</span> <span class="attr">action</span>=<span class="string">"/cgi-bin/form1.py"</span>&gt;</span></div><div class="line">Name: <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"name"</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">value</span>=<span class="string">"Submit"</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">form</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span><span class="tag">&lt;/<span class="name">html</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>form1.py内容为：</p>
+
+<pre><code>#!/usr/bin/env python
+import cgi
+form = cgi.FieldStorage() # instantiate only once!
+name = form.getfirst(&apos;name&apos;, &apos;empty&apos;)
+
+# Avoid script injection escaping the user input
+name = cgi.escape(name)
+
+print &quot;&quot;&quot;\
+Content-Type: text/html\n
+&lt;html&gt;&lt;body&gt;
+&lt;p&gt;The submitted name was &quot;%s&quot;&lt;/p&gt;
+&lt;/body&gt;&lt;/html&gt;
+&quot;&quot;&quot; % name
+</code></pre><p><em>getfirst</em>方法获取指定字段的第一个值，如果该字段不存在则为空。将表单的方法改为post它同样适用。</p><br><p>为了避免用户提交危险的内容，可以使用<em>cgi.escape()</em>方法对内容进行转换。</p><br><h2>多字段名</h2><br><p>对于多个字段具有相同名字的可以使用<em>getlist()</em>方法，它返回一个列表包含了这些值。</p>
+
+<pre><code>&lt;html&gt;&lt;body&gt;
+&lt;form method=&quot;post&quot; action=&quot;/cgi-bin/form2.py&quot;&gt;
+Red&lt;input type=&quot;checkbox&quot; name=&quot;color&quot; value=&quot;red&quot;&gt;
+Green&lt;input type=&quot;checkbox&quot; name=&quot;color&quot; value=&quot;green&quot;&gt;
+&lt;input type=&quot;submit&quot; value=&quot;Submit&quot;&gt;
+&lt;/form&gt;
+&lt;/body&gt;&lt;/html&gt;
+</code></pre><p>form2.py内容如下：</p>
+
+<pre><code>#!/usr/bin/env python
+import cgi
+form = cgi.FieldStorage()
+
+# getlist() returns a list containing the
+# values of the fields with the given name
+colors = form.getlist(&apos;color&apos;)
+
+print &quot;Content-Type: text/html\n&quot;
+print &apos;&lt;html&gt;&lt;body&gt;&apos;
+print &apos;The colors list:&apos;, colors
+for color in colors:
+   print &apos;&lt;p&gt;&apos;, cgi.escape(color), &apos;&lt;/p&gt;&apos;
+print &apos;&lt;/body&gt;&lt;/html&gt;&apos;
+</code></pre><h2>文件上传</h2>
+
+<pre><code>&lt;html&gt;&lt;body&gt;
+&lt;form enctype=&quot;multipart/form-data&quot; action=&quot;/cgi-bin/form3.py&quot; method=&quot;post&quot;&gt;
+&lt;p&gt;File: &lt;input type=&quot;file&quot; name=&quot;file&quot;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;input type=&quot;submit&quot; value=&quot;Upload&quot;&gt;&lt;/p&gt;
+&lt;/form&gt;
+&lt;/body&gt;&lt;/html&gt;
+</code></pre><p><em>getfirst()</em>和<em>getlist()</em>都只能获取文件的内容。想获取文件名需要使用<em>FieldStorage</em>。</p><br><p>form3.py内容如下：</p>
+
+<pre><code>#!/usr/bin/env python
+import cgi, os
+import cgitb; cgitb.enable()
+
+try: # Windows needs stdio set for binary mode.
+    import msvcrt
+    msvcrt.setmode (0, os.O_BINARY) # stdin  = 0
+    msvcrt.setmode (1, os.O_BINARY) # stdout = 1
+except ImportError:
+    pass
+
+form = cgi.FieldStorage()
+
+# A nested FieldStorage instance holds the file
+fileitem = form[&apos;file&apos;]
+
+# Test if the file was uploaded
+if fileitem.filename:
+
+   # strip leading path from file name to avoid directory traversal attacks
+   fn = os.path.basename(fileitem.filename)
+   open(&apos;files/&apos; + fn, &apos;wb&apos;).write(fileitem.file.read())
+   message = &apos;The file &quot;&apos; + fn + &apos;&quot; was uploaded successfully&apos;
+
+else:
+   message = &apos;No file was uploaded&apos;
+
+print &quot;&quot;&quot;\
+Content-Type: text/html\n
+&lt;html&gt;&lt;body&gt;
+&lt;p&gt;%s&lt;/p&gt;
+&lt;/body&gt;&lt;/html&gt;
+&quot;&quot;&quot; % (message,)
+</code></pre><p></p><h2>大文件上传</h2><p></p>
+<p>在处理大文件时如果内存不足，可以使用生成器将文件分成小片。<br><br>可将之前的脚本改写如下：</p>
+
+<pre><code>#!/usr/bin/env python
+import cgi, os
+import cgitb; cgitb.enable()
+
+try: # Windows needs stdio set for binary mode.
+    import msvcrt
+    msvcrt.setmode (0, os.O_BINARY) # stdin  = 0
+    msvcrt.setmode (1, os.O_BINARY) # stdout = 1
+except ImportError:
+    pass
+
+form = cgi.FieldStorage()
+
+# Generator to buffer file chunks
+def fbuffer(f, chunk_size=10000):
+   while True:
+      chunk = f.read(chunk_size)
+      if not chunk: break
+      yield chunk
+
+# A nested FieldStorage instance holds the file
+fileitem = form[&apos;file&apos;]
+
+# Test if the file was uploaded
+if fileitem.filename:
+
+   # strip leading path from file name to avoid directory traversal attacks
+   fn = os.path.basename(fileitem.filename)
+   f = open(&apos;files/&apos; + fn, &apos;wb&apos;, 10000)
+
+   # Read the file in chunks
+   for chunk in fbuffer(fileitem.file):
+      f.write(chunk)
+   f.close()
+   message = &apos;The file &quot;&apos; + fn + &apos;&quot; was uploaded successfully&apos;
+
+else:
+   message = &apos;No file was uploaded&apos;
+
+print &quot;&quot;&quot;\
+Content-Type: text/html\n
+&lt;html&gt;&lt;body&gt;
+&lt;p&gt;%s&lt;/p&gt;
+&lt;/body&gt;&lt;/html&gt;
+&quot;&quot;&quot; % (message,)
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83990.html" data-id="cjojwghfz00jt1i08swrbkggl" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web开发/">Web开发</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-/archives/83984.html" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/83984.html" class="article-date">
@@ -109,7 +287,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83984.html" data-id="cjo5f57jh00u4f808z1tgnh9s" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83984.html" data-id="cjojwghfx00jo1i0830iqzu7d" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web开发/">Web开发</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -151,7 +329,7 @@
         <p></p><h2>简介</h2><p></p>
 <p>CGI(Common Gateway Interface)，通用网关接口的简称。它是客户端和服务器程序进行数据传输的一种标准。</p><br><p>一个CGI程序可以使用任何语言编写，通常它是放在Web服务器（如Apache）目录下的cgi-bin目录里。</p><br><h2>实例</h2><br><p>接下来看一个简单的例子。</p>
 
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#!/usr/bin/env python</span></div><div class="line"><span class="keyword">print</span> <span class="string">"Content-Type: text/html"</span></div><div class="line"><span class="keyword">print</span></div><div class="line"><span class="keyword">print</span> <span class="string">"""\</span></div><div class="line"><span class="string">&lt;html&gt;</span></div><div class="line"><span class="string">&lt;body&gt;</span></div><div class="line"><span class="string">&lt;h2&gt;Hello World!&lt;/h2&gt;</span></div><div class="line"><span class="string">&lt;/body&gt;</span></div><div class="line"><span class="string">&lt;/html&gt;</span></div><div class="line"><span class="string">"""</span></div></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#!/usr/bin/env python</span></div><div class="line"><span class="keyword">print</span> <span class="string">"Content-Type: text/html"</span></div><div class="line"><span class="keyword">print</span></div><div class="line"><span class="keyword">print</span> <span class="string">"""\</span></div><div class="line">&lt;html&gt;</div><div class="line">&lt;body&gt;</div><div class="line">&lt;h2&gt;Hello World!&lt;/h2&gt;</div><div class="line">&lt;/body&gt;</div><div class="line">&lt;/html&gt;</div><div class="line">"""</div></pre></td></tr></table></figure>
 <p>脚本程序的第一行指定了python解释器的路径。在你系统中它也可能为：</p>
 
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#!/usr/bin/python</span></div><div class="line"><span class="comment">#!/usr/bin/python2</span></div><div class="line"><span class="comment">#!c:\Python26\python.exe</span></div><div class="line"><span class="comment">#!c:\Python27\python.exe</span></div></pre></td></tr></table></figure>
@@ -164,7 +342,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83979.html" data-id="cjo5f57jb00twf808h0y7nq5j" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83979.html" data-id="cjojwghfw00jm1i083n4hkvxf" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web开发/">Web开发</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -209,7 +387,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83975.html" data-id="cjo5f57jk00u7f80896gz8s9z" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83975.html" data-id="cjojwghft00ji1i08bc701p0x" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ruby/">Ruby</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gtk/">gtk</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/翻译/">翻译</a></li></ul>
@@ -254,7 +432,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83972.html" data-id="cjo5f57j300tlf8088bgolhx0" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83972.html" data-id="cjojwghfo00jb1i08pzm0a6ax" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ruby/">Ruby</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gtk/">gtk</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/翻译/">翻译</a></li></ul>
@@ -299,7 +477,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83969.html" data-id="cjo5f57jr00uff808ayfk7o1h" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83969.html" data-id="cjojwghfq00jf1i08zjz43nab" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ruby/">Ruby</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gtk/">gtk</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/翻译/">翻译</a></li></ul>
@@ -344,7 +522,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83966.html" data-id="cjo5f57je00tzf808tj5cd471" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83966.html" data-id="cjojwghfl00j91i08cqkh3rqi" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ruby/">Ruby</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gtk/">gtk</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/翻译/">翻译</a></li></ul>
@@ -389,7 +567,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83963.html" data-id="cjo5f57j900tsf8081dmduo6b" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83963.html" data-id="cjojwghfk00j61i08mhdnp6q0" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ruby/">Ruby</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gtk/">gtk</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/翻译/">翻译</a></li></ul>
@@ -434,7 +612,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83960.html" data-id="cjo5f57j700tpf808zrh82z54" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83960.html" data-id="cjojwghfi00j31i0805ldesqf" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ruby/">Ruby</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gtk/">gtk</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/翻译/">翻译</a></li></ul>
@@ -479,52 +657,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83957.html" data-id="cjo5f57j100tif808y44csw8h" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ruby/">Ruby</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gtk/">gtk</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/翻译/">翻译</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-/archives/83954.html" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/archives/83954.html" class="article-date">
-  <time datetime="2013-11-20T23:28:32.000Z" itemprop="datePublished">2013-11-20</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/Ruby栏目/">Ruby栏目</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/archives/83954.html">[翻译]Ruby GTK教程1——介绍</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p></p><h1>Ruby GTK介绍</h1><p></p>
-<p>在这部分的Ruby GTK编程教程中，我偿将介绍GTK库并且使用Ruby语言编写我们的第一个程序。</p><br><p>这个教程的目标是让你入门GTK和Ruby。贪吃蛇游戏的图片可以从这里<a href="http://zetcode.com/img/gui/rubygtk/images.zip" target="_blank" rel="external">下载</a>。</p><br><h2>关于</h2><br><p>GTK是一个领先的创建图形化用户界面的套件。Ruby是一个流行的脚本语言。</p><br><h2>简单的例子</h2><br><p>第一个例子我们创建一个简单的窗口。这个窗口位置屏幕中间。</p><br><pre><code>#!/usr/bin/ruby<br><br># ZetCode Ruby GTK tutorial<br>#<br># This program centers a window on<br># the screen<br>#<br># author: jan bodnar<br># website: www.zetcode.com<br># last modified: April 2009<br><br>require ‘gtk2’<br><br>class RubyApp &lt; Gtk::Window<br><br>    def initialize<br>        super<br><br>        set_title “Center”<br>        signal_connect “destroy” do<br>            Gtk.main_quit<br>        end<br><br>        set_default_size 250, 200<br>        set_window_position Gtk::Window::POS_CENTER<br><br>        show<br>    end<br>end<br><br>Gtk.init<br>    window = RubyApp.new<br>Gtk.main<br></code></pre><br><p>这个例子在屏幕中间显示了一个250x200像素的窗口。</p><br><pre><code>require ‘gtk2’<br></code></pre><br><p><em>require</em>关键字导入了这个应用程序中将要使用的类。</p><br><pre><code>class RubyApp &lt; Gtk::Window<br></code></pre><br><p>这个例子继承自<em>Window</em>。<em>Window</em>是一个顶级容器。</p><br><pre><code>set_title “Center”<br></code></pre><br><p>设置窗口的标题。</p><br><pre><code>signal_connect “destroy” do<br>    Gtk.main_quit<br>end<br></code></pre><br><p>当我们点击标题栏的关闭按钮或者按下Alt+F4时<em>destroy</em>事件被触发。<em>main_quit</em>正常退出应用程序。</p><br><pre><code>set_default_size 250, 200<br></code></pre><br><p>设置应用程序窗口的默认大小。</p><br><pre><code>set_window_position Gtk::Window::POS_CENTER<br></code></pre><br><p>将窗口放置在屏幕中间。</p><br><pre><code>show<br></code></pre><br><p>一些就绪，我们在屏幕上显示该窗口。</p><br><pre><code>Gtk.init<br>    window = RubyApp.new<br>Gtk.main<br></code></pre><br><p>这三行启动应用程序。</p><br><h2>创建提示框</h2><br><p>第二个例子我们将显示一个提示框。提示框(Tooltip)是一个小的矩形窗口用于显示一些简洁的提示信息。它是一个常用的GUI组件。它是应用程序帮助系统的一部分。</p><br><pre><code>#!/usr/bin/ruby<br><br># ZetCode Ruby GTK tutorial<br>#<br># This code shows a tooltip on<br># a window and a button<br>#<br># author: jan bodnar<br># website: www.zetcode.com<br># last modified: June 2009<br><br>require ‘gtk2’<br><br>class RubyApp &lt; Gtk::Window<br><br>    def initialize<br>        super<br><br>        set_title  “Tooltips”<br>        signal_connect “destroy” do<br>            Gtk.main_quit<br>        end<br><br>        fixed = Gtk::Fixed.new<br>        add fixed<br><br>        button = Gtk::Button.new “Button”<br>        button.set_size_request 80, 35<br>        button.set_tooltip_text “Button widget”<br><br>        fixed.put button, 50, 50<br><br>        set_tooltip_text “Window widget”<br>        set_default_size 250, 200<br>        set_window_position Gtk::Window::POS_CENTER<br><br>        show_all<br><br>    end<br>end<br><br>Gtk.init<br>    window = RubyApp.new<br>Gtk.main<br></code></pre><br><p>这个例子创建了一个窗口。如果我们将鼠标光标放在窗口的区域中，将会出现一个提示框。</p><br><pre><code>button.set_tooltip_text “Button widget”<br></code></pre><br><p>我们使用<em>set_tooltip_text</em>方法设置一个提示框。</p><br><p><img alt="image1" src="http://zetcode.com/img/gui/rubygtk/tooltip.png"><br><br><em>图片：提示框</em></p><br><h2>退出按钮</h2><br><p>在这节的最后一个例子我们将创建一个退出按钮。当我们按下这个按钮时程序结束。</p><br><pre><code>#!/usr/bin/ruby<br><br># ZetCode Ruby GTK tutorial<br>#<br># This program creates a quit<br># button. When we press the button,<br># the application terminates.<br>#<br># author: jan bodnar<br># website: www.zetcode.com<br># last modified: June 2009<br><br>require ‘gtk2’<br><br>class RubyApp &lt; Gtk::Window<br><br>    def initialize<br>        super<br><br>        set_title  “Quit button”<br>        signal_connect “destroy” do<br>            Gtk.main_quit<br>        end<br><br>        init_ui<br><br>        show_all<br>    end<br><br>    def init_ui<br><br>        fixed = Gtk::Fixed.new<br>        add fixed<br><br>        button = Gtk::Button.new “Quit”<br>        button.set_size_request 80, 35<br>        button.signal_connect “clicked” do<br>            Gtk.main_quit<br>        end<br><br>        fixed.put button, 50, 50<br><br>        set_default_size 250, 200<br>        set_window_position Gtk::Window::POS_CENTER<br>    end<br>end<br><br>Gtk.init<br>    window = RubyApp.new<br>Gtk.main<br></code></pre><br><p>我们使用一个按钮控件。这是一个非常平常的控件。它显示一个文本、图像或者两者都显示。</p><br><pre><code>init_ui<br></code></pre><br><p>我们将用户接口的创建委派给<em>init_ui</em>方法。</p><br><pre><code>show_all<br></code></pre><br><p>我们有两个选择。对每个控件都调用<em>show</em>，或者调用<em>show_all</em>显示容器的所有了子控件。</p><br><pre><code>button = Gtk::Button.new “Quit”<br></code></pre><br><p>这里创建一个按钮控件。</p><br><pre><code>button.set_size_request 80, 35<br></code></pre><br><p>设置按钮的大小。</p><br><pre><code>button.signal_connect “clicked” do<br>    Gtk.main_quit<br>end<br></code></pre><br><p>我们将<em>main_quit</em>方法插入到按钮的点击事件中。</p><br><pre><code>fixed.put button, 50, 50<br></code></pre><br><p>将退出按钮放在<em>fixed</em>容器的x=50，y=50的位置。<br><img alt="image2" src="http://zetcode.com/img/gui/rubygtk/quitbutton.png"><br><br><em>图片：退出按钮</em></p><br><p>这一节我们介绍Ruby语言的GTK库。</p><br><hr><br><p>原文地址： <a href="http://zetcode.com/gui/rubygtk/introduction/" target="_blank" rel="external">http://zetcode.com/gui/rubygtk/introduction/</a><br><br>翻译：龙昌  admin@longchangjin.cn  </p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83954.html" data-id="cjo5f57iu00t7f808g3lq2bdl" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83957.html" data-id="cjojwghff00iz1i08t86dbtj4" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ruby/">Ruby</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gtk/">gtk</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/翻译/">翻译</a></li></ul>
@@ -593,6 +726,10 @@
       <ul>
         
           <li>
+            <a href="/archives/84171.html">使用python编写游戏修改器</a>
+          </li>
+        
+          <li>
             <a href="/archives/84170.html">使用pytest测试flask应用</a>
           </li>
         
@@ -606,10 +743,6 @@
         
           <li>
             <a href="/archives/84167.html">由octpress迁移到了hexo</a>
-          </li>
-        
-          <li>
-            <a href="/archives/84166.html">通过串口连接raspberry pi</a>
           </li>
         
       </ul>

@@ -69,6 +69,50 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-/archives/84024.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/84024.html" class="article-date">
+  <time datetime="2014-01-04T12:26:52.000Z" itemprop="datePublished">2014-01-04</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/编程开发/">编程开发</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/84024.html">使用ccache加快编译速度</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>ccache是一个编译器缓存，可以将编译的结果缓存起来。这样尽管第一次编译会花费长一点的时间，不过之后再次编译将变得非常非常快。 </p><br><h3>1、安装</h3><br><p>主流的linux发行版应该都有这个包，对于Debian系列的可以执行以下命令安装：</p><br><pre><code>sudo apt-get install ccache<br></code></pre><br><h3>2、使用</h3><br><p>安装之后基本不用进行什么配置就可以直接使用了。<br><br>例如之前要编译一个hello.c文件要执行命令：  </p><br><pre><code>gcc hello.c -o hello<br></code></pre><br><p>现在是：</p><br><pre><code>ccache gcc hello.c -o hello<br></code></pre><br><p>ccache默认是将结果缓存保存到 $HOME/.ccache 目录下。如果想要修改这个目录，可以修改 CCACHE_DIR 环境变量。例如：</p><br><pre><code>export CCACHE_DIR=/ramdisk/ccache<br></code></pre><br><p>如果觉得每次都在命令前加上ccache比较麻烦的话，有一个一劳永逸的办法。执行如下命令：</p><br><pre><code>cp ccache /usr/local/bin/<br>ln -s ccache /usr/local/bin/gcc<br>ln -s ccache /usr/local/bin/g++<br>ln -s ccache /usr/local/bin/cc<br>ln -s ccache /usr/local/bin/c++<br></code></pre><br><p>不过这样的话每次都是使用的ccache，不太灵活。这个就要自己取舍了。</p><br><h3>3、实例</h3><br><p>接下来通过一个例子来看看使用ccache和不使用的差别。<br><br>作为一个Python程序员，我们就来编译一个Python试试。</p><br><pre><code>$ tar xf Python-2.7.3.tar.gz<br>$ cd Python-2.7.3<br>$ ./configure<br>$ time make<br>make  96.49s user 5.10s system 93% cpu 1:48.77 total<br></code></pre><br><p>首次编译花了1分48秒。</p><br><pre><code>$ time make<br>make  0.12s user 0.03s system 88% cpu 0.172 total<br>$ make clean<br>$ time make<br>make  96.46s user 4.98s system 95% cpu 1:46.43 total<br></code></pre><br><p>清除结果之后再次编译，还是花了1分46秒。</p><br><p>再来看看使用ccache后的结果：</p><br><pre><code>$ tar xf Python-2.7.3.tar.gz<br>$ cd Python-2.7.3<br>$ ./configure<br>$ time make<br>make  99.42s user 5.84s system 93% cpu 1:52.95 total<br><br>$ time make<br>make  0.16s user 0.00s system 89% cpu 0.178 total<br>$ make clean<br>$ time make<br>make  3.36s user 1.41s system 52% cpu 9.093 total<br></code></pre><br><p>首次编译花了1分52秒，之后都是只花了几秒。</p><br><p>查看ccache的统计信息：</p><br><pre><code>$ ccache -s<br>cache directory                     /home/longchang/.ccache<br>cache hit (direct)                   250<br>cache hit (preprocessed)               4<br>cache miss                           349<br>called for link                      132<br>alled for preprocessing              84<br>compile failed                        29<br>preprocessor error                    28<br>bad compiler arguments                 5<br>unsupported source language            6<br>autoconf compile/link                224<br>no input file                         24<br>files in cache                       710<br>cache size                          30.3 Mbytes<br>max cache size                       1.0 Gbytes<br></code></pre><br><p>清除掉缓存后再次编译：</p><br><pre><code>$ ccache -c<br>Cleaned cache<br><br>$ make clean<br>$ time make<br>make  99.36s user 5.94s system 92% cpu 1:53.47 total<br><br>$ make clean<br>$ time make<br>make  3.48s user 1.42s system 54% cpu 9.049 total<br></code></pre><br><p>ccache手册： <a href="http://ccache.samba.org/manual.html" target="_blank" rel="external">http://ccache.samba.org/manual.html</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/84024.html" data-id="cjojwghgt00kv1i08tpc7zscy" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gcc/">gcc</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/资源分享/">资源分享</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-/archives/84018.html" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/84018.html" class="article-date">
@@ -102,7 +146,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84018.html" data-id="cjo5f57ka00v1f80809e4fcm7" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84018.html" data-id="cjojwghgr00ks1i085vlvb8fb" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web开发/">Web开发</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/css/">css</a></li></ul>
@@ -143,12 +187,12 @@
       
         <p>当请求方法为POST时，请求字符串会放在HTTP的body中。可以使用环境变量中的wsgi.input进行读取。同时CONTENT_LENGTH变量记录了内容的长度。</p>
 <p>下面是一个简单的例子：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#!/usr/bin/env python</span></div><div class="line"></div><div class="line"><span class="keyword">from</span> wsgiref.simple_server <span class="keyword">import</span> make_server</div><div class="line"><span class="keyword">from</span> cgi <span class="keyword">import</span> parse_qs, escape</div><div class="line"></div><div class="line">html = <span class="string">"""</span></div><div class="line"><span class="string">&lt;html&gt;</span></div><div class="line"><span class="string">&lt;body&gt;</span></div><div class="line"><span class="string">   &lt;form method="post" action=""&gt;</span></div><div class="line"><span class="string">      &lt;p&gt;</span></div><div class="line"><span class="string">         Age: &lt;input type="text" name="age"&gt;</span></div><div class="line"><span class="string">         &lt;/p&gt;</span></div><div class="line"><span class="string">      &lt;p&gt;</span></div><div class="line"><span class="string">         Hobbies:</span></div><div class="line"><span class="string">         &lt;input name="hobbies" type="checkbox" value="software"&gt; Software</span></div><div class="line"><span class="string">         &lt;input name="hobbies" type="checkbox" value="tunning"&gt; Auto Tunning</span></div><div class="line"><span class="string">         &lt;/p&gt;</span></div><div class="line"><span class="string">      &lt;p&gt;</span></div><div class="line"><span class="string">         &lt;input type="submit" value="Submit"&gt;</span></div><div class="line"><span class="string">         &lt;/p&gt;</span></div><div class="line"><span class="string">      &lt;/form&gt;</span></div><div class="line"><span class="string">   &lt;p&gt;</span></div><div class="line"><span class="string">      Age: %s&lt;br&gt;</span></div><div class="line"><span class="string">      Hobbies: %s</span></div><div class="line"><span class="string">      &lt;/p&gt;</span></div><div class="line"><span class="string">   &lt;/body&gt;</span></div><div class="line"><span class="string">&lt;/html&gt;</span></div><div class="line"><span class="string">"""</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">application</span><span class="params">(environ, start_response)</span>:</span></div><div class="line"></div><div class="line">   <span class="comment"># the environment variable CONTENT_LENGTH may be empty or missing</span></div><div class="line">   <span class="keyword">try</span>:</div><div class="line">      request_body_size = int(environ.get(<span class="string">'CONTENT_LENGTH'</span>, <span class="number">0</span>))</div><div class="line">   <span class="keyword">except</span> (ValueError):</div><div class="line">      request_body_size = <span class="number">0</span></div><div class="line"></div><div class="line">   <span class="comment"># When the method is POST the query string will be sent</span></div><div class="line">   <span class="comment"># in the HTTP request body which is passed by the WSGI server</span></div><div class="line">   <span class="comment"># in the file like wsgi.input environment variable.</span></div><div class="line">   request_body = environ[<span class="string">'wsgi.input'</span>].read(request_body_size)</div><div class="line">   d = parse_qs(request_body)</div><div class="line"></div><div class="line">   age = d.get(<span class="string">'age'</span>, [<span class="string">''</span>])[<span class="number">0</span>] <span class="comment"># Returns the first age value.</span></div><div class="line">   hobbies = d.get(<span class="string">'hobbies'</span>, []) <span class="comment"># Returns a list of hobbies.</span></div><div class="line"></div><div class="line">   <span class="comment"># Always escape user input to avoid script injection</span></div><div class="line">   age = escape(age)</div><div class="line">   hobbies = [escape(hobby) <span class="keyword">for</span> hobby <span class="keyword">in</span> hobbies]</div><div class="line"></div><div class="line">   response_body = html % (age <span class="keyword">or</span> <span class="string">'Empty'</span>,</div><div class="line">               <span class="string">', '</span>.join(hobbies <span class="keyword">or</span> [<span class="string">'No Hobbies'</span>]))</div><div class="line"></div><div class="line">   status = <span class="string">'200 OK'</span></div><div class="line"></div><div class="line">   response_headers = [(<span class="string">'Content-Type'</span>, <span class="string">'text/html'</span>),</div><div class="line">                  (<span class="string">'Content-Length'</span>, str(len(response_body)))]</div><div class="line">   start_response(status, response_headers)</div><div class="line"></div><div class="line">   <span class="keyword">return</span> [response_body]</div><div class="line"></div><div class="line">httpd = make_server(<span class="string">'localhost'</span>, <span class="number">8051</span>, application)</div><div class="line">httpd.serve_forever()</div></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#!/usr/bin/env python</span></div><div class="line"></div><div class="line"><span class="keyword">from</span> wsgiref.simple_server <span class="keyword">import</span> make_server</div><div class="line"><span class="keyword">from</span> cgi <span class="keyword">import</span> parse_qs, escape</div><div class="line"></div><div class="line">html = <span class="string">"""</span></div><div class="line">&lt;html&gt;</div><div class="line">&lt;body&gt;</div><div class="line">   &lt;form method="post" action=""&gt;</div><div class="line">      &lt;p&gt;</div><div class="line">         Age: &lt;input type="text" name="age"&gt;</div><div class="line">         &lt;/p&gt;</div><div class="line">      &lt;p&gt;</div><div class="line">         Hobbies:</div><div class="line">         &lt;input name="hobbies" type="checkbox" value="software"&gt; Software</div><div class="line">         &lt;input name="hobbies" type="checkbox" value="tunning"&gt; Auto Tunning</div><div class="line">         &lt;/p&gt;</div><div class="line">      &lt;p&gt;</div><div class="line">         &lt;input type="submit" value="Submit"&gt;</div><div class="line">         &lt;/p&gt;</div><div class="line">      &lt;/form&gt;</div><div class="line">   &lt;p&gt;</div><div class="line">      Age: %s&lt;br&gt;</div><div class="line">      Hobbies: %s</div><div class="line">      &lt;/p&gt;</div><div class="line">   &lt;/body&gt;</div><div class="line">&lt;/html&gt;</div><div class="line">"""</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">application</span><span class="params">(environ, start_response)</span>:</span></div><div class="line"></div><div class="line">   <span class="comment"># the environment variable CONTENT_LENGTH may be empty or missing</span></div><div class="line">   <span class="keyword">try</span>:</div><div class="line">      request_body_size = int(environ.get(<span class="string">'CONTENT_LENGTH'</span>, <span class="number">0</span>))</div><div class="line">   <span class="keyword">except</span> (ValueError):</div><div class="line">      request_body_size = <span class="number">0</span></div><div class="line"></div><div class="line">   <span class="comment"># When the method is POST the query string will be sent</span></div><div class="line">   <span class="comment"># in the HTTP request body which is passed by the WSGI server</span></div><div class="line">   <span class="comment"># in the file like wsgi.input environment variable.</span></div><div class="line">   request_body = environ[<span class="string">'wsgi.input'</span>].read(request_body_size)</div><div class="line">   d = parse_qs(request_body)</div><div class="line"></div><div class="line">   age = d.get(<span class="string">'age'</span>, [<span class="string">''</span>])[<span class="number">0</span>] <span class="comment"># Returns the first age value.</span></div><div class="line">   hobbies = d.get(<span class="string">'hobbies'</span>, []) <span class="comment"># Returns a list of hobbies.</span></div><div class="line"></div><div class="line">   <span class="comment"># Always escape user input to avoid script injection</span></div><div class="line">   age = escape(age)</div><div class="line">   hobbies = [escape(hobby) <span class="keyword">for</span> hobby <span class="keyword">in</span> hobbies]</div><div class="line"></div><div class="line">   response_body = html % (age <span class="keyword">or</span> <span class="string">'Empty'</span>,</div><div class="line">               <span class="string">', '</span>.join(hobbies <span class="keyword">or</span> [<span class="string">'No Hobbies'</span>]))</div><div class="line"></div><div class="line">   status = <span class="string">'200 OK'</span></div><div class="line"></div><div class="line">   response_headers = [(<span class="string">'Content-Type'</span>, <span class="string">'text/html'</span>),</div><div class="line">                  (<span class="string">'Content-Length'</span>, str(len(response_body)))]</div><div class="line">   start_response(status, response_headers)</div><div class="line"></div><div class="line">   <span class="keyword">return</span> [response_body]</div><div class="line"></div><div class="line">httpd = make_server(<span class="string">'localhost'</span>, <span class="number">8051</span>, application)</div><div class="line">httpd.serve_forever()</div></pre></td></tr></table></figure>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84015.html" data-id="cjo5f57kg00vef808buajy5xi" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84015.html" data-id="cjojwghgo00ko1i084eacgfil" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web开发/">Web开发</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -190,12 +234,12 @@
         <p>执行之前的程序，然后在浏览器中打开 <a href="http://localhost:8051/?a=10&amp;b=w&amp;b=r" target="_blank" rel="external">http://localhost:8051/?a=10&amp;b=w&amp;b=r</a> 这样的url。</p>
 <p>环境变量字典中保存了请求信息REQUEST_METHOD和QUERY_STRING。问号之后的内容即为此次请求字符串的值。可以写一个函数对它进行解析，或者直接使用CGI模块的parse_qs函数，它返回一个字典，其值为一个列表。</p>
 <p>下面是一个简单的例子：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#!/usr/bin/env python</span></div><div class="line"></div><div class="line"><span class="keyword">from</span> wsgiref.simple_server <span class="keyword">import</span> make_server</div><div class="line"><span class="keyword">from</span> cgi <span class="keyword">import</span> parse_qs, escape</div><div class="line"></div><div class="line">html = <span class="string">"""</span></div><div class="line"><span class="string">&lt;html&gt;</span></div><div class="line"><span class="string">&lt;body&gt;</span></div><div class="line"><span class="string">   &lt;form method="get" action=""&gt;</span></div><div class="line"><span class="string">      &lt;p&gt;</span></div><div class="line"><span class="string">         Age: &lt;input type="text" name="age"&gt;</span></div><div class="line"><span class="string">         &lt;/p&gt;</span></div><div class="line"><span class="string">      &lt;p&gt;</span></div><div class="line"><span class="string">         Hobbies:</span></div><div class="line"><span class="string">         &lt;input name="hobbies" type="checkbox" value="software"&gt; Software</span></div><div class="line"><span class="string">         &lt;input name="hobbies" type="checkbox" value="tunning"&gt; Auto Tunning</span></div><div class="line"><span class="string">         &lt;/p&gt;</span></div><div class="line"><span class="string">      &lt;p&gt;</span></div><div class="line"><span class="string">         &lt;input type="submit" value="Submit"&gt;</span></div><div class="line"><span class="string">         &lt;/p&gt;</span></div><div class="line"><span class="string">      &lt;/form&gt;</span></div><div class="line"><span class="string">   &lt;p&gt;</span></div><div class="line"><span class="string">      Age: %s&lt;br&gt;</span></div><div class="line"><span class="string">      Hobbies: %s</span></div><div class="line"><span class="string">      &lt;/p&gt;</span></div><div class="line"><span class="string">   &lt;/body&gt;</span></div><div class="line"><span class="string">&lt;/html&gt;"""</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">application</span><span class="params">(environ, start_response)</span>:</span></div><div class="line"></div><div class="line">   <span class="comment"># Returns a dictionary containing lists as values.</span></div><div class="line">   d = parse_qs(environ[<span class="string">'QUERY_STRING'</span>])</div><div class="line"></div><div class="line">   <span class="comment"># In this idiom you must issue a list containing a default value.</span></div><div class="line">   age = d.get(<span class="string">'age'</span>, [<span class="string">''</span>])[<span class="number">0</span>] <span class="comment"># Returns the first age value.</span></div><div class="line">   hobbies = d.get(<span class="string">'hobbies'</span>, []) <span class="comment"># Returns a list of hobbies.</span></div><div class="line"></div><div class="line">   <span class="comment"># Always escape user input to avoid script injection</span></div><div class="line">   age = escape(age)</div><div class="line">   hobbies = [escape(hobby) <span class="keyword">for</span> hobby <span class="keyword">in</span> hobbies]</div><div class="line"></div><div class="line">   response_body = html % (age <span class="keyword">or</span> <span class="string">'Empty'</span>,</div><div class="line">               <span class="string">', '</span>.join(hobbies <span class="keyword">or</span> [<span class="string">'No Hobbies'</span>]))</div><div class="line"></div><div class="line">   status = <span class="string">'200 OK'</span></div><div class="line"></div><div class="line">   <span class="comment"># Now content type is text/html</span></div><div class="line">   response_headers = [(<span class="string">'Content-Type'</span>, <span class="string">'text/html'</span>),</div><div class="line">                  (<span class="string">'Content-Length'</span>, str(len(response_body)))]</div><div class="line">   start_response(status, response_headers)</div><div class="line"></div><div class="line">   <span class="keyword">return</span> [response_body]</div><div class="line"></div><div class="line">httpd = make_server(<span class="string">'localhost'</span>, <span class="number">8051</span>, application)</div><div class="line"><span class="comment"># Now it is serve_forever() in instead of handle_request().</span></div><div class="line"><span class="comment"># In Windows you can kill it in the Task Manager (python.exe).</span></div><div class="line"><span class="comment"># In Linux a Ctrl-C will do it.</span></div><div class="line">httpd.serve_forever()</div></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#!/usr/bin/env python</span></div><div class="line"></div><div class="line"><span class="keyword">from</span> wsgiref.simple_server <span class="keyword">import</span> make_server</div><div class="line"><span class="keyword">from</span> cgi <span class="keyword">import</span> parse_qs, escape</div><div class="line"></div><div class="line">html = <span class="string">"""</span></div><div class="line">&lt;html&gt;</div><div class="line">&lt;body&gt;</div><div class="line">   &lt;form method="get" action=""&gt;</div><div class="line">      &lt;p&gt;</div><div class="line">         Age: &lt;input type="text" name="age"&gt;</div><div class="line">         &lt;/p&gt;</div><div class="line">      &lt;p&gt;</div><div class="line">         Hobbies:</div><div class="line">         &lt;input name="hobbies" type="checkbox" value="software"&gt; Software</div><div class="line">         &lt;input name="hobbies" type="checkbox" value="tunning"&gt; Auto Tunning</div><div class="line">         &lt;/p&gt;</div><div class="line">      &lt;p&gt;</div><div class="line">         &lt;input type="submit" value="Submit"&gt;</div><div class="line">         &lt;/p&gt;</div><div class="line">      &lt;/form&gt;</div><div class="line">   &lt;p&gt;</div><div class="line">      Age: %s&lt;br&gt;</div><div class="line">      Hobbies: %s</div><div class="line">      &lt;/p&gt;</div><div class="line">   &lt;/body&gt;</div><div class="line">&lt;/html&gt;"""</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">application</span><span class="params">(environ, start_response)</span>:</span></div><div class="line"></div><div class="line">   <span class="comment"># Returns a dictionary containing lists as values.</span></div><div class="line">   d = parse_qs(environ[<span class="string">'QUERY_STRING'</span>])</div><div class="line"></div><div class="line">   <span class="comment"># In this idiom you must issue a list containing a default value.</span></div><div class="line">   age = d.get(<span class="string">'age'</span>, [<span class="string">''</span>])[<span class="number">0</span>] <span class="comment"># Returns the first age value.</span></div><div class="line">   hobbies = d.get(<span class="string">'hobbies'</span>, []) <span class="comment"># Returns a list of hobbies.</span></div><div class="line"></div><div class="line">   <span class="comment"># Always escape user input to avoid script injection</span></div><div class="line">   age = escape(age)</div><div class="line">   hobbies = [escape(hobby) <span class="keyword">for</span> hobby <span class="keyword">in</span> hobbies]</div><div class="line"></div><div class="line">   response_body = html % (age <span class="keyword">or</span> <span class="string">'Empty'</span>,</div><div class="line">               <span class="string">', '</span>.join(hobbies <span class="keyword">or</span> [<span class="string">'No Hobbies'</span>]))</div><div class="line"></div><div class="line">   status = <span class="string">'200 OK'</span></div><div class="line"></div><div class="line">   <span class="comment"># Now content type is text/html</span></div><div class="line">   response_headers = [(<span class="string">'Content-Type'</span>, <span class="string">'text/html'</span>),</div><div class="line">                  (<span class="string">'Content-Length'</span>, str(len(response_body)))]</div><div class="line">   start_response(status, response_headers)</div><div class="line"></div><div class="line">   <span class="keyword">return</span> [response_body]</div><div class="line"></div><div class="line">httpd = make_server(<span class="string">'localhost'</span>, <span class="number">8051</span>, application)</div><div class="line"><span class="comment"># Now it is serve_forever() in instead of handle_request().</span></div><div class="line"><span class="comment"># In Windows you can kill it in the Task Manager (python.exe).</span></div><div class="line"><span class="comment"># In Linux a Ctrl-C will do it.</span></div><div class="line">httpd.serve_forever()</div></pre></td></tr></table></figure>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84013.html" data-id="cjo5f57kd00v8f80842kfxzf6" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84013.html" data-id="cjojwghgn00kl1i0848o3gdem" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web开发/">Web开发</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -241,7 +285,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84010.html" data-id="cjo5f57k700uvf808ik9zeuf2" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84010.html" data-id="cjojwghgk00ke1i08f5ws8m35" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web开发/">Web开发</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -288,7 +332,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84007.html" data-id="cjo5f57k500usf808kcvxgiqn" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84007.html" data-id="cjojwghgi00kb1i087qbcdkcx" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web开发/">Web开发</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -329,13 +373,13 @@
       
         <p>WSGI(Web Server Gateway Interface)并不是一个服务器，而是一个协议。最开始是用Python写的，现在很多语言都有了对应的实现。详细内容可以看这里： <a href="http://www.python.org/dev/peps/pep-3333/" target="_blank" rel="external">http://www.python.org/dev/peps/pep-3333/</a></p>
 <p>WSGI应用程序接口是一个可调用的对象。它必须接收两个固定的参数：一个包含了类似CGI变量的字典；一个可调用的函数用于返回HTTP状态代码和数据头。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># This is our application object. It could have any name,</span></div><div class="line"><span class="comment"># except when using mod_wsgi where it must be "application"</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">application</span><span class="params">( # It accepts two arguments:</span></span></div><div class="line"><span class="function"><span class="params">      # environ points to a dictionary containing CGI like environment variables</span></span></div><div class="line"><span class="function"><span class="params">      # which is filled by the server for each received request from the client</span></span></div><div class="line"><span class="function"><span class="params">      environ,</span></span></div><div class="line"><span class="function"><span class="params">      # start_response is a callback function supplied by the server</span></span></div><div class="line"><span class="function"><span class="params">      # which will be used to send the HTTP status and headers to the server</span></span></div><div class="line"><span class="function"><span class="params">      start_response)</span>:</span></div><div class="line"></div><div class="line">   <span class="comment"># build the response body possibly using the environ dictionary</span></div><div class="line">   response_body = <span class="string">'The request method was %s'</span> % environ[<span class="string">'REQUEST_METHOD'</span>]</div><div class="line"></div><div class="line">   <span class="comment"># HTTP response code and message</span></div><div class="line">   status = <span class="string">'200 OK'</span></div><div class="line"></div><div class="line">   <span class="comment"># These are HTTP headers expected by the client.</span></div><div class="line">   <span class="comment"># They must be wrapped as a list of tupled pairs:</span></div><div class="line">   <span class="comment"># [(Header name, Header value)].</span></div><div class="line">   response_headers = [(<span class="string">'Content-Type'</span>, <span class="string">'text/plain'</span>),</div><div class="line">                       (<span class="string">'Content-Length'</span>, str(len(response_body)))]</div><div class="line"></div><div class="line">   <span class="comment"># Send them to the server using the supplied function</span></div><div class="line">   start_response(status, response_headers)</div><div class="line"></div><div class="line">   <span class="comment"># Return the response body.</span></div><div class="line">   <span class="comment"># Notice it is wrapped in a list although it could be any iterable.</span></div><div class="line">   <span class="keyword">return</span> [response_body]</div></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># This is our application object. It could have any name,</span></div><div class="line"><span class="comment"># except when using mod_wsgi where it must be "application"</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">application</span><span class="params">( # It accepts two arguments:</span></span></div><div class="line">      # environ points to a dictionary containing CGI like environment variables</div><div class="line">      # which is filled by the server for each received request from the client</div><div class="line">      environ,</div><div class="line">      # start_response is a callback function supplied by the server</div><div class="line">      # which will be used to send the HTTP status and headers to the server</div><div class="line">      start_response):</div><div class="line"></div><div class="line">   <span class="comment"># build the response body possibly using the environ dictionary</span></div><div class="line">   response_body = <span class="string">'The request method was %s'</span> % environ[<span class="string">'REQUEST_METHOD'</span>]</div><div class="line"></div><div class="line">   <span class="comment"># HTTP response code and message</span></div><div class="line">   status = <span class="string">'200 OK'</span></div><div class="line"></div><div class="line">   <span class="comment"># These are HTTP headers expected by the client.</span></div><div class="line">   <span class="comment"># They must be wrapped as a list of tupled pairs:</span></div><div class="line">   <span class="comment"># [(Header name, Header value)].</span></div><div class="line">   response_headers = [(<span class="string">'Content-Type'</span>, <span class="string">'text/plain'</span>),</div><div class="line">                       (<span class="string">'Content-Length'</span>, str(len(response_body)))]</div><div class="line"></div><div class="line">   <span class="comment"># Send them to the server using the supplied function</span></div><div class="line">   start_response(status, response_headers)</div><div class="line"></div><div class="line">   <span class="comment"># Return the response body.</span></div><div class="line">   <span class="comment"># Notice it is wrapped in a list although it could be any iterable.</span></div><div class="line">   <span class="keyword">return</span> [response_body]</div></pre></td></tr></table></figure>
 <p>以上是一个应用程序的基本框架。由于没有服务器，因此这段代码目前还不能运行。</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84004.html" data-id="cjo5f57k300upf808r6tnv1jr" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84004.html" data-id="cjojwghgg00k81i08gjw1gu77" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web开发/">Web开发</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -431,7 +475,7 @@ Content-Type: text/html\n
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84001.html" data-id="cjo5f57k800uyf808cmp5fjko" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84001.html" data-id="cjojwghge00k41i08m3gfy0z6" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web开发/">Web开发</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -482,7 +526,7 @@ Content-Type: text/html\n
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83998.html" data-id="cjo5f57jt00ujf808qf5krtz0" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83998.html" data-id="cjojwghg700jw1i08uw62qnqd" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web开发/">Web开发</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -522,192 +566,14 @@ Content-Type: text/html\n
     <div class="article-entry" itemprop="articleBody">
       
         <p>可以使用subprocess.Popen或者os.popen4让cgi执行shell命令。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#!/usr/bin/python</span></div><div class="line"><span class="keyword">import</span> cgitb; cgitb.enable()</div><div class="line"></div><div class="line"><span class="comment"># The subprocess module is new in 2.4</span></div><div class="line"><span class="keyword">import</span> os, urllib, subprocess <span class="keyword">as</span> sub</div><div class="line"></div><div class="line"><span class="comment"># Retrieve the command from the query string</span></div><div class="line"><span class="comment"># and unencode the escaped %xx chars</span></div><div class="line">str_command = urllib.unquote(os.environ[<span class="string">'QUERY_STRING'</span>])</div><div class="line"></div><div class="line">p = sub.Popen([<span class="string">'/bin/bash'</span>, <span class="string">'-c'</span>, str_command], </div><div class="line">    stdout=sub.PIPE, stderr=sub.STDOUT)</div><div class="line">output = urllib.unquote(p.stdout.read())</div><div class="line"></div><div class="line"><span class="keyword">print</span> <span class="string">"""\</span></div><div class="line"><span class="string">Content-Type: text/html\n</span></div><div class="line"><span class="string">&lt;html&gt;&lt;body&gt;</span></div><div class="line"><span class="string">&lt;pre&gt;</span></div><div class="line"><span class="string">$ %s</span></div><div class="line"><span class="string">%s</span></div><div class="line"><span class="string">&lt;/pre&gt;</span></div><div class="line"><span class="string">&lt;/body&gt;&lt;/html&gt;</span></div><div class="line"><span class="string">"""</span> % (str_command, output)</div></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#!/usr/bin/python</span></div><div class="line"><span class="keyword">import</span> cgitb; cgitb.enable()</div><div class="line"></div><div class="line"><span class="comment"># The subprocess module is new in 2.4</span></div><div class="line"><span class="keyword">import</span> os, urllib, subprocess <span class="keyword">as</span> sub</div><div class="line"></div><div class="line"><span class="comment"># Retrieve the command from the query string</span></div><div class="line"><span class="comment"># and unencode the escaped %xx chars</span></div><div class="line">str_command = urllib.unquote(os.environ[<span class="string">'QUERY_STRING'</span>])</div><div class="line"></div><div class="line">p = sub.Popen([<span class="string">'/bin/bash'</span>, <span class="string">'-c'</span>, str_command], </div><div class="line">    stdout=sub.PIPE, stderr=sub.STDOUT)</div><div class="line">output = urllib.unquote(p.stdout.read())</div><div class="line"></div><div class="line"><span class="keyword">print</span> <span class="string">"""\</span></div><div class="line">Content-Type: text/html\n</div><div class="line">&lt;html&gt;&lt;body&gt;</div><div class="line">&lt;pre&gt;</div><div class="line">$ %s</div><div class="line">%s</div><div class="line">&lt;/pre&gt;</div><div class="line">&lt;/body&gt;&lt;/html&gt;</div><div class="line">""" % (str_command, output)</div></pre></td></tr></table></figure>
 <p>注意：这只是一个例子，在生产环境中这么使用是非常的不安全。</p>
 <p>可以使用Cookies和Session对用户进行认证以提高安全性。</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83993.html" data-id="cjo5f57jn00ubf808jdhl3baa" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web开发/">Web开发</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-/archives/83990.html" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/archives/83990.html" class="article-date">
-  <time datetime="2013-12-07T14:22:08.000Z" itemprop="datePublished">2013-12-07</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/Web开发/">Web开发</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/archives/83990.html">python cgi教程3——表单</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>cgi模块中有一个FieldStorage类可用于表单处理。</p><br><h2>单一字段名</h2><br><p>有一个HTML表单如下：</p>
-
-<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span><span class="tag">&lt;<span class="name">body</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">method</span>=<span class="string">"get"</span> <span class="attr">action</span>=<span class="string">"/cgi-bin/form1.py"</span>&gt;</span></div><div class="line">Name: <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"name"</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">value</span>=<span class="string">"Submit"</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">form</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span><span class="tag">&lt;/<span class="name">html</span>&gt;</span></div></pre></td></tr></table></figure>
-<p>form1.py内容为：</p>
-
-<pre><code>#!/usr/bin/env python
-import cgi
-form = cgi.FieldStorage() # instantiate only once!
-name = form.getfirst(&apos;name&apos;, &apos;empty&apos;)
-
-# Avoid script injection escaping the user input
-name = cgi.escape(name)
-
-print &quot;&quot;&quot;\
-Content-Type: text/html\n
-&lt;html&gt;&lt;body&gt;
-&lt;p&gt;The submitted name was &quot;%s&quot;&lt;/p&gt;
-&lt;/body&gt;&lt;/html&gt;
-&quot;&quot;&quot; % name
-</code></pre><p><em>getfirst</em>方法获取指定字段的第一个值，如果该字段不存在则为空。将表单的方法改为post它同样适用。</p><br><p>为了避免用户提交危险的内容，可以使用<em>cgi.escape()</em>方法对内容进行转换。</p><br><h2>多字段名</h2><br><p>对于多个字段具有相同名字的可以使用<em>getlist()</em>方法，它返回一个列表包含了这些值。</p>
-
-<pre><code>&lt;html&gt;&lt;body&gt;
-&lt;form method=&quot;post&quot; action=&quot;/cgi-bin/form2.py&quot;&gt;
-Red&lt;input type=&quot;checkbox&quot; name=&quot;color&quot; value=&quot;red&quot;&gt;
-Green&lt;input type=&quot;checkbox&quot; name=&quot;color&quot; value=&quot;green&quot;&gt;
-&lt;input type=&quot;submit&quot; value=&quot;Submit&quot;&gt;
-&lt;/form&gt;
-&lt;/body&gt;&lt;/html&gt;
-</code></pre><p>form2.py内容如下：</p>
-
-<pre><code>#!/usr/bin/env python
-import cgi
-form = cgi.FieldStorage()
-
-# getlist() returns a list containing the
-# values of the fields with the given name
-colors = form.getlist(&apos;color&apos;)
-
-print &quot;Content-Type: text/html\n&quot;
-print &apos;&lt;html&gt;&lt;body&gt;&apos;
-print &apos;The colors list:&apos;, colors
-for color in colors:
-   print &apos;&lt;p&gt;&apos;, cgi.escape(color), &apos;&lt;/p&gt;&apos;
-print &apos;&lt;/body&gt;&lt;/html&gt;&apos;
-</code></pre><h2>文件上传</h2>
-
-<pre><code>&lt;html&gt;&lt;body&gt;
-&lt;form enctype=&quot;multipart/form-data&quot; action=&quot;/cgi-bin/form3.py&quot; method=&quot;post&quot;&gt;
-&lt;p&gt;File: &lt;input type=&quot;file&quot; name=&quot;file&quot;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;input type=&quot;submit&quot; value=&quot;Upload&quot;&gt;&lt;/p&gt;
-&lt;/form&gt;
-&lt;/body&gt;&lt;/html&gt;
-</code></pre><p><em>getfirst()</em>和<em>getlist()</em>都只能获取文件的内容。想获取文件名需要使用<em>FieldStorage</em>。</p><br><p>form3.py内容如下：</p>
-
-<pre><code>#!/usr/bin/env python
-import cgi, os
-import cgitb; cgitb.enable()
-
-try: # Windows needs stdio set for binary mode.
-    import msvcrt
-    msvcrt.setmode (0, os.O_BINARY) # stdin  = 0
-    msvcrt.setmode (1, os.O_BINARY) # stdout = 1
-except ImportError:
-    pass
-
-form = cgi.FieldStorage()
-
-# A nested FieldStorage instance holds the file
-fileitem = form[&apos;file&apos;]
-
-# Test if the file was uploaded
-if fileitem.filename:
-
-   # strip leading path from file name to avoid directory traversal attacks
-   fn = os.path.basename(fileitem.filename)
-   open(&apos;files/&apos; + fn, &apos;wb&apos;).write(fileitem.file.read())
-   message = &apos;The file &quot;&apos; + fn + &apos;&quot; was uploaded successfully&apos;
-
-else:
-   message = &apos;No file was uploaded&apos;
-
-print &quot;&quot;&quot;\
-Content-Type: text/html\n
-&lt;html&gt;&lt;body&gt;
-&lt;p&gt;%s&lt;/p&gt;
-&lt;/body&gt;&lt;/html&gt;
-&quot;&quot;&quot; % (message,)
-</code></pre><p></p><h2>大文件上传</h2><p></p>
-<p>在处理大文件时如果内存不足，可以使用生成器将文件分成小片。<br><br>可将之前的脚本改写如下：</p>
-
-<pre><code>#!/usr/bin/env python
-import cgi, os
-import cgitb; cgitb.enable()
-
-try: # Windows needs stdio set for binary mode.
-    import msvcrt
-    msvcrt.setmode (0, os.O_BINARY) # stdin  = 0
-    msvcrt.setmode (1, os.O_BINARY) # stdout = 1
-except ImportError:
-    pass
-
-form = cgi.FieldStorage()
-
-# Generator to buffer file chunks
-def fbuffer(f, chunk_size=10000):
-   while True:
-      chunk = f.read(chunk_size)
-      if not chunk: break
-      yield chunk
-
-# A nested FieldStorage instance holds the file
-fileitem = form[&apos;file&apos;]
-
-# Test if the file was uploaded
-if fileitem.filename:
-
-   # strip leading path from file name to avoid directory traversal attacks
-   fn = os.path.basename(fileitem.filename)
-   f = open(&apos;files/&apos; + fn, &apos;wb&apos;, 10000)
-
-   # Read the file in chunks
-   for chunk in fbuffer(fileitem.file):
-      f.write(chunk)
-   f.close()
-   message = &apos;The file &quot;&apos; + fn + &apos;&quot; was uploaded successfully&apos;
-
-else:
-   message = &apos;No file was uploaded&apos;
-
-print &quot;&quot;&quot;\
-Content-Type: text/html\n
-&lt;html&gt;&lt;body&gt;
-&lt;p&gt;%s&lt;/p&gt;
-&lt;/body&gt;&lt;/html&gt;
-&quot;&quot;&quot; % (message,)
-</code></pre>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83990.html" data-id="cjo5f57k000umf8086doncki5" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83993.html" data-id="cjojwghgc00k01i08fdorfzog" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web开发/">Web开发</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -776,6 +642,10 @@ Content-Type: text/html\n
       <ul>
         
           <li>
+            <a href="/archives/84171.html">使用python编写游戏修改器</a>
+          </li>
+        
+          <li>
             <a href="/archives/84170.html">使用pytest测试flask应用</a>
           </li>
         
@@ -789,10 +659,6 @@ Content-Type: text/html\n
         
           <li>
             <a href="/archives/84167.html">由octpress迁移到了hexo</a>
-          </li>
-        
-          <li>
-            <a href="/archives/84166.html">通过串口连接raspberry pi</a>
           </li>
         
       </ul>
