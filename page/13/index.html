@@ -69,6 +69,53 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-/archives/83849.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83849.html" class="article-date">
+  <time datetime="2013-07-10T22:43:44.000Z" itemprop="datePublished">2013-07-10</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/数据结构和算法/">数据结构和算法</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/83849.html">常用的排序算法（八）——桶排序</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>桶排序算法对待排数列有一定的要求。数据长度必须一样，并且符合均匀分布。</p>
+<p>桶排序的基本思想就是先创建一个含n个元素的数组，即就是创建n个桶。然后将待排的数进行哈希算法并链接到这个数组的各个元素中去，即就是将这些数分布到各个桶中去。为得到结果先对各个桶中的数据进行排序，然后按次序把各个桶的元素取出来即可。</p>
+<p>代码如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;time.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></div><div class="line"><span class="keyword">const</span> <span class="keyword">int</span> N = <span class="number">20</span>;</div><div class="line"><span class="keyword">const</span> <span class="keyword">int</span> M = <span class="number">10</span>;</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">struct</span> <span class="title">chain</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">int</span> key;</div><div class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">chain</span> *<span class="title">next</span>;</span></div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">init_bucket</span><span class="params">(struct chain a[], <span class="keyword">int</span> n)</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">int</span> i = <span class="number">0</span>;</div><div class="line">    <span class="keyword">for</span>(; i &lt; n; i++)</div><div class="line">    &#123;</div><div class="line">        a[i].key = i * <span class="number">10</span>;</div><div class="line">        a[i].next = <span class="literal">NULL</span>;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> * <span class="title">generate</span><span class="params">(<span class="keyword">int</span> a[], <span class="keyword">int</span> n)</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">int</span> i;</div><div class="line">    <span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; n; i++)</div><div class="line">    &#123;</div><div class="line">        a[i] = <span class="number">0</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">time_t</span> t;</div><div class="line">    srand((<span class="keyword">unsigned</span>)time(&amp;t));</div><div class="line"></div><div class="line">    <span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; n; i++)</div><div class="line">    &#123;</div><div class="line">        a[i] = rand() % <span class="number">100</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> a;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">print_array</span><span class="params">(<span class="keyword">int</span> *a, <span class="keyword">int</span> n)</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">int</span> i = <span class="number">0</span>;</div><div class="line">    <span class="keyword">while</span>(i &lt; n)</div><div class="line">    &#123;</div><div class="line">        <span class="built_in">printf</span>(<span class="string">"%4d"</span>, a[i]);</div><div class="line">        i++;</div><div class="line">    &#125;</div><div class="line">    <span class="built_in">printf</span>(<span class="string">"\n"</span>);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">print_bucket</span><span class="params">(struct chain a[], <span class="keyword">int</span> n)</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">int</span> i = <span class="number">0</span>;</div><div class="line">    <span class="keyword">for</span>(; i &lt; n; i++)</div><div class="line">    &#123;</div><div class="line">        <span class="built_in">printf</span>(<span class="string">"%4d"</span>, a[i].key);</div><div class="line">    &#125;</div><div class="line">    <span class="built_in">printf</span>(<span class="string">"\n"</span>);</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">insertChain</span><span class="params">(struct chain node, struct chain *newNode)</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">if</span>(node.next == <span class="literal">NULL</span>)</div><div class="line">    &#123;</div><div class="line">        node.next = newNode;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">else</span></div><div class="line">    &#123;</div><div class="line">        struct chain *p = node.next;</div><div class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">chain</span> *<span class="title">q</span> = <span class="title">p</span>;</span></div><div class="line">        <span class="keyword">while</span>(p-&gt;key &lt; newNode-&gt;key)</div><div class="line">        &#123;</div><div class="line"></div><div class="line">            q = p;</div><div class="line">            p = p-&gt;next;</div><div class="line">        &#125;</div><div class="line">        newNode-&gt;next = q-&gt;next;</div><div class="line">        q-&gt;next = newNode;</div><div class="line"></div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">print_keys</span><span class="params">(struct chain a[], <span class="keyword">int</span> n)</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">int</span> i = <span class="number">0</span>;</div><div class="line">    <span class="keyword">for</span>(; i &lt; n; i++)</div><div class="line">    &#123;</div><div class="line">        <span class="keyword">if</span>(a[i].next != <span class="literal">NULL</span>)</div><div class="line">        &#123;</div><div class="line">            <span class="class"><span class="keyword">struct</span> <span class="title">chain</span> *<span class="title">p</span> = <span class="title">a</span>[<span class="title">i</span>].<span class="title">next</span>;</span></div><div class="line">            <span class="keyword">while</span>(p-&gt;next != <span class="literal">NULL</span>)</div><div class="line">            &#123;</div><div class="line">                <span class="built_in">printf</span>(<span class="string">"%4d"</span>, p-&gt;key);</div><div class="line">                p = p-&gt;next;</div><div class="line">            &#125;</div><div class="line">            <span class="built_in">printf</span>(<span class="string">"%4d"</span>, p-&gt;key);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">insert_bucket</span><span class="params">(struct chain a[], <span class="keyword">int</span> *keys, <span class="keyword">int</span> n)</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">int</span> i = <span class="number">0</span>;</div><div class="line">    <span class="keyword">for</span>(; i &lt; n; i++)</div><div class="line">    &#123;</div><div class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">chain</span> *<span class="title">newNode</span> = (<span class="title">struct</span> <span class="title">chain</span> *)<span class="title">malloc</span>(<span class="title">sizeof</span>(<span class="title">struct</span> <span class="title">chain</span>));</span></div><div class="line">        newNode-&gt;key = keys[i];</div><div class="line">        newNode-&gt;next = <span class="literal">NULL</span>;</div><div class="line"></div><div class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">chain</span> *<span class="title">node</span> = &amp;<span class="title">a</span>[<span class="title">keys</span>[<span class="title">i</span>] / 10];</span></div><div class="line"></div><div class="line">        <span class="keyword">if</span>(node-&gt;next == <span class="literal">NULL</span>)</div><div class="line">        &#123;</div><div class="line">            node-&gt;next = newNode;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">else</span></div><div class="line">        &#123;</div><div class="line">            struct chain *p = node-&gt;next;</div><div class="line">            <span class="class"><span class="keyword">struct</span> <span class="title">chain</span> *<span class="title">q</span> = <span class="title">p</span>;</span></div><div class="line">            <span class="keyword">while</span>((p-&gt;key &lt;= newNode-&gt;key) &amp;&amp; (p-&gt;next != <span class="literal">NULL</span>))</div><div class="line">            &#123;</div><div class="line"></div><div class="line">                q = p;</div><div class="line">                p = p-&gt;next;</div><div class="line">            &#125;</div><div class="line">            newNode-&gt;next = q-&gt;next;</div><div class="line">            q-&gt;next = newNode;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></div><div class="line">&#123;</div><div class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">chain</span> <span class="title">heads</span>[<span class="title">M</span>];</span></div><div class="line">    init_bucket(heads, M);</div><div class="line">    <span class="built_in">printf</span>(<span class="string">"bucket: "</span>);</div><div class="line">    print_bucket(heads, M);</div><div class="line"></div><div class="line">    <span class="keyword">int</span> keys[N];</div><div class="line">    generate(keys,N);</div><div class="line">    <span class="built_in">printf</span>(<span class="string">"numbers:"</span>);</div><div class="line">    print_array(keys, N);</div><div class="line"></div><div class="line">    insert_bucket(heads, keys, N);</div><div class="line">    <span class="built_in">printf</span>(<span class="string">"ordered:"</span>);</div><div class="line">    print_keys(heads, M);</div><div class="line">    <span class="built_in">printf</span>(<span class="string">"\n"</span>);</div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83849.html" data-id="cjosluzvc00g0sh08zuzd368c" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/排序算法/">排序算法</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/算法/">算法</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-/archives/83847.html" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/83847.html" class="article-date">
@@ -105,7 +152,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83847.html" data-id="cjojwghd600ga1i08mkxrluex" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83847.html" data-id="cjosluzva00fwsh08g5c5wtpv" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/排序算法/">排序算法</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/算法/">算法</a></li></ul>
@@ -154,7 +201,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83845.html" data-id="cjojwghd100fz1i08tzrue7u0" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83845.html" data-id="cjosluzv800fssh08fe1rf0zn" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/排序算法/">排序算法</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/算法/">算法</a></li></ul>
@@ -207,7 +254,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83841.html" data-id="cjojwghcw00fj1i081xofg6jp" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83841.html" data-id="cjosluzv600fosh08jvg6z1a8" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/排序算法/">排序算法</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/算法/">算法</a></li></ul>
@@ -256,7 +303,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83838.html" data-id="cjojwghcx00fo1i088cotedg8" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83838.html" data-id="cjosluzv500fksh08spppwi3s" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/排序算法/">排序算法</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/算法/">算法</a></li></ul>
@@ -306,7 +353,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83834.html" data-id="cjojwghcy00fr1i0849d2ipo3" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83834.html" data-id="cjosluzv400fhsh084ayy02j5" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/排序算法/">排序算法</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/算法/">算法</a></li></ul>
@@ -353,7 +400,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83832.html" data-id="cjojwghcz00fu1i08h0vacuax" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83832.html" data-id="cjosluzv200fcsh08q97efep1" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/排序算法/">排序算法</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/算法/">算法</a></li></ul>
@@ -401,7 +448,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83828.html" data-id="cjojwghcu00fg1i08sw2y2xmf" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83828.html" data-id="cjosluzv100f9sh08b9ejve4t" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/排序算法/">排序算法</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/算法/">算法</a></li></ul>
@@ -458,7 +505,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83823.html" data-id="cjojwghct00fc1i08t9i7hmve" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83823.html" data-id="cjosluzv000f6sh08jphklcvl" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -540,62 +587,10 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83820.html" data-id="cjojwghco00ey1i08ti4vftz7" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83820.html" data-id="cjosluzuy00f2sh082fvpix8k" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vim/">vim</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-/archives/83817.html" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/archives/83817.html" class="article-date">
-  <time datetime="2013-04-14T20:48:42.000Z" itemprop="datePublished">2013-04-14</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/Linux栏目/">Linux栏目</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/archives/83817.html">Linux下安装sudo工具</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>以gentoo为例，先执行命令安装sudo工具<br><code># emerge sudo</code></p>
-<p>然后再进行配置。sudo的配置文件是/etc/sudoers。应当永远使用visudo命令编辑/etc/sudoers文件。visudo会锁住sudoers文件，保存修改到临时文件，然后检查文件格式，确保正确后才会覆盖sudoers文件。必须保证sudoers格式正确，否则sudo将无法运行。</p>
-<p>编辑/etc/sudoers文件，加入以下内容：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Defaults    env_reset</div><div class="line">Defaults    secure_path=&quot;/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin&quot;</div></pre></td></tr></table></figure></p>
-<p>要为某个用户提供特权，使其可以使用sudo执行所有命令，在配置文件中加入：<br><code>用户名   ALL=(ALL) ALL</code></p>
-<p>如果只想允许本地登陆的用户使用sudo：<br><code>用户名   主机名=(ALL) ALL</code></p>
-<p>允许admin用户组成员无密码使用sudo：<br><code>%admin      ALL=(ALL) NOPASSWD: ALL</code></p>
-<p>请把用户名替换为实际用户名称。</p>
-<p>只为用户启用部分特权：<br><code>用户名 主机名=/sbin/halt,/sbin/reboot -Syu</code><br><code>该用户只能使用sudo执行halt、reboot。</code></p>
-<p>在~/.bashrc中加入 complete -cf sudo 开启sudo的自动补全。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83817.html" data-id="cjojwghcs00f91i08u935jn2s" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Gentoo/">Gentoo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li></ul>
 
     </footer>
   </div>
@@ -639,7 +634,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/ARM/" style="font-size: 13.68px;">ARM</a> <a href="/tags/Android/" style="font-size: 10px;">Android</a> <a href="/tags/Arch/" style="font-size: 13.16px;">Arch</a> <a href="/tags/C/" style="font-size: 16.32px;">C</a> <a href="/tags/Django/" style="font-size: 11.05px;">Django</a> <a href="/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/tags/Dreamweaver/" style="font-size: 10px;">Dreamweaver</a> <a href="/tags/Fedora/" style="font-size: 10.53px;">Fedora</a> <a href="/tags/Flash/" style="font-size: 10px;">Flash</a> <a href="/tags/GObject/" style="font-size: 12.63px;">GObject</a> <a href="/tags/Gentoo/" style="font-size: 10.53px;">Gentoo</a> <a href="/tags/Hash/" style="font-size: 10px;">Hash</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Mac/" style="font-size: 10px;">Mac</a> <a href="/tags/PS/" style="font-size: 12.63px;">PS</a> <a href="/tags/Qt/" style="font-size: 10.53px;">Qt</a> <a href="/tags/Raspberry-pi/" style="font-size: 10px;">Raspberry pi</a> <a href="/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/tags/Ruby/" style="font-size: 18.95px;">Ruby</a> <a href="/tags/Scrapy/" style="font-size: 11.05px;">Scrapy</a> <a href="/tags/TQ2440/" style="font-size: 12.11px;">TQ2440</a> <a href="/tags/USB/" style="font-size: 11.05px;">USB</a> <a href="/tags/VirtualBox/" style="font-size: 11.05px;">VirtualBox</a> <a href="/tags/Web开发/" style="font-size: 16.84px;">Web开发</a> <a href="/tags/WordPress/" style="font-size: 10px;">WordPress</a> <a href="/tags/Xcode/" style="font-size: 10px;">Xcode</a> <a href="/tags/access/" style="font-size: 12.63px;">access</a> <a href="/tags/adobe/" style="font-size: 10px;">adobe</a> <a href="/tags/ajax/" style="font-size: 11.05px;">ajax</a> <a href="/tags/angular/" style="font-size: 13.16px;">angular</a> <a href="/tags/apache/" style="font-size: 10px;">apache</a> <a href="/tags/asp/" style="font-size: 13.16px;">asp</a> <a href="/tags/css/" style="font-size: 10.53px;">css</a> <a href="/tags/firefox/" style="font-size: 11.05px;">firefox</a> <a href="/tags/ftp/" style="font-size: 10px;">ftp</a> <a href="/tags/gcc/" style="font-size: 12.63px;">gcc</a> <a href="/tags/git/" style="font-size: 11.58px;">git</a> <a href="/tags/grub/" style="font-size: 10px;">grub</a> <a href="/tags/gtk/" style="font-size: 17.89px;">gtk</a> <a href="/tags/gulp/" style="font-size: 10px;">gulp</a> <a href="/tags/ibus/" style="font-size: 10px;">ibus</a> <a href="/tags/js/" style="font-size: 15.26px;">js</a> <a href="/tags/mongodb/" style="font-size: 15.79px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 11.58px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/php/" style="font-size: 14.74px;">php</a> <a href="/tags/pygame/" style="font-size: 15.79px;">pygame</a> <a href="/tags/python/" style="font-size: 19.47px;">python</a> <a href="/tags/react/" style="font-size: 11.58px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/ubuntu/" style="font-size: 13.16px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 18.42px;">vim</a> <a href="/tags/vmware/" style="font-size: 10px;">vmware</a> <a href="/tags/w3m/" style="font-size: 10px;">w3m</a> <a href="/tags/windows/" style="font-size: 13.16px;">windows</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/免费/" style="font-size: 10px;">免费</a> <a href="/tags/内核/" style="font-size: 10px;">内核</a> <a href="/tags/匹配算法/" style="font-size: 12.63px;">匹配算法</a> <a href="/tags/单片机/" style="font-size: 10.53px;">单片机</a> <a href="/tags/嵌入式/" style="font-size: 10px;">嵌入式</a> <a href="/tags/开源软件/" style="font-size: 14.21px;">开源软件</a> <a href="/tags/排序算法/" style="font-size: 14.21px;">排序算法</a> <a href="/tags/文件空间/" style="font-size: 10px;">文件空间</a> <a href="/tags/无线网/" style="font-size: 10px;">无线网</a> <a href="/tags/正则式/" style="font-size: 10px;">正则式</a> <a href="/tags/注册机/" style="font-size: 10.53px;">注册机</a> <a href="/tags/游戏/" style="font-size: 14.74px;">游戏</a> <a href="/tags/电脑技巧/" style="font-size: 14.21px;">电脑技巧</a> <a href="/tags/空间/" style="font-size: 10px;">空间</a> <a href="/tags/算法/" style="font-size: 17.37px;">算法</a> <a href="/tags/红旗/" style="font-size: 10px;">红旗</a> <a href="/tags/经典语录/" style="font-size: 10px;">经典语录</a> <a href="/tags/网络日志/" style="font-size: 13.16px;">网络日志</a> <a href="/tags/翻译/" style="font-size: 18.42px;">翻译</a> <a href="/tags/视频教程/" style="font-size: 14.74px;">视频教程</a> <a href="/tags/资源分享/" style="font-size: 15.79px;">资源分享</a> <a href="/tags/转载/" style="font-size: 10.53px;">转载</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
+      <a href="/tags/ARM/" style="font-size: 13.89px;">ARM</a> <a href="/tags/Android/" style="font-size: 10px;">Android</a> <a href="/tags/Arch/" style="font-size: 13.33px;">Arch</a> <a href="/tags/C/" style="font-size: 16.11px;">C</a> <a href="/tags/Django/" style="font-size: 11.11px;">Django</a> <a href="/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/tags/Dreamweaver/" style="font-size: 10px;">Dreamweaver</a> <a href="/tags/Fedora/" style="font-size: 10.56px;">Fedora</a> <a href="/tags/Flash/" style="font-size: 10px;">Flash</a> <a href="/tags/GObject/" style="font-size: 12.78px;">GObject</a> <a href="/tags/Gentoo/" style="font-size: 10.56px;">Gentoo</a> <a href="/tags/Hash/" style="font-size: 10px;">Hash</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Mac/" style="font-size: 10px;">Mac</a> <a href="/tags/PS/" style="font-size: 12.78px;">PS</a> <a href="/tags/Qt/" style="font-size: 10.56px;">Qt</a> <a href="/tags/Raspberry-pi/" style="font-size: 10px;">Raspberry pi</a> <a href="/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/tags/Ruby/" style="font-size: 18.89px;">Ruby</a> <a href="/tags/Scrapy/" style="font-size: 11.11px;">Scrapy</a> <a href="/tags/TQ2440/" style="font-size: 12.22px;">TQ2440</a> <a href="/tags/USB/" style="font-size: 11.11px;">USB</a> <a href="/tags/VirtualBox/" style="font-size: 11.11px;">VirtualBox</a> <a href="/tags/Web开发/" style="font-size: 16.67px;">Web开发</a> <a href="/tags/WordPress/" style="font-size: 10px;">WordPress</a> <a href="/tags/Xcode/" style="font-size: 10px;">Xcode</a> <a href="/tags/access/" style="font-size: 12.78px;">access</a> <a href="/tags/adobe/" style="font-size: 10px;">adobe</a> <a href="/tags/ajax/" style="font-size: 11.11px;">ajax</a> <a href="/tags/angular/" style="font-size: 13.33px;">angular</a> <a href="/tags/apache/" style="font-size: 10px;">apache</a> <a href="/tags/asp/" style="font-size: 13.33px;">asp</a> <a href="/tags/css/" style="font-size: 10.56px;">css</a> <a href="/tags/firefox/" style="font-size: 11.11px;">firefox</a> <a href="/tags/ftp/" style="font-size: 10px;">ftp</a> <a href="/tags/gcc/" style="font-size: 12.78px;">gcc</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/grub/" style="font-size: 10px;">grub</a> <a href="/tags/gtk/" style="font-size: 17.78px;">gtk</a> <a href="/tags/gulp/" style="font-size: 10px;">gulp</a> <a href="/tags/ibus/" style="font-size: 10px;">ibus</a> <a href="/tags/js/" style="font-size: 15.56px;">js</a> <a href="/tags/mongodb/" style="font-size: 15.56px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 11.67px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/php/" style="font-size: 15px;">php</a> <a href="/tags/pygame/" style="font-size: 15.56px;">pygame</a> <a href="/tags/python/" style="font-size: 19.44px;">python</a> <a href="/tags/react/" style="font-size: 12.22px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/ubuntu/" style="font-size: 13.33px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 18.33px;">vim</a> <a href="/tags/vmware/" style="font-size: 10px;">vmware</a> <a href="/tags/w3m/" style="font-size: 10px;">w3m</a> <a href="/tags/windows/" style="font-size: 13.33px;">windows</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/免费/" style="font-size: 10px;">免费</a> <a href="/tags/内核/" style="font-size: 10px;">内核</a> <a href="/tags/匹配算法/" style="font-size: 12.78px;">匹配算法</a> <a href="/tags/单片机/" style="font-size: 10.56px;">单片机</a> <a href="/tags/嵌入式/" style="font-size: 10px;">嵌入式</a> <a href="/tags/开源软件/" style="font-size: 14.44px;">开源软件</a> <a href="/tags/排序算法/" style="font-size: 14.44px;">排序算法</a> <a href="/tags/文件空间/" style="font-size: 10px;">文件空间</a> <a href="/tags/无线网/" style="font-size: 10px;">无线网</a> <a href="/tags/正则式/" style="font-size: 10px;">正则式</a> <a href="/tags/注册机/" style="font-size: 10.56px;">注册机</a> <a href="/tags/游戏/" style="font-size: 15px;">游戏</a> <a href="/tags/电脑技巧/" style="font-size: 14.44px;">电脑技巧</a> <a href="/tags/空间/" style="font-size: 10px;">空间</a> <a href="/tags/算法/" style="font-size: 17.22px;">算法</a> <a href="/tags/红旗/" style="font-size: 10px;">红旗</a> <a href="/tags/经典语录/" style="font-size: 10px;">经典语录</a> <a href="/tags/网络日志/" style="font-size: 13.33px;">网络日志</a> <a href="/tags/翻译/" style="font-size: 18.33px;">翻译</a> <a href="/tags/视频教程/" style="font-size: 15px;">视频教程</a> <a href="/tags/资源分享/" style="font-size: 15.56px;">资源分享</a> <a href="/tags/转载/" style="font-size: 10.56px;">转载</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
     </div>
   </div>
 
@@ -661,6 +656,10 @@
       <ul>
         
           <li>
+            <a href="/archives/84172.html">在storybook中使用antd</a>
+          </li>
+        
+          <li>
             <a href="/archives/84171.html">使用python编写游戏修改器</a>
           </li>
         
@@ -674,10 +673,6 @@
         
           <li>
             <a href="/archives/84168.html">在Docker中运行X11程序</a>
-          </li>
-        
-          <li>
-            <a href="/archives/84167.html">由octpress迁移到了hexo</a>
           </li>
         
       </ul>
