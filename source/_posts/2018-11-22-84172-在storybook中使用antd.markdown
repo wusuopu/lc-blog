@@ -1,0 +1,150 @@
+---
+layout: 'post'
+title: '在storybook中使用antd'
+date: '2018-11-22T06:55:23.919Z'
+comments: true
+post_id: '84172'
+permalink: '/archives/84172.html'
+categories: ["前端相关"]
+tags: ["js", "react"]
+---
+
+最近一个 react 的项目有用到了 antd 这个 ui 库。这里作个笔记记录一下如何在 storybook 中显示 antd 的组件。
+
+项目是使用 `create-react-app` 创建的，项目目录结构如下：
+```
+├── .storybook/
+├── README.md
+├── antd-theme.js
+├── node_modules
+├── package.json
+├── public
+└── src
+    ├── App.js
+    ├── components
+    │   ├── button.js
+    │   └── button.stories.js
+    ├── index.js
+    └── registerServiceWorker.js
+```
+
+这里创建了一个 `button` 组件，内容如下：
+```js
+// src/components/button.js
+import React, { Component, Fragment } from 'react';
+import { Button } from 'antd';
+
+class ButtonGhost extends Component {
+  render() { 
+    return (
+      <Fragment>
+        <h3 className="ex-title">Ghost Button</h3>
+        <div style={{ background: 'rgb(47, 45, 165)', padding: '26px 16px 16px' }}>
+          <Button type="primary">Primary</Button>
+          <Button className="ml20" ghost>Default</Button>
+          <Button className="ml20" type="dashed" ghost>Dashed</Button>
+          <Button className="ml20" type="danger" ghost>danger</Button>
+        </div>
+      </Fragment>
+    );
+  }
+}
+ 
+export default ButtonGhost;
+```
+
+对应的 storybook 案例如下：
+```js
+// src/components/button.stories.js
+import React from 'react';
+import { storiesOf } from '@storybook/react';
+import Button from './button';
+
+storiesOf('General', module)
+  .add('Button', () => <Button />)
+```
+
+然后 storybook 配置如下：
+```js
+// .storybook/config.js
+import React from 'react'
+import { configure } from '@storybook/react'
+import { ThemeProvider  } from 'styled-components'
+
+const req = require.context('../src/components', true, /\.stories\.js$/)
+
+function loadStories() {
+  req.keys().forEach((filename) => req(filename))
+}
+
+configure(loadStories, module)
+```
+
+然后运行 storybook ： `start-storybook -p 6006 -c .storybook`，效果如下：
+
+![](/wp-content/uploads/2018/11/antd-storybook-01.png)
+
+这是由于 antd 的 css 没有加载，因此所有按钮的样式都没有。
+参考 https://ant.design/docs/react/use-with-create-react-app-cn 的说明，修改 babel 和 webpack 的配置。
+参考 https://storybook.js.org/configurations/custom-webpack-config 的说明，修改 storybook 的 webpack 配置。
+
+创建文件 `.storybook/.babelrc`：
+```js
+{
+  "presets": [
+    [
+      "env",
+      {
+        "modules": false,
+        "targets": {
+          "browsers": [
+            ">1%",
+            "last 4 versions",
+            "Firefox ESR",
+            "not ie < 11"
+          ]
+        }
+      }
+    ],
+    "react",
+    "stage-3"
+  ],
+  "plugins": [
+    [
+      "import",
+      {
+        "libraryName": "antd",
+        "style": true
+      }
+    ]
+  ]
+}
+```
+
+创建文件 `.storybook/webpack.config.js`：
+```js
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.less$/,
+        use: [{
+          loader: "style-loader"
+        }, {
+          loader: "css-loader"
+        }, {
+          loader: "less-loader",
+          options: {
+            //modifyVars: antdTheme,    // 如果要自定义主题样式
+            javascriptEnabled: true
+          }
+        }]
+      }
+    ]
+  }
+};
+```
+
+然后在 `.storybook/config.js` 文件添加 `import 'antd/dist/antd.less';` 。
+最后的效果如下：
+![](/wp-content/uploads/2018/11/antd-storybook-02.png)
