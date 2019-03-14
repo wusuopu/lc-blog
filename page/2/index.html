@@ -58,7 +58,7 @@
         
           <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+        <a id="nav-search-btn" class="nav-icon" title="Søk"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.xefan.com"></form>
@@ -68,6 +68,84 @@
 </header>
       <div class="outer">
         <section id="main">
+  
+    <article id="post-/archives/84164.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/84164.html" class="article-date">
+  <time datetime="2016-07-31T16:25:17.000Z" itemprop="datePublished">2016-07-31</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/编程开发/">编程开发</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/84164.html">ReactNative获取设备屏幕尺寸</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>在做移动开发过程中，有时我们需要适配不同尺寸大小的屏幕。这里我们就需要到获取设备屏幕的大小。<br>由于我们是使用的 ReactNative 来开发手机 app，这里就介绍一下在 ReactNative 中如何获取到设备屏幕的分辨率的。<br>也算是对之前踩坑的总结吧。</p>
+<p>在此之前需要先了解 ReactNative 中的尺寸计算单位，它并不是使用的px。<a href="http://facebook.github.io/react-native/releases/next/docs/pixelratio.html" target="_blank" rel="external">http://facebook.github.io/react-native/releases/next/docs/pixelratio.html</a></p>
+<h2 id="使用-Dimensions-模块"><a href="#使用-Dimensions-模块" class="headerlink" title="使用 Dimensions 模块"></a>使用 Dimensions 模块</h2><p>在 ReactNative 中有一个 Dimensions 模块，通过它可以获取当前设备的屏幕分辨率。<br>参考： <a href="http://facebook.github.io/react-native/releases/next/docs/dimensions.html" target="_blank" rel="external">http://facebook.github.io/react-native/releases/next/docs/dimensions.html</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">var &#123;height, width&#125; = Dimensions.get(&apos;window&apos;);</div></pre></td></tr></table></figure>
+<p>刚开始时我也是使用这种方法来得到整个屏幕的分辨率的，感觉轻松搞定。然而这里面却有一个坑。</p>
+<p>首先来看看 ios 和 android 中的界面结构：</p>
+<p><img src="/wp-content/uploads/2016/07/31/ios-screen-struct.png" alt="ios-screen-struct"><br><img src="/wp-content/uploads/2016/07/31/android-screen-struct.png" alt="android-screen-struct"></p>
+<p>如图所示，屏幕的宽度计算比较简单，就是从左边到右边的距离即可。<br>然后就是屏幕的高度了，这里其实我们是需要获取到可用区域的高度。<br>如图所示，对于 ios 系统来说可用区域高度就是整个屏幕的高度减去 Status Bar 的高度；<br>对于 android 系统来说就是屏幕的高度减去 Status Bar 和 Soft Menu Bar 的高度。</p>
+<h2 id="获取-iOS-设备的屏幕分辨率"><a href="#获取-iOS-设备的屏幕分辨率" class="headerlink" title="获取 iOS 设备的屏幕分辨率"></a>获取 iOS 设备的屏幕分辨率</h2><p>正如上面所说的，在 ios 下的计算方法为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">var WIDTH = Dimensions.get(&apos;window&apos;).width;</div><div class="line">var HEIGHT = Dimensions.get(&apos;window&apos;).height - STATUS_BAR_HEIGHT;</div></pre></td></tr></table></figure>
+<p>在 ios 系统状态栏高度(STATUS_BAR_HEIGHT)通常为 20。<br>不过如果你设置了隐藏状态栏的话，那么 <code>STATUS_BAR_HEIGHT</code> 则为0。</p>
+<p>以上是手机竖屏的情况，在横屏状态下则交换两个值：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">var LANDSCAPE_WIDTH = HEIGHT + STATUS_BAR_HEIGHT;</div><div class="line">var LANDSCAPE_HEIGHT = WIDTH - STATUS_BAR_HEIGHT;</div></pre></td></tr></table></figure>
+<p>到了这里虽然麻烦了一点，但是总体来说也还好。问题都解决了。<br>感觉生活是如此美好啊，然而这个世界上却还有一个系统名为 android。<br>它有着数不清种类屏幕大小的设备，然后瞬间感觉整个人都不好了。</p>
+<h2 id="获取-Android-设备的屏幕分辨率"><a href="#获取-Android-设备的屏幕分辨率" class="headerlink" title="获取 Android 设备的屏幕分辨率"></a>获取 Android 设备的屏幕分辨率</h2><p>如果按照 ios 下的方法来做，获取到 <code>WIDTH</code> 是没有问题，<br>但是 <code>HEIGHT</code> 的话还需要减去 Status Bar 和 Soft Menu Bar 的高度。<br>因此我们还需要获取到状态栏的高度(STATUS_BAR_HEIGHT)和虚拟按钮的高度(SOFT_MENU_BAR_HEIGHT)。</p>
+<p>这里我们使用<a href="https://github.com/jaysoo/react-native-extra-dimensions-android" target="_blank" rel="external">react-native-extra-dimensions-android</a>这个库。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">const ExtraDimensions = require(&apos;react-native-extra-dimensions-android&apos;);</div><div class="line"></div><div class="line">const STATUS_BAR_HEIGHT = ExtraDimensions.get(&apos;STATUS_BAR_HEIGHT&apos;);</div><div class="line">const SOFT_MENU_BAR_HEIGHT = ExtraDimensions.get(&apos;SOFT_MENU_BAR_HEIGHT&apos;);</div><div class="line">const WIDTH = ExtraDimensions.get(&apos;REAL_WINDOW_WIDTH&apos;);</div><div class="line">const HEIGHT = ExtraDimensions.get(&apos;REAL_WINDOW_HEIGHT&apos;) - STATUS_BAR_HEIGHT - SOFT_MENU_BAR_HEIGHT;</div></pre></td></tr></table></figure>
+<p>以上是设备竖屏的结果，在横屏下你以为是不是只需要交换两个值就搞定了呢。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">var LANDSCAPE_WIDTH = HEIGHT + STATUS_BAR_HEIGHT;</div><div class="line">var LANDSCAPE_HEIGHT = WIDTH - STATUS_BAR_HEIGHT;</div></pre></td></tr></table></figure>
+<p>Naive!!如果这么轻松就搞定了的话，android就不叫做android了。</p>
+<p>先来看看下面两张图片吧，分别是一个android平板设备在横屏和竖屏状态下的截图：</p>
+<p><img src="/wp-content/uploads/2016/07/31/android-pad-landscape.png" alt="android-pad-landscape"><br><img src="/wp-content/uploads/2016/07/31/android-pad-portrait.png" alt="android-pad-portrait"></p>
+<p>你把你手中的 android 手机分别进入横屏和竖屏状态下，再对照上面两张图片你会发现什么。<br>没错的，在平板设备上屏幕旋转之后 Soft Menu Bar 也跟着旋转了，<br>而在手机设备上 Soft Menu Bar 是始终固定在手机底部的。</p>
+<p>尼玛，太坑爹了。看到这里瞬间呕血三升，要适配手机跟平板实现是太麻烦了。<br>以下是我的解决办法，先检查当前设备是否为平板，然后再分别处理。<br>至于平板的判断方法就自己想办法了，我的方法也不一定准。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">if (isPad) &#123;</div><div class="line">  LANDSCAPE_WIDTH = HEIGHT + STATUS_BAR_HEIGHT + SOFT_MENU_BAR_HEIGHT;</div><div class="line">  LANDSCAPE_HEIGHT = WIDTH - STATUS_BAR_HEIGHT - SOFT_MENU_BAR_HEIGHT;</div><div class="line">&#125; else &#123;</div><div class="line">  LANDSCAPE_WIDTH = HEIGHT + STATUS_BAR_HEIGHT;</div><div class="line">  LANDSCAPE_HEIGHT = WIDTH - STATUS_BAR_HEIGHT;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>以上是在 android 下遇到的第一个大坑。</p>
+<p>到了这里我以为一切都该结束了吧，然而没想到还有一种手机叫做魅族。如下图：</p>
+<p><img src="/wp-content/uploads/2016/07/31/Mezu-smart-bar.png" alt="Mezu-smart-bar"></p>
+<p>在屏幕右下角其实是有一个按钮的，然而左图所示的，该按钮被魅族手机的 Smart Bar 遮住了。<br>进入系统设置将 Smart Bar 隐藏后效果如右图所示。</p>
+<p>看到这里又吐了两口老血，此为第二个大坑。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">const SMART_BAR_HEIGHT = ExtraDimensions.get(&apos;SMART_BAR_HEIGHT&apos;);</div><div class="line"></div><div class="line">if (SMART_BAR_HEIGHT) &#123;</div><div class="line">  HEIGHT -= SMART_BAR_HEIGHT;</div><div class="line">&#125;</div><div class="line"></div><div class="line">....</div><div class="line">// 在上面 LANDSCAPE 的计算结果上再作如下处理</div><div class="line"></div><div class="line">if (SMART_BAR_HEIGHT) &#123;</div><div class="line">  LANDSCAPE_WIDTH += SMART_BAR_HEIGHT;</div><div class="line">  LANDSCAPE_HEIGHT -= SMART_BAR_HEIGHT;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>在魅族的手机上计算屏幕高度时还需要再减去 Smart Bar 的高度，<br>同时还需要注意的是， Smart Bar 跟平板上的Soft Menu Bar 一样会随着屏幕旋转而转动的。</p>
+<p>最后还有一点需要注意的是，在安装 <code>react-native-extra-dimensions-android</code> 库时不能直接使用 <code>npm install --save react-native-extra-dimensions-android</code> 进行安装，<br>而是需要直接通过 git 仓库来安装： <code>npm install --save git+https://github.com/jaysoo/react-native-extra-dimensions-android.git</code>。</p>
+<p>因为在 npm 上 <code>react-native-extra-dimensions-android</code> 的最新版为 0.17.0，<br>而 <code>SMART_BAR_HEIGHT</code> 的功能是在此之后才添加进来的。</p>
+<p>在库的版本上面又被坑了一下。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/84164.html" data-id="cjt83lru700obhqq3hbuvv8ai" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/react/">react</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
   
     <article id="post-/archives/84163.html" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
@@ -116,7 +194,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84163.html" data-id="cjsrjh1xg00nvhlq3gzmon8lz" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84163.html" data-id="cjt83lru600o7hqq3t5lg2lpk" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/react/">react</a></li></ul>
@@ -174,7 +252,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84162.html" data-id="cjsrjh1xf00nrhlq3y7xx3ct9" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84162.html" data-id="cjt83lru500o4hqq3fhzbsu4h" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/react/">react</a></li></ul>
@@ -233,7 +311,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84161.html" data-id="cjsrjh1xe00nohlq32xtyi25z" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84161.html" data-id="cjt83lru100o1hqq3p2mcoc0y" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li></ul>
@@ -302,7 +380,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84160.html" data-id="cjsrjh1xc00nlhlq3tia1eue0" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84160.html" data-id="cjt83lru000nzhqq3mud3bhgq" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gulp/">gulp</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a></li></ul>
@@ -357,7 +435,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84159.html" data-id="cjsrjh1xa00nehlq3626uiovj" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84159.html" data-id="cjt83lrtz00nvhqq3wvy5hwo5" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ajax/">ajax</a></li></ul>
@@ -416,7 +494,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84158.html" data-id="cjsrjh1xb00nihlq3n9a9yol9" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84158.html" data-id="cjt83lrty00nshqq3yaqnj11w" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Xcode/">Xcode</a></li></ul>
@@ -482,7 +560,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84157.html" data-id="cjsrjh1x800nbhlq3qeqyjr1t" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84157.html" data-id="cjt83lrtw00nohqq3mtfsvs66" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a></li></ul>
@@ -538,7 +616,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84156.html" data-id="cjsrjh1x700n7hlq324hfe56z" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84156.html" data-id="cjt83lrtu00nmhqq3g27ckhlc" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a></li></ul>
@@ -587,7 +665,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84155.html" data-id="cjsrjh1x600n4hlq3hbhy6d8u" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84155.html" data-id="cjt83lrts00njhqq33vxp30yg" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a></li></ul>
@@ -600,80 +678,10 @@
 
 
   
-    <article id="post-/archives/84154.html" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/archives/84154.html" class="article-date">
-  <time datetime="2015-08-23T10:12:08.000Z" itemprop="datePublished">2015-08-23</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/Ruby栏目/">Ruby栏目</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/archives/84154.html">在Ruby中使用DATA和__END__将代码和数据混合</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>之前一直不理解 <code>__END__</code> 的用法，现在看了这篇文章后才算是了解了，于是便翻译之。<br>《Mixing code and data in Ruby with DATA and __END__》: <a href="http://blog.honeybadger.io/data-and-end-in-ruby/" target="_blank" rel="external">http://blog.honeybadger.io/data-and-end-in-ruby/</a></p>
-<hr>
-<p>你知道 Ruby 提供了一种方法在你的脚本中可以将源文件作为数据源来使用吗？当你在写一些一次性的脚本用于验证概念时这个小技巧会为你节约一些时间。让我们来看看吧。</p>
-<h2 id="DATA-和-END"><a href="#DATA-和-END" class="headerlink" title="DATA 和 __END__"></a>DATA 和 __END__</h2><p>在下面这个例子中，我使用了一个有趣的关键字 <code>__END__</code>。所有在 <code>__END__</code> 下面的内容将会被 Ruby 解释器所忽略。但是有趣的是 ruby 为你提供了一个称为 <code>DATA</code> 的 IO 对象，就像你可以读取其他任何文件一样，它能让你读取到 <code>__END__</code> 以下的所有内容。</p>
-<p>下面这个例子中，我们遍历每一行并进行输出。</p>
-<figure class="highlight ruby"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">DATA.each_line <span class="keyword">do</span> <span class="params">|line|</span></div><div class="line">  puts line</div><div class="line"><span class="keyword">end</span></div><div class="line"> </div><div class="line"><span class="comment">__END__</span></div><div class="line"><span class="comment">Doom</span></div><div class="line"><span class="comment">Quake</span></div><div class="line"><span class="comment">Diablo</span></div></pre></td></tr></table></figure>
-<p>关于这个技术我最喜欢的实例是使用 <code>DATA</code> 来包含一个 ERB 模板。它同样也可用于 YAML、CSV等等。</p>
-<figure class="highlight ruby"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">require</span> <span class="string">'erb'</span></div><div class="line"> </div><div class="line">time = Time.now</div><div class="line">renderer = ERB.new(DATA.read)</div><div class="line">puts renderer.result()</div><div class="line"> </div><div class="line"><span class="comment">__END__</span></div><div class="line"><span class="comment">The current time is &lt;%= time %&gt;.</span></div></pre></td></tr></table></figure>
-<p>实际上你也可以使用 <code>DATA</code> 来读取 <code>__END__</code> 关键字以上的内容。那是因为 <code>DATA</code> 实际上是一个指向了整个源文件，并定位到 <code>__END__</code> 关键字的位置。你可以试试看在输出之前将 IO 对象反转。下面这个例子将会输出整个源文件。</p>
-<figure class="highlight ruby"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">DATA.rewind</div><div class="line">puts DATA.read <span class="comment"># prints the entire source file</span></div><div class="line"> </div><div class="line"><span class="comment">__END__</span></div><div class="line"><span class="comment">meh</span></div></pre></td></tr></table></figure>
-<h2 id="多文件问题"><a href="#多文件问题" class="headerlink" title="多文件问题"></a>多文件问题</h2><p>这个技术最大的缺点是它只能用于单个文件的脚本，直接运行该文件，不能在其他文件进行导入。</p>
-<p>下面这个例子，我们有两个文件，并且每个都有它们自己的 <code>__END__</code> 部分。然而却只有一个全局 <code>DATA</code> 对象。因此第二个文件的 <code>__END__</code> 部分刚访问不到了。</p>
-<figure class="highlight ruby"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># first.rb</span></div><div class="line"><span class="keyword">require</span> <span class="string">"./second"</span></div><div class="line"> </div><div class="line">puts <span class="string">"First file\n----------------------"</span></div><div class="line">puts DATA.read</div><div class="line"> </div><div class="line">print_second_data()</div><div class="line"> </div><div class="line"><span class="comment">__END__</span></div><div class="line"><span class="comment">First end clause</span></div></pre></td></tr></table></figure>
-<figure class="highlight ruby"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># second.rb</span></div><div class="line"> </div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">print_second_data</span></span></div><div class="line">  puts <span class="string">"Second file\n----------------------"</span></div><div class="line">  puts DATA.read <span class="comment"># Won't output anything, since first.rb read the entire file</span></div><div class="line"><span class="keyword">end</span></div><div class="line"> </div><div class="line"><span class="comment">__END__</span></div><div class="line"><span class="comment"> </span></div><div class="line"><span class="comment">Second end clause</span></div></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">snhorne ~/tmp $ ruby first.rb</div><div class="line">First file</div><div class="line">----------------------</div><div class="line">First end clause</div><div class="line"> </div><div class="line">Second file</div><div class="line">----------------------</div></pre></td></tr></table></figure>
-<h2 id="对于多文件的一个解决方案"><a href="#对于多文件的一个解决方案" class="headerlink" title="对于多文件的一个解决方案"></a>对于多文件的一个解决方案</h2><p>在 Sinatra 中有一个很酷的特性是它允许你在你应用的 <code>__END__</code> 部分添加多个内联模板。它看起来像下面这样：</p>
-<figure class="highlight ruby"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># This code is from the Sinatra docs at http://www.sinatrarb.com/intro.html</span></div><div class="line"><span class="keyword">require</span> <span class="string">'sinatra'</span></div><div class="line"> </div><div class="line">get <span class="string">'/'</span> <span class="keyword">do</span></div><div class="line">  haml <span class="symbol">:index</span></div><div class="line"><span class="keyword">end</span></div><div class="line"> </div><div class="line"><span class="comment">__END__</span></div><div class="line"><span class="comment"> </span></div><div class="line"><span class="comment">@@ layout</span></div><div class="line"><span class="comment">%html</span></div><div class="line"><span class="comment"> </span></div><div class="line"><span class="comment">  = yield</span></div><div class="line"><span class="comment"> </span></div><div class="line"><span class="comment">@@ index</span></div><div class="line"><span class="comment">%div.title Hello world.</span></div></pre></td></tr></table></figure>
-<p>sinatra 是如何实现的呢？毕竟你的应用可能是运行在 rack 上。在生产环境中你不能再通过 <code>ruby myapp.rb</code> 来运行！他们必须有一种在多文件中使用 <code>DATA</code> 的解决方案。</p>
-<p>因此如果你稍微深入一下 Sinatra 的源代码，你会发现它们并没有使用 <code>DATA</code>。而是使用了跟下面这段代码类似的方案。</p>
-<figure class="highlight ruby"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># I'm paraphrasing. See the original at https://github.com/sinatra/sinatra/blob/master/lib/sinatra/base.rb#L1284</span></div><div class="line">app, data = File.read(__FILE_<span class="number">_</span>).split(<span class="regexp">/^__END__$/</span>, <span class="number">2</span>)</div></pre></td></tr></table></figure>
-<p>实际上它比这个要更复杂一些，因为它们不想读取 <code>__FILE__</code>，它只是 <code>sinatra/base.rb</code> 文件。它们其实是需要获取调用了该方法的文件的内容。它们通过解析 <code>caller</code> 的结果来获取。</p>
-<p><code>caller</code> 方法将会告诉你当前运行的方法是从哪调用的。这里是个简单的例子：</p>
-<figure class="highlight ruby"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">some_method</span></span></div><div class="line">  puts caller</div><div class="line"><span class="keyword">end</span></div><div class="line"> </div><div class="line">some_method <span class="comment"># =&gt; caller.rb:5:in `&lt;main&gt;'</span></div></pre></td></tr></table></figure>
-<p>现在可以简单地获取到文件名了，然后从该文件中再提取出与 <code>DATA</code> 等价的内容。</p>
-<figure class="highlight ruby"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_caller_data</span></span></div><div class="line">  puts File.read(caller.first.split(<span class="string">":"</span>).first).split(<span class="string">"__END__"</span>, <span class="number">2</span>).last</div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
-<h2 id="请善用它，不要作恶"><a href="#请善用它，不要作恶" class="headerlink" title="请善用它，不要作恶"></a>请善用它，不要作恶</h2><p>希望对于这些技巧你不要经常使用。它们不会使得代码干净、可维护。</p>
-<p>然后，你偶尔需要一些又快又脏的实现一个一次性的脚本或者验证一些概念。此时 <code>DATA</code> 和 <code>__END__</code> 就非常有用了。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84154.html" data-id="cjsrjh1x500n0hlq3ui2q5cqt" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ruby/">Ruby</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/翻译/">翻译</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
 
 
   <nav id="page-nav">
-    <a class="extend prev" rel="prev" href="/">&laquo;Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/30/">30</a><a class="extend next" rel="next" href="/page/3/">Next&raquo;</a>
+    <a class="extend prev" rel="prev" href="/">&laquo;Forrige</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/30/">30</a><a class="extend next" rel="next" href="/page/3/">Neste&raquo;</a>
   </nav>
 
 </section>
@@ -682,7 +690,7 @@
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Categories</h3>
+    <h3 class="widget-title">Kategorier</h3>
     <div class="widget">
       <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Linux栏目/">Linux栏目</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Python栏目/">Python栏目</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Ruby栏目/">Ruby栏目</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Ruby栏目/Web开发/">Web开发</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/Web开发/">Web开发</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Web开发/Python栏目/">Python栏目</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/前端相关/">前端相关</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/嵌入式栏目/">嵌入式栏目</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/开源软件/">开源软件</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/教程/">教程</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据库/">数据库</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据结构和算法/">数据结构和算法</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/编程开发/">编程开发</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/网络日志/">网络日志</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/资源分享/">资源分享</a></li></ul>
     </div>
@@ -704,14 +712,14 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/ARM/" style="font-size: 13.89px;">ARM</a> <a href="/tags/Android/" style="font-size: 10.56px;">Android</a> <a href="/tags/Arch/" style="font-size: 13.33px;">Arch</a> <a href="/tags/C/" style="font-size: 16.11px;">C</a> <a href="/tags/Django/" style="font-size: 11.11px;">Django</a> <a href="/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/tags/Dreamweaver/" style="font-size: 10px;">Dreamweaver</a> <a href="/tags/Fedora/" style="font-size: 10.56px;">Fedora</a> <a href="/tags/Flash/" style="font-size: 10px;">Flash</a> <a href="/tags/GObject/" style="font-size: 12.78px;">GObject</a> <a href="/tags/Gentoo/" style="font-size: 10.56px;">Gentoo</a> <a href="/tags/Hash/" style="font-size: 10px;">Hash</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Mac/" style="font-size: 10px;">Mac</a> <a href="/tags/PS/" style="font-size: 12.78px;">PS</a> <a href="/tags/Qt/" style="font-size: 10.56px;">Qt</a> <a href="/tags/Raspberry-pi/" style="font-size: 10px;">Raspberry pi</a> <a href="/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/tags/Ruby/" style="font-size: 18.89px;">Ruby</a> <a href="/tags/Scrapy/" style="font-size: 11.11px;">Scrapy</a> <a href="/tags/TQ2440/" style="font-size: 12.22px;">TQ2440</a> <a href="/tags/USB/" style="font-size: 11.11px;">USB</a> <a href="/tags/VirtualBox/" style="font-size: 11.11px;">VirtualBox</a> <a href="/tags/Web开发/" style="font-size: 16.67px;">Web开发</a> <a href="/tags/WordPress/" style="font-size: 10px;">WordPress</a> <a href="/tags/Xcode/" style="font-size: 10px;">Xcode</a> <a href="/tags/access/" style="font-size: 12.78px;">access</a> <a href="/tags/adobe/" style="font-size: 10px;">adobe</a> <a href="/tags/ajax/" style="font-size: 11.11px;">ajax</a> <a href="/tags/angular/" style="font-size: 13.33px;">angular</a> <a href="/tags/apache/" style="font-size: 10px;">apache</a> <a href="/tags/asp/" style="font-size: 13.33px;">asp</a> <a href="/tags/css/" style="font-size: 10.56px;">css</a> <a href="/tags/firefox/" style="font-size: 11.11px;">firefox</a> <a href="/tags/ftp/" style="font-size: 10px;">ftp</a> <a href="/tags/gcc/" style="font-size: 12.78px;">gcc</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/grub/" style="font-size: 10px;">grub</a> <a href="/tags/gtk/" style="font-size: 17.78px;">gtk</a> <a href="/tags/gulp/" style="font-size: 10px;">gulp</a> <a href="/tags/ibus/" style="font-size: 10px;">ibus</a> <a href="/tags/js/" style="font-size: 15.56px;">js</a> <a href="/tags/mongodb/" style="font-size: 15.56px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 11.67px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/php/" style="font-size: 15px;">php</a> <a href="/tags/pygame/" style="font-size: 15.56px;">pygame</a> <a href="/tags/python/" style="font-size: 19.44px;">python</a> <a href="/tags/react/" style="font-size: 12.22px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/ubuntu/" style="font-size: 13.33px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 18.33px;">vim</a> <a href="/tags/vmware/" style="font-size: 10px;">vmware</a> <a href="/tags/w3m/" style="font-size: 10px;">w3m</a> <a href="/tags/windows/" style="font-size: 13.33px;">windows</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/免费/" style="font-size: 10px;">免费</a> <a href="/tags/内核/" style="font-size: 10px;">内核</a> <a href="/tags/匹配算法/" style="font-size: 12.78px;">匹配算法</a> <a href="/tags/单片机/" style="font-size: 10.56px;">单片机</a> <a href="/tags/嵌入式/" style="font-size: 10px;">嵌入式</a> <a href="/tags/开源软件/" style="font-size: 14.44px;">开源软件</a> <a href="/tags/排序算法/" style="font-size: 14.44px;">排序算法</a> <a href="/tags/文件空间/" style="font-size: 10px;">文件空间</a> <a href="/tags/无线网/" style="font-size: 10px;">无线网</a> <a href="/tags/树莓派/" style="font-size: 10px;">树莓派</a> <a href="/tags/正则式/" style="font-size: 10px;">正则式</a> <a href="/tags/注册机/" style="font-size: 10.56px;">注册机</a> <a href="/tags/游戏/" style="font-size: 15px;">游戏</a> <a href="/tags/电脑技巧/" style="font-size: 14.44px;">电脑技巧</a> <a href="/tags/空间/" style="font-size: 10px;">空间</a> <a href="/tags/算法/" style="font-size: 17.22px;">算法</a> <a href="/tags/红旗/" style="font-size: 10px;">红旗</a> <a href="/tags/经典语录/" style="font-size: 10px;">经典语录</a> <a href="/tags/网络日志/" style="font-size: 13.33px;">网络日志</a> <a href="/tags/翻译/" style="font-size: 18.33px;">翻译</a> <a href="/tags/视频教程/" style="font-size: 15px;">视频教程</a> <a href="/tags/资源分享/" style="font-size: 15.56px;">资源分享</a> <a href="/tags/转载/" style="font-size: 10.56px;">转载</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
+      <a href="/tags/ARM/" style="font-size: 13.89px;">ARM</a> <a href="/tags/Android/" style="font-size: 10.56px;">Android</a> <a href="/tags/Arch/" style="font-size: 13.33px;">Arch</a> <a href="/tags/C/" style="font-size: 16.11px;">C</a> <a href="/tags/Django/" style="font-size: 11.11px;">Django</a> <a href="/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/tags/Dreamweaver/" style="font-size: 10px;">Dreamweaver</a> <a href="/tags/Fedora/" style="font-size: 10.56px;">Fedora</a> <a href="/tags/Flash/" style="font-size: 10px;">Flash</a> <a href="/tags/GObject/" style="font-size: 12.78px;">GObject</a> <a href="/tags/Gentoo/" style="font-size: 10.56px;">Gentoo</a> <a href="/tags/Hash/" style="font-size: 10px;">Hash</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Mac/" style="font-size: 10px;">Mac</a> <a href="/tags/PS/" style="font-size: 12.78px;">PS</a> <a href="/tags/Qt/" style="font-size: 10.56px;">Qt</a> <a href="/tags/Raspberry-pi/" style="font-size: 10px;">Raspberry pi</a> <a href="/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/tags/Ruby/" style="font-size: 18.89px;">Ruby</a> <a href="/tags/Scrapy/" style="font-size: 11.11px;">Scrapy</a> <a href="/tags/TQ2440/" style="font-size: 12.22px;">TQ2440</a> <a href="/tags/USB/" style="font-size: 11.11px;">USB</a> <a href="/tags/VirtualBox/" style="font-size: 11.11px;">VirtualBox</a> <a href="/tags/Web开发/" style="font-size: 16.67px;">Web开发</a> <a href="/tags/WordPress/" style="font-size: 10px;">WordPress</a> <a href="/tags/Xcode/" style="font-size: 10px;">Xcode</a> <a href="/tags/access/" style="font-size: 12.78px;">access</a> <a href="/tags/adobe/" style="font-size: 10px;">adobe</a> <a href="/tags/ajax/" style="font-size: 11.11px;">ajax</a> <a href="/tags/angular/" style="font-size: 13.33px;">angular</a> <a href="/tags/apache/" style="font-size: 10px;">apache</a> <a href="/tags/asp/" style="font-size: 13.33px;">asp</a> <a href="/tags/css/" style="font-size: 10.56px;">css</a> <a href="/tags/firefox/" style="font-size: 11.11px;">firefox</a> <a href="/tags/ftp/" style="font-size: 10px;">ftp</a> <a href="/tags/gcc/" style="font-size: 12.78px;">gcc</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/grub/" style="font-size: 10px;">grub</a> <a href="/tags/gtk/" style="font-size: 17.78px;">gtk</a> <a href="/tags/gulp/" style="font-size: 10px;">gulp</a> <a href="/tags/ibus/" style="font-size: 10px;">ibus</a> <a href="/tags/js/" style="font-size: 16.11px;">js</a> <a href="/tags/mongodb/" style="font-size: 15.56px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 11.67px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/php/" style="font-size: 15px;">php</a> <a href="/tags/pygame/" style="font-size: 15.56px;">pygame</a> <a href="/tags/python/" style="font-size: 19.44px;">python</a> <a href="/tags/react/" style="font-size: 12.78px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/ubuntu/" style="font-size: 13.33px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 18.33px;">vim</a> <a href="/tags/vmware/" style="font-size: 10px;">vmware</a> <a href="/tags/w3m/" style="font-size: 10px;">w3m</a> <a href="/tags/windows/" style="font-size: 13.33px;">windows</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/免费/" style="font-size: 10px;">免费</a> <a href="/tags/内核/" style="font-size: 10px;">内核</a> <a href="/tags/匹配算法/" style="font-size: 12.78px;">匹配算法</a> <a href="/tags/单片机/" style="font-size: 10.56px;">单片机</a> <a href="/tags/嵌入式/" style="font-size: 10px;">嵌入式</a> <a href="/tags/开源软件/" style="font-size: 14.44px;">开源软件</a> <a href="/tags/排序算法/" style="font-size: 14.44px;">排序算法</a> <a href="/tags/文件空间/" style="font-size: 10px;">文件空间</a> <a href="/tags/无线网/" style="font-size: 10px;">无线网</a> <a href="/tags/树莓派/" style="font-size: 10px;">树莓派</a> <a href="/tags/正则式/" style="font-size: 10px;">正则式</a> <a href="/tags/注册机/" style="font-size: 10.56px;">注册机</a> <a href="/tags/游戏/" style="font-size: 15px;">游戏</a> <a href="/tags/电脑技巧/" style="font-size: 14.44px;">电脑技巧</a> <a href="/tags/空间/" style="font-size: 10px;">空间</a> <a href="/tags/算法/" style="font-size: 17.22px;">算法</a> <a href="/tags/红旗/" style="font-size: 10px;">红旗</a> <a href="/tags/经典语录/" style="font-size: 10px;">经典语录</a> <a href="/tags/网络日志/" style="font-size: 13.33px;">网络日志</a> <a href="/tags/翻译/" style="font-size: 18.33px;">翻译</a> <a href="/tags/视频教程/" style="font-size: 15px;">视频教程</a> <a href="/tags/资源分享/" style="font-size: 15.56px;">资源分享</a> <a href="/tags/转载/" style="font-size: 10.56px;">转载</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
     </div>
   </div>
 
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Archives</h3>
+    <h3 class="widget-title">Arkiv</h3>
     <div class="widget">
       <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">November 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05/">May 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/02/">February 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/11/">November 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">October 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">September 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/08/">August 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/07/">July 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/05/">May 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04/">April 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">March 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">January 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/12/">December 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">June 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">May 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">April 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">January 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">October 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/09/">September 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/08/">August 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/07/">July 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/05/">May 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/04/">April 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/03/">March 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/02/">February 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/12/">December 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/11/">November 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/10/">October 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/09/">September 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/08/">August 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/07/">July 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/05/">May 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/04/">April 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/03/">March 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/02/">February 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/01/">January 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/12/">December 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/11/">November 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/10/">October 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/09/">September 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/08/">August 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/07/">July 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/06/">June 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/05/">May 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/04/">April 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/03/">March 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/12/">December 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/11/">November 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/10/">October 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/09/">September 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/08/">August 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/07/">July 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/05/">May 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/12/">December 2008</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/07/">July 2008</a></li></ul>
     </div>
@@ -721,9 +729,13 @@
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Recent Posts</h3>
+    <h3 class="widget-title">Siste innlegg</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/archives/84174.html">react storybook使用typescript</a>
+          </li>
         
           <li>
             <a href="/archives/84173.html">在树莓派3上运行Android6</a>
@@ -739,10 +751,6 @@
         
           <li>
             <a href="/archives/84170.html">使用pytest测试flask应用</a>
-          </li>
-        
-          <li>
-            <a href="/archives/84169.html">HAProxy+Nginx+gunicorn获取真实ip</a>
           </li>
         
       </ul>
