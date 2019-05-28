@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.xefan.com/"/>
-  <updated>2019-03-14T03:46:50.111Z</updated>
+  <updated>2019-05-28T03:37:03.639Z</updated>
   <id>http://www.xefan.com/</id>
   
   <author>
@@ -14,6 +14,59 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>记录神舟战神 Z7M-KP7GZ 安装黑苹果过程</title>
+    <link href="http://www.xefan.com/archives/84175.html"/>
+    <id>http://www.xefan.com/archives/84175.html</id>
+    <published>2019-05-28T08:40:43.583Z</published>
+    <updated>2019-05-28T03:37:03.639Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>现在这台 MacBook Air 差不多用了4年，因此打算换台新的电脑。目前需要一台有独显的电脑，一来是跑一些程序，二来是方便打游戏。<br>另外由于 macOS 已经用习惯了，不想再换其他系统。因此才考虑的安装黑苹果。通过两周的调研，别人给的经验是最好选择已经有人安装成功过的电脑型号，免得有问题自己折腾。<br>于是乎就选择了性价比比较高的神舟。最后安装完成之后，系统还有些小问题，不过基本也能用。对于要求比较高的建议还是白苹果吧。</p>
+<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><ul>
+<li>一个8G以上的U盘，用于烧写系统镜像</li>
+<li>一个U盘，大小不限，只要启动WinPE就行</li>
+<li>一个usb鼠标，安装过程中触摸板用不了</li>
+</ul>
+<p>因为我打算安装3个系统，我的硬盘分区如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">128G SSD:</div><div class="line">ESP     600M    用于EFI引导</div><div class="line">EXT4    127G    用于安装ubuntu</div><div class="line"></div><div class="line">1TB机械硬盘：</div><div class="line">ESP     200M    用于EFI引导</div><div class="line">MSR     128M</div><div class="line">NTFS    100G    Windows C</div><div class="line">NTFS    100G    Windows D</div><div class="line">SWAP    16G     Linux交换分区</div><div class="line">EXFAT32 320G    用于多个系统之间分享文件</div><div class="line">APFS    440G    安装黑苹果</div></pre></td></tr></table></figure></p>
+<p>在安装过程中需要用苹果的硬盘工具进行分区，如果硬盘上有文件的话需要先进行备份。</p>
+<p>安装过程我是参考的黑果小兵博客： <a href="https://blog.daliansky.net/Lenovo-Xiaoxin-Air-13-macOS-Mojave-installation-tutorial.html" target="_blank" rel="external">https://blog.daliansky.net/Lenovo-Xiaoxin-Air-13-macOS-Mojave-installation-tutorial.html</a></p>
+<p>下载镜像 ( <a href="https://blog.daliansky.net/tags/%E9%95%9C%E5%83%8F/" target="_blank" rel="external">https://blog.daliansky.net/tags/%E9%95%9C%E5%83%8F/</a> ) 然后使用镜像烧写工具将镜像烧写到8G的U盘。这里我用的是 Etcher 这个工具。<br>参考别人的说法，10.14 的系统没有 Nvidia 的显卡驱动，10.13 的系统才有。不过我还是下载的 10.14.4 的系统镜像。</p>
+<p>下载 Z7M-KP7GZ 的相关驱动： <a href="https://github.com/kirainmoe/hasee-z7-kp7gz-macos" target="_blank" rel="external">https://github.com/kirainmoe/hasee-z7-kp7gz-macos</a></p>
+<h2 id="安装步骤"><a href="#安装步骤" class="headerlink" title="安装步骤"></a>安装步骤</h2><p>启动电脑进入 BIOS 禁用 Secure Boot。然后通过U盘启动进入WinPE，先按照上面的硬盘分区计划对硬盘进行分区。如果你是整块硬盘只用于安装 macOS，则可以忽略这上步。<br>然后重启换另一个U盘启动进入 macOS 的安装界面。进入 Clover 后按 o 键在 Boot 项后面添加 nv_disable=1 参数。如图：<br><img src="/wp-content/uploads/2019/05/hasee_macos_01.jpg" alt=""></p>
+<p>然后回车开始引导 macOS。等几分钟之后就进入了安装程序，依次选择语言、同意用户协议、选择安装硬盘。<br>这里可以打开硬盘工具，然后进行分区。建议使用 APFS 格式的分区。注意，如果原来硬盘上有数据的记得先备份。如图：<br><img src="/wp-content/uploads/2019/05/hasee_macos_02.png" alt=""><br><img src="/wp-content/uploads/2019/05/hasee_macos_03.jpg" alt=""></p>
+<p>安装过程中会重启，重启之后进入 Clover 再选择使用对应的硬盘分区，选择”Boot macOS install from Mac”启动项，不要选择Preboot的启动项。<br><img src="/wp-content/uploads/2019/05/hasee_macos_04.jpg" alt=""></p>
+<p>如果出现Kernel Panic错误，重启再来试一遍吧。<br><img src="/wp-content/uploads/2019/05/hasee_macos_05.jpg" alt=""></p>
+<p>安装过程中啥都干不了，只能等了。差不多等半个小时就安装完成。接下来进入设置向导，选择地区、添加几号等操作。这个过程中触摸板用不了，所以需要外接鼠标。<br>最后安装完成，进入系统。<br><img src="/wp-content/uploads/2019/05/hasee_macos_06.jpg" alt=""></p>
+<p>系统安装完成之后，接下来就是安装EFI。因为现在EFI文件还是U盘里，否则就只能每次启动时都需要通过U盘来引导了。<br>在前面使用硬盘工具进行分区时，它会在当前硬盘的开始位置创建一个200M的ESP分区。我们只需要将U盘中的EFI复制到这个分区里即可。</p>
+<p>打开终端执行命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"># 查找分区情况</div><div class="line">diskutil list</div><div class="line"></div><div class="line"># 分别挂载本地硬盘的EFI分区各u盘的EFI分区</div><div class="line">sudo diskutil mount disk1s1</div><div class="line">sudo diskutil mount disk3s1</div></pre></td></tr></table></figure></p>
+<p>然后将u盘中EFI目录下的所有文件复制到硬盘中的EFI目录。如果之前已经有安装过其他的系统，那么只需要将u盘中的 EFI/CLOVER 复制到硬盘中的 EFI 目录下即可</p>
+<h2 id="安装驱动"><a href="#安装驱动" class="headerlink" title="安装驱动"></a>安装驱动</h2><p>现在系统安装好了，EFI也安装好了。应该就可以正常地进入系统了。不过目前还有这些问题：</p>
+<ul>
+<li>触摸板用不了</li>
+<li>WiFi、蓝牙用不了</li>
+<li>显卡用不了，不用使用外接显示器</li>
+</ul>
+<p>然后我们再接着安装驱动文件。先挂载 ESP 分区，备份 EFI 目录，以免出错之后进不了系统时可以恢复。</p>
+<p>删掉 /EFI/CLOVER 文件夹中的所有文件，然后将刚刚下载的所有驱动文件复制到 /EFI/CLOVER 目录下。<br>重启电脑然后执行里面的 optimize.sh 脚本，注意不要启动HiDPI。驱动安装好之后触摸板应该就能用了。</p>
+<p>如果声卡不能使用的话，执行命令 kextstat -list-only | grep AppleALC  看看AppleALC.kext 驱动已正确加载。如果没有正确加载，请将其安装在 /Library/Extensions 下后执行命令 sudo kextcache -i / 重建缓存并重启。</p>
+<p>接下来搞定无线网卡，如果不想折腾直接用有线了行。Z7M-KP7GZ用的是Intel的无线网卡，这个在 macOS 下是无解的。<br>其他折腾过的网友建议是换Broadcom的。如果要使用AirDrop或者Handoff，要求有蓝牙4.0LE，需要特定型号的博通网卡，比如博通BCM94322HMP（有带蓝牙和不带蓝牙版本的，注意挑选）。</p>
+<p>于是我就在淘宝上买了块 BCM94350 WiFi、蓝牙二合一。然后拆机将网卡换上去。网卡在风扇的旁边。<br><img src="/wp-content/uploads/2019/05/hasee_macos_07.jpg" alt=""></p>
+<p>结果一开机系统就崩溃了，进入不了登录界面。后来联系卖家，他们说这个只有 macOS 10.13 的驱动，没有 10.14 的。而我安装主正是 10.14 的系统。<br>欲哭无泪啊，折腾了两天，BCM94350网卡的驱动实在搞不定。最后只得再买了个支持黑苹果的USB无线网卡。<br>另外显卡驱动目前在 10.14 下也是无解的。如果要外接显示器的话，可能需要再购买带显卡的 type-C 设备。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;现在这台 MacBook Air 差不多用了4年，因此打算换台新的电脑。目前需要一台有独显的电脑，一来是跑一些程序，二来是方便打游戏。&lt;br
+    
+    </summary>
+    
+      <category term="教程" scheme="http://www.xefan.com/categories/%E6%95%99%E7%A8%8B/"/>
+    
+    
+      <category term="Mac" scheme="http://www.xefan.com/tags/Mac/"/>
+    
+  </entry>
   
   <entry>
     <title>react storybook使用typescript</title>
@@ -727,36 +780,6 @@
     <summary type="html">
     
       &lt;p&gt;要在 rails 中使用 angular 直接在页面中引入进行即可，这个倒是不难。&lt;br&gt;只是在开发过程中突然发现了一个问题，就是 angular 的模板应该如何组织呢。&lt;br&gt;如果全写成内联模板这个不太好维护，如果是写成单个文件放在 public 目录下也不太妥。&lt;br&gt;
-    
-    </summary>
-    
-      <category term="前端相关" scheme="http://www.xefan.com/categories/%E5%89%8D%E7%AB%AF%E7%9B%B8%E5%85%B3/"/>
-    
-    
-      <category term="js" scheme="http://www.xefan.com/tags/js/"/>
-    
-      <category term="angular" scheme="http://www.xefan.com/tags/angular/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>AngularJS学习笔记6——与jQuery、Bootstrap结合</title>
-    <link href="http://www.xefan.com/archives/84155.html"/>
-    <id>http://www.xefan.com/archives/84155.html</id>
-    <published>2015-08-24T10:25:28.000Z</published>
-    <updated>2017-01-21T16:20:19.000Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="jQuery"><a href="#jQuery" class="headerlink" title="jQuery"></a>jQuery</h2><p>如果想要在 angular 内部调用 jQuery 的函数（如 jQuery 的 ajax 功能）比较简单，直接调用 <code>$.ajax</code> 即可。<br>但是如果想要在 angular 外部调用其函数就稍微麻烦一点，毕竟这也与 angular 的设计理念不符。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">&lt;div ng-controller=&quot;PageController&quot;&gt;</div><div class="line">  ...</div><div class="line">&lt;/div&gt;</div><div class="line"></div><div class="line">&lt;script&gt;</div><div class="line">  var appModule = angular.module(&apos;myApp&apos;, []);</div><div class="line">  appModule.controller(&apos;PageController&apos;, [&apos;$scope&apos;, &apos;$http&apos;, function($scope, $http)&#123;</div><div class="line">      ...</div><div class="line">  &#125;]);</div></pre></td></tr></table></figure>
-<p>例如上个这段代码，如果想要从外部访问 <code>PageController</code> 中的某些内容。则可以先获取 <code>PageController</code> 的上下文对象($scope)：<code>angular.element($(&#39;[ng-controller=&quot;PageController&quot;]&#39;)).scope();</code><br>在外部修改了 <code>scope</code> 的某些值时会发现对应的视图并没有更新，这时还需要调用 <code>scope</code> 的 <code>$digest</code> 方法进行同步，或者直接调用 <code>$apply</code> 方法进行操作。</p>
-<h2 id="Bootstrap"><a href="#Bootstrap" class="headerlink" title="Bootstrap"></a>Bootstrap</h2><p>之前使用 angularjs 时遇到了 Bootstrap 的控件不能正常使用了，如 dropdown 组件点击了没有效果。<br>经过分析发现是 angularjs 将 Bootstrap 的组件的事件给截获了。</p>
-<p>好在有 angular-bootstrap 这么一个组件可以将它们整合在一起。</p>
-<p><a href="http://angular-ui.github.io/bootstrap/" target="_blank" rel="external">http://angular-ui.github.io/bootstrap/</a></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;jQuery&quot;&gt;&lt;a href=&quot;#jQuery&quot; class=&quot;headerlink&quot; title=&quot;jQuery&quot;&gt;&lt;/a&gt;jQuery&lt;/h2&gt;&lt;p&gt;如果想要在 angular 内部调用 jQuery 的函数（如 jQuery 的 ajax 功能）比较简单，
     
     </summary>
     

@@ -56,9 +56,9 @@
       </nav>
       <nav id="sub-nav">
         
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="Flux RSS"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Søk"></a>
+        <a id="nav-search-btn" class="nav-icon" title="Rechercher"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.xefan.com"></form>
@@ -68,6 +68,59 @@
 </header>
       <div class="outer">
         <section id="main">
+  
+    <article id="post-/archives/83668.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83668.html" class="article-date">
+  <time datetime="2011-12-29T22:55:04.000Z" itemprop="datePublished">2011-12-29</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/编程开发/">编程开发</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/83668.html">Windows下静态编译Qt4</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>既然是静态编译，那就要编译出来的程序不信赖于任何dll文件。<br>首先下载qt-win-opensource-4.7.4-mingw.exe： <a href="http://get.qt.nokia.com/qt/source/qt-win-opensource-4.7.4-mingw.exe" target="_blank" rel="external">http://get.qt.nokia.com/qt/source/qt-win-opensource-4.7.4-mingw.exe</a> 和MinGW-gcc440_1.zip： <a href="http://get.qt.nokia.com/misc/MinGW-gcc440_1.zip" target="_blank" rel="external">http://get.qt.nokia.com/misc/MinGW-gcc440_1.zip</a></p>
+<p>然后依次解压MinGW-gcc440_1.zip、安装qt-win-opensource-4.7.4-mingw.exe。记得要将gcc的目录和qt的目录添加到环境变量中。</p>
+<p>然后打开DOS窗口并切换到Qt的目录（比如我的是D:\Qt\4.7.4），再设置两个变量<br><em>set QTDIR=D:\Qt\4.7.4</em><br><em> set QMAKESPEC=win32-g++</em>  </p>
+<p>再编辑D:\Qt\4.7.4\mkspecs\win32-g++\qmake.conf文件（最好先备份），改两处：<br><em>QMAKE_LFLAGS = -enable-stdcall-fixup -Wl,-enable-auto-import -Wl,-enable-runtime-pseudo-reloc</em><br>修改为<br><em>QMAKE_LFLAGS = <span style="color: #ff0000;">-static</span> -enable-stdcall-fixup -Wl,-enable-auto-import -Wl,-enable-runtime-pseudo-reloc</em><br>再将<br><em>QMAKE_LFLAGS_DLL = -shared</em><br>修改为<br><em>QMAKE_LFLAGS_DLL = -static</em>  </p>
+<p>再执行命令：<br>configure -platform win32-g++ <span style="color: #ff0000;">-release</span> -opensource <span style="color: #ff0000;">-static</span> -fast -qt-sql-sqlite -plugin-sql-sqlite -qt-zlib -qt-gif -qt-libpng -qt-libmng -qt-libtiff -qt-libjpeg -no-webkit -nomake examples -nomake docs -nomake demos  </p>
+<p>如果有提问是否遵守LGPL协议，选y。配置完成后，最后两句是这样的：<br>Qt is now configured for building. Just run mingw32-make.<br>To reconfigure, run mingw32-make confclean and configure.  </p>
+<p>cd src<br>mingw32-make -i -k  </p>
+<p>注意：我们只在在Qt子目录src里运行make。不要在整个qt库的大目录下运行make。只在src目录make，这样只编译核心的Qt库和一些插件，节省时间，而且有核心Qt库就够用了。<br>如果在D:\Qt\4.7.4\ 整个大目录下运行make，那么make还会去重新编译生成tools目录下的代码，重新做工具程序，像assistant.exe、designer.exe、linguist.exe、qmlviewer.exe等等（生成后全在bin目录）。这些工具使用静态库生成后巨大无比。这些工具程序不管是静态链接还是动态链接生成的，对我们编程压根没影响，都一样用。  </p>
+<p>好了，接下来就是漫长的等待。2个多小时左右就应该可以编译完成了。<br>此时再用Qt编译生成的可执行文件不用再信赖Qt的动态库了,但是文件比较大随便一个都是10M以上，而且如果使用的是从qt官网下载的MinGW-gcc编译生成的可执行文件还是会信赖mingwm10.dll动态库。这个只需换一个版本的编译器即可，我用的是这个： <a href="http://115.com/file/dn3fkn1g" target="_blank" rel="external">http://115.com/file/dn3fkn1g</a>  </p>
+<p>如果嫌这个过程太麻烦可以直接下载我编译好的静态库来使用：<br>Qt4.7.4_Win32静态库.part1.rar： <a href="http://115.com/file/dn3zwayy" target="_blank" rel="external">http://115.com/file/dn3zwayy</a><br>Qt4.7.4_Win32静态库.part2.rar： <a href="http://115.com/file/dn3zwa9g" target="_blank" rel="external">http://115.com/file/dn3zwa9g</a><br>这个是完整版的，解压下来有2G多。如果觉得太大了可以下载精简版：<br>Qt4.7.4_Win32静态库精简版.rar： <a href="http://115.com/file/bhy7bat6" target="_blank" rel="external">http://115.com/file/bhy7bat6</a><br>精简版只保留了编译时需要的库文件和qmake等必要的工具，解压下来有500M左右。<br>注意：只有解压到D盘根目录下才能使用<br>编译器用的是mingw-7.2.exe： <a href="http://115.com/file/dn3fkn1g" target="_blank" rel="external">http://115.com/file/dn3fkn1g</a>  </p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83668.html" data-id="cjw79491000b9un08avpo73xu" class="article-share-link">Partager</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Qt/">Qt</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/windows/">windows</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
   
     <article id="post-/archives/83665.html" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
@@ -112,7 +165,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83665.html" data-id="cjt83lrpf00bdhqq3g2fveeyz" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83665.html" data-id="cjw79491100bcun08hzbuqldh" class="article-share-link">Partager</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gtk/">gtk</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/windows/">windows</a></li></ul>
@@ -168,7 +221,7 @@ http://www.xefan.com
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83663.html" data-id="cjt83lrpe00bahqq39mav0lrj" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83663.html" data-id="cjw79490y00b2un089p3182ho" class="article-share-link">Partager</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gcc/">gcc</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/windows/">windows</a></li></ul>
@@ -217,7 +270,7 @@ http://www.xefan.com
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83661.html" data-id="cjt83lrpd00b7hqq3wk2z5cwq" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83661.html" data-id="cjw79490x00azun08vmlcf5ru" class="article-share-link">Partager</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Arch/">Arch</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li></ul>
@@ -276,7 +329,7 @@ printable = yes
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83658.html" data-id="cjt83lrpc00b4hqq3w8fc6e9g" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83658.html" data-id="cjw79490z00b6un084ivl1cae" class="article-share-link">Partager</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li></ul>
@@ -324,7 +377,7 @@ printable = yes
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83656.html" data-id="cjt83lrpb00b1hqq3nkoyvad0" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83656.html" data-id="cjw79490v00awun08d988e0zg" class="article-share-link">Partager</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Arch/">Arch</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li></ul>
@@ -374,7 +427,7 @@ printable = yes
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83650.html" data-id="cjt83lrp900ayhqq3pppgu5cg" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83650.html" data-id="cjw79490t00aqun08rt5faqsx" class="article-share-link">Partager</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gtk/">gtk</a></li></ul>
@@ -421,7 +474,7 @@ printable = yes
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83648.html" data-id="cjt83lrp800auhqq3ga8tqejq" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83648.html" data-id="cjw79490u00auun081sih4dqg" class="article-share-link">Partager</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ibus/">ibus</a></li></ul>
@@ -470,7 +523,7 @@ printable = yes
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83642.html" data-id="cjt83lrp700arhqq387qujel9" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83642.html" data-id="cjw79490s00anun08spfro8hi" class="article-share-link">Partager</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gtk/">gtk</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -517,7 +570,7 @@ printable = yes
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83639.html" data-id="cjt83lrp700aohqq362rabwqr" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83639.html" data-id="cjw79490q00akun08ba4musz8" class="article-share-link">Partager</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gtk/">gtk</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -530,93 +583,10 @@ printable = yes
 
 
   
-    <article id="post-/archives/83637.html" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/archives/83637.html" class="article-date">
-  <time datetime="2011-10-16T20:24:20.000Z" itemprop="datePublished">2011-10-16</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/Linux栏目/">Linux栏目</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/archives/83637.html">Arch Linux安装xfce和slim</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>这几天终于把Arch Linux + Xfce + slim配置好了，做个笔记备忘。</p>
-<h1>安装Xfce</h1><br><a href="https://wiki.archlinux.org/index.php/Xfce_(简体中文" target="_blank" rel="external">https://wiki.archlinux.org/index.php/Xfce_(简体中文</a>)<br><br><strong>安装准备</strong><br><br>请在安装与使用xfce前确认已经安装有xorg以及hal。<br><br><code># pacman -S xorg hal</code><br><br>默认安装的archlinux是不包含xorg以及hal的。如果不安装两者，将造成xfce无法启动。HAL 已经被诸如udev,udisks,upower这些程序替代 。<br><br><strong>安装XFCE系统(Xfce 4.8)</strong><br><br><code># pacman -S xfce4 xfce4-goodies</code><br><code># pacman -S $(pacman -Sgq xfce4-goodies | grep -v xfce4-xfapplet-plugin)</code><br><br>默认安装的xfce4，首次启动出现的小提示窗口里面是没有任何东西的。如果你想看到刚启动时候的技巧和小提示，那么就需要安装fortune-mod<br><br><code># pacman -S fortune-mod</code><br><br>安装好xfce4之后可能会发现xfce4-mixer通过ALSA并不能控制音量，需要安装gstreamer0.10-base-plugins：<br><br><code># pacman -S gstreamer0.10-base-plugins</code><br><br>对于笔记本用户，Xfce4-mixer如果不能同时控制外放与耳机，请尝试安装全部Plugins：<br><br><code># pacman -S gstreamer0.10-plugins</code><br><br><strong>安装和配置Daemons</strong><br><br><strong>安装dbus：</strong><br><br><code># pacman -S dbus</code><br><br>需要在开机的时候自动运行，应该将dbus添加到/etc/rc.conf文件中的DAEMONS：<br>DAEMONS=(syslog-ng dbus network crond)<br><br>如果不想重启开始dbus服务： <code># /etc/rc.d/dbus start</code><br><br>安装gamin (fam已经是过时的东西)，它会在后台自动运行检查文件改动反应给桌面，并且不需要添加到Daemons。<br><br><code># pacman -S gamin</code><br><br><h1>运行XFCE</h1>
-
-<p><strong>手动启动</strong></p>
-<p>你只需要运行： <code>$ startxfce4</code></p>
-<p>从终端启动，例如使用xinit/startx 需要配置Xinitrc (简体中文)。<br>如果还没有~/.xinitrc 文件，系统里有一份实例文件供参考：<code>$ cp /etc/skel/.xinitrc ~/.xinitrc</code></p>
-<p>在最后添加（因为权限的问题推荐在启动xfce之前添加ck-launch-session dbus-launch启）：<br><em>exec ck-launch-session dbus-launch –exit-with-session startxfce4</em></p>
-<p><strong>在XFCE中关机和重启</strong></p>
-<p>在/etc/sudoers文件末尾添加如下一行：<br><em>%users ALL=(root) NOPASSWD: /usr/lib/xfce4/session/xfsm-shutdown-helper</em></p>
-<p><code># gpasswd -a 你的用户名 users</code></p>
-<p><strong>声音</strong><br><strong>安装ALSA</strong><br><a href="https://wiki.archlinux.org/index.php/Advanced_Linux_Sound_Architecture_(简体中文" target="_blank" rel="external">https://wiki.archlinux.org/index.php/Advanced_Linux_Sound_Architecture_(简体中文</a>)</p>
-<p>要求有本地化的ALSA程序和管理</p>
-<p><code># pacman -S alsa-lib alsa-utils</code><br><code># pacman -S alsa-oss</code></p>
-<p>所有ALSA程序都很可能需要依赖alsa-lib。</p>
-<p><strong>使用ALSA驱动如何让xfce4-mixer来控制音量</strong></p>
-<p>新版的xfce4-mixer使用了gstreamer作为后端，这样就不用直接与驱动交流，更加统一。与驱动打交道的工作交给了gstreamer。因此如果你xfce4-mixer无法正常工作，就需要配置好gstreamer。首先当然你得安装xfce4-mixer。</p>
-<p><code>pacman -S xfce4-mixer gstreamer0.10-base-plugins</code></p>
-<p>你需要至少安装gstreamer0.10-good-plugins,考虑安装gstreamer0.10-bad-plugins</p>
-<p><code>pacman -S gstreamer0.10-good-plugins gstreamer0.10-bad-plugins</code></p>
-<p>然后删除面板上的mixer插件，然后重新添加一次，或者先登出然后再登录一次，对gstreamer做更改后必须这样做才能让操作生效。</p>
-<p></p><h1>安装SLiM</h1><br><a href="https://wiki.archlinux.org/index.php/SLiM_(简体中文" target="_blank" rel="external">https://wiki.archlinux.org/index.php/SLiM_(简体中文</a>)<p></p>
-<p><strong>介绍</strong></p>
-<p>SLiM是Simple Login Manager（简单登录管理器）的缩写。SLiM是简单、轻量级和容易配置的，相对较易在低端和高端的系统中使用。对于那些希望寻找一个不依赖于GNOME或者KDE，可以在Xfce、Openbox、Fluxbox等环境下使用的登录管理器的人来说，SLiM也是非常合适的。</p>
-<p><strong>安装</strong></p>
-<p>可以在extra软件仓库中找到SLiM： <code># pacman -S slim</code></p>
-<p>同时还可以安装主题包： <code># pacman -S slim-themes archlinux-themes-slim</code></p>
-<p><strong>配置</strong></p>
-<p>启用SLiM</p>
-<p>单用户环境<br>要将SLiM配置为加载某个特定的环境，只需编辑~/.xinitrc如下：<br>将[session-command]替换为适当的会话命令。例如：<br>要启动Xfce:<br><em>exec ck-launch-session dbus-launch –exit-with-session startxfce4</em></p>
-<p>打开 /etc/rc.conf。<br><code># vi /etc/rc.conf</code></p>
-<p>添加一个服务slim<br><em>DAEMONS=(syslogd klogd !pcmcia network netfs crond slim)</em></p>
-<p>修改默认运行等级  </p>
-<ol>
-<li>切换用户到root.<br>$ su  </li>
-<li>编辑/etc/inittab：<br><code># vi /etc/inittab</code>  </li>
-<li>找到如下这一行：<br>id:3:initdefault:  </li>
-<li>为了启动X11需要把’3’修改成’5’：<br>id:5:initdefault:  </li>
-<li>保存此文件并退出编辑器，下次启动时你选择的显示管理器就会运行了。  </li>
-</ol>
-<p>这样就差不多了，细节上的以后再慢慢琢磨。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83637.html" data-id="cjt83lrp500aihqq3wv628x56" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Arch/">Arch</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
 
 
   <nav id="page-nav">
-    <a class="extend prev" rel="prev" href="/page/17/">&laquo;Forrige</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/16/">16</a><a class="page-number" href="/page/17/">17</a><span class="page-number current">18</span><a class="page-number" href="/page/19/">19</a><a class="page-number" href="/page/20/">20</a><span class="space">&hellip;</span><a class="page-number" href="/page/30/">30</a><a class="extend next" rel="next" href="/page/19/">Neste&raquo;</a>
+    <a class="extend prev" rel="prev" href="/page/17/">&laquo;Précédent</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/16/">16</a><a class="page-number" href="/page/17/">17</a><span class="page-number current">18</span><a class="page-number" href="/page/19/">19</a><a class="page-number" href="/page/20/">20</a><span class="space">&hellip;</span><a class="page-number" href="/page/31/">31</a><a class="extend next" rel="next" href="/page/19/">Suivant&raquo;</a>
   </nav>
 
 </section>
@@ -625,7 +595,7 @@ printable = yes
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Kategorier</h3>
+    <h3 class="widget-title">Catégories</h3>
     <div class="widget">
       <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Linux栏目/">Linux栏目</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Python栏目/">Python栏目</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Ruby栏目/">Ruby栏目</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Ruby栏目/Web开发/">Web开发</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/Web开发/">Web开发</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Web开发/Python栏目/">Python栏目</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/前端相关/">前端相关</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/嵌入式栏目/">嵌入式栏目</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/开源软件/">开源软件</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/教程/">教程</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据库/">数据库</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据结构和算法/">数据结构和算法</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/编程开发/">编程开发</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/网络日志/">网络日志</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/资源分享/">资源分享</a></li></ul>
     </div>
@@ -635,7 +605,7 @@ printable = yes
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Tags</h3>
+    <h3 class="widget-title">Mot-clés</h3>
     <div class="widget">
       <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ARM/">ARM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/">Android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Arch/">Arch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/">C</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Django/">Django</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker/">Docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Dreamweaver/">Dreamweaver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Fedora/">Fedora</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flash/">Flash</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GObject/">GObject</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Gentoo/">Gentoo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hash/">Hash</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mac/">Mac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PS/">PS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Qt/">Qt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Raspberry-pi/">Raspberry pi</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redis/">Redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Ruby/">Ruby</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scrapy/">Scrapy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TQ2440/">TQ2440</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/USB/">USB</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/VirtualBox/">VirtualBox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web开发/">Web开发</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WordPress/">WordPress</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Xcode/">Xcode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/access/">access</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/adobe/">adobe</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ajax/">ajax</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apache/">apache</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asp/">asp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css/">css</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/firefox/">firefox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ftp/">ftp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gcc/">gcc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/grub/">grub</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gtk/">gtk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gulp/">gulp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ibus/">ibus</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pygame/">pygame</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vmware/">vmware</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/w3m/">w3m</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/windows/">windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xml/">xml</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/免费/">免费</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内核/">内核</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/匹配算法/">匹配算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/单片机/">单片机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/嵌入式/">嵌入式</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/开源软件/">开源软件</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/排序算法/">排序算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/文件空间/">文件空间</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/无线网/">无线网</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/树莓派/">树莓派</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/正则式/">正则式</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/注册机/">注册机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/游戏/">游戏</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/电脑技巧/">电脑技巧</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/空间/">空间</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/算法/">算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/红旗/">红旗</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/经典语录/">经典语录</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络日志/">网络日志</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/翻译/">翻译</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/视频教程/">视频教程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/资源分享/">资源分享</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/转载/">转载</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/随笔/">随笔</a></li></ul>
     </div>
@@ -645,18 +615,18 @@ printable = yes
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Tag Cloud</h3>
+    <h3 class="widget-title">Nuage de mot-clés</h3>
     <div class="widget tagcloud">
-      <a href="/tags/ARM/" style="font-size: 13.89px;">ARM</a> <a href="/tags/Android/" style="font-size: 10.56px;">Android</a> <a href="/tags/Arch/" style="font-size: 13.33px;">Arch</a> <a href="/tags/C/" style="font-size: 16.11px;">C</a> <a href="/tags/Django/" style="font-size: 11.11px;">Django</a> <a href="/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/tags/Dreamweaver/" style="font-size: 10px;">Dreamweaver</a> <a href="/tags/Fedora/" style="font-size: 10.56px;">Fedora</a> <a href="/tags/Flash/" style="font-size: 10px;">Flash</a> <a href="/tags/GObject/" style="font-size: 12.78px;">GObject</a> <a href="/tags/Gentoo/" style="font-size: 10.56px;">Gentoo</a> <a href="/tags/Hash/" style="font-size: 10px;">Hash</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Mac/" style="font-size: 10px;">Mac</a> <a href="/tags/PS/" style="font-size: 12.78px;">PS</a> <a href="/tags/Qt/" style="font-size: 10.56px;">Qt</a> <a href="/tags/Raspberry-pi/" style="font-size: 10px;">Raspberry pi</a> <a href="/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/tags/Ruby/" style="font-size: 18.89px;">Ruby</a> <a href="/tags/Scrapy/" style="font-size: 11.11px;">Scrapy</a> <a href="/tags/TQ2440/" style="font-size: 12.22px;">TQ2440</a> <a href="/tags/USB/" style="font-size: 11.11px;">USB</a> <a href="/tags/VirtualBox/" style="font-size: 11.11px;">VirtualBox</a> <a href="/tags/Web开发/" style="font-size: 16.67px;">Web开发</a> <a href="/tags/WordPress/" style="font-size: 10px;">WordPress</a> <a href="/tags/Xcode/" style="font-size: 10px;">Xcode</a> <a href="/tags/access/" style="font-size: 12.78px;">access</a> <a href="/tags/adobe/" style="font-size: 10px;">adobe</a> <a href="/tags/ajax/" style="font-size: 11.11px;">ajax</a> <a href="/tags/angular/" style="font-size: 13.33px;">angular</a> <a href="/tags/apache/" style="font-size: 10px;">apache</a> <a href="/tags/asp/" style="font-size: 13.33px;">asp</a> <a href="/tags/css/" style="font-size: 10.56px;">css</a> <a href="/tags/firefox/" style="font-size: 11.11px;">firefox</a> <a href="/tags/ftp/" style="font-size: 10px;">ftp</a> <a href="/tags/gcc/" style="font-size: 12.78px;">gcc</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/grub/" style="font-size: 10px;">grub</a> <a href="/tags/gtk/" style="font-size: 17.78px;">gtk</a> <a href="/tags/gulp/" style="font-size: 10px;">gulp</a> <a href="/tags/ibus/" style="font-size: 10px;">ibus</a> <a href="/tags/js/" style="font-size: 16.11px;">js</a> <a href="/tags/mongodb/" style="font-size: 15.56px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 11.67px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/php/" style="font-size: 15px;">php</a> <a href="/tags/pygame/" style="font-size: 15.56px;">pygame</a> <a href="/tags/python/" style="font-size: 19.44px;">python</a> <a href="/tags/react/" style="font-size: 12.78px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/ubuntu/" style="font-size: 13.33px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 18.33px;">vim</a> <a href="/tags/vmware/" style="font-size: 10px;">vmware</a> <a href="/tags/w3m/" style="font-size: 10px;">w3m</a> <a href="/tags/windows/" style="font-size: 13.33px;">windows</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/免费/" style="font-size: 10px;">免费</a> <a href="/tags/内核/" style="font-size: 10px;">内核</a> <a href="/tags/匹配算法/" style="font-size: 12.78px;">匹配算法</a> <a href="/tags/单片机/" style="font-size: 10.56px;">单片机</a> <a href="/tags/嵌入式/" style="font-size: 10px;">嵌入式</a> <a href="/tags/开源软件/" style="font-size: 14.44px;">开源软件</a> <a href="/tags/排序算法/" style="font-size: 14.44px;">排序算法</a> <a href="/tags/文件空间/" style="font-size: 10px;">文件空间</a> <a href="/tags/无线网/" style="font-size: 10px;">无线网</a> <a href="/tags/树莓派/" style="font-size: 10px;">树莓派</a> <a href="/tags/正则式/" style="font-size: 10px;">正则式</a> <a href="/tags/注册机/" style="font-size: 10.56px;">注册机</a> <a href="/tags/游戏/" style="font-size: 15px;">游戏</a> <a href="/tags/电脑技巧/" style="font-size: 14.44px;">电脑技巧</a> <a href="/tags/空间/" style="font-size: 10px;">空间</a> <a href="/tags/算法/" style="font-size: 17.22px;">算法</a> <a href="/tags/红旗/" style="font-size: 10px;">红旗</a> <a href="/tags/经典语录/" style="font-size: 10px;">经典语录</a> <a href="/tags/网络日志/" style="font-size: 13.33px;">网络日志</a> <a href="/tags/翻译/" style="font-size: 18.33px;">翻译</a> <a href="/tags/视频教程/" style="font-size: 15px;">视频教程</a> <a href="/tags/资源分享/" style="font-size: 15.56px;">资源分享</a> <a href="/tags/转载/" style="font-size: 10.56px;">转载</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
+      <a href="/tags/ARM/" style="font-size: 13.89px;">ARM</a> <a href="/tags/Android/" style="font-size: 10.56px;">Android</a> <a href="/tags/Arch/" style="font-size: 13.33px;">Arch</a> <a href="/tags/C/" style="font-size: 16.11px;">C</a> <a href="/tags/Django/" style="font-size: 11.11px;">Django</a> <a href="/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/tags/Dreamweaver/" style="font-size: 10px;">Dreamweaver</a> <a href="/tags/Fedora/" style="font-size: 10.56px;">Fedora</a> <a href="/tags/Flash/" style="font-size: 10px;">Flash</a> <a href="/tags/GObject/" style="font-size: 12.78px;">GObject</a> <a href="/tags/Gentoo/" style="font-size: 10.56px;">Gentoo</a> <a href="/tags/Hash/" style="font-size: 10px;">Hash</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Mac/" style="font-size: 10.56px;">Mac</a> <a href="/tags/PS/" style="font-size: 12.78px;">PS</a> <a href="/tags/Qt/" style="font-size: 10.56px;">Qt</a> <a href="/tags/Raspberry-pi/" style="font-size: 10px;">Raspberry pi</a> <a href="/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/tags/Ruby/" style="font-size: 18.89px;">Ruby</a> <a href="/tags/Scrapy/" style="font-size: 11.11px;">Scrapy</a> <a href="/tags/TQ2440/" style="font-size: 12.22px;">TQ2440</a> <a href="/tags/USB/" style="font-size: 11.11px;">USB</a> <a href="/tags/VirtualBox/" style="font-size: 11.11px;">VirtualBox</a> <a href="/tags/Web开发/" style="font-size: 16.67px;">Web开发</a> <a href="/tags/WordPress/" style="font-size: 10px;">WordPress</a> <a href="/tags/Xcode/" style="font-size: 10px;">Xcode</a> <a href="/tags/access/" style="font-size: 12.78px;">access</a> <a href="/tags/adobe/" style="font-size: 10px;">adobe</a> <a href="/tags/ajax/" style="font-size: 11.11px;">ajax</a> <a href="/tags/angular/" style="font-size: 13.33px;">angular</a> <a href="/tags/apache/" style="font-size: 10px;">apache</a> <a href="/tags/asp/" style="font-size: 13.33px;">asp</a> <a href="/tags/css/" style="font-size: 10.56px;">css</a> <a href="/tags/firefox/" style="font-size: 11.11px;">firefox</a> <a href="/tags/ftp/" style="font-size: 10px;">ftp</a> <a href="/tags/gcc/" style="font-size: 12.78px;">gcc</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/grub/" style="font-size: 10px;">grub</a> <a href="/tags/gtk/" style="font-size: 17.78px;">gtk</a> <a href="/tags/gulp/" style="font-size: 10px;">gulp</a> <a href="/tags/ibus/" style="font-size: 10px;">ibus</a> <a href="/tags/js/" style="font-size: 16.11px;">js</a> <a href="/tags/mongodb/" style="font-size: 15.56px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 11.67px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/php/" style="font-size: 15px;">php</a> <a href="/tags/pygame/" style="font-size: 15.56px;">pygame</a> <a href="/tags/python/" style="font-size: 19.44px;">python</a> <a href="/tags/react/" style="font-size: 12.78px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/ubuntu/" style="font-size: 13.33px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 18.33px;">vim</a> <a href="/tags/vmware/" style="font-size: 10px;">vmware</a> <a href="/tags/w3m/" style="font-size: 10px;">w3m</a> <a href="/tags/windows/" style="font-size: 13.33px;">windows</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/免费/" style="font-size: 10px;">免费</a> <a href="/tags/内核/" style="font-size: 10px;">内核</a> <a href="/tags/匹配算法/" style="font-size: 12.78px;">匹配算法</a> <a href="/tags/单片机/" style="font-size: 10.56px;">单片机</a> <a href="/tags/嵌入式/" style="font-size: 10px;">嵌入式</a> <a href="/tags/开源软件/" style="font-size: 14.44px;">开源软件</a> <a href="/tags/排序算法/" style="font-size: 14.44px;">排序算法</a> <a href="/tags/文件空间/" style="font-size: 10px;">文件空间</a> <a href="/tags/无线网/" style="font-size: 10px;">无线网</a> <a href="/tags/树莓派/" style="font-size: 10px;">树莓派</a> <a href="/tags/正则式/" style="font-size: 10px;">正则式</a> <a href="/tags/注册机/" style="font-size: 10.56px;">注册机</a> <a href="/tags/游戏/" style="font-size: 15px;">游戏</a> <a href="/tags/电脑技巧/" style="font-size: 14.44px;">电脑技巧</a> <a href="/tags/空间/" style="font-size: 10px;">空间</a> <a href="/tags/算法/" style="font-size: 17.22px;">算法</a> <a href="/tags/红旗/" style="font-size: 10px;">红旗</a> <a href="/tags/经典语录/" style="font-size: 10px;">经典语录</a> <a href="/tags/网络日志/" style="font-size: 13.33px;">网络日志</a> <a href="/tags/翻译/" style="font-size: 18.33px;">翻译</a> <a href="/tags/视频教程/" style="font-size: 15px;">视频教程</a> <a href="/tags/资源分享/" style="font-size: 15.56px;">资源分享</a> <a href="/tags/转载/" style="font-size: 10.56px;">转载</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
     </div>
   </div>
 
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Arkiv</h3>
+    <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">November 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05/">May 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/02/">February 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/11/">November 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">October 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">September 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/08/">August 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/07/">July 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/05/">May 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04/">April 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">March 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">January 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/12/">December 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">June 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">May 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">April 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">January 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">October 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/09/">September 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/08/">August 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/07/">July 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/05/">May 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/04/">April 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/03/">March 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/02/">February 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/12/">December 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/11/">November 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/10/">October 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/09/">September 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/08/">August 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/07/">July 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/05/">May 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/04/">April 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/03/">March 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/02/">February 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/01/">January 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/12/">December 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/11/">November 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/10/">October 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/09/">September 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/08/">August 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/07/">July 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/06/">June 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/05/">May 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/04/">April 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/03/">March 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/12/">December 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/11/">November 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/10/">October 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/09/">September 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/08/">August 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/07/">July 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/05/">May 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/12/">December 2008</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/07/">July 2008</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">November 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05/">May 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/02/">February 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/11/">November 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">October 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">September 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/08/">August 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/07/">July 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/05/">May 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04/">April 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">March 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">January 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/12/">December 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">June 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">May 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">April 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">January 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">October 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/09/">September 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/08/">August 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/07/">July 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/05/">May 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/04/">April 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/03/">March 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/02/">February 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/12/">December 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/11/">November 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/10/">October 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/09/">September 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/08/">August 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/07/">July 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/05/">May 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/04/">April 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/03/">March 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/02/">February 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/01/">January 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/12/">December 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/11/">November 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/10/">October 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/09/">September 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/08/">August 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/07/">July 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/06/">June 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/05/">May 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/04/">April 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/03/">March 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/12/">December 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/11/">November 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/10/">October 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/09/">September 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/08/">August 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/07/">July 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/05/">May 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/12/">December 2008</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/07/">July 2008</a></li></ul>
     </div>
   </div>
 
@@ -664,9 +634,13 @@ printable = yes
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Siste innlegg</h3>
+    <h3 class="widget-title">Articles récents</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/archives/84175.html">记录神舟战神 Z7M-KP7GZ 安装黑苹果过程</a>
+          </li>
         
           <li>
             <a href="/archives/84174.html">react storybook使用typescript</a>
@@ -682,10 +656,6 @@ printable = yes
         
           <li>
             <a href="/archives/84171.html">使用python编写游戏修改器</a>
-          </li>
-        
-          <li>
-            <a href="/archives/84170.html">使用pytest测试flask应用</a>
           </li>
         
       </ul>
@@ -719,7 +689,7 @@ printable = yes
   <div class="outer">
     <div id="footer-info" class="inner">
       &copy; 2019 龍昌<br>
-      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+      Propulsé by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>
 </footer>
