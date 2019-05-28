@@ -1,0 +1,104 @@
+---
+layout: 'post'
+title: '记录神舟战神 Z7M-KP7GZ 安装黑苹果过程'
+date: '2019-05-28T00:40:43.583Z'
+comments: true
+post_id: '84175'
+permalink: '/archives/84175.html'
+categories: ["教程"]
+tags: ["Mac"]
+---
+
+## 前言
+现在这台 MacBook Air 差不多用了4年，因此打算换台新的电脑。目前需要一台有独显的电脑，一来是跑一些程序，二来是方便打游戏。
+另外由于 macOS 已经用习惯了，不想再换其他系统。因此才考虑的安装黑苹果。通过两周的调研，别人给的经验是最好选择已经有人安装成功过的电脑型号，免得有问题自己折腾。
+于是乎就选择了性价比比较高的神舟。最后安装完成之后，系统还有些小问题，不过基本也能用。对于要求比较高的建议还是白苹果吧。
+
+## 准备
+* 一个8G以上的U盘，用于烧写系统镜像
+* 一个U盘，大小不限，只要启动WinPE就行
+* 一个usb鼠标，安装过程中触摸板用不了
+
+因为我打算安装3个系统，我的硬盘分区如下：
+```
+128G SSD:
+ESP     600M    用于EFI引导
+EXT4    127G    用于安装ubuntu
+
+1TB机械硬盘：
+ESP     200M    用于EFI引导
+MSR     128M
+NTFS    100G    Windows C
+NTFS    100G    Windows D
+SWAP    16G     Linux交换分区
+EXFAT32 320G    用于多个系统之间分享文件
+APFS    440G    安装黑苹果
+```
+
+在安装过程中需要用苹果的硬盘工具进行分区，如果硬盘上有文件的话需要先进行备份。
+
+安装过程我是参考的黑果小兵博客： https://blog.daliansky.net/Lenovo-Xiaoxin-Air-13-macOS-Mojave-installation-tutorial.html
+
+下载镜像 ( https://blog.daliansky.net/tags/%E9%95%9C%E5%83%8F/ ) 然后使用镜像烧写工具将镜像烧写到8G的U盘。这里我用的是 Etcher 这个工具。
+参考别人的说法，10.14 的系统没有 Nvidia 的显卡驱动，10.13 的系统才有。不过我还是下载的 10.14.4 的系统镜像。
+
+下载 Z7M-KP7GZ 的相关驱动： https://github.com/kirainmoe/hasee-z7-kp7gz-macos
+
+## 安装步骤
+启动电脑进入 BIOS 禁用 Secure Boot。然后通过U盘启动进入WinPE，先按照上面的硬盘分区计划对硬盘进行分区。如果你是整块硬盘只用于安装 macOS，则可以忽略这上步。
+然后重启换另一个U盘启动进入 macOS 的安装界面。进入 Clover 后按 o 键在 Boot 项后面添加 nv_disable=1 参数。如图：
+![](/wp-content/uploads/2019/05/hasee_macos_01.jpg)
+
+然后回车开始引导 macOS。等几分钟之后就进入了安装程序，依次选择语言、同意用户协议、选择安装硬盘。
+这里可以打开硬盘工具，然后进行分区。建议使用 APFS 格式的分区。注意，如果原来硬盘上有数据的记得先备份。如图：
+![](/wp-content/uploads/2019/05/hasee_macos_02.png)
+![](/wp-content/uploads/2019/05/hasee_macos_03.jpg)
+
+安装过程中会重启，重启之后进入 Clover 再选择使用对应的硬盘分区，选择”Boot macOS install from Mac”启动项，不要选择Preboot的启动项。
+![](/wp-content/uploads/2019/05/hasee_macos_04.jpg)
+
+如果出现Kernel Panic错误，重启再来试一遍吧。
+![](/wp-content/uploads/2019/05/hasee_macos_05.jpg)
+
+安装过程中啥都干不了，只能等了。差不多等半个小时就安装完成。接下来进入设置向导，选择地区、添加几号等操作。这个过程中触摸板用不了，所以需要外接鼠标。
+最后安装完成，进入系统。
+![](/wp-content/uploads/2019/05/hasee_macos_06.jpg)
+
+系统安装完成之后，接下来就是安装EFI。因为现在EFI文件还是U盘里，否则就只能每次启动时都需要通过U盘来引导了。
+在前面使用硬盘工具进行分区时，它会在当前硬盘的开始位置创建一个200M的ESP分区。我们只需要将U盘中的EFI复制到这个分区里即可。
+
+打开终端执行命令：
+```
+# 查找分区情况
+diskutil list
+
+# 分别挂载本地硬盘的EFI分区各u盘的EFI分区
+sudo diskutil mount disk1s1
+sudo diskutil mount disk3s1
+```
+
+然后将u盘中EFI目录下的所有文件复制到硬盘中的EFI目录。如果之前已经有安装过其他的系统，那么只需要将u盘中的 EFI/CLOVER 复制到硬盘中的 EFI 目录下即可
+
+## 安装驱动
+现在系统安装好了，EFI也安装好了。应该就可以正常地进入系统了。不过目前还有这些问题：
+* 触摸板用不了
+* WiFi、蓝牙用不了
+* 显卡用不了，不用使用外接显示器
+
+
+然后我们再接着安装驱动文件。先挂载 ESP 分区，备份 EFI 目录，以免出错之后进不了系统时可以恢复。
+
+删掉 /EFI/CLOVER 文件夹中的所有文件，然后将刚刚下载的所有驱动文件复制到 /EFI/CLOVER 目录下。
+重启电脑然后执行里面的 optimize.sh 脚本，注意不要启动HiDPI。驱动安装好之后触摸板应该就能用了。
+
+如果声卡不能使用的话，执行命令 kextstat -list-only | grep AppleALC  看看AppleALC.kext 驱动已正确加载。如果没有正确加载，请将其安装在 /Library/Extensions 下后执行命令 sudo kextcache -i / 重建缓存并重启。
+
+接下来搞定无线网卡，如果不想折腾直接用有线了行。Z7M-KP7GZ用的是Intel的无线网卡，这个在 macOS 下是无解的。
+其他折腾过的网友建议是换Broadcom的。如果要使用AirDrop或者Handoff，要求有蓝牙4.0LE，需要特定型号的博通网卡，比如博通BCM94322HMP（有带蓝牙和不带蓝牙版本的，注意挑选）。
+
+于是我就在淘宝上买了块 BCM94350 WiFi、蓝牙二合一。然后拆机将网卡换上去。网卡在风扇的旁边。
+![](/wp-content/uploads/2019/05/hasee_macos_07.jpg)
+
+结果一开机系统就崩溃了，进入不了登录界面。后来联系卖家，他们说这个只有 macOS 10.13 的驱动，没有 10.14 的。而我安装主正是 10.14 的系统。
+欲哭无泪啊，折腾了两天，BCM94350网卡的驱动实在搞不定。最后只得再买了个支持黑苹果的USB无线网卡。
+另外显卡驱动目前在 10.14 下也是无解的。如果要外接显示器的话，可能需要再购买带显卡的 type-C 设备。
