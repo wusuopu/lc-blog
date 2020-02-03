@@ -1,0 +1,54 @@
+---
+layout: 'post'
+title: 'Github Actions使用'
+date: '2020-02-03T06:35:36.443Z'
+comments: true
+post_id: '84178'
+permalink: '/archives/84178.html'
+categories: ["编程开发"]
+tags: ["git"]
+---
+
+最近在看 Github Actions，相对一 Gitlab CI 来说，它的配置就没有那么直观了。
+
+以下通过一个例子来说下 Github Actions 的用法。
+
+在项目根目录下创建文件 `.github/workflows/main.yml`
+
+```yaml
+name: CI
+
+on:
+  # 仅在有以 'v' 开头的 tag push 时才会触发
+  push:
+    tags:
+      - v*
+
+jobs:
+  build:
+    name: build docker image
+    runs-on: ubuntu-latest
+
+    steps:
+    # 切换到当前的 commit
+    - uses: actions/checkout@v2
+      with:
+        ref: ${{ github.ref }}
+    - name: build docker image
+      env:
+        canister_user: ${{ secrets.canister_user }}
+        canister_password: ${{ secrets.canister_password }}
+        docker_image_name: cloud.canister.io:5000/${{ github.repository }}
+      run: |
+        echo $GITHUB_WORKSPACE $GITHUB_REF
+        cd $GITHUB_WORKSPACE
+        docker build -t $docker_image_name:${GITHUB_REF##*/} .
+        docker login -u $canister_user -p $canister_password cloud.canister.io:5000
+        docker push $docker_image_name:${GITHUB_REF##*/}
+```
+
+以上的配置执行的操作是，当有新的 'v' 开头的 tag push 时，则 build docker image 并 push 到 cloud.canister.io 的私有 docker registry 上。
+
+这里 canister 的用户名和密码是通过 secrets 来配置的，在 github 的 repository -> Settings -> Secrets 页面。
+
+参考： https://help.github.com/en/actions
