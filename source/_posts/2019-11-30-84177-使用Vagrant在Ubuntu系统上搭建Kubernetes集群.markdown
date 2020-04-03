@@ -25,15 +25,38 @@ tags: ["Docker", "k8s"]
 
 ### VirtualBox
 
-需要下载 Vagrant 所兼容的版本(https://www.vagrantup.com/docs/virtualbox/)。我是直接用 apt-get 安装 5.2 的版本。
+需要下载 Vagrant 所兼容的版本( https://www.vagrantup.com/docs/virtualbox/ )。我是直接用 apt-get 安装 5.2 的版本。
 
 ```
-apt-get install virtual virtualbox-guest-additions-iso
+apt-get install virtualbox virtualbox-guest-additions-iso
 ```
 
 ## 运行 ubuntu 单实例
 
 创建 Vagrantfile 配置文件，这里在 virtualbox 内运行的是 Ubuntu 18.04。
+若 Vagrant 的 Box 文件下载太慢，可先提前下载好：
+```
+wget https://app.vagrantup.com/ubuntu/boxes/bionic64/versions/20191125.0.0/providers/virtualbox.box
+
+cat > virtualbox.json <EOF
+{
+  "name": "ubuntu/bionic64",
+  "versions": [
+    {
+      "version": "20191125.0.0",
+      "providers": [
+        {
+          "name": "virtualbox",
+          "url": "virtualbox.box"
+        }
+      ]
+    }
+  ]
+}
+EOF
+
+vagrant box add ubuntu/bionic64 virtualbox.json
+```
 
 ```ruby
 # -*- mode: ruby -*-
