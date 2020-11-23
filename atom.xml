@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.xefan.com/"/>
-  <updated>2020-11-23T02:22:50.244Z</updated>
+  <updated>2020-11-23T06:25:07.216Z</updated>
   <id>http://www.xefan.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://www.xefan.com/archives/84181.html"/>
     <id>http://www.xefan.com/archives/84181.html</id>
     <published>2020-11-23T09:00:58.877Z</published>
-    <updated>2020-11-23T02:22:50.244Z</updated>
+    <updated>2020-11-23T06:25:07.216Z</updated>
     
     <content type="html"><![CDATA[<p>在之前的文章<a href="/archives/84178.html">《Github Actions使用》</a>有介绍了Github Actions的使用方法。<br>之前是直接的 Github 官方提供的 runner，来执行。不过官方提供的 runner 多少还是有些限制。<br>这次我们来尝试将自己的 server 配置成 runner 来执行 actions。</p>
 <p>关于添加自己的机器，可参考 Github 官方文档： <a href="https://docs.github.com/en/free-pro-team@latest/actions/hosting-your-own-runners/adding-self-hosted-runners" target="_blank" rel="external">https://docs.github.com/en/free-pro-team@latest/actions/hosting-your-own-runners/adding-self-hosted-runners</a></p>
@@ -33,6 +33,7 @@
 <p>为了安全起见，我们可以再运行一个 Docker-in-Docker 的服务，然后这个就只需要连接到该服务即可。<br>创建一个 docker-compose.yml 文件：</p>
 <figure class="highlight yaml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="attr">version:</span> <span class="string">"2"</span></div><div class="line"></div><div class="line"><span class="attr">services:</span></div><div class="line"><span class="attr">  dind:</span></div><div class="line"><span class="attr">    image:</span> <span class="attr">docker:19.03-dind</span></div><div class="line"><span class="attr">    privileged:</span> <span class="literal">true</span></div><div class="line"><span class="attr">    volumes:</span></div><div class="line"><span class="bullet">      -</span> <span class="string">./tmp/docker-lib:/var/lib/docker</span></div><div class="line"><span class="bullet">      -</span> <span class="string">./tmp/docker-run:/var/run</span></div><div class="line"></div><div class="line"><span class="attr">  github-runner:</span></div><div class="line"><span class="attr">    image:</span> <span class="string">wusuopu/github-actions-runner:2.273.6</span></div><div class="line"><span class="attr">    depends_on:</span></div><div class="line"><span class="bullet">      -</span> <span class="string">dind</span></div><div class="line"><span class="attr">    environment:</span></div><div class="line"><span class="bullet">      -</span> <span class="string">GH_REPOSITORY=https://github.com/xxxx</span></div><div class="line"><span class="bullet">      -</span> <span class="string">GH_RUNNER_TOKEN=xxxxxxxxxxxxx</span></div><div class="line"><span class="bullet">      -</span> <span class="string">GH_RUNNER_LABELS=dind</span></div><div class="line"><span class="attr">    volumes:</span></div><div class="line"><span class="bullet">      -</span> <span class="string">./tmp/docker-run:/var/run</span></div></pre></td></tr></table></figure>
 <p>然后执行命令 <code>docker-compose up -d</code> 启动服务即可。<br>如果之后 actions 任务太多处理不过来，可以将 runner 扩容，多增加几个 runner 实例： <code>docker-compose scale github-runner=3</code></p>
+<p>至此，我们自己的 runner 就配置好了。如果想要在 actions 中使用我们自己的 runner，则需要修改之前的配置文件 <code>.github/workflows/main.yml</code>。将 <code>runs-on: ubuntu-latest</code> 改为 <code>runs-on: self-hosted</code> 。</p>
 ]]></content>
     
     <summary type="html">
