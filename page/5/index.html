@@ -69,6 +69,83 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-/archives/84139.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/84139.html" class="article-date">
+  <time datetime="2014-12-29T16:52:37.000Z" itemprop="datePublished">2014-12-29</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/数据库/">数据库</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/84139.html">Mongodb分片配置实例</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>数据分片即是从一个集合中选择一个片键(shard key)作为数据拆分的依据，原理与索引类似，然后将集合的数据拆分并保存到不同的服务器上。<br>以下通过一个例子来介绍一下Mongodb的分片配置。</p>
+<p>有四台主机：</p>
+<ul>
+<li>172.17.0.6    (配置服务器)</li>
+<li>172.17.0.7    (mongos)</li>
+<li>172.17.0.8    (片服务器)</li>
+<li>172.17.0.9    (片服务器)</li>
+</ul>
+<p>1.在 172.17.0.6 上启动 mongod 服务作为配置服务器；<br>修改配置，使其作为一个配置服务器，默认监听 27019 端口。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">configsvr = true</div></pre></td></tr></table></figure>
+<p>启动服务 <code>$ service mongodb start</code></p>
+<p>2.在 172.17.0.7 上启动 mongos 服务作为路由服务;<br>建立mongos进程。(可以有多台配置服务器)，用法如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ mongos --configdb &lt;config server hostnames&gt;[,&lt;config server hostnames&gt;]</div></pre></td></tr></table></figure>
+<p>例如： <code>$ mongos --configdb 172.17.0.6:27019</code></p>
+<p>注意：在同一个分片集群中的每个 mongos 必须使用相同的 configDB 配置。</p>
+<p>3.添加分片<br>一个片服务既可以是单个 mongod 实例，也可以是一个副本集。<br>1).先分别在 172.17.0.8 和 172.17.0.9 上启动片服务器，即就是一个普通的 mongod 服务。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ service mongodb start</div></pre></td></tr></table></figure>
+<p>2).使用 mongo 客户端连接到 mongos 服务</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ mongo --host &lt;hostname of machine running mongos&gt; --port &lt;port mongos listens on&gt;</div></pre></td></tr></table></figure>
+<p>如： <code>$ mongo --host 172.17.0.7 --port 27017</code></p>
+<p>3).在 mongo 客户端上执行命令添加分片：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&gt; use admin</div><div class="line">&gt; db.auth(&lt;user&gt;, &lt;pswd&gt;)</div><div class="line">&gt; sh.addShard(&quot;172.17.0.8:27017&quot;)</div><div class="line">&gt; sh.addShard(&quot;172.17.0.9:27017&quot;)</div></pre></td></tr></table></figure>
+<p>4.切片数据<br>1).首先对数据库进行切片<br>使用 mongo 客户端连接到 mongos ，执行命令打开数据库的分片功能，用法如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&gt; sh.enableSharding(&quot;&lt;database&gt;&quot;)</div></pre></td></tr></table></figure>
+<p>例如要打开 mydb 数据库的分片功能： <code>&gt; sh.enableSharding(&quot;mydb&quot;)</code></p>
+<p>2).然后对数据集合进行切片<br>命令用法如下：  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&gt; sh.shardCollection(&quot;&lt;database&gt;.&lt;collection&gt;&quot;, shard-key-pattern)</div></pre></td></tr></table></figure>
+<p><code>shard-key-pattern</code> 与索引的用法一样，例如，要对 mydb 数据库的 test 集合按照 <code>_id</code> 字段进行分片： <code>&gt; sh.shardCollection(&quot;mydb.test&quot;, {&quot;_id&quot;: &quot;hashed&quot;})</code></p>
+<p>接下来通过一个程序来测试一下，向数据库中添加10000条数据：</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#!/usr/bin/env ruby</span></div><div class="line"><span class="comment">#-*- coding:utf-8 -*-</span></div><div class="line"></div><div class="line"><span class="keyword">require</span> <span class="string">"mongo"</span></div><div class="line"></div><div class="line"><span class="keyword">begin</span></div><div class="line">  conn = Mongo::Connection.new <span class="string">'172.17.0.7'</span></div><div class="line">  db = conn[<span class="string">'mydb'</span>]</div><div class="line"><span class="keyword">rescue</span> Exception=&gt;e</div><div class="line">  p e</div><div class="line">  exit <span class="number">1</span></div><div class="line"><span class="keyword">end</span></div><div class="line"></div><div class="line">i = <span class="number">0</span></div><div class="line"><span class="keyword">while</span> i &lt; <span class="number">10000</span></div><div class="line">  d = &#123;<span class="string">'no'</span> =&gt; i&#125;</div><div class="line">  d = db[<span class="string">'test'</span>].insert(d)</div><div class="line">  i += <span class="number">1</span></div><div class="line">  puts d</div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+<p>然后分别查看 172.17.0.8 和 172.17.0.9 的状态：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">172.17.0.8:</div><div class="line">&gt; db.test.count()</div><div class="line">4952</div><div class="line"></div><div class="line">172.17.0.9:</div><div class="line">&gt; db.test.count()</div><div class="line">5048</div></pre></td></tr></table></figure>
+<p>数据基本上是平均的分布在两台服务器上。</p>
+<p>参考： <a href="http://docs.mongodb.org/manual/tutorial/deploy-shard-cluster/" target="_blank" rel="external">http://docs.mongodb.org/manual/tutorial/deploy-shard-cluster/</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/84139.html" data-id="ck8jp06dl00o9zgcfctq0bmxr" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mongodb/">mongodb</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-/archives/84138.html" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/84138.html" class="article-date">
@@ -118,7 +195,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84138.html" data-id="ck663mltx00o0w9jdh7wzrkid" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84138.html" data-id="ck8jp06dk00o6zgcfgrshb3id" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Django/">Django</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -206,7 +283,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84137.html" data-id="ck663mltv00nww9jdt7zga9a7" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84137.html" data-id="ck8jp06dj00o2zgcfcmk6twal" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mongodb/">mongodb</a></li></ul>
@@ -259,7 +336,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84136.html" data-id="ck663mltu00nsw9jd5cqrskca" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84136.html" data-id="ck8jp06di00nyzgcf6kr0zqjo" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/php/">php</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vim/">vim</a></li></ul>
@@ -314,7 +391,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84135.html" data-id="ck663mltt00npw9jdpfjua7k7" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84135.html" data-id="ck8jp06dh00nvzgcf5m1clx4l" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Django/">Django</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -366,7 +443,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84134.html" data-id="ck663mlts00nlw9jdgc6odptx" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84134.html" data-id="ck8jp06dg00nrzgcfwo65h1t1" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vim/">vim</a></li></ul>
@@ -414,7 +491,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84133.html" data-id="ck663mltr00niw9jdnnw9xqjz" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84133.html" data-id="ck8jp06de00nkzgcfoh09avws" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/网络日志/">网络日志</a></li></ul>
@@ -458,7 +535,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84132.html" data-id="ck663mltq00new9jdxi9jbyxx" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84132.html" data-id="ck8jp06df00nozgcft3whmd5i" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vim/">vim</a></li></ul>
@@ -510,7 +587,7 @@ au BufNewFile,BufRead *.coffee set ft=coffee
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84130.html" data-id="ck663mltp00nbw9jdl3q9ujcr" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84130.html" data-id="ck8jp06dd00nhzgcfgke5leqi" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vim/">vim</a></li></ul>
@@ -554,106 +631,10 @@ au BufNewFile,BufRead *.coffee set ft=coffee
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84127.html" data-id="ck663mlto00n7w9jdq1xtfzy6" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84127.html" data-id="ck8jp06dc00ndzgcfd6192z1l" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vim/">vim</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-/archives/84124.html" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/archives/84124.html" class="article-date">
-  <time datetime="2014-09-21T20:06:35.000Z" itemprop="datePublished">2014-09-21</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/Linux栏目/">Linux栏目</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/archives/84124.html">Docker使用笔记</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p></p><p>docker是一个Linux下的应用容器引擎。使用它可以很方便地将程序以及依赖都打包到一个可移植的容器中。最后体验了一下，使用docker配置了一个Web开发环境。这样就不用担心每次重装系统之后都要重新配置开发环境。</p><p></p>
-<p></p><h3>安装</h3><p></p>
-<p></p><p>首先是安装docker应用程序，目前只有64位系统才能使用。</p><p></p>
-<pre><code>$ [sudo] apt-get install apparmor apparmor-profiles apparmor-utils
-$ [sudo] apt-get install aufs-tools
-$ [sudo] apt-get install cgroup-lite
-
-$ wget https://get.docker.io/builds/Linux/x86_64/docker-latest.tgz
-$ [sudo] tar xf docker-latest.tgz -C /
-</code></pre>
-<h3>基本用法</h3>
-<p>安装完成之后使用 <code>[sudo] docker -d</code> 命令启动docker的daemon进程。</p>
-<p>以下是一些常用命令的用法介绍：</p>
-<pre><code>docker version            # 查看版本
-docker search TERM        # 搜索镜像
-docker pull NAME[:TAG]    # 下载镜像
-</code></pre>
-
-<p></p><p>启动镜像：</p><p></p>
-<pre><code>docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
-docker run IMAGE -t -i /bin/bash                        # 进入镜像的shell环境
-docker run IMAGE -p 12345:8000 -t -i /bin/bash          # 进入镜像的shell环境，将主机的12345端口映射到容器的8000端口
-
-</code></pre>
-
-<p></p><p>容器与镜像管理：</p><p></p>
-<pre><code>docker ps [OPTIONS]                              # 列出容器
-docker images [OPTIONS] [NAME]                   # 列出镜像
-docker rm [OPTIONS] CONTAINER [CONTAINER...]     # 删除容器
-docker rmi IMAGE [IMAGE...]                      # 删除镜像
-
-docker commit [OPTIONS] CONTAINER [REPOSITORY[:TAG]]    # 根据修改的容器创建一个新的镜像
-docker commit -m &quot;centos&quot; f9ccb5cef3c0 wusuopu/centos6
-docker push NAME[:TAG]                                  # 上传镜像
-</code></pre>
-
-<pre><code>docker inspect CONTAINER|IMAGE [CONTAINER|IMAGE...]     # 查看一个容器或者镜像的详细信息
-docker logs CONTAINER     # 查看日志
-docker start CONTAINER [CONTAINER...]                   # 启动镜像
-docker stop CONTAINER [CONTAINER...]                    # 停止镜像
-docker tag [OPTIONS] IMAGE [REGISTRYHOST/][USERNAME/]NAME[:TAG]   # 给镜像打tag
-docker diff CONTAINER     # 查看容器文件系统的变化
-docker cp CONTAINER:PATH HOSTPATH                       # 将文件从容器复制到主机
-</code></pre>
-
-<p></p><p>导入、导出：</p><p></p>
-<pre><code>docker export CONTAINER                                 # 导出容器到标准输出
-docker export red_panda &gt; latest.tar
-
-docker import URL|- [REPOSITORY[:TAG]]                  # 导入文件为镜像
-docker import http://example.com/exampleimage.tgz
-cat exampleimage.tgz | sudo docker import - exampleimagelocal:new
-</code></pre>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84124.html" data-id="ck663mltn00n4w9jdvr41pss0" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/">Linux</a></li></ul>
 
     </footer>
   </div>
@@ -697,7 +678,7 @@ cat exampleimage.tgz | sudo docker import - exampleimagelocal:new
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/ARM/" style="font-size: 13.68px;">ARM</a> <a href="/tags/Android/" style="font-size: 10.53px;">Android</a> <a href="/tags/Arch/" style="font-size: 13.16px;">Arch</a> <a href="/tags/C/" style="font-size: 15.79px;">C</a> <a href="/tags/Django/" style="font-size: 11.05px;">Django</a> <a href="/tags/Docker/" style="font-size: 10.53px;">Docker</a> <a href="/tags/Dreamweaver/" style="font-size: 10px;">Dreamweaver</a> <a href="/tags/Fedora/" style="font-size: 10.53px;">Fedora</a> <a href="/tags/Flash/" style="font-size: 10px;">Flash</a> <a href="/tags/GObject/" style="font-size: 12.63px;">GObject</a> <a href="/tags/Gentoo/" style="font-size: 10.53px;">Gentoo</a> <a href="/tags/Hash/" style="font-size: 10px;">Hash</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Mac/" style="font-size: 10.53px;">Mac</a> <a href="/tags/PS/" style="font-size: 12.63px;">PS</a> <a href="/tags/Qt/" style="font-size: 10.53px;">Qt</a> <a href="/tags/Raspberry-pi/" style="font-size: 10px;">Raspberry pi</a> <a href="/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/tags/Ruby/" style="font-size: 18.95px;">Ruby</a> <a href="/tags/Scrapy/" style="font-size: 11.05px;">Scrapy</a> <a href="/tags/TQ2440/" style="font-size: 12.11px;">TQ2440</a> <a href="/tags/USB/" style="font-size: 11.05px;">USB</a> <a href="/tags/VirtualBox/" style="font-size: 11.05px;">VirtualBox</a> <a href="/tags/Web开发/" style="font-size: 16.84px;">Web开发</a> <a href="/tags/WordPress/" style="font-size: 10px;">WordPress</a> <a href="/tags/Xcode/" style="font-size: 10px;">Xcode</a> <a href="/tags/access/" style="font-size: 12.63px;">access</a> <a href="/tags/adobe/" style="font-size: 10px;">adobe</a> <a href="/tags/ajax/" style="font-size: 11.05px;">ajax</a> <a href="/tags/angular/" style="font-size: 13.16px;">angular</a> <a href="/tags/apache/" style="font-size: 10px;">apache</a> <a href="/tags/asp/" style="font-size: 13.16px;">asp</a> <a href="/tags/css/" style="font-size: 10.53px;">css</a> <a href="/tags/firefox/" style="font-size: 11.05px;">firefox</a> <a href="/tags/ftp/" style="font-size: 10px;">ftp</a> <a href="/tags/gcc/" style="font-size: 12.63px;">gcc</a> <a href="/tags/git/" style="font-size: 12.11px;">git</a> <a href="/tags/grub/" style="font-size: 10px;">grub</a> <a href="/tags/gtk/" style="font-size: 17.89px;">gtk</a> <a href="/tags/gulp/" style="font-size: 10px;">gulp</a> <a href="/tags/ibus/" style="font-size: 10px;">ibus</a> <a href="/tags/js/" style="font-size: 16.32px;">js</a> <a href="/tags/k8s/" style="font-size: 10px;">k8s</a> <a href="/tags/mongodb/" style="font-size: 15.26px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 11.58px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/node/" style="font-size: 10.53px;">node</a> <a href="/tags/php/" style="font-size: 14.74px;">php</a> <a href="/tags/pygame/" style="font-size: 15.26px;">pygame</a> <a href="/tags/python/" style="font-size: 19.47px;">python</a> <a href="/tags/react/" style="font-size: 12.63px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/typescript/" style="font-size: 10px;">typescript</a> <a href="/tags/ubuntu/" style="font-size: 13.16px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 18.42px;">vim</a> <a href="/tags/vmware/" style="font-size: 10px;">vmware</a> <a href="/tags/w3m/" style="font-size: 10px;">w3m</a> <a href="/tags/windows/" style="font-size: 13.16px;">windows</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/免费/" style="font-size: 10px;">免费</a> <a href="/tags/内核/" style="font-size: 10px;">内核</a> <a href="/tags/匹配算法/" style="font-size: 12.63px;">匹配算法</a> <a href="/tags/单片机/" style="font-size: 10.53px;">单片机</a> <a href="/tags/嵌入式/" style="font-size: 10px;">嵌入式</a> <a href="/tags/开源软件/" style="font-size: 14.21px;">开源软件</a> <a href="/tags/排序算法/" style="font-size: 14.21px;">排序算法</a> <a href="/tags/文件空间/" style="font-size: 10px;">文件空间</a> <a href="/tags/无线网/" style="font-size: 10px;">无线网</a> <a href="/tags/树莓派/" style="font-size: 10px;">树莓派</a> <a href="/tags/正则式/" style="font-size: 10px;">正则式</a> <a href="/tags/注册机/" style="font-size: 10.53px;">注册机</a> <a href="/tags/游戏/" style="font-size: 14.74px;">游戏</a> <a href="/tags/电脑技巧/" style="font-size: 14.21px;">电脑技巧</a> <a href="/tags/空间/" style="font-size: 10px;">空间</a> <a href="/tags/算法/" style="font-size: 17.37px;">算法</a> <a href="/tags/红旗/" style="font-size: 10px;">红旗</a> <a href="/tags/经典语录/" style="font-size: 10px;">经典语录</a> <a href="/tags/网络日志/" style="font-size: 13.16px;">网络日志</a> <a href="/tags/翻译/" style="font-size: 18.42px;">翻译</a> <a href="/tags/视频教程/" style="font-size: 14.74px;">视频教程</a> <a href="/tags/资源分享/" style="font-size: 15.26px;">资源分享</a> <a href="/tags/转载/" style="font-size: 10.53px;">转载</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
+      <a href="/tags/ARM/" style="font-size: 13.68px;">ARM</a> <a href="/tags/Android/" style="font-size: 10.53px;">Android</a> <a href="/tags/Arch/" style="font-size: 13.16px;">Arch</a> <a href="/tags/C/" style="font-size: 15.79px;">C</a> <a href="/tags/Django/" style="font-size: 11.05px;">Django</a> <a href="/tags/Docker/" style="font-size: 11.05px;">Docker</a> <a href="/tags/Dreamweaver/" style="font-size: 10px;">Dreamweaver</a> <a href="/tags/Fedora/" style="font-size: 10.53px;">Fedora</a> <a href="/tags/Flash/" style="font-size: 10px;">Flash</a> <a href="/tags/GObject/" style="font-size: 12.63px;">GObject</a> <a href="/tags/Gentoo/" style="font-size: 10.53px;">Gentoo</a> <a href="/tags/Hash/" style="font-size: 10px;">Hash</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Mac/" style="font-size: 10.53px;">Mac</a> <a href="/tags/PS/" style="font-size: 12.63px;">PS</a> <a href="/tags/Qt/" style="font-size: 10.53px;">Qt</a> <a href="/tags/Raspberry-pi/" style="font-size: 10px;">Raspberry pi</a> <a href="/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/tags/Ruby/" style="font-size: 18.95px;">Ruby</a> <a href="/tags/Scrapy/" style="font-size: 11.05px;">Scrapy</a> <a href="/tags/TQ2440/" style="font-size: 12.11px;">TQ2440</a> <a href="/tags/USB/" style="font-size: 11.05px;">USB</a> <a href="/tags/VirtualBox/" style="font-size: 11.05px;">VirtualBox</a> <a href="/tags/Web开发/" style="font-size: 16.84px;">Web开发</a> <a href="/tags/WordPress/" style="font-size: 10px;">WordPress</a> <a href="/tags/Xcode/" style="font-size: 10px;">Xcode</a> <a href="/tags/access/" style="font-size: 12.63px;">access</a> <a href="/tags/adobe/" style="font-size: 10px;">adobe</a> <a href="/tags/ajax/" style="font-size: 11.05px;">ajax</a> <a href="/tags/angular/" style="font-size: 13.16px;">angular</a> <a href="/tags/apache/" style="font-size: 10px;">apache</a> <a href="/tags/asp/" style="font-size: 13.16px;">asp</a> <a href="/tags/css/" style="font-size: 10.53px;">css</a> <a href="/tags/firefox/" style="font-size: 11.05px;">firefox</a> <a href="/tags/ftp/" style="font-size: 10px;">ftp</a> <a href="/tags/gcc/" style="font-size: 12.63px;">gcc</a> <a href="/tags/git/" style="font-size: 12.11px;">git</a> <a href="/tags/grub/" style="font-size: 10px;">grub</a> <a href="/tags/gtk/" style="font-size: 17.89px;">gtk</a> <a href="/tags/gulp/" style="font-size: 10px;">gulp</a> <a href="/tags/ibus/" style="font-size: 10px;">ibus</a> <a href="/tags/js/" style="font-size: 16.32px;">js</a> <a href="/tags/k8s/" style="font-size: 10.53px;">k8s</a> <a href="/tags/mongodb/" style="font-size: 15.26px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 11.58px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/node/" style="font-size: 10.53px;">node</a> <a href="/tags/php/" style="font-size: 14.74px;">php</a> <a href="/tags/pygame/" style="font-size: 15.26px;">pygame</a> <a href="/tags/python/" style="font-size: 19.47px;">python</a> <a href="/tags/react/" style="font-size: 12.63px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/typescript/" style="font-size: 10px;">typescript</a> <a href="/tags/ubuntu/" style="font-size: 13.16px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 18.42px;">vim</a> <a href="/tags/vmware/" style="font-size: 10px;">vmware</a> <a href="/tags/w3m/" style="font-size: 10px;">w3m</a> <a href="/tags/windows/" style="font-size: 13.16px;">windows</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/免费/" style="font-size: 10px;">免费</a> <a href="/tags/内核/" style="font-size: 10px;">内核</a> <a href="/tags/匹配算法/" style="font-size: 12.63px;">匹配算法</a> <a href="/tags/单片机/" style="font-size: 10.53px;">单片机</a> <a href="/tags/嵌入式/" style="font-size: 10px;">嵌入式</a> <a href="/tags/开源软件/" style="font-size: 14.21px;">开源软件</a> <a href="/tags/排序算法/" style="font-size: 14.21px;">排序算法</a> <a href="/tags/文件空间/" style="font-size: 10px;">文件空间</a> <a href="/tags/无线网/" style="font-size: 10px;">无线网</a> <a href="/tags/树莓派/" style="font-size: 10px;">树莓派</a> <a href="/tags/正则式/" style="font-size: 10px;">正则式</a> <a href="/tags/注册机/" style="font-size: 10.53px;">注册机</a> <a href="/tags/游戏/" style="font-size: 14.74px;">游戏</a> <a href="/tags/电脑技巧/" style="font-size: 14.21px;">电脑技巧</a> <a href="/tags/空间/" style="font-size: 10px;">空间</a> <a href="/tags/算法/" style="font-size: 17.37px;">算法</a> <a href="/tags/红旗/" style="font-size: 10px;">红旗</a> <a href="/tags/经典语录/" style="font-size: 10px;">经典语录</a> <a href="/tags/网络日志/" style="font-size: 13.16px;">网络日志</a> <a href="/tags/翻译/" style="font-size: 18.42px;">翻译</a> <a href="/tags/视频教程/" style="font-size: 14.74px;">视频教程</a> <a href="/tags/资源分享/" style="font-size: 15.26px;">资源分享</a> <a href="/tags/转载/" style="font-size: 10.53px;">转载</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
     </div>
   </div>
 
@@ -706,7 +687,7 @@ cat exampleimage.tgz | sudo docker import - exampleimagelocal:new
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">February 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">November 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05/">May 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/02/">February 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/11/">November 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">October 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">September 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/08/">August 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/07/">July 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/05/">May 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04/">April 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">March 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">January 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/12/">December 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">June 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">May 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">April 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">January 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">October 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/09/">September 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/08/">August 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/07/">July 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/05/">May 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/04/">April 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/03/">March 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/02/">February 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/12/">December 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/11/">November 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/10/">October 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/09/">September 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/08/">August 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/07/">July 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/05/">May 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/04/">April 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/03/">March 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/02/">February 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/01/">January 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/12/">December 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/11/">November 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/10/">October 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/09/">September 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/08/">August 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/07/">July 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/06/">June 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/05/">May 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/04/">April 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/03/">March 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/12/">December 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/11/">November 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/10/">October 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/09/">September 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/08/">August 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/07/">July 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/05/">May 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/12/">December 2008</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/07/">July 2008</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">April 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">February 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">November 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05/">May 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/02/">February 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/11/">November 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">October 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">September 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/08/">August 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/07/">July 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/05/">May 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04/">April 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">March 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">January 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/12/">December 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">June 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">May 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">April 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">January 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">October 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/09/">September 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/08/">August 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/07/">July 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/05/">May 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/04/">April 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/03/">March 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/02/">February 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/12/">December 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/11/">November 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/10/">October 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/09/">September 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/08/">August 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/07/">July 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/05/">May 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/04/">April 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/03/">March 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/02/">February 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/01/">January 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/12/">December 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/11/">November 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/10/">October 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/09/">September 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/08/">August 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/07/">July 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/06/">June 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/05/">May 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/04/">April 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/03/">March 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/12/">December 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/11/">November 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/10/">October 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/09/">September 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/08/">August 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/07/">July 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/05/">May 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/12/">December 2008</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/07/">July 2008</a></li></ul>
     </div>
   </div>
 
@@ -717,6 +698,10 @@ cat exampleimage.tgz | sudo docker import - exampleimagelocal:new
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/archives/84179.html">使用Vagrant和Docker搭建Kubernetes集群</a>
+          </li>
         
           <li>
             <a href="/archives/84178.html">Github Actions使用</a>
@@ -732,10 +717,6 @@ cat exampleimage.tgz | sudo docker import - exampleimagelocal:new
         
           <li>
             <a href="/archives/84175.html">记录神舟战神 Z7M-KP7GZ 安装黑苹果过程</a>
-          </li>
-        
-          <li>
-            <a href="/archives/84174.html">react storybook使用typescript</a>
           </li>
         
       </ul>

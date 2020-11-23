@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.xefan.com/"/>
-  <updated>2020-02-03T06:52:14.992Z</updated>
+  <updated>2020-04-03T05:18:56.063Z</updated>
   <id>http://www.xefan.com/</id>
   
   <author>
@@ -14,6 +14,42 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>使用Vagrant和Docker搭建Kubernetes集群</title>
+    <link href="http://www.xefan.com/archives/84179.html"/>
+    <id>http://www.xefan.com/archives/84179.html</id>
+    <published>2020-04-03T12:28:20.946Z</published>
+    <updated>2020-04-03T05:18:56.063Z</updated>
+    
+    <content type="html"><![CDATA[<p>在之前的文章<a href="/archives/84177.html">《使用Vagrant在Ubuntu系统上搭建Kubernetes集群》</a>介绍了使用 Vagrant 在 VirtualBox 中安装 Ubuntu 系统搭建 Kubernetes 集群。<br>因为 Vagrant 是支持 Docker 的，所以这篇文章就来尝试不再使用 VirtualBox 了，而是直接使用 Docker 来搭建 Kubernetes 集群。</p>
+<h2 id="安装依赖"><a href="#安装依赖" class="headerlink" title="安装依赖"></a>安装依赖</h2><p>需要先安装以下程序：</p>
+<ul>
+<li>Vagrant</li>
+<li>Docker</li>
+<li>Kubectl</li>
+</ul>
+<h2 id="运行集群"><a href="#运行集群" class="headerlink" title="运行集群"></a>运行集群</h2><p>因为是在本地学习 k8s，因此为了方便我就使用 Rancher 的 k3s 来进行安装。<br>下载 Vagrant 配置文件： <a href="https://github.com/wusuopu/kubernetes-vagrant-alpine" target="_blank" rel="external">https://github.com/wusuopu/kubernetes-vagrant-alpine</a></p>
+<p>然后执行命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">vagrant up --no-parallel --provision</div></pre></td></tr></table></figure></p>
+<p>这里启动 k3s 服务，并将 master node 的 /etc/rancher/k3s/k3s.yaml 文件内容复制到 host 系统上来，这样就可以直接在 host 系统中用 kubectl 来操作集群。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">-&gt; % k get node -o wide</div><div class="line">NAME        STATUS   ROLES    AGE   VERSION        INTERNAL-IP   EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION     CONTAINER-RUNTIME</div><div class="line">alpine-02   Ready    &lt;none&gt;   59m   v1.17.4-k3s1   172.17.0.3    &lt;none&gt;        Alpine Linux v3.11   4.9.184-linuxkit   docker://19.3.8</div><div class="line">alpine-01   Ready    master   59m   v1.17.4-k3s1   172.17.0.2    &lt;none&gt;        Alpine Linux v3.11   4.9.184-linuxkit   docker://19.3.8</div><div class="line">alpine-03   Ready    &lt;none&gt;   58m   v1.17.4-k3s1   172.17.0.4    &lt;none&gt;        Alpine Linux v3.11   4.9.184-linuxkit   docker://19.3.8</div></pre></td></tr></table></figure>
+<p>这里集群的各个 node 都是一个 docker container。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">-&gt; % docker ps</div><div class="line">CONTAINER ID        IMAGE                        COMMAND                  CREATED             STATUS              PORTS                                                           NAMES</div><div class="line">a91d13e2cca0        wusuopu/vagrant:k3s-alpine   &quot;dockerd-entrypoint.…&quot;   About an hour ago   Up 35 minutes       2375-2376/tcp, 6443/tcp, 127.0.0.1:2201-&gt;22/tcp                 kubernetes-vagrant-alpine_alpine-03_1585887389</div><div class="line">cce93873b666        wusuopu/vagrant:k3s-alpine   &quot;dockerd-entrypoint.…&quot;   About an hour ago   Up 35 minutes       2375-2376/tcp, 6443/tcp, 127.0.0.1:2200-&gt;22/tcp                 kubernetes-vagrant-alpine_alpine-02_1585887382</div><div class="line">d4844843ca3e        wusuopu/vagrant:k3s-alpine   &quot;dockerd-entrypoint.…&quot;   About an hour ago   Up 36 minutes       2375-2376/tcp, 0.0.0.0:6443-&gt;6443/tcp, 127.0.0.1:2222-&gt;22/tcp   kubernetes-vagrant-alpine_alpine-01_1585887365</div></pre></td></tr></table></figure></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;在之前的文章&lt;a href=&quot;/archives/84177.html&quot;&gt;《使用Vagrant在Ubuntu系统上搭建Kubernetes集群》&lt;/a&gt;介绍了使用 Vagrant 在 VirtualBox 中安装 Ubuntu 系统搭建 Kubernetes 集群。&lt;br&gt;
+    
+    </summary>
+    
+      <category term="Linux栏目" scheme="http://www.xefan.com/categories/Linux%E6%A0%8F%E7%9B%AE/"/>
+    
+    
+      <category term="Docker" scheme="http://www.xefan.com/tags/Docker/"/>
+    
+      <category term="k8s" scheme="http://www.xefan.com/tags/k8s/"/>
+    
+  </entry>
   
   <entry>
     <title>Github Actions使用</title>
@@ -51,14 +87,14 @@
     <link href="http://www.xefan.com/archives/84177.html"/>
     <id>http://www.xefan.com/archives/84177.html</id>
     <published>2019-11-30T15:37:50.127Z</published>
-    <updated>2019-12-02T09:03:52.127Z</updated>
+    <updated>2020-04-03T04:29:53.792Z</updated>
     
     <content type="html"><![CDATA[<h2 id="安装依赖"><a href="#安装依赖" class="headerlink" title="安装依赖"></a>安装依赖</h2><h3 id="Vagrant"><a href="#Vagrant" class="headerlink" title="Vagrant"></a>Vagrant</h3><p>目前 Vagrant (<a href="https://www.vagrantup.com/downloads.html" target="_blank" rel="external">https://www.vagrantup.com/downloads.html</a>) 最新为 v2.2.6，Kubernetes 为 v1.16</p>
 <h3 id="Kubectl"><a href="#Kubectl" class="headerlink" title="Kubectl"></a>Kubectl</h3><p>下载最新版的 kubectl:</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">`curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl`</div></pre></td></tr></table></figure>
-<h3 id="VirtualBox"><a href="#VirtualBox" class="headerlink" title="VirtualBox"></a>VirtualBox</h3><p>需要下载 Vagrant 所兼容的版本(<a href="https://www.vagrantup.com/docs/virtualbox/)。我是直接用" target="_blank" rel="external">https://www.vagrantup.com/docs/virtualbox/)。我是直接用</a> apt-get 安装 5.2 的版本。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">apt-get install virtual virtualbox-guest-additions-iso</div></pre></td></tr></table></figure>
-<h2 id="运行-ubuntu-单实例"><a href="#运行-ubuntu-单实例" class="headerlink" title="运行 ubuntu 单实例"></a>运行 ubuntu 单实例</h2><p>创建 Vagrantfile 配置文件，这里在 virtualbox 内运行的是 Ubuntu 18.04。</p>
+<h3 id="VirtualBox"><a href="#VirtualBox" class="headerlink" title="VirtualBox"></a>VirtualBox</h3><p>需要下载 Vagrant 所兼容的版本( <a href="https://www.vagrantup.com/docs/virtualbox/" target="_blank" rel="external">https://www.vagrantup.com/docs/virtualbox/</a> )。我是直接用 apt-get 安装 5.2 的版本。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">apt-get install virtualbox virtualbox-guest-additions-iso</div></pre></td></tr></table></figure>
+<h2 id="运行-ubuntu-单实例"><a href="#运行-ubuntu-单实例" class="headerlink" title="运行 ubuntu 单实例"></a>运行 ubuntu 单实例</h2><p>创建 Vagrantfile 配置文件，这里在 virtualbox 内运行的是 Ubuntu 18.04。<br>若 Vagrant 的 Box 文件下载太慢，可先提前下载好：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">wget https://app.vagrantup.com/ubuntu/boxes/bionic64/versions/20191125.0.0/providers/virtualbox.box</div><div class="line"></div><div class="line">cat &gt; virtualbox.json &lt;EOF</div><div class="line">&#123;</div><div class="line">  &quot;name&quot;: &quot;ubuntu/bionic64&quot;,</div><div class="line">  &quot;versions&quot;: [</div><div class="line">    &#123;</div><div class="line">      &quot;version&quot;: &quot;20191125.0.0&quot;,</div><div class="line">      &quot;providers&quot;: [</div><div class="line">        &#123;</div><div class="line">          &quot;name&quot;: &quot;virtualbox&quot;,</div><div class="line">          &quot;url&quot;: &quot;virtualbox.box&quot;</div><div class="line">        &#125;</div><div class="line">      ]</div><div class="line">    &#125;</div><div class="line">  ]</div><div class="line">&#125;</div><div class="line">EOF</div><div class="line"></div><div class="line">vagrant box add ubuntu/bionic64 virtualbox.json</div></pre></td></tr></table></figure></p>
 <figure class="highlight ruby"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># -*- mode: ruby -*-</span></div><div class="line"><span class="comment"># vi: set ft=ruby :</span></div><div class="line"></div><div class="line">$num_instances = <span class="number">1</span></div><div class="line">$instance_name_prefix = <span class="string">"ubuntu"</span></div><div class="line">$vm_gui = <span class="literal">false</span></div><div class="line">$vm_memory = <span class="number">1024</span></div><div class="line">$vm_cpus = <span class="number">1</span></div><div class="line">$vb_cpuexecutioncap = <span class="number">100</span></div><div class="line">ip_prefix = <span class="string">'172.17.8.'</span></div><div class="line"></div><div class="line">Vagrant.configure(<span class="number">2</span>) <span class="keyword">do</span> <span class="params">|config|</span></div><div class="line">  (<span class="number">1</span>..$num_instances).each <span class="keyword">do</span> <span class="params">|i|</span></div><div class="line">    config.vm.define vm_name = <span class="string">"%s-%02d"</span> % [$instance_name_prefix, i] <span class="keyword">do</span> <span class="params">|node|</span></div><div class="line">      node.vm.box = <span class="string">'ubuntu/bionic64'</span></div><div class="line">      node.vm.box_version = <span class="string">"20191125.0.0"</span></div><div class="line">      node.vm.box_check_update = <span class="literal">false</span></div><div class="line">      node.vm.hostname = vm_name</div><div class="line">      node.vm.synced_folder <span class="string">'.'</span>, <span class="string">'/vagrant'</span>, <span class="symbol">type:</span> <span class="string">'virtualbox'</span></div><div class="line"></div><div class="line">      ip = <span class="string">"<span class="subst">#&#123;ip_prefix&#125;</span><span class="subst">#&#123;i+<span class="number">100</span>&#125;</span>"</span></div><div class="line">      node.vm.network <span class="string">'private_network'</span>, <span class="symbol">ip:</span> ip</div><div class="line">      node.vm.provider <span class="symbol">:virtualbox</span> <span class="keyword">do</span> <span class="params">|vb|</span></div><div class="line">        vb.gui = $vm_gui</div><div class="line">        vb.memory = $vm_memory</div><div class="line">        vb.cpus = $vm_cpus</div><div class="line">        vb.customize [<span class="string">"modifyvm"</span>, <span class="symbol">:id</span>, <span class="string">"--cpuexecutioncap"</span>, <span class="string">"<span class="subst">#&#123;$vb_cpuexecutioncap&#125;</span>"</span>]</div><div class="line">      <span class="keyword">end</span></div><div class="line">    <span class="keyword">end</span></div><div class="line">  <span class="keyword">end</span></div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
 <p>接着启动 ubuntu</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">vagrant up</div></pre></td></tr></table></figure>
@@ -759,42 +795,6 @@
       <category term="js" scheme="http://www.xefan.com/tags/js/"/>
     
       <category term="gulp" scheme="http://www.xefan.com/tags/gulp/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>HTTP Access Control跨域请求</title>
-    <link href="http://www.xefan.com/archives/84159.html"/>
-    <id>http://www.xefan.com/archives/84159.html</id>
-    <published>2016-03-17T16:35:12.000Z</published>
-    <updated>2017-01-21T16:20:19.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>最近在使用 Ajax api 请求时遇到了跨域的问题，现在问题解决了顺便做个笔记。  </p>
-<p>场景：现在主站域名为 example.org ，需要通过 ajax 请求 hello-world.example 上的资源。</p>
-<h2 id="Access-Control-Allow-Origin"><a href="#Access-Control-Allow-Origin" class="headerlink" title="Access-Control-Allow-Origin"></a>Access-Control-Allow-Origin</h2><p>如果请求时遇到如下错误：<br><code>No &#39;Access-Control-Allow-Origin&#39; header is present on the requested resource. Origin &#39;http://example.org&#39; is therefore not allowed access.</code></p>
-<p>则需要在 hello-world.example 的 server 端 Response Headers 中设置 <code>Access-Control-Allow-Origin</code> 字段。其值根据情况设置为 <code>http://example.org</code> 或者 <code>https://example.org</code> 。</p>
-<h2 id="Access-Control-Allow-Methods"><a href="#Access-Control-Allow-Methods" class="headerlink" title="Access-Control-Allow-Methods"></a>Access-Control-Allow-Methods</h2><p>一般情况下只允许 GET 和 POST 请求，对于 RESTful 的 api 可能会有其他类型的请求。例如：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">$.ajax(&#123;</div><div class="line">  url: &apos;http://hello-world.example/sessions/me.json&apos;,</div><div class="line">  method: &apos;DELETE&apos;,</div><div class="line">  dataType: &apos;json&apos;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
-<p>这时如果出现方法不被允许，则需要在 server 端 Response Headers 中设置 <code>Access-Control-Allow-Methods</code> 字段。如： <code>Access-Control-Allow-Methods: GET, POST, DELETE</code> 。</p>
-<h2 id="Access-Control-Allow-Credentials"><a href="#Access-Control-Allow-Credentials" class="headerlink" title="Access-Control-Allow-Credentials"></a>Access-Control-Allow-Credentials</h2><p>当在 hello-world.example 站点登录之后，浏览器会保存对应的 Cookies ，但是在 example.org 站点中使用 ajax 时发现 hello-world.example 的 Cookies 并没有附加到 Request Headers 中。</p>
-<p>此时就需要设置 XMLHttpRequest 的 <code>withCredentials</code> 属性，例如：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">$.ajax(&#123;</div><div class="line">  url: &apos;http://hello-world.example/session/me.json&apos;,</div><div class="line">  method: &apos;GET&apos;,</div><div class="line">  dataType: &apos;json&apos;,</div><div class="line">  xhrFields: &#123;</div><div class="line">      withCredentials: true</div><div class="line">  &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
-<p>同时在 server 端 Response Headers 中设置 <code>Access-Control-Allow-Credentials</code> 字段。说明允许通过跨域修改 Cookies 。如： <code>Access-Control-Allow-Credentials: true</code></p>
-<p>以上是常用的几个字段，更多设置参考手册： <a href="https://www.w3.org/TR/access-control/" target="_blank" rel="external">https://www.w3.org/TR/access-control/</a></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;最近在使用 Ajax api 请求时遇到了跨域的问题，现在问题解决了顺便做个笔记。  &lt;/p&gt;
-&lt;p&gt;场景：现在主站域名为 example.org ，需要通过 ajax 请求 hello-world.example 上的资源。&lt;/p&gt;
-&lt;h2 id=&quot;Access-Cont
-    
-    </summary>
-    
-      <category term="Web开发" scheme="http://www.xefan.com/categories/Web%E5%BC%80%E5%8F%91/"/>
-    
-    
-      <category term="ajax" scheme="http://www.xefan.com/tags/ajax/"/>
     
   </entry>
   

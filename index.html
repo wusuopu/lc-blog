@@ -69,6 +69,61 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-/archives/84179.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/84179.html" class="article-date">
+  <time datetime="2020-04-03T12:28:20.946Z" itemprop="datePublished">2020-04-03</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Linux栏目/">Linux栏目</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/84179.html">使用Vagrant和Docker搭建Kubernetes集群</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>在之前的文章<a href="/archives/84177.html">《使用Vagrant在Ubuntu系统上搭建Kubernetes集群》</a>介绍了使用 Vagrant 在 VirtualBox 中安装 Ubuntu 系统搭建 Kubernetes 集群。<br>因为 Vagrant 是支持 Docker 的，所以这篇文章就来尝试不再使用 VirtualBox 了，而是直接使用 Docker 来搭建 Kubernetes 集群。</p>
+<h2 id="安装依赖"><a href="#安装依赖" class="headerlink" title="安装依赖"></a>安装依赖</h2><p>需要先安装以下程序：</p>
+<ul>
+<li>Vagrant</li>
+<li>Docker</li>
+<li>Kubectl</li>
+</ul>
+<h2 id="运行集群"><a href="#运行集群" class="headerlink" title="运行集群"></a>运行集群</h2><p>因为是在本地学习 k8s，因此为了方便我就使用 Rancher 的 k3s 来进行安装。<br>下载 Vagrant 配置文件： <a href="https://github.com/wusuopu/kubernetes-vagrant-alpine" target="_blank" rel="external">https://github.com/wusuopu/kubernetes-vagrant-alpine</a></p>
+<p>然后执行命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">vagrant up --no-parallel --provision</div></pre></td></tr></table></figure></p>
+<p>这里启动 k3s 服务，并将 master node 的 /etc/rancher/k3s/k3s.yaml 文件内容复制到 host 系统上来，这样就可以直接在 host 系统中用 kubectl 来操作集群。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">-&gt; % k get node -o wide</div><div class="line">NAME        STATUS   ROLES    AGE   VERSION        INTERNAL-IP   EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION     CONTAINER-RUNTIME</div><div class="line">alpine-02   Ready    &lt;none&gt;   59m   v1.17.4-k3s1   172.17.0.3    &lt;none&gt;        Alpine Linux v3.11   4.9.184-linuxkit   docker://19.3.8</div><div class="line">alpine-01   Ready    master   59m   v1.17.4-k3s1   172.17.0.2    &lt;none&gt;        Alpine Linux v3.11   4.9.184-linuxkit   docker://19.3.8</div><div class="line">alpine-03   Ready    &lt;none&gt;   58m   v1.17.4-k3s1   172.17.0.4    &lt;none&gt;        Alpine Linux v3.11   4.9.184-linuxkit   docker://19.3.8</div></pre></td></tr></table></figure>
+<p>这里集群的各个 node 都是一个 docker container。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">-&gt; % docker ps</div><div class="line">CONTAINER ID        IMAGE                        COMMAND                  CREATED             STATUS              PORTS                                                           NAMES</div><div class="line">a91d13e2cca0        wusuopu/vagrant:k3s-alpine   &quot;dockerd-entrypoint.…&quot;   About an hour ago   Up 35 minutes       2375-2376/tcp, 6443/tcp, 127.0.0.1:2201-&gt;22/tcp                 kubernetes-vagrant-alpine_alpine-03_1585887389</div><div class="line">cce93873b666        wusuopu/vagrant:k3s-alpine   &quot;dockerd-entrypoint.…&quot;   About an hour ago   Up 35 minutes       2375-2376/tcp, 6443/tcp, 127.0.0.1:2200-&gt;22/tcp                 kubernetes-vagrant-alpine_alpine-02_1585887382</div><div class="line">d4844843ca3e        wusuopu/vagrant:k3s-alpine   &quot;dockerd-entrypoint.…&quot;   About an hour ago   Up 36 minutes       2375-2376/tcp, 0.0.0.0:6443-&gt;6443/tcp, 127.0.0.1:2222-&gt;22/tcp   kubernetes-vagrant-alpine_alpine-01_1585887365</div></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/84179.html" data-id="ck8jp06es00ryzgcfkiuyfnes" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Docker/">Docker</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/k8s/">k8s</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-/archives/84178.html" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/84178.html" class="article-date">
@@ -106,7 +161,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84178.html" data-id="ck663mlv100rqw9jdnq4ccxrd" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84178.html" data-id="ck8jp06es00s0zgcf26jsj5tq" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/git/">git</a></li></ul>
@@ -148,9 +203,9 @@
         <h2 id="安装依赖"><a href="#安装依赖" class="headerlink" title="安装依赖"></a>安装依赖</h2><h3 id="Vagrant"><a href="#Vagrant" class="headerlink" title="Vagrant"></a>Vagrant</h3><p>目前 Vagrant (<a href="https://www.vagrantup.com/downloads.html" target="_blank" rel="external">https://www.vagrantup.com/downloads.html</a>) 最新为 v2.2.6，Kubernetes 为 v1.16</p>
 <h3 id="Kubectl"><a href="#Kubectl" class="headerlink" title="Kubectl"></a>Kubectl</h3><p>下载最新版的 kubectl:</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">`curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl`</div></pre></td></tr></table></figure>
-<h3 id="VirtualBox"><a href="#VirtualBox" class="headerlink" title="VirtualBox"></a>VirtualBox</h3><p>需要下载 Vagrant 所兼容的版本(<a href="https://www.vagrantup.com/docs/virtualbox/)。我是直接用" target="_blank" rel="external">https://www.vagrantup.com/docs/virtualbox/)。我是直接用</a> apt-get 安装 5.2 的版本。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">apt-get install virtual virtualbox-guest-additions-iso</div></pre></td></tr></table></figure>
-<h2 id="运行-ubuntu-单实例"><a href="#运行-ubuntu-单实例" class="headerlink" title="运行 ubuntu 单实例"></a>运行 ubuntu 单实例</h2><p>创建 Vagrantfile 配置文件，这里在 virtualbox 内运行的是 Ubuntu 18.04。</p>
+<h3 id="VirtualBox"><a href="#VirtualBox" class="headerlink" title="VirtualBox"></a>VirtualBox</h3><p>需要下载 Vagrant 所兼容的版本( <a href="https://www.vagrantup.com/docs/virtualbox/" target="_blank" rel="external">https://www.vagrantup.com/docs/virtualbox/</a> )。我是直接用 apt-get 安装 5.2 的版本。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">apt-get install virtualbox virtualbox-guest-additions-iso</div></pre></td></tr></table></figure>
+<h2 id="运行-ubuntu-单实例"><a href="#运行-ubuntu-单实例" class="headerlink" title="运行 ubuntu 单实例"></a>运行 ubuntu 单实例</h2><p>创建 Vagrantfile 配置文件，这里在 virtualbox 内运行的是 Ubuntu 18.04。<br>若 Vagrant 的 Box 文件下载太慢，可先提前下载好：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">wget https://app.vagrantup.com/ubuntu/boxes/bionic64/versions/20191125.0.0/providers/virtualbox.box</div><div class="line"></div><div class="line">cat &gt; virtualbox.json &lt;EOF</div><div class="line">&#123;</div><div class="line">  &quot;name&quot;: &quot;ubuntu/bionic64&quot;,</div><div class="line">  &quot;versions&quot;: [</div><div class="line">    &#123;</div><div class="line">      &quot;version&quot;: &quot;20191125.0.0&quot;,</div><div class="line">      &quot;providers&quot;: [</div><div class="line">        &#123;</div><div class="line">          &quot;name&quot;: &quot;virtualbox&quot;,</div><div class="line">          &quot;url&quot;: &quot;virtualbox.box&quot;</div><div class="line">        &#125;</div><div class="line">      ]</div><div class="line">    &#125;</div><div class="line">  ]</div><div class="line">&#125;</div><div class="line">EOF</div><div class="line"></div><div class="line">vagrant box add ubuntu/bionic64 virtualbox.json</div></pre></td></tr></table></figure></p>
 <figure class="highlight ruby"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># -*- mode: ruby -*-</span></div><div class="line"><span class="comment"># vi: set ft=ruby :</span></div><div class="line"></div><div class="line">$num_instances = <span class="number">1</span></div><div class="line">$instance_name_prefix = <span class="string">"ubuntu"</span></div><div class="line">$vm_gui = <span class="literal">false</span></div><div class="line">$vm_memory = <span class="number">1024</span></div><div class="line">$vm_cpus = <span class="number">1</span></div><div class="line">$vb_cpuexecutioncap = <span class="number">100</span></div><div class="line">ip_prefix = <span class="string">'172.17.8.'</span></div><div class="line"></div><div class="line">Vagrant.configure(<span class="number">2</span>) <span class="keyword">do</span> <span class="params">|config|</span></div><div class="line">  (<span class="number">1</span>..$num_instances).each <span class="keyword">do</span> <span class="params">|i|</span></div><div class="line">    config.vm.define vm_name = <span class="string">"%s-%02d"</span> % [$instance_name_prefix, i] <span class="keyword">do</span> <span class="params">|node|</span></div><div class="line">      node.vm.box = <span class="string">'ubuntu/bionic64'</span></div><div class="line">      node.vm.box_version = <span class="string">"20191125.0.0"</span></div><div class="line">      node.vm.box_check_update = <span class="literal">false</span></div><div class="line">      node.vm.hostname = vm_name</div><div class="line">      node.vm.synced_folder <span class="string">'.'</span>, <span class="string">'/vagrant'</span>, <span class="symbol">type:</span> <span class="string">'virtualbox'</span></div><div class="line"></div><div class="line">      ip = <span class="string">"<span class="subst">#&#123;ip_prefix&#125;</span><span class="subst">#&#123;i+<span class="number">100</span>&#125;</span>"</span></div><div class="line">      node.vm.network <span class="string">'private_network'</span>, <span class="symbol">ip:</span> ip</div><div class="line">      node.vm.provider <span class="symbol">:virtualbox</span> <span class="keyword">do</span> <span class="params">|vb|</span></div><div class="line">        vb.gui = $vm_gui</div><div class="line">        vb.memory = $vm_memory</div><div class="line">        vb.cpus = $vm_cpus</div><div class="line">        vb.customize [<span class="string">"modifyvm"</span>, <span class="symbol">:id</span>, <span class="string">"--cpuexecutioncap"</span>, <span class="string">"<span class="subst">#&#123;$vb_cpuexecutioncap&#125;</span>"</span>]</div><div class="line">      <span class="keyword">end</span></div><div class="line">    <span class="keyword">end</span></div><div class="line">  <span class="keyword">end</span></div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
 <p>接着启动 ubuntu</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">vagrant up</div></pre></td></tr></table></figure>
@@ -181,7 +236,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84177.html" data-id="ck663mlv000rmw9jd1x3t08dg" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84177.html" data-id="ck8jp06er00ruzgcfmszl8up6" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Docker/">Docker</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/k8s/">k8s</a></li></ul>
@@ -239,7 +294,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84176.html" data-id="ck663mlv000rjw9jdnmxpgnb3" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84176.html" data-id="ck8jp06eq00rrzgcfqpde8ye6" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/node/">node</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/typescript/">typescript</a></li></ul>
@@ -313,7 +368,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84175.html" data-id="ck663mluy00rfw9jd6akfv30y" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84175.html" data-id="ck8jp06ep00rnzgcf7tyh8k38" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Mac/">Mac</a></li></ul>
@@ -369,7 +424,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84174.html" data-id="ck663mluy00rcw9jd4965401r" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84174.html" data-id="ck8jp06eo00rkzgcfb1a2l2m4" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/react/">react</a></li></ul>
@@ -419,7 +474,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84173.html" data-id="ck663mlux00r8w9jdeedj75o1" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84173.html" data-id="ck8jp06en00rgzgcfhr8z7rjr" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/树莓派/">树莓派</a></li></ul>
@@ -473,7 +528,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84172.html" data-id="ck663mluw00r5w9jdvgq9lv3g" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84172.html" data-id="ck8jp06em00rdzgcfv31njojy" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/react/">react</a></li></ul>
@@ -526,7 +581,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84171.html" data-id="ck663mluu00r1w9jd126m507z" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84171.html" data-id="ck8jp06el00r9zgcfaogfz3el" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -588,56 +643,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84170.html" data-id="ck663mlut00qyw9jdu8gflrax" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-/archives/84169.html" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/archives/84169.html" class="article-date">
-  <time datetime="2017-06-10T22:31:24.730Z" itemprop="datePublished">2017-06-10</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/Python栏目/">Python栏目</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/archives/84169.html">HAProxy+Nginx+gunicorn获取真实ip</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>之前在部署在 nginx + uwsgi 应用时都是通过如下方法来获取真实的客户端ip的：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">upstream app_server &#123;</div><div class="line">    server unix:///tmp/gunicorn.sock fail_timeout=0;</div><div class="line">&#125;</div><div class="line"></div><div class="line">server &#123;</div><div class="line">    listen       80;</div><div class="line">    server_name  localhost;</div><div class="line">    location / &#123;</div><div class="line">        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;</div><div class="line">        proxy_set_header Host $http_host;</div><div class="line">        proxy_redirect off;</div><div class="line"></div><div class="line">        proxy_pass   http://app_server;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>这样在 uwsgi 的应用程序中只需要读取 http headers 中的 X-Forwarded-For 字段即可。</p>
-<p>但是最近由于运维架构的是采用 haproxy + nginx + uwsgi 是形式，导致了在 uwsgi 应用程序中获取到的 ip 都是 haproxy 的。<br>为了要获取到真实的ip地址，需要由 haproxy 将 ip 传给 nginx，再由 nginx 传给 uwsgi。<br>在网上搜索了半天 haproxy 的相关配置，感觉太复杂了。因此还是决定从 nginx 入手。</p>
-<p>经过实验将 nginx 的配置改为如下即可：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">proxy_set_header X-Forwarded-For $http_x_forwarded_for;</div><div class="line">proxy_set_header Host $http_host;</div><div class="line">proxy_redirect off;</div></pre></td></tr></table></figure>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84169.html" data-id="ck663mlus00quw9jdjf6rxvct" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84170.html" data-id="ck8jp06ej00r6zgcf99m1bek2" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -684,7 +690,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/ARM/" style="font-size: 13.68px;">ARM</a> <a href="/tags/Android/" style="font-size: 10.53px;">Android</a> <a href="/tags/Arch/" style="font-size: 13.16px;">Arch</a> <a href="/tags/C/" style="font-size: 15.79px;">C</a> <a href="/tags/Django/" style="font-size: 11.05px;">Django</a> <a href="/tags/Docker/" style="font-size: 10.53px;">Docker</a> <a href="/tags/Dreamweaver/" style="font-size: 10px;">Dreamweaver</a> <a href="/tags/Fedora/" style="font-size: 10.53px;">Fedora</a> <a href="/tags/Flash/" style="font-size: 10px;">Flash</a> <a href="/tags/GObject/" style="font-size: 12.63px;">GObject</a> <a href="/tags/Gentoo/" style="font-size: 10.53px;">Gentoo</a> <a href="/tags/Hash/" style="font-size: 10px;">Hash</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Mac/" style="font-size: 10.53px;">Mac</a> <a href="/tags/PS/" style="font-size: 12.63px;">PS</a> <a href="/tags/Qt/" style="font-size: 10.53px;">Qt</a> <a href="/tags/Raspberry-pi/" style="font-size: 10px;">Raspberry pi</a> <a href="/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/tags/Ruby/" style="font-size: 18.95px;">Ruby</a> <a href="/tags/Scrapy/" style="font-size: 11.05px;">Scrapy</a> <a href="/tags/TQ2440/" style="font-size: 12.11px;">TQ2440</a> <a href="/tags/USB/" style="font-size: 11.05px;">USB</a> <a href="/tags/VirtualBox/" style="font-size: 11.05px;">VirtualBox</a> <a href="/tags/Web开发/" style="font-size: 16.84px;">Web开发</a> <a href="/tags/WordPress/" style="font-size: 10px;">WordPress</a> <a href="/tags/Xcode/" style="font-size: 10px;">Xcode</a> <a href="/tags/access/" style="font-size: 12.63px;">access</a> <a href="/tags/adobe/" style="font-size: 10px;">adobe</a> <a href="/tags/ajax/" style="font-size: 11.05px;">ajax</a> <a href="/tags/angular/" style="font-size: 13.16px;">angular</a> <a href="/tags/apache/" style="font-size: 10px;">apache</a> <a href="/tags/asp/" style="font-size: 13.16px;">asp</a> <a href="/tags/css/" style="font-size: 10.53px;">css</a> <a href="/tags/firefox/" style="font-size: 11.05px;">firefox</a> <a href="/tags/ftp/" style="font-size: 10px;">ftp</a> <a href="/tags/gcc/" style="font-size: 12.63px;">gcc</a> <a href="/tags/git/" style="font-size: 12.11px;">git</a> <a href="/tags/grub/" style="font-size: 10px;">grub</a> <a href="/tags/gtk/" style="font-size: 17.89px;">gtk</a> <a href="/tags/gulp/" style="font-size: 10px;">gulp</a> <a href="/tags/ibus/" style="font-size: 10px;">ibus</a> <a href="/tags/js/" style="font-size: 16.32px;">js</a> <a href="/tags/k8s/" style="font-size: 10px;">k8s</a> <a href="/tags/mongodb/" style="font-size: 15.26px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 11.58px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/node/" style="font-size: 10.53px;">node</a> <a href="/tags/php/" style="font-size: 14.74px;">php</a> <a href="/tags/pygame/" style="font-size: 15.26px;">pygame</a> <a href="/tags/python/" style="font-size: 19.47px;">python</a> <a href="/tags/react/" style="font-size: 12.63px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/typescript/" style="font-size: 10px;">typescript</a> <a href="/tags/ubuntu/" style="font-size: 13.16px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 18.42px;">vim</a> <a href="/tags/vmware/" style="font-size: 10px;">vmware</a> <a href="/tags/w3m/" style="font-size: 10px;">w3m</a> <a href="/tags/windows/" style="font-size: 13.16px;">windows</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/免费/" style="font-size: 10px;">免费</a> <a href="/tags/内核/" style="font-size: 10px;">内核</a> <a href="/tags/匹配算法/" style="font-size: 12.63px;">匹配算法</a> <a href="/tags/单片机/" style="font-size: 10.53px;">单片机</a> <a href="/tags/嵌入式/" style="font-size: 10px;">嵌入式</a> <a href="/tags/开源软件/" style="font-size: 14.21px;">开源软件</a> <a href="/tags/排序算法/" style="font-size: 14.21px;">排序算法</a> <a href="/tags/文件空间/" style="font-size: 10px;">文件空间</a> <a href="/tags/无线网/" style="font-size: 10px;">无线网</a> <a href="/tags/树莓派/" style="font-size: 10px;">树莓派</a> <a href="/tags/正则式/" style="font-size: 10px;">正则式</a> <a href="/tags/注册机/" style="font-size: 10.53px;">注册机</a> <a href="/tags/游戏/" style="font-size: 14.74px;">游戏</a> <a href="/tags/电脑技巧/" style="font-size: 14.21px;">电脑技巧</a> <a href="/tags/空间/" style="font-size: 10px;">空间</a> <a href="/tags/算法/" style="font-size: 17.37px;">算法</a> <a href="/tags/红旗/" style="font-size: 10px;">红旗</a> <a href="/tags/经典语录/" style="font-size: 10px;">经典语录</a> <a href="/tags/网络日志/" style="font-size: 13.16px;">网络日志</a> <a href="/tags/翻译/" style="font-size: 18.42px;">翻译</a> <a href="/tags/视频教程/" style="font-size: 14.74px;">视频教程</a> <a href="/tags/资源分享/" style="font-size: 15.26px;">资源分享</a> <a href="/tags/转载/" style="font-size: 10.53px;">转载</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
+      <a href="/tags/ARM/" style="font-size: 13.68px;">ARM</a> <a href="/tags/Android/" style="font-size: 10.53px;">Android</a> <a href="/tags/Arch/" style="font-size: 13.16px;">Arch</a> <a href="/tags/C/" style="font-size: 15.79px;">C</a> <a href="/tags/Django/" style="font-size: 11.05px;">Django</a> <a href="/tags/Docker/" style="font-size: 11.05px;">Docker</a> <a href="/tags/Dreamweaver/" style="font-size: 10px;">Dreamweaver</a> <a href="/tags/Fedora/" style="font-size: 10.53px;">Fedora</a> <a href="/tags/Flash/" style="font-size: 10px;">Flash</a> <a href="/tags/GObject/" style="font-size: 12.63px;">GObject</a> <a href="/tags/Gentoo/" style="font-size: 10.53px;">Gentoo</a> <a href="/tags/Hash/" style="font-size: 10px;">Hash</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Mac/" style="font-size: 10.53px;">Mac</a> <a href="/tags/PS/" style="font-size: 12.63px;">PS</a> <a href="/tags/Qt/" style="font-size: 10.53px;">Qt</a> <a href="/tags/Raspberry-pi/" style="font-size: 10px;">Raspberry pi</a> <a href="/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/tags/Ruby/" style="font-size: 18.95px;">Ruby</a> <a href="/tags/Scrapy/" style="font-size: 11.05px;">Scrapy</a> <a href="/tags/TQ2440/" style="font-size: 12.11px;">TQ2440</a> <a href="/tags/USB/" style="font-size: 11.05px;">USB</a> <a href="/tags/VirtualBox/" style="font-size: 11.05px;">VirtualBox</a> <a href="/tags/Web开发/" style="font-size: 16.84px;">Web开发</a> <a href="/tags/WordPress/" style="font-size: 10px;">WordPress</a> <a href="/tags/Xcode/" style="font-size: 10px;">Xcode</a> <a href="/tags/access/" style="font-size: 12.63px;">access</a> <a href="/tags/adobe/" style="font-size: 10px;">adobe</a> <a href="/tags/ajax/" style="font-size: 11.05px;">ajax</a> <a href="/tags/angular/" style="font-size: 13.16px;">angular</a> <a href="/tags/apache/" style="font-size: 10px;">apache</a> <a href="/tags/asp/" style="font-size: 13.16px;">asp</a> <a href="/tags/css/" style="font-size: 10.53px;">css</a> <a href="/tags/firefox/" style="font-size: 11.05px;">firefox</a> <a href="/tags/ftp/" style="font-size: 10px;">ftp</a> <a href="/tags/gcc/" style="font-size: 12.63px;">gcc</a> <a href="/tags/git/" style="font-size: 12.11px;">git</a> <a href="/tags/grub/" style="font-size: 10px;">grub</a> <a href="/tags/gtk/" style="font-size: 17.89px;">gtk</a> <a href="/tags/gulp/" style="font-size: 10px;">gulp</a> <a href="/tags/ibus/" style="font-size: 10px;">ibus</a> <a href="/tags/js/" style="font-size: 16.32px;">js</a> <a href="/tags/k8s/" style="font-size: 10.53px;">k8s</a> <a href="/tags/mongodb/" style="font-size: 15.26px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 11.58px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/node/" style="font-size: 10.53px;">node</a> <a href="/tags/php/" style="font-size: 14.74px;">php</a> <a href="/tags/pygame/" style="font-size: 15.26px;">pygame</a> <a href="/tags/python/" style="font-size: 19.47px;">python</a> <a href="/tags/react/" style="font-size: 12.63px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/typescript/" style="font-size: 10px;">typescript</a> <a href="/tags/ubuntu/" style="font-size: 13.16px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 18.42px;">vim</a> <a href="/tags/vmware/" style="font-size: 10px;">vmware</a> <a href="/tags/w3m/" style="font-size: 10px;">w3m</a> <a href="/tags/windows/" style="font-size: 13.16px;">windows</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/免费/" style="font-size: 10px;">免费</a> <a href="/tags/内核/" style="font-size: 10px;">内核</a> <a href="/tags/匹配算法/" style="font-size: 12.63px;">匹配算法</a> <a href="/tags/单片机/" style="font-size: 10.53px;">单片机</a> <a href="/tags/嵌入式/" style="font-size: 10px;">嵌入式</a> <a href="/tags/开源软件/" style="font-size: 14.21px;">开源软件</a> <a href="/tags/排序算法/" style="font-size: 14.21px;">排序算法</a> <a href="/tags/文件空间/" style="font-size: 10px;">文件空间</a> <a href="/tags/无线网/" style="font-size: 10px;">无线网</a> <a href="/tags/树莓派/" style="font-size: 10px;">树莓派</a> <a href="/tags/正则式/" style="font-size: 10px;">正则式</a> <a href="/tags/注册机/" style="font-size: 10.53px;">注册机</a> <a href="/tags/游戏/" style="font-size: 14.74px;">游戏</a> <a href="/tags/电脑技巧/" style="font-size: 14.21px;">电脑技巧</a> <a href="/tags/空间/" style="font-size: 10px;">空间</a> <a href="/tags/算法/" style="font-size: 17.37px;">算法</a> <a href="/tags/红旗/" style="font-size: 10px;">红旗</a> <a href="/tags/经典语录/" style="font-size: 10px;">经典语录</a> <a href="/tags/网络日志/" style="font-size: 13.16px;">网络日志</a> <a href="/tags/翻译/" style="font-size: 18.42px;">翻译</a> <a href="/tags/视频教程/" style="font-size: 14.74px;">视频教程</a> <a href="/tags/资源分享/" style="font-size: 15.26px;">资源分享</a> <a href="/tags/转载/" style="font-size: 10.53px;">转载</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
     </div>
   </div>
 
@@ -693,7 +699,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">February 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">November 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05/">May 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/02/">February 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/11/">November 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">October 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">September 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/08/">August 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/07/">July 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/05/">May 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04/">April 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">March 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">January 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/12/">December 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">June 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">May 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">April 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">January 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">October 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/09/">September 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/08/">August 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/07/">July 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/05/">May 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/04/">April 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/03/">March 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/02/">February 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/12/">December 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/11/">November 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/10/">October 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/09/">September 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/08/">August 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/07/">July 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/05/">May 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/04/">April 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/03/">March 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/02/">February 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/01/">January 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/12/">December 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/11/">November 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/10/">October 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/09/">September 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/08/">August 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/07/">July 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/06/">June 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/05/">May 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/04/">April 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/03/">March 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/12/">December 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/11/">November 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/10/">October 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/09/">September 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/08/">August 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/07/">July 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/05/">May 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/12/">December 2008</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/07/">July 2008</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">April 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">February 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">November 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05/">May 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/02/">February 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/11/">November 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">October 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">September 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/08/">August 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/07/">July 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/05/">May 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04/">April 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">March 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">January 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/12/">December 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">June 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">May 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">April 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">January 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">October 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/09/">September 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/08/">August 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/07/">July 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/05/">May 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/04/">April 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/03/">March 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/02/">February 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/12/">December 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/11/">November 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/10/">October 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/09/">September 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/08/">August 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/07/">July 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/05/">May 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/04/">April 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/03/">March 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/02/">February 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/01/">January 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/12/">December 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/11/">November 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/10/">October 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/09/">September 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/08/">August 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/07/">July 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/06/">June 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/05/">May 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/04/">April 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/03/">March 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/12/">December 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/11/">November 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/10/">October 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/09/">September 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/08/">August 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/07/">July 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/05/">May 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/12/">December 2008</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/07/">July 2008</a></li></ul>
     </div>
   </div>
 
@@ -704,6 +710,10 @@
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/archives/84179.html">使用Vagrant和Docker搭建Kubernetes集群</a>
+          </li>
         
           <li>
             <a href="/archives/84178.html">Github Actions使用</a>
@@ -719,10 +729,6 @@
         
           <li>
             <a href="/archives/84175.html">记录神舟战神 Z7M-KP7GZ 安装黑苹果过程</a>
-          </li>
-        
-          <li>
-            <a href="/archives/84174.html">react storybook使用typescript</a>
           </li>
         
       </ul>
