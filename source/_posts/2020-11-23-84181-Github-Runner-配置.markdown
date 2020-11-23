@@ -1,0 +1,69 @@
+---
+layout: 'post'
+title: 'Github Runner 配置'
+date: '2020-11-23T01:00:58.877Z'
+comments: true
+post_id: '84181'
+permalink: '/archives/84181.html'
+categories: ["编程开发"]
+tags: ["git"]
+---
+
+在之前的文章[《Github Actions使用》](/archives/84178.html)有介绍了Github Actions的使用方法。
+之前是直接的 Github 官方提供的 runner，来执行。不过官方提供的 runner 多少还是有些限制。
+这次我们来尝试将自己的 server 配置成 runner 来执行 actions。
+
+关于添加自己的机器，可参考 Github 官方文档： https://docs.github.com/en/free-pro-team@latest/actions/hosting-your-own-runners/adding-self-hosted-runners
+
+在 github 中 runner 分为三个级别： repository, organization, enterprise。
+其中 repository 级别的 runner 就只能在这个代码仓库下使用；
+organization 和 enterprise 级别的 runner 可以在这个 organization 或者 enterprise 下的所有代码仓库中共享。
+
+由于我是免费用户，这里我就以 organization 为例吧。另外为了方便我们就直接通过 docker 来运行。
+
+参考官方文档，首先进入到 organization 的 actions 设置页面，然后选择添加一个 runner。没有 organization 的可以自己创建一个。
+接着在自己的 server 上执行命令：
+
+```
+docker run -d \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    -e GH_REPOSITORY=xxxxxxxxxxxx \
+    -e GH_RUNNER_TOKEN=xxxxxxxxxxxxx \
+    -e GH_RUNNER_LABELS=label1,label2 \
+    wusuopu/github-actions-runner:2.273.6
+```
+
+其中 GH_REPOSITORY 就是设置页面上显示的 url 参数，GH_RUNNER_TOKEN 就是 token 参数。GH_RUNNER_LABELS 则根据自己的需要来为该 runner 设置标签。
+
+至此，自己的 runner 就已经配置好了。不过这里我们是直接在这个 runerr 的 container 中操作 server 上的 docker 服务。这样其实是非常危险的，尤其是对于公有仓库来说。
+
+
+为了安全起见，我们可以再运行一个 Docker-in-Docker 的服务，然后这个就只需要连接到该服务即可。
+创建一个 docker-compose.yml 文件：
+
+```yaml
+version: "2"
+
+services:
+  dind:
+    image: docker:19.03-dind
+    privileged: true
+    volumes:
+      - ./tmp/docker-lib:/var/lib/docker
+      - ./tmp/docker-run:/var/run
+
+  github-runner:
+    image: wusuopu/github-actions-runner:2.273.6
+    depends_on:
+      - dind
+    environment:
+      - GH_REPOSITORY=https://github.com/xxxx
+      - GH_RUNNER_TOKEN=xxxxxxxxxxxxx
+      - GH_RUNNER_LABELS=dind
+    volumes:
+      - ./tmp/docker-run:/var/run
+```
+
+然后执行命令 `docker-compose up -d` 启动服务即可。
+如果之后 actions 任务太多处理不过来，可以将 runner 扩容，多增加几个 runner 实例： `docker-compose scale github-runner=3`
+
