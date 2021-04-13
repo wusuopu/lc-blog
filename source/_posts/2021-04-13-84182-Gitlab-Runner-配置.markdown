@@ -1,0 +1,96 @@
+---
+layout: 'post'
+title: 'Gitlab Runner 配置'
+date: '2021-04-13T10:13:48.096Z'
+comments: true
+post_id: '84182'
+permalink: '/archives/84182.html'
+categories: ["编程开发"]
+tags: ["git"]
+---
+
+前一篇文章有介绍了 Gitlab Runner 的配置，现在再来介绍一下 Gitlab Runner 的配置。
+
+关于添加自己的机器，可参考 Gitlab 官方文档: https://docs.gitlab.com/runner/register/index.html
+
+同样的，为了方便，我们使用 docker 来一键部署。首先到 gitlab 的 CI/CD 项目设置页面，然后查看当前项目的 runner 注册 token。
+然后执行如下命令进行 runner 注册。
+
+```
+docker run --rm -it -v $PWD/tmp/gitlab-runner-config:/etc/gitlab-runner gitlab/gitlab-runner:alpine register
+  --non-interactive \
+  --url "https://gitlab.com/" \
+  --registration-token "PROJECT_REGISTRATION_TOKEN" \
+  --executor "docker" \
+  --docker-image alpine:latest \
+  --docker-volumes /var/run/docker.sock:/var/run/docker.sock
+  --description "docker-runner" \
+  --tag-list "docker,linux" \
+  --run-untagged="true" \
+  --locked="false" \
+  --access-level="not_protected"
+```
+
+注意这里的 `PROJECT_REGISTRATION_TOKEN` 需要替换为对应的 token；
+`--run-untagged` 要设为 true，才能运行所有的 job。否则就只会执行打了 tag 的 job 。
+如果需要多个项目共享该 runner，那么 `--locked` 就设为 false；
+
+注册成功之后会生成 ./tmp/gitlab-runner-config/config.toml 文件：
+```
+concurrent = 1
+check_interval = 0
+
+[session_server]
+  session_timeout = 1800
+
+[[runners]]
+  name = "runner-docker-01"
+  url = "https://gitlab.com/"
+  token = "xxxxxxxxxxxxxxxxxxxx"
+  executor = "docker"
+  [runners.custom_build_dir]
+  [runners.cache]
+    [runners.cache.s3]
+    [runners.cache.gcs]
+    [runners.cache.azure]
+  [runners.docker]
+    host = "unix:///var/run/docker.sock"
+    tls_verify = false
+    image = "alpine"
+    privileged = true
+    disable_entrypoint_overwrite = false
+    oom_kill_disable = false
+    disable_cache = false
+    volumes = ["/var/run/docker.sock:/var/run/docker.sock", "/cache"]
+    shm_size = 0
+```
+
+如果更换服务器了，但是还想要继续使用该 runner 的配置，只需要保留该配置文件即可。
+
+以上是 runner 注册成功，接下来就使用该配置文件来启动 runner 服务吧。
+同样也是为了安全起见，我们使用 docker-in-docker 的方式来部署。
+创建一个 docker-compose.yml 文件：
+
+```yaml
+version: "2"
+
+services:
+  dind:
+    image: docker:19.03-dind
+    privileged: true
+    # 使用国内docker镜像源
+    command: ["--registry-mirror", "https://hub-mirror.c.163.com"]
+    volumes:
+      - ./tmp/docker-lib:/var/lib/docker
+      - ./tmp/docker-run:/var/run
+
+  gitlab-runner:
+    image: gitlab/gitlab-runner:alpine
+    depends_on:
+      - dind
+    volumes:
+      - ./tmp/docker-run:/var/run
+      - ./tmp/gitlab-runner-config:/etc/gitlab-runner
+```
+
+然后执行命令 `docker-compose up -d` 启动服务即可。
