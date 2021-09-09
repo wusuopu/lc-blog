@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.xefan.com/"/>
-  <updated>2021-04-13T06:52:34.080Z</updated>
+  <updated>2021-09-09T03:04:27.705Z</updated>
   <id>http://www.xefan.com/</id>
   
   <author>
@@ -14,6 +14,42 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>记录在docker中运行whenever遇到的问题</title>
+    <link href="http://www.xefan.com/archives/84183.html"/>
+    <id>http://www.xefan.com/archives/84183.html</id>
+    <published>2021-09-09T10:12:48.610Z</published>
+    <updated>2021-09-09T03:04:27.705Z</updated>
+    
+    <content type="html"><![CDATA[<p>最近在将一个 rails 的项目移到 docker 方式来部署。这个项目有用到了 whenever 来执行定时任务，这里记录一下在迁移过程中遇到的一些问题。</p>
+<p>因为 whenever 是使用系统的 cron 来实现的定时任务，所以直接就在 docker image 内安装一个 cron 即可： <code>apt-get install -y cron</code> 。<br>然后尝试执行命令： <code>whenever -i; crontab -l</code> 看看定时任务都有设置正确。最后在容器启动的时候使用命令 <code>service cron start</code> 一并将 cron 也启动。</p>
+<p>至此感觉事情很简单，一切都很顺利。然而过了两天客户反馈说是这两天的定时任务都没有执行。<br>定时任务没执行，那就是 cron 有问题。现在来开始排查问题。</p>
+<p>先再安装 syslog： <code>apt-get install -y rsyslog</code>，将 cron 的日志保存下来，方便查找错误。<br>然后往 crontab 中随便添加一条任务，每分钟执行一次命令： <code>date &gt;&gt; /tmp/date.log</code>。</p>
+<p>结果1分钟之后 cron 的日志显示有报如下错误：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">FAILED to open PAM security session (Cannot make/remove an entry for the specified session)</div></pre></td></tr></table></figure></p>
+<p>经过搜索知道在 docker 内是没有 session 的，所以 PAM set_loginuid 会失败。需要将 <code>set_loginuid</code> 这行注释掉：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sed -i &apos;/^session\s\+required\s\+pam_loginuid.so/c\#session required pam_loginuid.so&apos; /etc/pam.d/cron</div></pre></td></tr></table></figure></p>
+<p>重启 cron 之后，<code>date &gt;&gt; /tmp/date.log</code> 定时任务也有正常执行了。</p>
+<p>到此感觉问题应该是解决了。然而又过了一天客户还是说定时任务没有执行。<br>看来还是存在问题的，还得接着排查。</p>
+<p>whenever 的任务是定时执行一些 rake 任务，然而执行的结果没有任何的日志。<br>于是我就新添加了一条 crontab 任务，将 rake 命令的 stdout 和 stderr 重定向到日志文件中。<br>然后就发现其实是因为在执行 rake 命令时提示 rake 命令不存在，从而导致执行失败的。<br>看来就因为 PATH 环境变量的问题。</p>
+<p>在启动 container 时是有设置了一些环境变量的，然而 cron 这个进程并没有继承这些变量。<br>所以现在就需要手动为 cron 再配置环境变量。在启动 cron 之前先执行命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">rm /etc/environment</div><div class="line">for variable_value in $(cat /proc/1/environ | sed &apos;s/\x00/\n/g&apos;); do</div><div class="line">  echo $variable_value &gt;&gt; /etc/environment</div><div class="line">done</div></pre></td></tr></table></figure></p>
+<p>现在再测试一切就正常了。<br>至此问题终于是解决了，于是就记录一下方便以后查阅。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;最近在将一个 rails 的项目移到 docker 方式来部署。这个项目有用到了 whenever 来执行定时任务，这里记录一下在迁移过程中遇到的一些问题。&lt;/p&gt;
+&lt;p&gt;因为 whenever 是使用系统的 cron 来实现的定时任务，所以直接就在 docker imag
+    
+    </summary>
+    
+      <category term="编程开发" scheme="http://www.xefan.com/categories/%E7%BC%96%E7%A8%8B%E5%BC%80%E5%8F%91/"/>
+    
+    
+      <category term="ruby" scheme="http://www.xefan.com/tags/ruby/"/>
+    
+      <category term="docker" scheme="http://www.xefan.com/tags/docker/"/>
+    
+  </entry>
   
   <entry>
     <title>Gitlab Runner 配置</title>
@@ -715,45 +751,6 @@
     <summary type="html">
     
       &lt;p&gt;在做移动开发过程中，有时我们需要适配不同尺寸大小的屏幕。这里我们就需要到获取设备屏幕的大小。&lt;br&gt;由于我们是使用的 ReactNative 来开发手机 app，这里就介绍一下在 ReactNative 中如何获取到设备屏幕的分辨率的。&lt;br&gt;也算是对之前踩坑的总结吧。&lt;/
-    
-    </summary>
-    
-      <category term="编程开发" scheme="http://www.xefan.com/categories/%E7%BC%96%E7%A8%8B%E5%BC%80%E5%8F%91/"/>
-    
-    
-      <category term="react" scheme="http://www.xefan.com/tags/react/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>ReactNative jsbundle管理</title>
-    <link href="http://www.xefan.com/archives/84163.html"/>
-    <id>http://www.xefan.com/archives/84163.html</id>
-    <published>2016-06-26T12:02:30.000Z</published>
-    <updated>2017-01-21T16:20:19.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>在<a href="http://www.xefan.com/archives/84162.html">上一篇文章</a>中介绍了 RN(ReactNative) 自动设置 development server IP 的方法。<br>这在开发过程中方便了不少，然而我在想能否更加方便一些呢。首先我们知道在开发 RN 应用时，jsbundle 有两种加载方式。<br>第一种是指定 url 通过网络进行加载；第二种是 pre-bundled 将 jsbundle 文件打包进 app 安装包中。<br>编译生成的安装包有 Debug 和 Release 两种模式，在 Debug 模式下默认是使用第一种方式加载 jsbundle，在 Release 模式下默认是使用第二种方式。</p>
-<p>现在我的需求是编译生成三种模式的安装包：Debug、Release 和 Stage。前两种跟之前一样，<br>而 Stage 模式下是使用第二种方式加载 jsbundle， 但是生成的 jsbundle 是 DEV 状态下的。<br>这样在开发过程中给他人安装app进行测试时就不需要反复的修改配置了。</p>
-<h2 id="修改-Android-的配置"><a href="#修改-Android-的配置" class="headerlink" title="修改 Android 的配置"></a>修改 Android 的配置</h2><p>对于的 android 的配置比较简单。只需修改 <code>android/app/build.gradle</code> 文件，新添加一个 <code>buildTypes</code> 即可。</p>
-<p>在 <code>apply from: &quot;react.gradle&quot;</code> 之前添加如下内容：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">project.ext.react = [</div><div class="line">  bundleInStage: true</div><div class="line">]</div></pre></td></tr></table></figure>
-<p>然后再修改配置如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">android &#123;</div><div class="line">    buildTypes &#123;</div><div class="line">        debug &#123;</div><div class="line">            applicationIdSuffix &quot;.debug&quot;</div><div class="line">            resValue &apos;string&apos;, &apos;app_name&apos;, &apos;&quot;XXXX(Debug)&quot;&apos;</div><div class="line">            ......</div><div class="line">        &#125;</div><div class="line">        release &#123;</div><div class="line">            minifyEnabled enableProguardInReleaseBuilds</div><div class="line">            proguardFiles getDefaultProguardFile(&quot;proguard-android.txt&quot;), &quot;proguard-rules.pro&quot;</div><div class="line">            resValue &apos;string&apos;, &apos;app_name&apos;, &apos;&quot;XXXX&quot;&apos;</div><div class="line">            ......</div><div class="line">        &#125;</div><div class="line">        stage &#123;</div><div class="line">            initWith(buildTypes.debug)</div><div class="line">            applicationIdSuffix &quot;.stage&quot;</div><div class="line">            resValue &apos;string&apos;, &apos;app_name&apos;, &apos;&quot;XXXX(Stage)&quot;&apos;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>这里添加了一个 <code>stage</code> buildTypes 继承至 <code>debug</code>。并且为了能够同时安装不同模式下的app，这里设置了不同模式 bundleID 的后缀。<br>同时还设置了不同模式下app的名称，以便区分。</p>
-<p>然后进行 <code>android</code> 目录下执行 <code>./gradlew assemble</code> 命令，即可在 <code>android/app/build/outputs/apk</code> 目录生成 app-debug.apk、app-release.apk 和 app-stage.apk 三个 apk 包。</p>
-<h2 id="修改-iOS-的配置"><a href="#修改-iOS-的配置" class="headerlink" title="修改 iOS 的配置"></a>修改 iOS 的配置</h2><p>首先将 Debug Configuration 复制为 Stage<br><img src="/wp-content/uploads/2016/06/26/Xcode-configuration.png" alt="Xcode-configuration"></p>
-<p>然后进入 <code>Build Settings</code> 修改 <code>Preprocessor Macros</code>，对 <code>Stage</code> 添加一项配置： <code>STAGE=1</code><br><img src="/wp-content/uploads/2016/06/26/Xcode-buildSettings.png" alt="Xcode-buildSettings"></p>
-<p>然后再编辑 <code>AppDelegate.m</code> 文件，修改 <code>jsCodeLocation</code> 相关配置。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">#if STAGE</div><div class="line">#warning &quot;STAGE&quot;</div><div class="line">  jsCodeLocation = [[NSBundle mainBundle] URLForResource:@&quot;main&quot; withExtension:@&quot;jsbundle&quot;];</div><div class="line">#elif DEBUG</div><div class="line">#if TARGET_OS_SIMULATOR</div><div class="line">#warning &quot;DEBUG SIMULATOR&quot;</div><div class="line">  jsCodeLocation = [NSURL URLWithString:@&quot;http://localhost:8081/index.ios.bundle?platform=ios&amp;dev=true&quot;];</div><div class="line">#else</div><div class="line">#warning &quot;DEBUG DEVICE&quot;</div><div class="line">  NSString *serverIP = [[NSBundle mainBundle] objectForInfoDictionaryKey:@&quot;SERVER_IP&quot;];</div><div class="line">  NSString *jsCodeUrlString = [NSString stringWithFormat:@&quot;http://%@:8081/index.ios.bundle?platform=ios&amp;dev=true&quot;, serverIP];</div><div class="line">  NSString *jsBundleUrlString = [jsCodeUrlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];</div><div class="line">  jsCodeLocation = [NSURL URLWithString:jsBundleUrlString];</div><div class="line">#endif</div><div class="line">#else</div><div class="line">#warning &quot;PRODUCTION DEVICE&quot;</div><div class="line">  jsCodeLocation = [[NSBundle mainBundle] URLForResource:@&quot;main&quot; withExtension:@&quot;jsbundle&quot;];</div><div class="line">#endif</div></pre></td></tr></table></figure>
-<p>为了能够同时安装多个应用，还需要设置各个模式下的 Bundle Identifier。进入 <code>Build Settings</code> -&gt; <code>Packaging</code> -&gt; <code>Product Bundle Identifier</code><br><img src="/wp-content/uploads/2016/06/26/Xcode-bundleID.png" alt="Xcode-bundleID"></p>
-<p>为了便于区分，最好给各个模式下的应用设置不同的AppName。进入 <code>Build Settings</code> -&gt; <code>User-Defined</code>，添加一项设置<br><img src="/wp-content/uploads/2016/06/26/Xcode-User-Defined.png" alt="Xcode-User-Defined"></p>
-<p>然后再进入 <code>Info</code>，设置 <code>CFBundleDisplayName</code> 的值为 <code>$(BUNDLE_DISPLAY_NAME)</code></p>
-<p>至此，配置已经修改完成。如果之前有使用 cocoapods 安装过第三方库的话，那么可能还需要再重新安装一遍。</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;在&lt;a href=&quot;http://www.xefan.com/archives/84162.html&quot;&gt;上一篇文章&lt;/a&gt;中介绍了 RN(ReactNative) 自动设置 development server IP 的方法。&lt;br&gt;这在开发过程中方便了不少，然而我在想能否
     
     </summary>
     
