@@ -1,0 +1,57 @@
+diff --git a/node_modules/hexo/lib/hexo/post.js b/node_modules/hexo/lib/hexo/post.js
+index 7f0db61..b0dc9cb 100644
+--- a/node_modules/hexo/lib/hexo/post.js
++++ b/node_modules/hexo/lib/hexo/post.js
+@@ -220,7 +220,7 @@ class Post {
+     this.context = context;
+   }
+ 
+-  create(data, replace, callback) {
++  async create(data, replace, callback) {
+     if (!callback && typeof replace === 'function') {
+       callback = replace;
+       replace = false;
+@@ -233,6 +233,22 @@ class Post {
+     data.layout = (data.layout || config.default_layout).toLowerCase();
+     data.date = data.date ? moment(data.date) : moment();
+ 
++    // postId自动递增
++    var sourceDir = config.source_dir;
++    var postDir = join(sourceDir, '_posts');
++    var allPosts = (await listDir(postDir)).sort();
++    var postId = 0;                 // 文章编号
++    for (let f of allPosts) {
++      if (f.endsWith('.markdown')) {
++        var num = parseInt(f.split('-')[3], 10)
++        if (num && num > postId) {
++          postId = num
++        }
++      }
++    }
++    postId++;
++    data.post_id = postId;
++
+     return Promise.all([
+       // Get the post path
+       ctx.execFilter('new_post_path', data, {
+diff --git a/node_modules/hexo/lib/plugins/filter/new_post_path.js b/node_modules/hexo/lib/plugins/filter/new_post_path.js
+index 706c8a2..3f00814 100644
+--- a/node_modules/hexo/lib/plugins/filter/new_post_path.js
++++ b/node_modules/hexo/lib/plugins/filter/new_post_path.js
+@@ -24,7 +24,7 @@ function newPostPathFilter(data = {}, replace) {
+   const { config } = this;
+   const newPostName = config.new_post_name;
+   const permalinkDefaults = config.permalink_defaults;
+-  const { path, layout, slug } = data;
++  const { path, layout, slug, post_id } = data;
+ 
+   if (!permalink || permalink.rule !== newPostName) {
+     permalink = new Permalink(newPostName);
+@@ -68,6 +68,7 @@ function newPostPathFilter(data = {}, replace) {
+           day: date.format('DD'),
+           i_day: date.format('D'),
+           title: slug,
++          post_id,
+           hash
+         };
+ 
