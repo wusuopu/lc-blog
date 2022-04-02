@@ -12,8 +12,8 @@
 <meta property="og:site_name" content="龍昌博客">
 <meta property="og:description" content="既然是静态编译，那就要编译出来的程序不信赖于任何dll文件。首先下载qt-win-opensource-4.7.4-mingw.exe： http:&#x2F;&#x2F;get.qt.nokia.com&#x2F;qt&#x2F;source&#x2F;qt-win-opensource-4.7.4-mingw.exe 和MinGW-gcc440_1.zip： http:&#x2F;&#x2F;get.qt.nokia.com&#x2F;misc&#x2F;MinGW-gcc440_">
 <meta property="og:locale">
-<meta property="article:published_time" content="2011-12-29T22:55:04.000Z">
-<meta property="article:modified_time" content="2018-01-11T03:56:30.000Z">
+<meta property="article:published_time" content="2011-12-29T14:55:04.000Z">
+<meta property="article:modified_time" content="2022-04-02T10:06:41.272Z">
 <meta property="article:author" content="龍昌">
 <meta property="article:tag" content="windows">
 <meta property="article:tag" content="Qt">
@@ -69,10 +69,10 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="post-/archives/83668.html" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-Windows下静态编译Qt4" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/83668.html" class="article-date">
-  <time datetime="2011-12-29T22:55:04.000Z" itemprop="datePublished">2011-12-29</time>
+  <time datetime="2011-12-29T14:55:04.000Z" itemprop="datePublished">2011-12-29</time>
 </a>
     
   <div class="article-category">
@@ -95,7 +95,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>既然是静态编译，那就要编译出来的程序不信赖于任何dll文件。<br>首先下载qt-win-opensource-4.7.4-mingw.exe： <a href="http://get.qt.nokia.com/qt/source/qt-win-opensource-4.7.4-mingw.exe" target="_blank" rel="external">http://get.qt.nokia.com/qt/source/qt-win-opensource-4.7.4-mingw.exe</a> 和MinGW-gcc440_1.zip： <a href="http://get.qt.nokia.com/misc/MinGW-gcc440_1.zip" target="_blank" rel="external">http://get.qt.nokia.com/misc/MinGW-gcc440_1.zip</a></p>
+        <p>既然是静态编译，那就要编译出来的程序不信赖于任何dll文件。<br>首先下载qt-win-opensource-4.7.4-mingw.exe： <a target="_blank" rel="noopener" href="http://get.qt.nokia.com/qt/source/qt-win-opensource-4.7.4-mingw.exe">http://get.qt.nokia.com/qt/source/qt-win-opensource-4.7.4-mingw.exe</a> 和MinGW-gcc440_1.zip： <a target="_blank" rel="noopener" href="http://get.qt.nokia.com/misc/MinGW-gcc440_1.zip">http://get.qt.nokia.com/misc/MinGW-gcc440_1.zip</a></p>
 <p>然后依次解压MinGW-gcc440_1.zip、安装qt-win-opensource-4.7.4-mingw.exe。记得要将gcc的目录和qt的目录添加到环境变量中。</p>
 <p>然后打开DOS窗口并切换到Qt的目录（比如我的是D:\Qt\4.7.4），再设置两个变量<br><em>set QTDIR=D:\Qt\4.7.4</em><br><em> set QMAKESPEC=win32-g++</em>  </p>
 <p>再编辑D:\Qt\4.7.4\mkspecs\win32-g++\qmake.conf文件（最好先备份），改两处：<br><em>QMAKE_LFLAGS = -enable-stdcall-fixup -Wl,-enable-auto-import -Wl,-enable-runtime-pseudo-reloc</em><br>修改为<br><em>QMAKE_LFLAGS = <span style="color: #ff0000;">-static</span> -enable-stdcall-fixup -Wl,-enable-auto-import -Wl,-enable-runtime-pseudo-reloc</em><br>再将<br><em>QMAKE_LFLAGS_DLL = -shared</em><br>修改为<br><em>QMAKE_LFLAGS_DLL = -static</em>  </p>
@@ -103,13 +103,13 @@
 <p>如果有提问是否遵守LGPL协议，选y。配置完成后，最后两句是这样的：<br>Qt is now configured for building. Just run mingw32-make.<br>To reconfigure, run mingw32-make confclean and configure.  </p>
 <p>cd src<br>mingw32-make -i -k  </p>
 <p>注意：我们只在在Qt子目录src里运行make。不要在整个qt库的大目录下运行make。只在src目录make，这样只编译核心的Qt库和一些插件，节省时间，而且有核心Qt库就够用了。<br>如果在D:\Qt\4.7.4\ 整个大目录下运行make，那么make还会去重新编译生成tools目录下的代码，重新做工具程序，像assistant.exe、designer.exe、linguist.exe、qmlviewer.exe等等（生成后全在bin目录）。这些工具使用静态库生成后巨大无比。这些工具程序不管是静态链接还是动态链接生成的，对我们编程压根没影响，都一样用。  </p>
-<p>好了，接下来就是漫长的等待。2个多小时左右就应该可以编译完成了。<br>此时再用Qt编译生成的可执行文件不用再信赖Qt的动态库了,但是文件比较大随便一个都是10M以上，而且如果使用的是从qt官网下载的MinGW-gcc编译生成的可执行文件还是会信赖mingwm10.dll动态库。这个只需换一个版本的编译器即可，我用的是这个： <a href="http://115.com/file/dn3fkn1g" target="_blank" rel="external">http://115.com/file/dn3fkn1g</a>  </p>
-<p>如果嫌这个过程太麻烦可以直接下载我编译好的静态库来使用：<br>Qt4.7.4_Win32静态库.part1.rar： <a href="http://115.com/file/dn3zwayy" target="_blank" rel="external">http://115.com/file/dn3zwayy</a><br>Qt4.7.4_Win32静态库.part2.rar： <a href="http://115.com/file/dn3zwa9g" target="_blank" rel="external">http://115.com/file/dn3zwa9g</a><br>这个是完整版的，解压下来有2G多。如果觉得太大了可以下载精简版：<br>Qt4.7.4_Win32静态库精简版.rar： <a href="http://115.com/file/bhy7bat6" target="_blank" rel="external">http://115.com/file/bhy7bat6</a><br>精简版只保留了编译时需要的库文件和qmake等必要的工具，解压下来有500M左右。<br>注意：只有解压到D盘根目录下才能使用<br>编译器用的是mingw-7.2.exe： <a href="http://115.com/file/dn3fkn1g" target="_blank" rel="external">http://115.com/file/dn3fkn1g</a>  </p>
+<p>好了，接下来就是漫长的等待。2个多小时左右就应该可以编译完成了。<br>此时再用Qt编译生成的可执行文件不用再信赖Qt的动态库了,但是文件比较大随便一个都是10M以上，而且如果使用的是从qt官网下载的MinGW-gcc编译生成的可执行文件还是会信赖mingwm10.dll动态库。这个只需换一个版本的编译器即可，我用的是这个： <a target="_blank" rel="noopener" href="http://115.com/file/dn3fkn1g">http://115.com/file/dn3fkn1g</a>  </p>
+<p>如果嫌这个过程太麻烦可以直接下载我编译好的静态库来使用：<br>Qt4.7.4_Win32静态库.part1.rar： <a target="_blank" rel="noopener" href="http://115.com/file/dn3zwayy">http://115.com/file/dn3zwayy</a><br>Qt4.7.4_Win32静态库.part2.rar： <a target="_blank" rel="noopener" href="http://115.com/file/dn3zwa9g">http://115.com/file/dn3zwa9g</a><br>这个是完整版的，解压下来有2G多。如果觉得太大了可以下载精简版：<br>Qt4.7.4_Win32静态库精简版.rar： <a target="_blank" rel="noopener" href="http://115.com/file/bhy7bat6">http://115.com/file/bhy7bat6</a><br>精简版只保留了编译时需要的库文件和qmake等必要的工具，解压下来有500M左右。<br>注意：只有解压到D盘根目录下才能使用<br>编译器用的是mingw-7.2.exe： <a target="_blank" rel="noopener" href="http://115.com/file/dn3fkn1g">http://115.com/file/dn3fkn1g</a>  </p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83668.html" data-id="cl1hn20cs00bopg4k23bu3kom" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83668.html" data-id="cl1hoxjzl003pdwoy5snq40xw" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Qt/" rel="tag">Qt</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/windows/" rel="tag">windows</a></li></ul>

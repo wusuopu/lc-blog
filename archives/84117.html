@@ -12,8 +12,8 @@
 <meta property="og:site_name" content="龍昌博客">
 <meta property="og:description" content="作为一个Vimmer和Pythoner，之前折腾过用python编写vim插件。现在作为半个Rubist，又开始继续折腾。在开始编写插件之前，你需要确认 Vim 是否支持 Ruby，通过以下命令来判别：$ vim –version | grep +ruby如果输出为空，则表示你当前的vim不支持Ruby，需要重新编译一下，并启用对Ruby的支持。顺便说下我当前的环境是：vim 7.4  ruby">
 <meta property="og:locale">
-<meta property="article:published_time" content="2014-07-03T23:08:38.000Z">
-<meta property="article:modified_time" content="2018-01-11T03:58:12.000Z">
+<meta property="article:published_time" content="2014-07-03T15:08:38.000Z">
+<meta property="article:modified_time" content="2022-04-02T10:06:41.280Z">
 <meta property="article:author" content="龍昌">
 <meta property="article:tag" content="vim">
 <meta property="article:tag" content="Ruby">
@@ -69,10 +69,10 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="post-/archives/84117.html" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-使用ruby开发vim插件" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/84117.html" class="article-date">
-  <time datetime="2014-07-03T23:08:38.000Z" itemprop="datePublished">2014-07-03</time>
+  <time datetime="2014-07-03T15:08:38.000Z" itemprop="datePublished">2014-07-03</time>
 </a>
     
   <div class="article-category">
@@ -95,12 +95,12 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>作为一个Vimmer和Pythoner，之前折腾过用python编写vim插件。现在作为半个Rubist，又开始继续折腾。</p><br><p>在开始编写插件之前，你需要确认 Vim 是否支持 Ruby，通过以下命令来判别：</p><br><pre><code>$ vim –version | grep +ruby<br></code></pre><br><p>如果输出为空，则表示你当前的vim不支持Ruby，需要重新编译一下，并启用对Ruby的支持。</p><br><p>顺便说下我当前的环境是：</p><br><ul><br><li>vim 7.4  </li><br><li>ruby 2.1.0  </li><br></ul><br><p>环境检查没有问题那么就开始吧。<br><br>在~/.vim/plugin目录下创建一个 demo.vim 文件。</p><br><p>在开头写上以下代码：</p><br><pre><code>if !has(‘ruby’)<br>    echo “Error: Required vim compiled with +ruby”<br>    finish<br>endif<br></code></pre><br><p>这段代码就是用 VimL 编写的，它将检查 Vim 是否支持 Ruby。</p><br><p>接下来再判断该插件是否已经加载过了，以免重复加载：</p><br><pre><code>if exists(‘g:loaded_ruby_demo_plugin’)<br>    finish<br>endif<br>let g:loaded_ruby_demo_plugin = 1<br></code></pre><br><p>所有的检查都没有问题，则开始插件的正文了。先定义一个函数。</p><br><pre><code>function! DemoFun1()<br>ruby&lt;&lt;EOF<br>buf = VIM::Buffer.current<br>puts “current buffer name: #{buf.name} number: #{buf.number} length: #{buf.length}”<br>EOF<br>endfunction<br></code></pre><br><p>function与endfunction是vim中用于定义函数的，在”ruby&lt;&lt;EOF”和”EOF”之间部分的是Ruby代码。这个例子是输出当前缓冲区的名字、编号以及总行数。<br><br>执行命令:call DemoFun1()，应该就可以看到输出结果了。</p><br><p>然后再举个例子说下函数的参数处理。</p><br><pre><code>function! DemoFun2(arg1)<br>ruby&lt;&lt; EOF<br>puts “you input: #{VIM.evaluate(‘a:arg1’)}”<br>EOF<br>endfunction<br></code></pre><br><p>这里定义了一个函数接收一个参数，然后将其输出。使用 VIM.evaluate 将vim的变量转化为Ruby的变量。</p><br><p>为了方便我们再定义两个命令，以简化对这两个函数的调用。</p><br><pre><code>command! -nargs=0 DemoFun1 call DemoFun1()<br>command! -nargs=1 -rang DemoFun2 call DemoFun2(&lt;f-args&gt;)<br></code></pre><br><p>要获取完整的代码可以访问： <a href="https://gist.github.com/wusuopu/c1182efefa85d4f6839b" target="_blank" rel="external">https://gist.github.com/wusuopu/c1182efefa85d4f6839b</a></p><br><p>接下来再简单说下vim中Ruby的使用。</p><br><p>vim为Ruby提供了一个VIM模块，通过它可以在Ruby中访问vim的接口。同时还提供了两个全局变量：$curwin、$curbuf，它们分别代表了当前窗口对象以及当前缓冲区对象。</p><br><p>VIM模块中有 Buffer 和 Window 两个对象，分别是用来对缓冲区和窗口进行操作的。同时VIM模块还提供了message、set_option、command和evaluate四个函数。</p><br><p>想要查看更多的帮忙信息，可以在vim中执行如下命令：</p><br><pre><code>:help ruby<br></code></pre><br><p>好了，先写这么多吧，其余的自己去尝试吧。</p>
+        <p>作为一个Vimmer和Pythoner，之前折腾过用python编写vim插件。现在作为半个Rubist，又开始继续折腾。</p><br><p>在开始编写插件之前，你需要确认 Vim 是否支持 Ruby，通过以下命令来判别：</p><br><pre><code>$ vim –version | grep +ruby<br></code></pre><br><p>如果输出为空，则表示你当前的vim不支持Ruby，需要重新编译一下，并启用对Ruby的支持。</p><br><p>顺便说下我当前的环境是：</p><br><ul><br><li>vim 7.4  </li><br><li>ruby 2.1.0  </li><br></ul><br><p>环境检查没有问题那么就开始吧。<br><br>在~/.vim/plugin目录下创建一个 demo.vim 文件。</p><br><p>在开头写上以下代码：</p><br><pre><code>if !has(‘ruby’)<br>    echo “Error: Required vim compiled with +ruby”<br>    finish<br>endif<br></code></pre><br><p>这段代码就是用 VimL 编写的，它将检查 Vim 是否支持 Ruby。</p><br><p>接下来再判断该插件是否已经加载过了，以免重复加载：</p><br><pre><code>if exists(‘g:loaded_ruby_demo_plugin’)<br>    finish<br>endif<br>let g:loaded_ruby_demo_plugin = 1<br></code></pre><br><p>所有的检查都没有问题，则开始插件的正文了。先定义一个函数。</p><br><pre><code>function! DemoFun1()<br>ruby&lt;&lt;EOF<br>buf = VIM::Buffer.current<br>puts “current buffer name: #&#123;buf.name&#125; number: #&#123;buf.number&#125; length: #&#123;buf.length&#125;”<br>EOF<br>endfunction<br></code></pre><br><p>function与endfunction是vim中用于定义函数的，在”ruby&lt;&lt;EOF”和”EOF”之间部分的是Ruby代码。这个例子是输出当前缓冲区的名字、编号以及总行数。<br><br>执行命令:call DemoFun1()，应该就可以看到输出结果了。</p><br><p>然后再举个例子说下函数的参数处理。</p><br><pre><code>function! DemoFun2(arg1)<br>ruby&lt;&lt; EOF<br>puts “you input: #&#123;VIM.evaluate(‘a:arg1’)&#125;”<br>EOF<br>endfunction<br></code></pre><br><p>这里定义了一个函数接收一个参数，然后将其输出。使用 VIM.evaluate 将vim的变量转化为Ruby的变量。</p><br><p>为了方便我们再定义两个命令，以简化对这两个函数的调用。</p><br><pre><code>command! -nargs=0 DemoFun1 call DemoFun1()<br>command! -nargs=1 -rang DemoFun2 call DemoFun2(&lt;f-args&gt;)<br></code></pre><br><p>要获取完整的代码可以访问： <a target="_blank" rel="noopener" href="https://gist.github.com/wusuopu/c1182efefa85d4f6839b">https://gist.github.com/wusuopu/c1182efefa85d4f6839b</a></p><br><p>接下来再简单说下vim中Ruby的使用。</p><br><p>vim为Ruby提供了一个VIM模块，通过它可以在Ruby中访问vim的接口。同时还提供了两个全局变量：$curwin、$curbuf，它们分别代表了当前窗口对象以及当前缓冲区对象。</p><br><p>VIM模块中有 Buffer 和 Window 两个对象，分别是用来对缓冲区和窗口进行操作的。同时VIM模块还提供了message、set_option、command和evaluate四个函数。</p><br><p>想要查看更多的帮忙信息，可以在vim中执行如下命令：</p><br><pre><code>:help ruby<br></code></pre><br><p>好了，先写这么多吧，其余的自己去尝试吧。</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84117.html" data-id="cl1hn20g200mxpg4k74gv37dq" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84117.html" data-id="cl1hoxk0g0073dwoy95u5g2rf" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ruby/" rel="tag">Ruby</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vim/" rel="tag">vim</a></li></ul>

@@ -12,8 +12,8 @@
 <meta property="og:site_name" content="龍昌博客">
 <meta property="og:description" content="这几天终于把Arch Linux + Xfce + slim配置好了，做个笔记备忘。 安装Xfcehttps:&#x2F;&#x2F;wiki.archlinux.org&#x2F;index.php&#x2F;Xfce_(简体中文)安装准备请在安装与使用xfce前确认已经安装有xorg以及hal。# pacman -S xorg hal默认安装的archlinux是不包含xorg以及hal的。如果不安装两者，将造成xfce无法启动。H">
 <meta property="og:locale">
-<meta property="article:published_time" content="2011-10-16T20:24:20.000Z">
-<meta property="article:modified_time" content="2018-01-11T03:56:11.000Z">
+<meta property="article:published_time" content="2011-10-16T12:24:20.000Z">
+<meta property="article:modified_time" content="2022-04-02T10:06:41.272Z">
 <meta property="article:author" content="龍昌">
 <meta property="article:tag" content="Linux">
 <meta property="article:tag" content="Arch">
@@ -69,10 +69,10 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="post-/archives/83637.html" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-Arch Linux安装xfce和slim" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/83637.html" class="article-date">
-  <time datetime="2011-10-16T20:24:20.000Z" itemprop="datePublished">2011-10-16</time>
+  <time datetime="2011-10-16T12:24:20.000Z" itemprop="datePublished">2011-10-16</time>
 </a>
     
   <div class="article-category">
@@ -96,7 +96,7 @@
     <div class="article-entry" itemprop="articleBody">
       
         <p>这几天终于把Arch Linux + Xfce + slim配置好了，做个笔记备忘。</p>
-<h1>安装Xfce</h1><br><a href="https://wiki.archlinux.org/index.php/Xfce_(简体中文" target="_blank" rel="external">https://wiki.archlinux.org/index.php/Xfce_(简体中文</a>)<br><br><strong>安装准备</strong><br><br>请在安装与使用xfce前确认已经安装有xorg以及hal。<br><br><code># pacman -S xorg hal</code><br><br>默认安装的archlinux是不包含xorg以及hal的。如果不安装两者，将造成xfce无法启动。HAL 已经被诸如udev,udisks,upower这些程序替代 。<br><br><strong>安装XFCE系统(Xfce 4.8)</strong><br><br><code># pacman -S xfce4 xfce4-goodies</code><br><code># pacman -S $(pacman -Sgq xfce4-goodies | grep -v xfce4-xfapplet-plugin)</code><br><br>默认安装的xfce4，首次启动出现的小提示窗口里面是没有任何东西的。如果你想看到刚启动时候的技巧和小提示，那么就需要安装fortune-mod<br><br><code># pacman -S fortune-mod</code><br><br>安装好xfce4之后可能会发现xfce4-mixer通过ALSA并不能控制音量，需要安装gstreamer0.10-base-plugins：<br><br><code># pacman -S gstreamer0.10-base-plugins</code><br><br>对于笔记本用户，Xfce4-mixer如果不能同时控制外放与耳机，请尝试安装全部Plugins：<br><br><code># pacman -S gstreamer0.10-plugins</code><br><br><strong>安装和配置Daemons</strong><br><br><strong>安装dbus：</strong><br><br><code># pacman -S dbus</code><br><br>需要在开机的时候自动运行，应该将dbus添加到/etc/rc.conf文件中的DAEMONS：<br>DAEMONS=(syslog-ng dbus network crond)<br><br>如果不想重启开始dbus服务： <code># /etc/rc.d/dbus start</code><br><br>安装gamin (fam已经是过时的东西)，它会在后台自动运行检查文件改动反应给桌面，并且不需要添加到Daemons。<br><br><code># pacman -S gamin</code><br><br><h1>运行XFCE</h1>
+<h1>安装Xfce</h1><br><a target="_blank" rel="noopener" href="https://wiki.archlinux.org/index.php/Xfce_(简体中文">https://wiki.archlinux.org/index.php/Xfce_(简体中文</a>)<br><br><strong>安装准备</strong><br><br>请在安装与使用xfce前确认已经安装有xorg以及hal。<br><br><code># pacman -S xorg hal</code><br><br>默认安装的archlinux是不包含xorg以及hal的。如果不安装两者，将造成xfce无法启动。HAL 已经被诸如udev,udisks,upower这些程序替代 。<br><br><strong>安装XFCE系统(Xfce 4.8)</strong><br><br><code># pacman -S xfce4 xfce4-goodies</code><br><code># pacman -S $(pacman -Sgq xfce4-goodies | grep -v xfce4-xfapplet-plugin)</code><br><br>默认安装的xfce4，首次启动出现的小提示窗口里面是没有任何东西的。如果你想看到刚启动时候的技巧和小提示，那么就需要安装fortune-mod<br><br><code># pacman -S fortune-mod</code><br><br>安装好xfce4之后可能会发现xfce4-mixer通过ALSA并不能控制音量，需要安装gstreamer0.10-base-plugins：<br><br><code># pacman -S gstreamer0.10-base-plugins</code><br><br>对于笔记本用户，Xfce4-mixer如果不能同时控制外放与耳机，请尝试安装全部Plugins：<br><br><code># pacman -S gstreamer0.10-plugins</code><br><br><strong>安装和配置Daemons</strong><br><br><strong>安装dbus：</strong><br><br><code># pacman -S dbus</code><br><br>需要在开机的时候自动运行，应该将dbus添加到/etc/rc.conf文件中的DAEMONS：<br>DAEMONS=(syslog-ng dbus network crond)<br><br>如果不想重启开始dbus服务： <code># /etc/rc.d/dbus start</code><br><br>安装gamin (fam已经是过时的东西)，它会在后台自动运行检查文件改动反应给桌面，并且不需要添加到Daemons。<br><br><code># pacman -S gamin</code><br><br><h1>运行XFCE</h1>
 
 <p><strong>手动启动</strong></p>
 <p>你只需要运行： <code>$ startxfce4</code></p>
@@ -105,7 +105,7 @@
 <p><strong>在XFCE中关机和重启</strong></p>
 <p>在/etc/sudoers文件末尾添加如下一行：<br><em>%users ALL=(root) NOPASSWD: /usr/lib/xfce4/session/xfsm-shutdown-helper</em></p>
 <p><code># gpasswd -a 你的用户名 users</code></p>
-<p><strong>声音</strong><br><strong>安装ALSA</strong><br><a href="https://wiki.archlinux.org/index.php/Advanced_Linux_Sound_Architecture_(简体中文" target="_blank" rel="external">https://wiki.archlinux.org/index.php/Advanced_Linux_Sound_Architecture_(简体中文</a>)</p>
+<p><strong>声音</strong><br><strong>安装ALSA</strong><br><a target="_blank" rel="noopener" href="https://wiki.archlinux.org/index.php/Advanced_Linux_Sound_Architecture_(简体中文">https://wiki.archlinux.org/index.php/Advanced_Linux_Sound_Architecture_(简体中文</a>)</p>
 <p>要求有本地化的ALSA程序和管理</p>
 <p><code># pacman -S alsa-lib alsa-utils</code><br><code># pacman -S alsa-oss</code></p>
 <p>所有ALSA程序都很可能需要依赖alsa-lib。</p>
@@ -115,7 +115,7 @@
 <p>你需要至少安装gstreamer0.10-good-plugins,考虑安装gstreamer0.10-bad-plugins</p>
 <p><code>pacman -S gstreamer0.10-good-plugins gstreamer0.10-bad-plugins</code></p>
 <p>然后删除面板上的mixer插件，然后重新添加一次，或者先登出然后再登录一次，对gstreamer做更改后必须这样做才能让操作生效。</p>
-<p></p><h1>安装SLiM</h1><br><a href="https://wiki.archlinux.org/index.php/SLiM_(简体中文" target="_blank" rel="external">https://wiki.archlinux.org/index.php/SLiM_(简体中文</a>)<p></p>
+<p><h1>安装SLiM</h1><br><a target="_blank" rel="noopener" href="https://wiki.archlinux.org/index.php/SLiM_(简体中文">https://wiki.archlinux.org/index.php/SLiM_(简体中文</a>)</p>
 <p><strong>介绍</strong></p>
 <p>SLiM是Simple Login Manager（简单登录管理器）的缩写。SLiM是简单、轻量级和容易配置的，相对较易在低端和高端的系统中使用。对于那些希望寻找一个不依赖于GNOME或者KDE，可以在Xfce、Openbox、Fluxbox等环境下使用的登录管理器的人来说，SLiM也是非常合适的。</p>
 <p><strong>安装</strong></p>
@@ -139,7 +139,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83637.html" data-id="cl1hn20cj00aspg4k3avdg2e6" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83637.html" data-id="cl1hoxjzh003fdwoyf4f5b73v" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Arch/" rel="tag">Arch</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/" rel="tag">Linux</a></li></ul>

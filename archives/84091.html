@@ -12,8 +12,8 @@
 <meta property="og:site_name" content="龍昌博客">
 <meta property="og:description" content="在Python代码中如果要创建一个自定义类使用class关键字即可，但是在C代码中就没那么方便了。首先简单介绍下Python中的类型。在python中一切皆对象，python中有两种对象：一种是类型对象（class对象）：表示Python定义的类型，例如int, str, object等；另一种是实例对象（instance对象）：表示由class对象创建的实例。Python中的所有对象都是直接或者">
 <meta property="og:locale">
-<meta property="article:published_time" content="2014-04-13T20:47:05.000Z">
-<meta property="article:modified_time" content="2018-01-11T03:57:59.000Z">
+<meta property="article:published_time" content="2014-04-13T12:47:05.000Z">
+<meta property="article:modified_time" content="2022-04-02T10:06:41.280Z">
 <meta property="article:author" content="龍昌">
 <meta property="article:tag" content="python">
 <meta property="article:tag" content="C">
@@ -69,10 +69,10 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="post-/archives/84091.html" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-使用C语言编写Python扩展3——创建自定义类型(1)" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/84091.html" class="article-date">
-  <time datetime="2014-04-13T20:47:05.000Z" itemprop="datePublished">2014-04-13</time>
+  <time datetime="2014-04-13T12:47:05.000Z" itemprop="datePublished">2014-04-13</time>
 </a>
     
   <div class="article-category">
@@ -95,7 +95,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p></p><p>在Python代码中如果要创建一个自定义类使用class关键字即可，但是在C代码中就没那么方便了。<br><br>首先简单介绍下Python中的类型。在python中一切皆对象，python中有两种对象：<br><br>一种是类型对象（class对象）：表示Python定义的类型，例如int, str, object等；<br><br>另一种是实例对象（instance对象）：表示由class对象创建的实例。<br>Python中的所有对象都是直接或者间接继承object，然后object又是typy类型。可以运行下面的例子看看输出结果：  </p><p></p>
+        <p><p>在Python代码中如果要创建一个自定义类使用class关键字即可，但是在C代码中就没那么方便了。<br><br>首先简单介绍下Python中的类型。在python中一切皆对象，python中有两种对象：<br><br>一种是类型对象（class对象）：表示Python定义的类型，例如int, str, object等；<br><br>另一种是实例对象（instance对象）：表示由class对象创建的实例。<br>Python中的所有对象都是直接或者间接继承object，然后object又是typy类型。可以运行下面的例子看看输出结果：  </p></p>
 <pre><code>class A(object):
     pass
 
@@ -119,7 +119,7 @@ print(isinstance(type, object))
 </code></pre>
 <p>python是一门面向对象的编程语言，它是用C写的，而C又是面向过程的编程语言，那么python的类在C中是如何实现的呢？答案就是用结构体来模拟。  </p>
 <p>在Python的<em>object.h</em>头文件中定义了一个重要的结构体 PyTypeObject 。创建新的类型就是靠的它，该结构体定义如下：  </p>
-<pre><code>typedef struct _typeobject {
+<pre><code>typedef struct _typeobject &#123;
     PyObject_VAR_HEAD
     char *tp_name; /* For printing, in format "&lt;module&gt;.&lt;name&gt;" */
     int tp_basicsize, tp_itemsize; /* For allocation */
@@ -193,17 +193,17 @@ print(isinstance(type, object))
     PyObject *tp_cache;
     PyObject *tp_subclasses;
     PyObject *tp_weaklist;
-} PyTypeObject;
+&#125; PyTypeObject;
 </code></pre>
 <p>这个比较庞大，里面包含的数据比较多，大部分都是一些函数指针而且可以为空，至于每个字段是什么意思请查看Python文档。  </p>
 <h2>创建自定义类型</h2>
 <p>创建一个新的C代码文件 <em>noddy.c</em> ，然后我们编写一个名为 noddy 的扩展模块，该模块包含了一个名为 Noddy 的类。  </p>
 <p>首先创建一个新的 PyTypeObject 类型的变量：</p>
-<pre><code>typedef struct {
+<pre><code>typedef struct &#123;
     PyObject_HEAD
     /* Type-specific fields go here. */
-} noddy_NoddyObject;
-static PyTypeObject noddy_NoddyType = {
+&#125; noddy_NoddyObject;
+static PyTypeObject noddy_NoddyType = &#123;
     PyVarObject_HEAD_INIT(NULL, 0)
     "noddy.Noddy",             /*tp_name*/
     sizeof(noddy_NoddyObject), /*tp_basicsize*/
@@ -225,18 +225,18 @@ static PyTypeObject noddy_NoddyType = {
     0,                         /*tp_as_buffer*/
     Py_TPFLAGS_DEFAULT,        /*tp_flags*/
     "Noddy objects",           /*tp_doc*/
-};
+&#125;;
 </code></pre>
 <p>这里是定义了一个noddy_NoddyObject结构体，它的第一个字段为 PyObject_HEAD ，因此相当于一个PyObject类型；然后还有一个 noddy_NoddyType 变量，它的第一个字段为 <em>PyVarObject_HEAD_INIT(NULL, 0)</em> ，这个很很重要，按理说这个应该写成 <em>PyVarObject_HEAD_INIT(&amp;PyType_Type, 0)</em> ，即表示Noddy这个类是一个type类型的对象。不过有的C编译器会对这个报错，因此这一项将在后面调用PyType_Ready函数来填充。<br>
 noddy_NoddyType 即是 Noddy 类，它保存了该类的元信息；noddy_NoddyObject结构体用于保存该类的实例对象的数据。<br>
 <em>只要是定义的结构体以PyObject_HEAD开始就属于是一个PyObject类型。PyObject_VAR_HEAD与PyObject_HEAD相似，只是PyObject_HEAD表示的是该类型占用内存大小是固定的如int、float；而PyObject_VAR_HEAD表示该类型占用的内存是可变的如list、dict。</em>   </p>
 <p>然后创建一个新扩展模块，并完成初始化：</p>
-<pre><code>static PyMethodDef noddy_methods[] = {
-    {NULL}  /* Sentinel */
-};
+<pre><code>static PyMethodDef noddy_methods[] = &#123;
+    &#123;NULL&#125;  /* Sentinel */
+&#125;;
 PyMODINIT_FUNC
 initnoddy(void) 
-{
+&#123;
     PyObject* m;
 
     noddy_NoddyType.tp_new = PyType_GenericNew;
@@ -248,7 +248,7 @@ initnoddy(void)
 
     Py_INCREF(&amp;noddy_NoddyType);
     PyModule_AddObject(m, "Noddy", (PyObject *)&amp;noddy_NoddyType);
-}
+&#125;
 </code></pre>
 <p><strong><em>注意</em></strong>：以上是针对Python2的，在Python3中模块的初始化操作略有不同。请参考第一节的内容。  </p>
 <p>noddy_NoddyType即是我们要创建的 Noddy 类，它是 PyTypeObject 类型的结构变量。为了创建新的类型，我们需要指明 tp_new 方法，它相当于Python中的 __new__，这里我们使用默认的 PyType_GenericNew 即可。<br>
@@ -270,7 +270,7 @@ class A(noddy.Noddy):
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84091.html" data-id="cl1hn20ft00m5pg4k4tx6zp1r" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84091.html" data-id="cl1hoxk0e006vdwoy6mil1h69" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/C/" rel="tag">C</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/" rel="tag">python</a></li></ul>

@@ -5,15 +5,15 @@
   
   <title>pymongo教程(2)——聚合操作 | 龍昌博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="在MongoDB中常用的聚合操作有 aggregation、map&#x2F;reduce和group 。首先先添加一些测试数据：db.things.insert({“x”: 1, “tags”: [“dog”, “cat”]})db.things.insert({“x”: 2, “tags”: [“cat”]})db.things.insert({“x”: 2, “tags”: [“mouse”, “ca">
+  <meta name="description" content="在MongoDB中常用的聚合操作有 aggregation、map&#x2F;reduce和group 。首先先添加一些测试数据：db.things.insert(&amp;#123;“x”: 1, “tags”: [“dog”, “cat”]&amp;#125;)db.things.insert(&amp;#123;“x”: 2, “tags”: [“cat”]&amp;#125;)db.things.insert(&amp;#123;“x”:">
 <meta property="og:type" content="article">
 <meta property="og:title" content="pymongo教程(2)——聚合操作">
 <meta property="og:url" content="http://www.xefan.com/archives/84057.html">
 <meta property="og:site_name" content="龍昌博客">
-<meta property="og:description" content="在MongoDB中常用的聚合操作有 aggregation、map&#x2F;reduce和group 。首先先添加一些测试数据：db.things.insert({“x”: 1, “tags”: [“dog”, “cat”]})db.things.insert({“x”: 2, “tags”: [“cat”]})db.things.insert({“x”: 2, “tags”: [“mouse”, “ca">
+<meta property="og:description" content="在MongoDB中常用的聚合操作有 aggregation、map&#x2F;reduce和group 。首先先添加一些测试数据：db.things.insert(&amp;#123;“x”: 1, “tags”: [“dog”, “cat”]&amp;#125;)db.things.insert(&amp;#123;“x”: 2, “tags”: [“cat”]&amp;#125;)db.things.insert(&amp;#123;“x”:">
 <meta property="og:locale">
-<meta property="article:published_time" content="2014-03-29T20:57:25.000Z">
-<meta property="article:modified_time" content="2018-01-11T03:57:56.000Z">
+<meta property="article:published_time" content="2014-03-29T12:57:25.000Z">
+<meta property="article:modified_time" content="2022-04-02T10:06:41.280Z">
 <meta property="article:author" content="龍昌">
 <meta property="article:tag" content="python">
 <meta property="article:tag" content="mongodb">
@@ -69,10 +69,10 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="post-/archives/84057.html" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-pymongo教程(2)——聚合操作" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/84057.html" class="article-date">
-  <time datetime="2014-03-29T20:57:25.000Z" itemprop="datePublished">2014-03-29</time>
+  <time datetime="2014-03-29T12:57:25.000Z" itemprop="datePublished">2014-03-29</time>
 </a>
     
   <div class="article-category">
@@ -95,12 +95,12 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>在MongoDB中常用的聚合操作有 aggregation、map/reduce和group 。</p><br><p>首先先添加一些测试数据：</p><br><pre><code>db.things.insert({“x”: 1, “tags”: [“dog”, “cat”]})<br>db.things.insert({“x”: 2, “tags”: [“cat”]})<br>db.things.insert({“x”: 2, “tags”: [“mouse”, “cat”, “dog”]})<br>db.things.insert({“x”: 3, “tags”: []})<br></code></pre><br><h2>aggregation</h2><br><p>以下例子是统计 tags 字段内的各个值的出现的次数。</p><br><pre><code>from bson.son import SON<br>db.things.aggregate([<br>    {“$unwind”: “$tags”},<br>    {“$group”: {“_id”: “$tags”, “count”: {“$sum”: 1}}},<br>    {“$sort”: SON([(“count”, -1), (“_id”, -1)])}<br>])<br><br>{‘ok’: 1.0, ‘result’: [{‘count’: 3, ‘_id’: ‘cat’}, {‘count’: 2, ‘_id’: ‘dog’}, {‘count’: 1, ‘_id’: ‘mouse’}]}<br></code></pre><br><p>注意：aggregate操作要求服务器程序为 2.1.0 以上的版本。PyMongo 驱动程序为 2.3 以上的版本。</p><br><h2>Map/Reduce</h2><br><p>上面的操作同样也可以使用 Map/Reduce 完成。</p><br><pre><code>from bson.code import Code<br>mapper = Code(“””<br>    function () {<br>      this.tags.forEach(function(z) {<br>        emit(z, 1);<br>      });<br>    }<br>“””)<br><br>reducer = Code(“””<br>    function (key, values) {<br>      var total = 0;<br>      for (var i = 0; i &lt; values.length; i++) {<br>        total += values[i];<br>      }<br>      return total;<br>    }<br>“””)<br><br>result = db.things.map_reduce(mapper, reducer, “myresults”)<br>for doc in result.find():<br>    print(doc)<br><br>{u’_id’: u’cat’, u’value’: 3.0}<br>{u’_id’: u’dog’, u’value’: 2.0}<br>{u’_id’: u’mouse’, u’value’: 1.0}<br></code></pre><br><p>map和reduce都是一个javascript的函数； map_reduce 方法会将统计结果保存到一个临时的数据集合中。</p><br><h2>Group</h2><br><p>group 操作与SQL的 GROUP BY 相似，同时比 Map/Reduce 要简单。</p><br><pre><code>reducer = Code(“””<br>    function(obj, prev){<br>      prev.count++;<br>    }<br>“””)<br><br>results = db.things.group(key={“x”:1}, condition={}, initial={“count”: 0}, reduce=reducer)<br>for doc in results:<br>    print(doc)<br><br>{‘x’: 1.0, ‘count’: 1.0}<br>{‘x’: 2.0, ‘count’: 2.0}<br>{‘x’: 3.0, ‘count’: 1.0}<br></code></pre><br><p>注意：在MongoDB的集群环境中不支持 group 操作，可以使用 aggregation 或者 map/reduce 代替。</p><br><p>完整的MongoDB聚合文档： <a href="http://docs.mongodb.org/manual/aggregation/" target="_blank" rel="external">http://docs.mongodb.org/manual/aggregation/</a></p>
+        <p>在MongoDB中常用的聚合操作有 aggregation、map/reduce和group 。</p><br><p>首先先添加一些测试数据：</p><br><pre><code>db.things.insert(&#123;“x”: 1, “tags”: [“dog”, “cat”]&#125;)<br>db.things.insert(&#123;“x”: 2, “tags”: [“cat”]&#125;)<br>db.things.insert(&#123;“x”: 2, “tags”: [“mouse”, “cat”, “dog”]&#125;)<br>db.things.insert(&#123;“x”: 3, “tags”: []&#125;)<br></code></pre><br><h2>aggregation</h2><br><p>以下例子是统计 tags 字段内的各个值的出现的次数。</p><br><pre><code>from bson.son import SON<br>db.things.aggregate([<br>    &#123;“$unwind”: “$tags”&#125;,<br>    &#123;“$group”: &#123;“_id”: “$tags”, “count”: &#123;“$sum”: 1&#125;&#125;&#125;,<br>    &#123;“$sort”: SON([(“count”, -1), (“_id”, -1)])&#125;<br>])<br><br>&#123;‘ok’: 1.0, ‘result’: [&#123;‘count’: 3, ‘_id’: ‘cat’&#125;, &#123;‘count’: 2, ‘_id’: ‘dog’&#125;, &#123;‘count’: 1, ‘_id’: ‘mouse’&#125;]&#125;<br></code></pre><br><p>注意：aggregate操作要求服务器程序为 2.1.0 以上的版本。PyMongo 驱动程序为 2.3 以上的版本。</p><br><h2>Map/Reduce</h2><br><p>上面的操作同样也可以使用 Map/Reduce 完成。</p><br><pre><code>from bson.code import Code<br>mapper = Code(“””<br>    function () &#123;<br>      this.tags.forEach(function(z) &#123;<br>        emit(z, 1);<br>      &#125;);<br>    &#125;<br>“””)<br><br>reducer = Code(“””<br>    function (key, values) &#123;<br>      var total = 0;<br>      for (var i = 0; i &lt; values.length; i++) &#123;<br>        total += values[i];<br>      &#125;<br>      return total;<br>    &#125;<br>“””)<br><br>result = db.things.map_reduce(mapper, reducer, “myresults”)<br>for doc in result.find():<br>    print(doc)<br><br>&#123;u’_id’: u’cat’, u’value’: 3.0&#125;<br>&#123;u’_id’: u’dog’, u’value’: 2.0&#125;<br>&#123;u’_id’: u’mouse’, u’value’: 1.0&#125;<br></code></pre><br><p>map和reduce都是一个javascript的函数； map_reduce 方法会将统计结果保存到一个临时的数据集合中。</p><br><h2>Group</h2><br><p>group 操作与SQL的 GROUP BY 相似，同时比 Map/Reduce 要简单。</p><br><pre><code>reducer = Code(“””<br>    function(obj, prev)&#123;<br>      prev.count++;<br>    &#125;<br>“””)<br><br>results = db.things.group(key=&#123;“x”:1&#125;, condition=&#123;&#125;, initial=&#123;“count”: 0&#125;, reduce=reducer)<br>for doc in results:<br>    print(doc)<br><br>&#123;‘x’: 1.0, ‘count’: 1.0&#125;<br>&#123;‘x’: 2.0, ‘count’: 2.0&#125;<br>&#123;‘x’: 3.0, ‘count’: 1.0&#125;<br></code></pre><br><p>注意：在MongoDB的集群环境中不支持 group 操作，可以使用 aggregation 或者 map/reduce 代替。</p><br><p>完整的MongoDB聚合文档： <a target="_blank" rel="noopener" href="http://docs.mongodb.org/manual/aggregation/">http://docs.mongodb.org/manual/aggregation/</a></p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84057.html" data-id="cl1hn20fm00lhpg4kwlztx3w0" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84057.html" data-id="cl1hoxk0c006mdwoy1ynwg6e6" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mongodb/" rel="tag">mongodb</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/" rel="tag">python</a></li></ul>

@@ -12,8 +12,8 @@
 <meta property="og:site_name" content="龍昌博客">
 <meta property="og:description" content="Scrapy是一个python的web爬虫框架，其设计思想与Django非常相似。如果事先用过Django的话那么理解Scrapy应该不难。 0.安装Scrapy当前Scrapy的稳定版本是0.18使用pip进行安装：  pip install Scrapy使用easy_install进行安装：  easy_install Scrapy初次使用可以按照它的官方教程操作，先熟悉一下：http:&#x2F;&#x2F;d">
 <meta property="og:locale">
-<meta property="article:published_time" content="2013-10-07T16:47:27.000Z">
-<meta property="article:modified_time" content="2018-01-11T03:56:55.000Z">
+<meta property="article:published_time" content="2013-10-07T08:47:27.000Z">
+<meta property="article:modified_time" content="2022-04-02T10:06:41.276Z">
 <meta property="article:author" content="龍昌">
 <meta property="article:tag" content="python">
 <meta property="article:tag" content="Scrapy">
@@ -69,10 +69,10 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="post-/archives/83883.html" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-Scrapy框架学习笔记1——概括" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/83883.html" class="article-date">
-  <time datetime="2013-10-07T16:47:27.000Z" itemprop="datePublished">2013-10-07</time>
+  <time datetime="2013-10-07T08:47:27.000Z" itemprop="datePublished">2013-10-07</time>
 </a>
     
   <div class="article-category">
@@ -96,7 +96,7 @@
     <div class="article-entry" itemprop="articleBody">
       
         <p>Scrapy是一个python的web爬虫框架，其设计思想与Django非常相似。如果事先用过Django的话那么理解Scrapy应该不难。</p>
-<h3>0.安装Scrapy</h3><br>当前Scrapy的稳定版本是0.18<br>使用pip进行安装：  <code>pip install Scrapy</code><br>使用easy_install进行安装：  <code>easy_install Scrapy</code><br><br><br>初次使用可以按照它的官方教程操作，先熟悉一下：<br><a href="http://doc.scrapy.org/en/0.18/intro/tutorial.html" target="_blank" rel="external">http://doc.scrapy.org/en/0.18/intro/tutorial.html</a><br><br><br><h3>1.一个项目的基本流程</h3><br>  创建新项目  scrapy startproject &lt;name&gt;<br><br>  然后在&lt;name&gt;/spiders目录下新建一个python文件。<br>  编写一个新的class继承自 scrapy.spider.BaseSpider，并且需要设置如下属性：<br>    <em> name: 该爬虫的名字，不能与其它的相同  
+<h3>0.安装Scrapy</h3><br>当前Scrapy的稳定版本是0.18<br>使用pip进行安装：  <code>pip install Scrapy</code><br>使用easy_install进行安装：  <code>easy_install Scrapy</code><br><br><br>初次使用可以按照它的官方教程操作，先熟悉一下：<br><a target="_blank" rel="noopener" href="http://doc.scrapy.org/en/0.18/intro/tutorial.html">http://doc.scrapy.org/en/0.18/intro/tutorial.html</a><br><br><br><h3>1.一个项目的基本流程</h3><br>  创建新项目  scrapy startproject &lt;name&gt;<br><br>  然后在&lt;name&gt;/spiders目录下新建一个python文件。<br>  编写一个新的class继承自 scrapy.spider.BaseSpider，并且需要设置如下属性：<br>    <em> name: 该爬虫的名字，不能与其它的相同  
     </em> start_urls: 开始的url入口<br>    <em> parse(): 对从start_urls的获取的内容进行处理的函数，需要一个Response参数  
     </em> allowed_domains: 一个列表，表示该爬虫允许爬取的网站域名。可选<br><br>  爬虫运行流程：<br>    <em> 首先调用 start_requests()方法访问start_urls的链接（默认的），然后由parse回调方法对请求的响应进行处理。  
     </em> 在回调中处理Response，并返回Item或者Request，再或者是由这两种对象组成的一个可迭代的对象。<br>      Request对象对应的callback可以与parse相同，也可以不同。<br><br><br>  最后运行这个爬虫脚本：  scrapy crawl name<br><br>  也可以直接在终端运行一个选择器： scrapy shell &lt;url&gt;<br><br><br><h3>2.使用Item</h3>
@@ -124,14 +124,14 @@ Item通常是在Spider的parse方法里使用，它用来保存解析到的数�
 </blockquote>
 <h3>4.保存数据</h3>
 
-<p>  想要保存抓取到的数据，最简单的方法是使用Feed exports。 参考官方文档：<a href="http://doc.scrapy.org/en/0.18/topics/feed-exports.html#topics-feed-exports" target="_blank" rel="external">http://doc.scrapy.org/en/0.18/topics/feed-exports.html#topics-feed-exports</a>  </p>
+<p>  想要保存抓取到的数据，最简单的方法是使用Feed exports。 参考官方文档：<a target="_blank" rel="noopener" href="http://doc.scrapy.org/en/0.18/topics/feed-exports.html#topics-feed-exports">http://doc.scrapy.org/en/0.18/topics/feed-exports.html#topics-feed-exports</a>  </p>
 <p>  例如将抓取的数据导出为json:  scrapy crawl dmoz -o items.json -t json  </p>
 <p>  对于小项目用这种方法也足够了。如果是比较复杂的数据的话可能就需要编写一个Item Pipeline进行处理了。</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83883.html" data-id="cl1hn20ef00gxpg4kl8otl4qs" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83883.html" data-id="cl1hoxk00005bdwoyg7uv7078" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Scrapy/" rel="tag">Scrapy</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/" rel="tag">python</a></li></ul>

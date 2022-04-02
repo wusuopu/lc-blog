@@ -12,8 +12,8 @@
 <meta property="og:site_name" content="龍昌博客">
 <meta property="og:description" content="根据TQ2440的手册可知LED1、2、3、4分别由GPB5、6、7、8控制。程序的步骤为：1、先将GPB5、6、7、8设为输出；2、将对应位置0表示LED灯亮，对应位置1表示灯灭。   程序如下： 123456789101112131415161718192021222324@  文件名：led_on.s.equ GPBCON, 0x56000010.equ GPBDAT, 0x56000014">
 <meta property="og:locale">
-<meta property="article:published_time" content="2012-04-29T20:26:34.000Z">
-<meta property="article:modified_time" content="2018-01-11T03:56:34.000Z">
+<meta property="article:published_time" content="2012-04-29T12:26:34.000Z">
+<meta property="article:modified_time" content="2022-04-02T10:06:41.276Z">
 <meta property="article:author" content="龍昌">
 <meta property="article:tag" content="ARM">
 <meta property="article:tag" content="TQ2440">
@@ -69,10 +69,10 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="post-/archives/83725.html" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-TQ2440 LED裸机驱动" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/83725.html" class="article-date">
-  <time datetime="2012-04-29T20:26:34.000Z" itemprop="datePublished">2012-04-29</time>
+  <time datetime="2012-04-29T12:26:34.000Z" itemprop="datePublished">2012-04-29</time>
 </a>
     
   <div class="article-category">
@@ -97,14 +97,14 @@
       
         <p>根据TQ2440的手册可知LED1、2、3、4分别由GPB5、6、7、8控制。<br>程序的步骤为：<br>1、先将GPB5、6、7、8设为输出；<br>2、将对应位置0表示LED灯亮，对应位置1表示灯灭。  </p>
 <p>程序如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">@  文件名：led_on.s</div><div class="line">.equ GPBCON, 0x56000010</div><div class="line">.equ GPBDAT, 0x56000014</div><div class="line">.equ GPBUP,  0x56000018</div><div class="line"></div><div class="line">.text</div><div class="line">.global _start</div><div class="line">_start:</div><div class="line">    LDR R0,=GPBCON</div><div class="line">    MOV R1,#0b010101010000000000    @将GPB5、6、7、8设为输出</div><div class="line">    STR R1,[R0]</div><div class="line">    LDR R0,=GPBDAT</div><div class="line">    MOV R1,#0x00000000</div><div class="line">n:  MVN R1,R1</div><div class="line">    STR R1,[R0]</div><div class="line">    LDR R2,=100000</div><div class="line">w:  SUB R2,R2,#1</div><div class="line">    CMP R2,#0</div><div class="line">    BGT w</div><div class="line">    B n</div><div class="line"></div><div class="line">MAIN_LOOP:</div><div class="line">    B MAIN_LOOP</div><div class="line">.end</div></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">@  文件名：led_on.s</span><br><span class="line">.equ GPBCON, 0x56000010</span><br><span class="line">.equ GPBDAT, 0x56000014</span><br><span class="line">.equ GPBUP,  0x56000018</span><br><span class="line"></span><br><span class="line">.text</span><br><span class="line">.global _start</span><br><span class="line">_start:</span><br><span class="line">    LDR R0,=GPBCON</span><br><span class="line">    MOV R1,#0b010101010000000000    @将GPB5、6、7、8设为输出</span><br><span class="line">    STR R1,[R0]</span><br><span class="line">    LDR R0,=GPBDAT</span><br><span class="line">    MOV R1,#0x00000000</span><br><span class="line">n:  MVN R1,R1</span><br><span class="line">    STR R1,[R0]</span><br><span class="line">    LDR R2,=100000</span><br><span class="line">w:  SUB R2,R2,#1</span><br><span class="line">    CMP R2,#0</span><br><span class="line">    BGT w</span><br><span class="line">    B n</span><br><span class="line"></span><br><span class="line">MAIN_LOOP:</span><br><span class="line">    B MAIN_LOOP</span><br><span class="line">.end</span><br></pre></td></tr></table></figure>
 <p>Makefile内容如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">ARCH=arm-linux-</div><div class="line">CC=$(ARCH)gcc</div><div class="line">LD=$(ARCH)ld</div><div class="line">Objcopy=$(ARCH)objcopy</div><div class="line"></div><div class="line">led_on:led_on.s</div><div class="line">	$(CC) -g -c -o led_on.o led_on.s</div><div class="line">	$(LD) -Ttext 0x00000000 -g led_on.o -o led_on_elf</div><div class="line">	$(Objcopy) -O binary -S led_on_elf led_on.bin</div><div class="line">clean:</div><div class="line">	rm -f led_on.bin</div><div class="line">	rm -f led_on.o</div><div class="line">	rm -f led_on_elf</div></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">ARCH=arm-linux-</span><br><span class="line">CC=$(ARCH)gcc</span><br><span class="line">LD=$(ARCH)ld</span><br><span class="line">Objcopy=$(ARCH)objcopy</span><br><span class="line"></span><br><span class="line">led_on:led_on.s</span><br><span class="line">	$(CC) -g -c -o led_on.o led_on.s</span><br><span class="line">	$(LD) -Ttext 0x00000000 -g led_on.o -o led_on_elf</span><br><span class="line">	$(Objcopy) -O binary -S led_on_elf led_on.bin</span><br><span class="line">clean:</span><br><span class="line">	rm -f led_on.bin</span><br><span class="line">	rm -f led_on.o</span><br><span class="line">	rm -f led_on_elf</span><br></pre></td></tr></table></figure>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83725.html" data-id="cl1hn20d500copg4ke5bw0s0z" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83725.html" data-id="cl1hoxjzp0042dwoyh36dgmmu" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ARM/" rel="tag">ARM</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/TQ2440/" rel="tag">TQ2440</a></li></ul>

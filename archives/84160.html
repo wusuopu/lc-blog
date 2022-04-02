@@ -12,8 +12,8 @@
 <meta property="og:site_name" content="龍昌博客">
 <meta property="og:description" content="Browsersync  是一个前端调试的利器，它能够让你在页面文件改动之后自动刷新浏览器，从而方便了前端的调试工作。 本文就是对于 Browsersync + Gulp 的配置作个简单的笔记。  首先安装 Browsersync 与 Gulp:  1$ npm install browser-sync gulp --save-dev  在 gulpfile.js 中创建新任务：  1234567">
 <meta property="og:locale">
-<meta property="article:published_time" content="2016-03-26T14:32:56.000Z">
-<meta property="article:modified_time" content="2017-01-21T16:20:19.000Z">
+<meta property="article:published_time" content="2016-03-26T06:32:56.000Z">
+<meta property="article:modified_time" content="2022-04-02T10:06:41.280Z">
 <meta property="article:author" content="龍昌">
 <meta property="article:tag" content="js">
 <meta property="article:tag" content="gulp">
@@ -69,10 +69,10 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="post-/archives/84160.html" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-gulp+browserSync配置" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/84160.html" class="article-date">
-  <time datetime="2016-03-26T14:32:56.000Z" itemprop="datePublished">2016-03-26</time>
+  <time datetime="2016-03-26T06:32:56.000Z" itemprop="datePublished">2016-03-26</time>
 </a>
     
   <div class="article-category">
@@ -100,14 +100,14 @@
 <ol>
 <li>首先安装 Browsersync 与 Gulp:</li>
 </ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ npm install browser-sync gulp --save-dev</div></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install browser-sync gulp --save-dev</span><br></pre></td></tr></table></figure>
 <ol>
 <li>在 <code>gulpfile.js</code> 中创建新任务：</li>
 </ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">var gulp = require(&apos;gulp&apos;);</div><div class="line">var browserSync = require(&apos;browser-sync&apos;).create();</div><div class="line"></div><div class="line">var config = &#123;</div><div class="line">  baseDir: &apos;src&apos;,</div><div class="line">  watchFiles: [ &apos;src/**/*.html&apos;, &apos;src/assets/css/*.css&apos;, &apos;src/assets/js/*.js&apos; ]</div><div class="line">&#125;</div><div class="line"></div><div class="line">gulp.task(&apos;serve&apos;, function() &#123;</div><div class="line">  browserSync.init(&#123;</div><div class="line">    files: config.watchFiles,</div><div class="line">    server: &#123;</div><div class="line">      baseDir: config.baseDir</div><div class="line">    &#125;</div><div class="line">  &#125;);</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">var gulp = require(&#x27;gulp&#x27;);</span><br><span class="line">var browserSync = require(&#x27;browser-sync&#x27;).create();</span><br><span class="line"></span><br><span class="line">var config = &#123;</span><br><span class="line">  baseDir: &#x27;src&#x27;,</span><br><span class="line">  watchFiles: [ &#x27;src/**/*.html&#x27;, &#x27;src/assets/css/*.css&#x27;, &#x27;src/assets/js/*.js&#x27; ]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">gulp.task(&#x27;serve&#x27;, function() &#123;</span><br><span class="line">  browserSync.init(&#123;</span><br><span class="line">    files: config.watchFiles,</span><br><span class="line">    server: &#123;</span><br><span class="line">      baseDir: config.baseDir</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
 <p>这里表示以 <code>src</code> 目录作为根目录启动 HTTP 服务，并监听 <code>src</code> 目录下的所有 <code>html</code>、<code>css</code> 以及 <code>js</code> 类型的文件，当这些文件有改动时 Browsersync 会自动刷新浏览器页面。</p>
-<p>如果想配合使用 SASS 之类的，可以参考： <a href="https://www.browsersync.io/docs/gulp/" target="_blank" rel="external">https://www.browsersync.io/docs/gulp/</a></p>
-<p>同时为了避免之后每次都要重新配置一遍，于是我自己写了个简单的 <code>yo</code> 生成器： <a href="https://github.com/wusuopu/my-yeoman-generator" target="_blank" rel="external">https://github.com/wusuopu/my-yeoman-generator</a></p>
+<p>如果想配合使用 SASS 之类的，可以参考： <a target="_blank" rel="noopener" href="https://www.browsersync.io/docs/gulp/">https://www.browsersync.io/docs/gulp/</a></p>
+<p>同时为了避免之后每次都要重新配置一遍，于是我自己写了个简单的 <code>yo</code> 生成器： <a target="_blank" rel="noopener" href="https://github.com/wusuopu/my-yeoman-generator">https://github.com/wusuopu/my-yeoman-generator</a></p>
 <p>由于这只是我自己 generator，并没有发布到 npm 上，因此只能手动进行安装。各位有兴趣的可以试试。使用方法：</p>
 <ol>
 <li><p>安装 yo 和 bower： <code>$ npm install -g yo bower</code></p>
@@ -115,17 +115,17 @@
 <li><p>安装 generator:</p>
 </li>
 </ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$ git clone https://github.com/wusuopu/my-yeoman-generator generator-wusuopu</div><div class="line">$ cd generator-wusuopu</div><div class="line">$ npm link</div></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ git clone https://github.com/wusuopu/my-yeoman-generator generator-wusuopu</span><br><span class="line">$ cd generator-wusuopu</span><br><span class="line">$ npm link</span><br></pre></td></tr></table></figure>
 <ol>
 <li>生成项目：</li>
 </ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$ mkdir webpage</div><div class="line">$ cd webpage</div><div class="line">$ yo wusuopu:bootstrap3</div></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ mkdir webpage</span><br><span class="line">$ cd webpage</span><br><span class="line">$ yo wusuopu:bootstrap3</span><br></pre></td></tr></table></figure>
 <p>这里 bootstrap3 generator 包含了 bootstrap3、font-awesome、jquery 这些常用的前端库，省得每次都需要重新下载一遍。</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84160.html" data-id="cl1hn20gw00q3pg4kkqbt0ruc" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84160.html" data-id="cl1hoxk0q0080dwoyf027495x" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gulp/" rel="tag">gulp</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/" rel="tag">js</a></li></ul>

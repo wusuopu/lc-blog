@@ -12,8 +12,8 @@
 <meta property="og:site_name" content="龍昌博客">
 <meta property="og:description" content="pymongo提供一些常用的数据类型，如：数据、字符串、日期等。如果感觉还不能满足需求，那么还可以自定义数据类型。 首先定义一个类： class Custom(object):     def __init__(self, x):         self.__x &#x3D; x      def x(self):         return self.__x  要将自定义类型的数据存入数据库中需要先进">
 <meta property="og:locale">
-<meta property="article:published_time" content="2014-03-30T20:05:55.000Z">
-<meta property="article:modified_time" content="2018-01-11T03:57:57.000Z">
+<meta property="article:published_time" content="2014-03-30T12:05:55.000Z">
+<meta property="article:modified_time" content="2022-04-02T10:06:41.280Z">
 <meta property="article:author" content="龍昌">
 <meta property="article:tag" content="python">
 <meta property="article:tag" content="mongodb">
@@ -69,10 +69,10 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="post-/archives/84060.html" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-pymongo教程(3)——自定义数据类型" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/84060.html" class="article-date">
-  <time datetime="2014-03-30T20:05:55.000Z" itemprop="datePublished">2014-03-30</time>
+  <time datetime="2014-03-30T12:05:55.000Z" itemprop="datePublished">2014-03-30</time>
 </a>
     
   <div class="article-category">
@@ -95,8 +95,8 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p></p><p>pymongo提供一些常用的数据类型，如：数据、字符串、日期等。如果感觉还不能满足需求，那么还可以自定义数据类型。</p><p></p>
-<p></p><p>首先定义一个类：</p><p></p>
+        <p><p>pymongo提供一些常用的数据类型，如：数据、字符串、日期等。如果感觉还不能满足需求，那么还可以自定义数据类型。</p></p>
+<p><p>首先定义一个类：</p></p>
 <pre><code>class Custom(object):
     def __init__(self, x):
         self.__x = x
@@ -108,13 +108,13 @@
 <h2>手动编码/解码</h2>
 <p>我们可以定义两个方法，在插入和查询数据时进行手动的编码、解码。</p>
 <pre><code>def encode_custom(custom):
-    return {"_type": "custom", "x": custom.x()}
+    return &#123;"_type": "custom", "x": custom.x()&#125;
 
 def decode_custom(document):
     assert document["_type"] == "custom"
     return Custom(document["x"])
 
-print(db.test.insert({"custom": encode_custom(Custom(5))}))
+print(db.test.insert(&#123;"custom": encode_custom(Custom(5))&#125;))
 print(db.test.find_one()['custom'])
 </code></pre>
 <h2>自动编码/解码</h2>
@@ -139,7 +139,7 @@ class Transform(SONManipulator):
         return son
 
 db.add_son_manipulator(Transform())
-print(db.test.insert({"custom": Custom(5)}))
+print(db.test.insert(&#123;"custom": Custom(5)&#125;))
 print(db.test.find_one())
 </code></pre>
 <h2>二进制编码</h2>
@@ -169,14 +169,14 @@ class TransformToBinary(SONManipulator):
         return son
 
 db.add_son_manipulator(TransformToBinary())
-print(db.test.insert({"custom": Custom(5)}))
+print(db.test.insert(&#123;"custom": Custom(5)&#125;))
 print(db.test.find_one())
 </code></pre>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84060.html" data-id="cl1hn20fl00lapg4khth55dlz" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84060.html" data-id="cl1hoxk0c006ndwoy30nkb9zb" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mongodb/" rel="tag">mongodb</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/" rel="tag">python</a></li></ul>

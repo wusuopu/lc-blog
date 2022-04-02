@@ -12,8 +12,8 @@
 <meta property="og:site_name" content="龍昌博客">
 <meta property="og:description" content="最近在使用 Ajax api 请求时遇到了跨域的问题，现在问题解决了顺便做个笔记。   场景：现在主站域名为 example.org ，需要通过 ajax 请求 hello-world.example 上的资源。 Access-Control-Allow-Origin如果请求时遇到如下错误：No &#39;Access-Control-Allow-Origin&#39; header is pre">
 <meta property="og:locale">
-<meta property="article:published_time" content="2016-03-17T16:35:12.000Z">
-<meta property="article:modified_time" content="2017-01-21T16:20:19.000Z">
+<meta property="article:published_time" content="2016-03-17T08:35:12.000Z">
+<meta property="article:modified_time" content="2022-04-02T10:06:41.280Z">
 <meta property="article:author" content="龍昌">
 <meta property="article:tag" content="ajax">
 <meta name="twitter:card" content="summary">
@@ -68,10 +68,10 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="post-/archives/84159.html" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-HTTP Access Control跨域请求" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/84159.html" class="article-date">
-  <time datetime="2016-03-17T16:35:12.000Z" itemprop="datePublished">2016-03-17</time>
+  <time datetime="2016-03-17T08:35:12.000Z" itemprop="datePublished">2016-03-17</time>
 </a>
     
   <div class="article-category">
@@ -99,18 +99,18 @@
 <h2 id="Access-Control-Allow-Origin"><a href="#Access-Control-Allow-Origin" class="headerlink" title="Access-Control-Allow-Origin"></a>Access-Control-Allow-Origin</h2><p>如果请求时遇到如下错误：<br><code>No &#39;Access-Control-Allow-Origin&#39; header is present on the requested resource. Origin &#39;http://example.org&#39; is therefore not allowed access.</code></p>
 <p>则需要在 hello-world.example 的 server 端 Response Headers 中设置 <code>Access-Control-Allow-Origin</code> 字段。其值根据情况设置为 <code>http://example.org</code> 或者 <code>https://example.org</code> 。</p>
 <h2 id="Access-Control-Allow-Methods"><a href="#Access-Control-Allow-Methods" class="headerlink" title="Access-Control-Allow-Methods"></a>Access-Control-Allow-Methods</h2><p>一般情况下只允许 GET 和 POST 请求，对于 RESTful 的 api 可能会有其他类型的请求。例如：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">$.ajax(&#123;</div><div class="line">  url: &apos;http://hello-world.example/sessions/me.json&apos;,</div><div class="line">  method: &apos;DELETE&apos;,</div><div class="line">  dataType: &apos;json&apos;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$.ajax(&#123;</span><br><span class="line">  url: &#x27;http://hello-world.example/sessions/me.json&#x27;,</span><br><span class="line">  method: &#x27;DELETE&#x27;,</span><br><span class="line">  dataType: &#x27;json&#x27;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
 <p>这时如果出现方法不被允许，则需要在 server 端 Response Headers 中设置 <code>Access-Control-Allow-Methods</code> 字段。如： <code>Access-Control-Allow-Methods: GET, POST, DELETE</code> 。</p>
 <h2 id="Access-Control-Allow-Credentials"><a href="#Access-Control-Allow-Credentials" class="headerlink" title="Access-Control-Allow-Credentials"></a>Access-Control-Allow-Credentials</h2><p>当在 hello-world.example 站点登录之后，浏览器会保存对应的 Cookies ，但是在 example.org 站点中使用 ajax 时发现 hello-world.example 的 Cookies 并没有附加到 Request Headers 中。</p>
 <p>此时就需要设置 XMLHttpRequest 的 <code>withCredentials</code> 属性，例如：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">$.ajax(&#123;</div><div class="line">  url: &apos;http://hello-world.example/session/me.json&apos;,</div><div class="line">  method: &apos;GET&apos;,</div><div class="line">  dataType: &apos;json&apos;,</div><div class="line">  xhrFields: &#123;</div><div class="line">      withCredentials: true</div><div class="line">  &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$.ajax(&#123;</span><br><span class="line">  url: &#x27;http://hello-world.example/session/me.json&#x27;,</span><br><span class="line">  method: &#x27;GET&#x27;,</span><br><span class="line">  dataType: &#x27;json&#x27;,</span><br><span class="line">  xhrFields: &#123;</span><br><span class="line">      withCredentials: true</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
 <p>同时在 server 端 Response Headers 中设置 <code>Access-Control-Allow-Credentials</code> 字段。说明允许通过跨域修改 Cookies 。如： <code>Access-Control-Allow-Credentials: true</code></p>
-<p>以上是常用的几个字段，更多设置参考手册： <a href="https://www.w3.org/TR/access-control/" target="_blank" rel="external">https://www.w3.org/TR/access-control/</a></p>
+<p>以上是常用的几个字段，更多设置参考手册： <a target="_blank" rel="noopener" href="https://www.w3.org/TR/access-control/">https://www.w3.org/TR/access-control/</a></p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84159.html" data-id="cl1hn20gv00q0pg4kdzxnnnai" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84159.html" data-id="cl1hoxk0p007zdwoy9qck4esz" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ajax/" rel="tag">ajax</a></li></ul>

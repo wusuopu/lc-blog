@@ -67,10 +67,10 @@
       <div class="outer">
         <section id="main">
   
-    <article id="post-/archives/84066.html" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-mongoengine教程(2)——文档模式" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/84066.html" class="article-date">
-  <time datetime="2014-04-03T20:46:12.000Z" itemprop="datePublished">2014-04-03</time>
+  <time datetime="2014-04-03T12:46:12.000Z" itemprop="datePublished">2014-04-03</time>
 </a>
     
   <div class="article-category">
@@ -93,12 +93,12 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>在MongoDB中一个文档(document)与关系型数据库中的一行(row)相似；文档保存在集合(collection)中，行保存在表(table)中。</p><br><h2>定义文档的模式</h2><br><p>与django类似，要定义一个文档模式只需要创建一个类继承自 Document，并添加一些 Field 对象。</p><br><pre><code>from mongoengine import *<br>import datetime<br><br>class Page(Document):<br>    title = StringField(max_length=200, required=True)<br>    date_modified = DateTimeField(default=datetime.datetime.now)<br></code></pre><br><p>如上定义了一个文档模式具有 title和date_modified 两个字段。</p><br><p>同时MongoDB本身就是无模式的，因此我们还可以创建动态的文档模式。它可以在添加数据时为不同的数据设置不同的字段。</p><br><pre><code>class Page(DynamicDocument):<br>    title = StringField(max_length=200, required=True)<br></code></pre><br><p>添加数据：</p><br><pre><code>page = Page(title=’Using MongoEngine’)<br>page.tags = [‘mongodb’, ‘mongoengine’]<br>page.save()<br></code></pre><br><h2>文档字段</h2><br><p>文档字段(Field)不是必需的，但是使用它来进行数据验证、设置默认值等操作会比较方便。</p><br><p>MongoEngine提供了如下这些类型的Field:</p><br><ul><br><li>BinaryField  </li><br><li>BooleanField  </li><br><li>ComplexDateTimeField  </li><br><li>DateTimeField  </li><br><li>DecimalField  </li><br><li>DictField  </li><br><li>DynamicField  </li><br><li>EmailField  </li><br><li>EmbeddedDocumentField  </li><br><li>FileField  </li><br><li>FloatField  </li><br><li>GenericEmbeddedDocumentField  </li><br><li>GenericReferenceField  </li><br><li>GeoPointField  </li><br><li>ImageField  </li><br><li>IntField  </li><br><li>ListField  </li><br><li>MapField  </li><br><li>ObjectIdField  </li><br><li>ReferenceField  </li><br><li>SequenceField  </li><br><li>SortedListField  </li><br><li>StringField  </li><br><li>URLField  </li><br><li>UUIDField  </li><br></ul><br><h2>文档之间引用关系</h2><br><p>在关系型数据库中多个表可以使用外键进行关联。然而MongoDB是无模式的，因此想要达到这样的效果就这能在应用程序中自己手动的进行关联了。</p><br><p>不过还好，使用MongoEngine的ReferenceField可以很方便的实现。</p><br><pre><code>class User(Document):<br>    name = StringField()<br><br>class Page(Document):<br>    content = StringField()<br>    author = ReferenceField(User)<br><br>john = User(name=”John Smith”)<br>john.save()<br><br>post = Page(content=”Test Page”)<br>post.author = john<br>post.save()<br></code></pre><br><h3>一对多的关系</h3><br><p>对于一对多的关系可以使用ListField来保存一个ReferenceField列表。在进行查询操作是需要传入一个实例对象。</p><br><pre><code>class User(Document):<br>    name = StringField()<br><br>class Page(Document):<br>    content = StringField()<br>    authors = ListField(ReferenceField(User))<br><br>bob = User(name=”Bob Jones”).save()<br>john = User(name=”John Smith”).save()<br><br>Page(content=”Test Page”, authors=[bob, john]).save()<br>Page(content=”Another Page”, authors=[john]).save()<br><br># Find all pages Bob authored<br>Page.objects(authors__in=[bob])<br></code></pre><br><h3>引用对象的删除操作</h3><br><p>MongoDB默认不会检查数据的完整性，因此在删除一个对象是就需要自己手动的处理引用了该对象的其他对象。</p><br><p>同样的MongoEngine也提供了一样的功能。ReferenceField有一个 reverse_delete_rule 参数可以进行设置。它的取值如下：  </p><br><ul><br><li>mongoengine.DO_NOTHING:默认就是这个值，它不会进行任何操作。  </li><br><li>mongoengine.DENY:如果该对象还被其他对象引用，则拒绝删除。  </li><br><li>mongoengine.NULLIFY:将其他对象对该对象的引用字段设为null。  </li><br><li>mongoengine.CASCADE:将引用了该对象的其他对象也删除掉。  </li><br><li>mongoengine.PULL:移除对该对象的引用。  </li><br></ul><br><h2>索引</h2><br><p>与django的Model相似，MongoEngine的Document也可以在meta属性中设置索引。</p><br><pre><code>class Page(Document):<br>    title = StringField()<br>    rating = StringField()<br>    meta = {<br>        ‘indexes’: [‘title’, (‘title’, ‘-rating’)]<br>    }<br></code></pre><br><p>meta中的indexes可以是一个列表，也可以是一个字典。</p>
+        <p>在MongoDB中一个文档(document)与关系型数据库中的一行(row)相似；文档保存在集合(collection)中，行保存在表(table)中。</p><br><h2>定义文档的模式</h2><br><p>与django类似，要定义一个文档模式只需要创建一个类继承自 Document，并添加一些 Field 对象。</p><br><pre><code>from mongoengine import *<br>import datetime<br><br>class Page(Document):<br>    title = StringField(max_length=200, required=True)<br>    date_modified = DateTimeField(default=datetime.datetime.now)<br></code></pre><br><p>如上定义了一个文档模式具有 title和date_modified 两个字段。</p><br><p>同时MongoDB本身就是无模式的，因此我们还可以创建动态的文档模式。它可以在添加数据时为不同的数据设置不同的字段。</p><br><pre><code>class Page(DynamicDocument):<br>    title = StringField(max_length=200, required=True)<br></code></pre><br><p>添加数据：</p><br><pre><code>page = Page(title=’Using MongoEngine’)<br>page.tags = [‘mongodb’, ‘mongoengine’]<br>page.save()<br></code></pre><br><h2>文档字段</h2><br><p>文档字段(Field)不是必需的，但是使用它来进行数据验证、设置默认值等操作会比较方便。</p><br><p>MongoEngine提供了如下这些类型的Field:</p><br><ul><br><li>BinaryField  </li><br><li>BooleanField  </li><br><li>ComplexDateTimeField  </li><br><li>DateTimeField  </li><br><li>DecimalField  </li><br><li>DictField  </li><br><li>DynamicField  </li><br><li>EmailField  </li><br><li>EmbeddedDocumentField  </li><br><li>FileField  </li><br><li>FloatField  </li><br><li>GenericEmbeddedDocumentField  </li><br><li>GenericReferenceField  </li><br><li>GeoPointField  </li><br><li>ImageField  </li><br><li>IntField  </li><br><li>ListField  </li><br><li>MapField  </li><br><li>ObjectIdField  </li><br><li>ReferenceField  </li><br><li>SequenceField  </li><br><li>SortedListField  </li><br><li>StringField  </li><br><li>URLField  </li><br><li>UUIDField  </li><br></ul><br><h2>文档之间引用关系</h2><br><p>在关系型数据库中多个表可以使用外键进行关联。然而MongoDB是无模式的，因此想要达到这样的效果就这能在应用程序中自己手动的进行关联了。</p><br><p>不过还好，使用MongoEngine的ReferenceField可以很方便的实现。</p><br><pre><code>class User(Document):<br>    name = StringField()<br><br>class Page(Document):<br>    content = StringField()<br>    author = ReferenceField(User)<br><br>john = User(name=”John Smith”)<br>john.save()<br><br>post = Page(content=”Test Page”)<br>post.author = john<br>post.save()<br></code></pre><br><h3>一对多的关系</h3><br><p>对于一对多的关系可以使用ListField来保存一个ReferenceField列表。在进行查询操作是需要传入一个实例对象。</p><br><pre><code>class User(Document):<br>    name = StringField()<br><br>class Page(Document):<br>    content = StringField()<br>    authors = ListField(ReferenceField(User))<br><br>bob = User(name=”Bob Jones”).save()<br>john = User(name=”John Smith”).save()<br><br>Page(content=”Test Page”, authors=[bob, john]).save()<br>Page(content=”Another Page”, authors=[john]).save()<br><br># Find all pages Bob authored<br>Page.objects(authors__in=[bob])<br></code></pre><br><h3>引用对象的删除操作</h3><br><p>MongoDB默认不会检查数据的完整性，因此在删除一个对象是就需要自己手动的处理引用了该对象的其他对象。</p><br><p>同样的MongoEngine也提供了一样的功能。ReferenceField有一个 reverse_delete_rule 参数可以进行设置。它的取值如下：  </p><br><ul><br><li>mongoengine.DO_NOTHING:默认就是这个值，它不会进行任何操作。  </li><br><li>mongoengine.DENY:如果该对象还被其他对象引用，则拒绝删除。  </li><br><li>mongoengine.NULLIFY:将其他对象对该对象的引用字段设为null。  </li><br><li>mongoengine.CASCADE:将引用了该对象的其他对象也删除掉。  </li><br><li>mongoengine.PULL:移除对该对象的引用。  </li><br></ul><br><h2>索引</h2><br><p>与django的Model相似，MongoEngine的Document也可以在meta属性中设置索引。</p><br><pre><code>class Page(Document):<br>    title = StringField()<br>    rating = StringField()<br>    meta = &#123;<br>        ‘indexes’: [‘title’, (‘title’, ‘-rating’)]<br>    &#125;<br></code></pre><br><p>meta中的indexes可以是一个列表，也可以是一个字典。</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84066.html" data-id="cl1hn20fn00llpg4kczy4bkfz" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84066.html" data-id="cl1hoxk0c006pdwoy1gas3ns9" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mongodb/" rel="tag">mongodb</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/" rel="tag">python</a></li></ul>
@@ -111,10 +111,10 @@
 
 
   
-    <article id="post-/archives/84063.html" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-mongoengine教程(1)——概述" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/84063.html" class="article-date">
-  <time datetime="2014-04-02T20:23:09.000Z" itemprop="datePublished">2014-04-02</time>
+  <time datetime="2014-04-02T12:23:09.000Z" itemprop="datePublished">2014-04-02</time>
 </a>
     
   <div class="article-category">
@@ -137,12 +137,12 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>MongoEngine是MongoDB的一个ODM(Object-Document Mapper)框架，它提供了类似Django的语法来操作MongoDB数据库。</p><br><h2>安装</h2><br><p>安装 MongoEngine 需要先安装 PyMongo。  </p><br><h3>使用pip安装</h3><br><pre><code>$ [sudo] pip install mongoengine<br></code></pre><br><h3>通过源代码安装</h3><br><p>先从 <a href="http://pypi.python.org/pypi/mongoengine/" target="_blank" rel="external">PyPi</a> 或者 <a href="http://github.com/MongoEngine/mongoengine" target="_blank" rel="external">Github</a> 下载源代码。然后再进行安装。</p><br><pre><code>$ [sudo] python setup.py install<br></code></pre><br><h2>使用</h2><br><p>首先启动 mongodb 服务器：</p><br><pre><code>$ mongod<br></code></pre><br><h3>连接服务器</h3><br><p>使用 connect 方法进行数据库链接，与pymongo的用法相似，其参数可以是多种型式的。</p><br><pre><code>from mongoengine import connect<br>connect(‘project1’)<br>connect(‘project1’, host=’mongodb://localhost:27017/test_database’)<br></code></pre><br><p>从 MongoEngine 0.6 开始增加了多数据库的支持， connect 的第二个参数可以为每个链接设置一个别名。</p><br><h3>定义数据模型</h3><br><p>mongoengine的 Document 与django的 Model 相似。</p><br><pre><code>class User(mongoengine.Document):<br>    name = mongoengine.StringField()<br><br>    meta = {“db_alias”: “default”}<br></code></pre><br><h3>数据操作</h3><br><p>数据的添加过程也与django相似：</p><br><pre><code>User.objects.create(name=”test1”)<br>User.objects.create(name=”test2”)<br>User(name=”test3”).save()<br></code></pre><br><p>查询数据：</p><br><pre><code>User.objects.filter(name=”test2”)<br></code></pre><br><p>删除数据：</p><br><pre><code>User.objects.filter(name=”test2”).delete()<br></code></pre><br><p>MongoEngine虽然提供了ODM，但是我们同样还是可以直接对数据库进行操作。<br><br>获取 pymongo 的 collection 对象：</p><br><pre><code>User.objects._collection<br></code></pre><br><p>然后就可以使用原生的pymongo操作了。</p>
+        <p>MongoEngine是MongoDB的一个ODM(Object-Document Mapper)框架，它提供了类似Django的语法来操作MongoDB数据库。</p><br><h2>安装</h2><br><p>安装 MongoEngine 需要先安装 PyMongo。  </p><br><h3>使用pip安装</h3><br><pre><code>$ [sudo] pip install mongoengine<br></code></pre><br><h3>通过源代码安装</h3><br><p>先从 <a target="_blank" rel="noopener" href="http://pypi.python.org/pypi/mongoengine/">PyPi</a> 或者 <a target="_blank" rel="noopener" href="http://github.com/MongoEngine/mongoengine">Github</a> 下载源代码。然后再进行安装。</p><br><pre><code>$ [sudo] python setup.py install<br></code></pre><br><h2>使用</h2><br><p>首先启动 mongodb 服务器：</p><br><pre><code>$ mongod<br></code></pre><br><h3>连接服务器</h3><br><p>使用 connect 方法进行数据库链接，与pymongo的用法相似，其参数可以是多种型式的。</p><br><pre><code>from mongoengine import connect<br>connect(‘project1’)<br>connect(‘project1’, host=’mongodb://localhost:27017/test_database’)<br></code></pre><br><p>从 MongoEngine 0.6 开始增加了多数据库的支持， connect 的第二个参数可以为每个链接设置一个别名。</p><br><h3>定义数据模型</h3><br><p>mongoengine的 Document 与django的 Model 相似。</p><br><pre><code>class User(mongoengine.Document):<br>    name = mongoengine.StringField()<br><br>    meta = &#123;“db_alias”: “default”&#125;<br></code></pre><br><h3>数据操作</h3><br><p>数据的添加过程也与django相似：</p><br><pre><code>User.objects.create(name=”test1”)<br>User.objects.create(name=”test2”)<br>User(name=”test3”).save()<br></code></pre><br><p>查询数据：</p><br><pre><code>User.objects.filter(name=”test2”)<br></code></pre><br><p>删除数据：</p><br><pre><code>User.objects.filter(name=”test2”).delete()<br></code></pre><br><p>MongoEngine虽然提供了ODM，但是我们同样还是可以直接对数据库进行操作。<br><br>获取 pymongo 的 collection 对象：</p><br><pre><code>User.objects._collection<br></code></pre><br><p>然后就可以使用原生的pymongo操作了。</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84063.html" data-id="cl1hn20fm00lepg4k2lv3xigm" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84063.html" data-id="cl1hoxk0c006odwoyh9vh9mq7" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mongodb/" rel="tag">mongodb</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/" rel="tag">python</a></li></ul>
@@ -155,10 +155,10 @@
 
 
   
-    <article id="post-/archives/84060.html" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-pymongo教程(3)——自定义数据类型" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/84060.html" class="article-date">
-  <time datetime="2014-03-30T20:05:55.000Z" itemprop="datePublished">2014-03-30</time>
+  <time datetime="2014-03-30T12:05:55.000Z" itemprop="datePublished">2014-03-30</time>
 </a>
     
   <div class="article-category">
@@ -181,8 +181,8 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p></p><p>pymongo提供一些常用的数据类型，如：数据、字符串、日期等。如果感觉还不能满足需求，那么还可以自定义数据类型。</p><p></p>
-<p></p><p>首先定义一个类：</p><p></p>
+        <p><p>pymongo提供一些常用的数据类型，如：数据、字符串、日期等。如果感觉还不能满足需求，那么还可以自定义数据类型。</p></p>
+<p><p>首先定义一个类：</p></p>
 <pre><code>class Custom(object):
     def __init__(self, x):
         self.__x = x
@@ -194,13 +194,13 @@
 <h2>手动编码/解码</h2>
 <p>我们可以定义两个方法，在插入和查询数据时进行手动的编码、解码。</p>
 <pre><code>def encode_custom(custom):
-    return {"_type": "custom", "x": custom.x()}
+    return &#123;"_type": "custom", "x": custom.x()&#125;
 
 def decode_custom(document):
     assert document["_type"] == "custom"
     return Custom(document["x"])
 
-print(db.test.insert({"custom": encode_custom(Custom(5))}))
+print(db.test.insert(&#123;"custom": encode_custom(Custom(5))&#125;))
 print(db.test.find_one()['custom'])
 </code></pre>
 <h2>自动编码/解码</h2>
@@ -225,7 +225,7 @@ class Transform(SONManipulator):
         return son
 
 db.add_son_manipulator(Transform())
-print(db.test.insert({"custom": Custom(5)}))
+print(db.test.insert(&#123;"custom": Custom(5)&#125;))
 print(db.test.find_one())
 </code></pre>
 <h2>二进制编码</h2>
@@ -255,14 +255,14 @@ class TransformToBinary(SONManipulator):
         return son
 
 db.add_son_manipulator(TransformToBinary())
-print(db.test.insert({"custom": Custom(5)}))
+print(db.test.insert(&#123;"custom": Custom(5)&#125;))
 print(db.test.find_one())
 </code></pre>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84060.html" data-id="cl1hn20fl00lapg4khth55dlz" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84060.html" data-id="cl1hoxk0c006ndwoy30nkb9zb" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mongodb/" rel="tag">mongodb</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/" rel="tag">python</a></li></ul>
@@ -275,10 +275,10 @@ print(db.test.find_one())
 
 
   
-    <article id="post-/archives/84057.html" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-pymongo教程(2)——聚合操作" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/84057.html" class="article-date">
-  <time datetime="2014-03-29T20:57:25.000Z" itemprop="datePublished">2014-03-29</time>
+  <time datetime="2014-03-29T12:57:25.000Z" itemprop="datePublished">2014-03-29</time>
 </a>
     
   <div class="article-category">
@@ -301,12 +301,12 @@ print(db.test.find_one())
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>在MongoDB中常用的聚合操作有 aggregation、map/reduce和group 。</p><br><p>首先先添加一些测试数据：</p><br><pre><code>db.things.insert({“x”: 1, “tags”: [“dog”, “cat”]})<br>db.things.insert({“x”: 2, “tags”: [“cat”]})<br>db.things.insert({“x”: 2, “tags”: [“mouse”, “cat”, “dog”]})<br>db.things.insert({“x”: 3, “tags”: []})<br></code></pre><br><h2>aggregation</h2><br><p>以下例子是统计 tags 字段内的各个值的出现的次数。</p><br><pre><code>from bson.son import SON<br>db.things.aggregate([<br>    {“$unwind”: “$tags”},<br>    {“$group”: {“_id”: “$tags”, “count”: {“$sum”: 1}}},<br>    {“$sort”: SON([(“count”, -1), (“_id”, -1)])}<br>])<br><br>{‘ok’: 1.0, ‘result’: [{‘count’: 3, ‘_id’: ‘cat’}, {‘count’: 2, ‘_id’: ‘dog’}, {‘count’: 1, ‘_id’: ‘mouse’}]}<br></code></pre><br><p>注意：aggregate操作要求服务器程序为 2.1.0 以上的版本。PyMongo 驱动程序为 2.3 以上的版本。</p><br><h2>Map/Reduce</h2><br><p>上面的操作同样也可以使用 Map/Reduce 完成。</p><br><pre><code>from bson.code import Code<br>mapper = Code(“””<br>    function () {<br>      this.tags.forEach(function(z) {<br>        emit(z, 1);<br>      });<br>    }<br>“””)<br><br>reducer = Code(“””<br>    function (key, values) {<br>      var total = 0;<br>      for (var i = 0; i &lt; values.length; i++) {<br>        total += values[i];<br>      }<br>      return total;<br>    }<br>“””)<br><br>result = db.things.map_reduce(mapper, reducer, “myresults”)<br>for doc in result.find():<br>    print(doc)<br><br>{u’_id’: u’cat’, u’value’: 3.0}<br>{u’_id’: u’dog’, u’value’: 2.0}<br>{u’_id’: u’mouse’, u’value’: 1.0}<br></code></pre><br><p>map和reduce都是一个javascript的函数； map_reduce 方法会将统计结果保存到一个临时的数据集合中。</p><br><h2>Group</h2><br><p>group 操作与SQL的 GROUP BY 相似，同时比 Map/Reduce 要简单。</p><br><pre><code>reducer = Code(“””<br>    function(obj, prev){<br>      prev.count++;<br>    }<br>“””)<br><br>results = db.things.group(key={“x”:1}, condition={}, initial={“count”: 0}, reduce=reducer)<br>for doc in results:<br>    print(doc)<br><br>{‘x’: 1.0, ‘count’: 1.0}<br>{‘x’: 2.0, ‘count’: 2.0}<br>{‘x’: 3.0, ‘count’: 1.0}<br></code></pre><br><p>注意：在MongoDB的集群环境中不支持 group 操作，可以使用 aggregation 或者 map/reduce 代替。</p><br><p>完整的MongoDB聚合文档： <a href="http://docs.mongodb.org/manual/aggregation/" target="_blank" rel="external">http://docs.mongodb.org/manual/aggregation/</a></p>
+        <p>在MongoDB中常用的聚合操作有 aggregation、map/reduce和group 。</p><br><p>首先先添加一些测试数据：</p><br><pre><code>db.things.insert(&#123;“x”: 1, “tags”: [“dog”, “cat”]&#125;)<br>db.things.insert(&#123;“x”: 2, “tags”: [“cat”]&#125;)<br>db.things.insert(&#123;“x”: 2, “tags”: [“mouse”, “cat”, “dog”]&#125;)<br>db.things.insert(&#123;“x”: 3, “tags”: []&#125;)<br></code></pre><br><h2>aggregation</h2><br><p>以下例子是统计 tags 字段内的各个值的出现的次数。</p><br><pre><code>from bson.son import SON<br>db.things.aggregate([<br>    &#123;“$unwind”: “$tags”&#125;,<br>    &#123;“$group”: &#123;“_id”: “$tags”, “count”: &#123;“$sum”: 1&#125;&#125;&#125;,<br>    &#123;“$sort”: SON([(“count”, -1), (“_id”, -1)])&#125;<br>])<br><br>&#123;‘ok’: 1.0, ‘result’: [&#123;‘count’: 3, ‘_id’: ‘cat’&#125;, &#123;‘count’: 2, ‘_id’: ‘dog’&#125;, &#123;‘count’: 1, ‘_id’: ‘mouse’&#125;]&#125;<br></code></pre><br><p>注意：aggregate操作要求服务器程序为 2.1.0 以上的版本。PyMongo 驱动程序为 2.3 以上的版本。</p><br><h2>Map/Reduce</h2><br><p>上面的操作同样也可以使用 Map/Reduce 完成。</p><br><pre><code>from bson.code import Code<br>mapper = Code(“””<br>    function () &#123;<br>      this.tags.forEach(function(z) &#123;<br>        emit(z, 1);<br>      &#125;);<br>    &#125;<br>“””)<br><br>reducer = Code(“””<br>    function (key, values) &#123;<br>      var total = 0;<br>      for (var i = 0; i &lt; values.length; i++) &#123;<br>        total += values[i];<br>      &#125;<br>      return total;<br>    &#125;<br>“””)<br><br>result = db.things.map_reduce(mapper, reducer, “myresults”)<br>for doc in result.find():<br>    print(doc)<br><br>&#123;u’_id’: u’cat’, u’value’: 3.0&#125;<br>&#123;u’_id’: u’dog’, u’value’: 2.0&#125;<br>&#123;u’_id’: u’mouse’, u’value’: 1.0&#125;<br></code></pre><br><p>map和reduce都是一个javascript的函数； map_reduce 方法会将统计结果保存到一个临时的数据集合中。</p><br><h2>Group</h2><br><p>group 操作与SQL的 GROUP BY 相似，同时比 Map/Reduce 要简单。</p><br><pre><code>reducer = Code(“””<br>    function(obj, prev)&#123;<br>      prev.count++;<br>    &#125;<br>“””)<br><br>results = db.things.group(key=&#123;“x”:1&#125;, condition=&#123;&#125;, initial=&#123;“count”: 0&#125;, reduce=reducer)<br>for doc in results:<br>    print(doc)<br><br>&#123;‘x’: 1.0, ‘count’: 1.0&#125;<br>&#123;‘x’: 2.0, ‘count’: 2.0&#125;<br>&#123;‘x’: 3.0, ‘count’: 1.0&#125;<br></code></pre><br><p>注意：在MongoDB的集群环境中不支持 group 操作，可以使用 aggregation 或者 map/reduce 代替。</p><br><p>完整的MongoDB聚合文档： <a target="_blank" rel="noopener" href="http://docs.mongodb.org/manual/aggregation/">http://docs.mongodb.org/manual/aggregation/</a></p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84057.html" data-id="cl1hn20fm00lhpg4kwlztx3w0" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84057.html" data-id="cl1hoxk0c006mdwoy1ynwg6e6" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mongodb/" rel="tag">mongodb</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/" rel="tag">python</a></li></ul>
@@ -319,10 +319,10 @@ print(db.test.find_one())
 
 
   
-    <article id="post-/archives/84053.html" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-pymongo教程(1)——概述" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/84053.html" class="article-date">
-  <time datetime="2014-03-29T14:39:11.000Z" itemprop="datePublished">2014-03-29</time>
+  <time datetime="2014-03-29T06:39:11.000Z" itemprop="datePublished">2014-03-29</time>
 </a>
     
   <div class="article-category">
@@ -345,9 +345,9 @@ print(db.test.find_one())
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p></p><p>MongoDB是使用C++开发的一款文档型数据库，PyMongo是MongoDB的Python驱动。</p><p></p>
-<p></p><h2>安装</h2><p></p>
-<p></p><h3>使用pip安装</h3><p></p>
+        <p><p>MongoDB是使用C++开发的一款文档型数据库，PyMongo是MongoDB的Python驱动。</p></p>
+<p><h2>安装</h2></p>
+<p><h3>使用pip安装</h3></p>
 <pre><code>$ [sudo] pip install pymongo
 </code></pre>
 <p>如果要安装特定的版本则：</p>
@@ -391,22 +391,22 @@ collection = db['test-collection']
 <h3>插入数据</h3>
 <p>在MongoDB中数据是以类似JSON格式进行保存的，在PyMongo中则是使用字典风格。然后可以数据集合对象的 insert() 方法进行插入数据。</p>
 <pre><code>import datetime
-post = {"author": "Mike",
+post = &#123;"author": "Mike",
         "text": "My first blog post!",
         "tags": ["mongodb", "python", "pymongo"],
-        "date": datetime.datetime.utcnow()}
+        "date": datetime.datetime.utcnow()&#125;
 post_id = db.posts.insert(post)
 </code></pre>
 <h3>查询数据</h3>
 <p>可以数据集合对象的 find() 方法进行查询数据。</p>
-<pre><code>db.posts.find({"author": "Mike"})
-db.posts.find_one({"author": "Mike"})
+<pre><code>db.posts.find(&#123;"author": "Mike"&#125;)
+db.posts.find_one(&#123;"author": "Mike"&#125;)
 </code></pre>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84053.html" data-id="cl1hn20fk00l7pg4khcvo5gh1" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84053.html" data-id="cl1hoxk0b006ldwoygal95787" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mongodb/" rel="tag">mongodb</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/" rel="tag">python</a></li></ul>
@@ -419,10 +419,10 @@ db.posts.find_one({"author": "Mike"})
 
 
   
-    <article id="post-/archives/84048.html" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-自动生成.gitignore文件" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/84048.html" class="article-date">
-  <time datetime="2014-03-07T21:09:22.000Z" itemprop="datePublished">2014-03-07</time>
+  <time datetime="2014-03-07T13:09:22.000Z" itemprop="datePublished">2014-03-07</time>
 </a>
     
   <div class="article-category">
@@ -445,9 +445,9 @@ db.posts.find_one({"author": "Mike"})
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p></p><p>.gitignore文件是用于对git进行设置，让其忽略对某些文件的跟踪。</p><p></p>
-<p></p><p>最近发现每创建一个新的仓库都要把.gitignore文件重新写一遍，甚是麻烦。于是就想能否自动生成.gitignore文件，这样的话就比较方便。最后找到了 gitignore.io 这个网站，它可以根据需求生成相应的.gitignore文件。比较你是用vim编辑器编写python代码，则输入vim  python就会生成对应vim和python的gitignore文件了。</p><p></p>
-<p></p><p>为了方便使用我编写了一个shell脚本。从 <a href="https://gist.github.com/wusuopu/9408486" target="_blank" rel="external">https://gist.github.com/wusuopu/9408486</a> 下载代码，保存为mkgitignore，并加上执行权限。然后执行如下命令生成.gitignore文件。</p><p></p>
+        <p><p>.gitignore文件是用于对git进行设置，让其忽略对某些文件的跟踪。</p></p>
+<p><p>最近发现每创建一个新的仓库都要把.gitignore文件重新写一遍，甚是麻烦。于是就想能否自动生成.gitignore文件，这样的话就比较方便。最后找到了 gitignore.io 这个网站，它可以根据需求生成相应的.gitignore文件。比较你是用vim编辑器编写python代码，则输入vim  python就会生成对应vim和python的gitignore文件了。</p></p>
+<p><p>为了方便使用我编写了一个shell脚本。从 <a target="_blank" rel="noopener" href="https://gist.github.com/wusuopu/9408486">https://gist.github.com/wusuopu/9408486</a> 下载代码，保存为mkgitignore，并加上执行权限。然后执行如下命令生成.gitignore文件。</p></p>
 <pre><code>$ mkgitignore vim,python
 $ mkgitignore vim,python .gitignore
 </code></pre>
@@ -460,7 +460,7 @@ $ mkgitignore vim,python .gitignore
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84048.html" data-id="cl1hn20fj00l3pg4ktrxzjbq2" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84048.html" data-id="cl1hoxk0b006kdwoy5lwu88v5" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/git/" rel="tag">git</a></li></ul>
@@ -473,10 +473,10 @@ $ mkgitignore vim,python .gitignore
 
 
   
-    <article id="post-/archives/84045.html" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-Linux下VNC使用" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/84045.html" class="article-date">
-  <time datetime="2014-03-01T20:21:53.000Z" itemprop="datePublished">2014-03-01</time>
+  <time datetime="2014-03-01T12:21:53.000Z" itemprop="datePublished">2014-03-01</time>
 </a>
     
   <div class="article-category">
@@ -499,8 +499,8 @@ $ mkgitignore vim,python .gitignore
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p></p><h3>安装</h3><p></p>
-<p></p><p>VNC (Virtual Network Computer)是虚拟网络计算机的缩写。VNC 是一款优秀的远程控制工具软件。<br><br>VNC程序有多个软件包可选择，例如执行以下命令进行安装：</p><p></p>
+        <p><h3>安装</h3></p>
+<p><p>VNC (Virtual Network Computer)是虚拟网络计算机的缩写。VNC 是一款优秀的远程控制工具软件。<br><br>VNC程序有多个软件包可选择，例如执行以下命令进行安装：</p></p>
 <pre><code>$ sudo apt-get install vnc4server
 $ sudo pacman -S tigervnc
 </code></pre>
@@ -538,7 +538,7 @@ startxfce4 &amp;
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84045.html" data-id="cl1hn20fi00kzpg4kkflllfqm" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84045.html" data-id="cl1hoxk0b006jdwoyht1fbkm6" class="article-share-link">Share</a>
       
       
     </footer>
@@ -549,10 +549,10 @@ startxfce4 &amp;
 
 
   
-    <article id="post-/archives/84042.html" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-修改Mongo命令提示符" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/84042.html" class="article-date">
-  <time datetime="2014-01-24T21:23:22.000Z" itemprop="datePublished">2014-01-24</time>
+  <time datetime="2014-01-24T13:23:22.000Z" itemprop="datePublished">2014-01-24</time>
 </a>
     
   <div class="article-category">
@@ -575,16 +575,16 @@ startxfce4 &amp;
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p></p><p>默认的启动mongo终端后，命令行的提示符就只有一个大于符号（&gt;）。虽然这不会有什么问题，但是如果同时开启了多个终端连接时，如一个本地连接一个远程连接。终端来回切换，有时就会忘了哪个是哪个，一旦误操作后果是很严重的。因此如果能够显示当前是哪个连接的话会很方便的。</p><p></p>
-<p></p><p>修改mongo的配置文件，将提示符改为“当前连接的主机:当前操作的数据库 (当前执行的命令数)&gt;” 这样的形式。</p><p></p>
-<p></p><p>编辑 ~/.mongorc.js 文件，没有则创建：</p><p></p>
+        <p><p>默认的启动mongo终端后，命令行的提示符就只有一个大于符号（&gt;）。虽然这不会有什么问题，但是如果同时开启了多个终端连接时，如一个本地连接一个远程连接。终端来回切换，有时就会忘了哪个是哪个，一旦误操作后果是很严重的。因此如果能够显示当前是哪个连接的话会很方便的。</p></p>
+<p><p>修改mongo的配置文件，将提示符改为“当前连接的主机:当前操作的数据库 (当前执行的命令数)&gt;” 这样的形式。</p></p>
+<p><p>编辑 ~/.mongorc.js 文件，没有则创建：</p></p>
 <pre><code>var cmdCountNum = 0;
-var prompt = function () {
+var prompt = function () &#123;
   var host = db.getMongo().host;
   var database = db.getName();
   cmdCountNum++;
   return host + ':' + database + ' (' + cmdCountNum + ')&gt; ';
-}
+&#125;
 </code></pre>
 <p>现在再执行mongo命令试试。</p>
 <pre><code>$ mongo
@@ -596,7 +596,7 @@ test
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84042.html" data-id="cl1hn20fh00kvpg4kbmqcbwuq" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84042.html" data-id="cl1hoxk0b006idwoy91pqcv7m" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mongodb/" rel="tag">mongodb</a></li></ul>
@@ -609,10 +609,10 @@ test
 
 
   
-    <article id="post-/archives/84039.html" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-使用nvm进行node多版本管理" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/84039.html" class="article-date">
-  <time datetime="2014-01-23T20:50:26.000Z" itemprop="datePublished">2014-01-23</time>
+  <time datetime="2014-01-23T12:50:26.000Z" itemprop="datePublished">2014-01-23</time>
 </a>
     
   <div class="article-category">
@@ -635,11 +635,11 @@ test
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p></p><p>nvm与Python的virtualenv和Ruby的rvm类似。<br><br>NVM (Node Version Manager，Node多版本管理器)是一个通用的叫法,它目前有许多不同的实现。通常我们说的 nvm 是指 <a href="https://github.com/creationix/nvm" target="_blank" rel="external">https://github.com/creationix/nvm</a> 或者 <a href="https://github.com/visionmedia/n" target="_blank" rel="external">https://github.com/visionmedia/n</a> 。这两个工具都是使用shell编写的。</p><p></p>
-<p></p><h2>n</h2><p></p>
-<p></p><p>个人感觉 n 比较简洁些，它就只有一个脚本文件。  </p><p></p>
-<p></p><h3>安装</h3><p></p>
-<p></p><p>如果已经安装了npm的话，可以直接执行命令进行安装n :</p><p></p>
+        <p><p>nvm与Python的virtualenv和Ruby的rvm类似。<br><br>NVM (Node Version Manager，Node多版本管理器)是一个通用的叫法,它目前有许多不同的实现。通常我们说的 nvm 是指 <a target="_blank" rel="noopener" href="https://github.com/creationix/nvm">https://github.com/creationix/nvm</a> 或者 <a target="_blank" rel="noopener" href="https://github.com/visionmedia/n">https://github.com/visionmedia/n</a> 。这两个工具都是使用shell编写的。</p></p>
+<p><h2>n</h2></p>
+<p><p>个人感觉 n 比较简洁些，它就只有一个脚本文件。  </p></p>
+<p><h3>安装</h3></p>
+<p><p>如果已经安装了npm的话，可以直接执行命令进行安装n :</p></p>
 <pre><code>$ npm install -g n
 </code></pre>
 <p>或者是直接获取源代码安装：</p>
@@ -651,15 +651,15 @@ $ [sudo] make install
 <p>直接运行 n 命令查看所有已安装的版本。</p>
 <pre><code>$ n
 </code></pre>
-<p>运行命令 n <version> 进行安装指定版本的node。 version 可以是 stable(最新稳定版)、latest(最新版)或者具体的版本数字。</version></p>
+<p>运行命令 n <version> 进行安装指定版本的node。 version 可以是 stable(最新稳定版)、latest(最新版)或者具体的版本数字。</p>
 <pre><code>$ n stable
 install : v0.10.24
 mkdir : /usr/local/n/versions/0.10.24
 fetch : http://nodejs.org/dist/v0.10.24/node-v0.10.24-linux-x64.tar.gz
 </code></pre>
 <p>指定的版本将会安装在 /usr/local/n/versions 目录下。</p>
-<p>运行命令 n rm <version> 删除已安装指定版本的node。</version></p>
-<p>运行命令 n use <version> 选择使用指定版本的node。</version></p>
+<p>运行命令 n rm <version> 删除已安装指定版本的node。</p>
+<p>运行命令 n use <version> 选择使用指定版本的node。</p>
 <h2>nvm</h2>
 <h3>安装</h3>
 <pre><code>$ git clone https://github.com/creationix/nvm.git ~/.nvm
@@ -686,7 +686,7 @@ $ source ~/.nvm/nvm.sh
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84039.html" data-id="cl1hn20fh00kspg4k2g67l2wp" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84039.html" data-id="cl1hoxk0a006hdwoydzipf52a" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/" rel="tag">js</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/node/" rel="tag">node</a></li></ul>
@@ -699,10 +699,10 @@ $ source ~/.nvm/nvm.sh
 
 
   
-    <article id="post-/archives/84036.html" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-使用virtualenv安装多个版本python" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/84036.html" class="article-date">
-  <time datetime="2014-01-22T19:01:41.000Z" itemprop="datePublished">2014-01-22</time>
+  <time datetime="2014-01-22T11:01:41.000Z" itemprop="datePublished">2014-01-22</time>
 </a>
     
   <div class="article-category">
@@ -725,12 +725,12 @@ $ source ~/.nvm/nvm.sh
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>使用virtualenv可以在你的系统中安装多个python环境，它与Ruby的rvm和nodejs的nvm类似。如果你要尝试不同版本的库的话，这个是非常有用的。</p><br><h3>安装</h3><br><p>安装方法很简单，直接执行命令：</p><br><pre><code>$ [sudo] pip install virtualenv<br></code></pre><br><p>如果是想到体验最新的非正式版，可以执行命令：</p><br><pre><code>$ [sudo] pip install <a href="https://github.com/pypa/virtualenv/tarball/develop" target="_blank" rel="external">https://github.com/pypa/virtualenv/tarball/develop</a><br></code></pre><br><h3>使用</h3><br><p>基本使用方法是：</p><br><pre><code>$ virtualenv &lt;DEST_DIR&gt;<br></code></pre><br><p>则在 &lt;DEST_DIR&gt; 目录下为 /usr/bin/python 创建一个新的虚拟环境。该环境下对应的python解释器为 &lt;DEST_DIR&gt;/bin/python 。</p><br><p>想要使用刚刚创建的python环境，可以修改 $PATH 环境变量，在开头加上 &lt;DEST_DIR&gt;/bin 。这样就可以直接执行 python 命令运行了，但是这样的话又会造成系统环境中的python无法正常使用了。 或者每次执行命令时输入完整的路径， &lt;DEST_DIR&gt;/bin/python ，但是这样比较麻烦。不过好在刚创建的虚拟环境中有一个 &lt;DEST_DIR&gt;/bin/activate 脚本文件，运行该脚本即可切换到虚拟环境中。</p><br><pre><code>$ source &lt;DEST_DIR&gt;/bin/activate<br>$ which python<br>&lt;DEST_DIR&gt;/bin/python<br></code></pre><br><p>这样默认的就是使用刚刚创建的虚拟环境中的python了。</p><br><p>官方文档： <a href="http://www.virtualenv.org/en/latest/" target="_blank" rel="external">http://www.virtualenv.org/en/latest/</a></p>
+        <p>使用virtualenv可以在你的系统中安装多个python环境，它与Ruby的rvm和nodejs的nvm类似。如果你要尝试不同版本的库的话，这个是非常有用的。</p><br><h3>安装</h3><br><p>安装方法很简单，直接执行命令：</p><br><pre><code>$ [sudo] pip install virtualenv<br></code></pre><br><p>如果是想到体验最新的非正式版，可以执行命令：</p><br><pre><code>$ [sudo] pip install <a target="_blank" rel="noopener" href="https://github.com/pypa/virtualenv/tarball/develop">https://github.com/pypa/virtualenv/tarball/develop</a><br></code></pre><br><h3>使用</h3><br><p>基本使用方法是：</p><br><pre><code>$ virtualenv &lt;DEST_DIR&gt;<br></code></pre><br><p>则在 &lt;DEST_DIR&gt; 目录下为 /usr/bin/python 创建一个新的虚拟环境。该环境下对应的python解释器为 &lt;DEST_DIR&gt;/bin/python 。</p><br><p>想要使用刚刚创建的python环境，可以修改 $PATH 环境变量，在开头加上 &lt;DEST_DIR&gt;/bin 。这样就可以直接执行 python 命令运行了，但是这样的话又会造成系统环境中的python无法正常使用了。 或者每次执行命令时输入完整的路径， &lt;DEST_DIR&gt;/bin/python ，但是这样比较麻烦。不过好在刚创建的虚拟环境中有一个 &lt;DEST_DIR&gt;/bin/activate 脚本文件，运行该脚本即可切换到虚拟环境中。</p><br><pre><code>$ source &lt;DEST_DIR&gt;/bin/activate<br>$ which python<br>&lt;DEST_DIR&gt;/bin/python<br></code></pre><br><p>这样默认的就是使用刚刚创建的虚拟环境中的python了。</p><br><p>官方文档： <a target="_blank" rel="noopener" href="http://www.virtualenv.org/en/latest/">http://www.virtualenv.org/en/latest/</a></p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84036.html" data-id="cl1hn20fg00kopg4kuk4mln9r" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84036.html" data-id="cl1hoxk0a006gdwoy1ne6flj7" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/" rel="tag">python</a></li></ul>

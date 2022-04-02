@@ -12,8 +12,8 @@
 <meta property="og:site_name" content="龍昌博客">
 <meta property="og:description" content="可以使用subprocess.Popen或者os.popen4让cgi执行shell命令。 1234567891011121314151617181920212223#!&#x2F;usr&#x2F;bin&#x2F;pythonimport cgitb; cgitb.enable()# The subprocess module is new in 2.4import os, urllib, subprocess as su">
 <meta property="og:locale">
-<meta property="article:published_time" content="2013-12-07T15:36:31.000Z">
-<meta property="article:modified_time" content="2018-01-11T03:57:51.000Z">
+<meta property="article:published_time" content="2013-12-07T07:36:31.000Z">
+<meta property="article:modified_time" content="2022-04-02T10:06:41.280Z">
 <meta property="article:author" content="龍昌">
 <meta property="article:tag" content="python">
 <meta property="article:tag" content="Web开发">
@@ -69,10 +69,10 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="post-/archives/83993.html" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-python cgi教程4——执行Shell命令" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/83993.html" class="article-date">
-  <time datetime="2013-12-07T15:36:31.000Z" itemprop="datePublished">2013-12-07</time>
+  <time datetime="2013-12-07T07:36:31.000Z" itemprop="datePublished">2013-12-07</time>
 </a>
     
   <div class="article-category">
@@ -96,14 +96,14 @@
     <div class="article-entry" itemprop="articleBody">
       
         <p>可以使用subprocess.Popen或者os.popen4让cgi执行shell命令。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#!/usr/bin/python</span></div><div class="line"><span class="keyword">import</span> cgitb; cgitb.enable()</div><div class="line"></div><div class="line"><span class="comment"># The subprocess module is new in 2.4</span></div><div class="line"><span class="keyword">import</span> os, urllib, subprocess <span class="keyword">as</span> sub</div><div class="line"></div><div class="line"><span class="comment"># Retrieve the command from the query string</span></div><div class="line"><span class="comment"># and unencode the escaped %xx chars</span></div><div class="line">str_command = urllib.unquote(os.environ[<span class="string">'QUERY_STRING'</span>])</div><div class="line"></div><div class="line">p = sub.Popen([<span class="string">'/bin/bash'</span>, <span class="string">'-c'</span>, str_command], </div><div class="line">    stdout=sub.PIPE, stderr=sub.STDOUT)</div><div class="line">output = urllib.unquote(p.stdout.read())</div><div class="line"></div><div class="line"><span class="keyword">print</span> <span class="string">"""\</span></div><div class="line">Content-Type: text/html\n</div><div class="line">&lt;html&gt;&lt;body&gt;</div><div class="line">&lt;pre&gt;</div><div class="line">$ %s</div><div class="line">%s</div><div class="line">&lt;/pre&gt;</div><div class="line">&lt;/body&gt;&lt;/html&gt;</div><div class="line">""" % (str_command, output)</div></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python</span></span><br><span class="line"><span class="keyword">import</span> cgitb; cgitb.enable()</span><br><span class="line"></span><br><span class="line"><span class="comment"># The subprocess module is new in 2.4</span></span><br><span class="line"><span class="keyword">import</span> os, urllib, subprocess <span class="keyword">as</span> sub</span><br><span class="line"></span><br><span class="line"><span class="comment"># Retrieve the command from the query string</span></span><br><span class="line"><span class="comment"># and unencode the escaped %xx chars</span></span><br><span class="line">str_command = urllib.unquote(os.environ[<span class="string">&#x27;QUERY_STRING&#x27;</span>])</span><br><span class="line"></span><br><span class="line">p = sub.Popen([<span class="string">&#x27;/bin/bash&#x27;</span>, <span class="string">&#x27;-c&#x27;</span>, str_command], </span><br><span class="line">    stdout=sub.PIPE, stderr=sub.STDOUT)</span><br><span class="line">output = urllib.unquote(p.stdout.read())</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span> <span class="string">&quot;&quot;&quot;\</span></span><br><span class="line"><span class="string">Content-Type: text/html\n</span></span><br><span class="line"><span class="string">&lt;html&gt;&lt;body&gt;</span></span><br><span class="line"><span class="string">&lt;pre&gt;</span></span><br><span class="line"><span class="string">$ %s</span></span><br><span class="line"><span class="string">%s</span></span><br><span class="line"><span class="string">&lt;/pre&gt;</span></span><br><span class="line"><span class="string">&lt;/body&gt;&lt;/html&gt;</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span> % (str_command, output)</span><br></pre></td></tr></table></figure>
 <p>注意：这只是一个例子，在生产环境中这么使用是非常的不安全。</p>
 <p>可以使用Cookies和Session对用户进行认证以提高安全性。</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83993.html" data-id="cl1hn20f400jnpg4kk1v0yarb" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83993.html" data-id="cl1hoxk070064dwoy7yfo0cdt" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web%E5%BC%80%E5%8F%91/" rel="tag">Web开发</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/" rel="tag">python</a></li></ul>

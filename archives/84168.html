@@ -12,8 +12,8 @@
 <meta property="og:site_name" content="龍昌博客">
 <meta property="og:description" content="如果是Linux系统的话，相对比较方便。先构建一个带gui各应的docker image，然后将本机的X11 sock挂载到container内，docker run -ti --rm -e DISPLAY&#x3D;$DISPLAY -v &#x2F;tmp&#x2F;.X11-unix:&#x2F;tmp&#x2F;.X11-unix chrome 如果是mac OS系统的话，相对麻烦一些。 1.安装所需的软件： 12brew install">
 <meta property="og:locale">
-<meta property="article:published_time" content="2017-05-06T19:45:30.987Z">
-<meta property="article:modified_time" content="2017-05-19T09:54:11.000Z">
+<meta property="article:published_time" content="2017-05-06T11:45:30.987Z">
+<meta property="article:modified_time" content="2022-04-02T10:06:41.280Z">
 <meta property="article:author" content="龍昌">
 <meta property="article:tag" content="Docker">
 <meta name="twitter:card" content="summary">
@@ -68,10 +68,10 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="post-/archives/84168.html" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-在Docker中运行X11程序" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/84168.html" class="article-date">
-  <time datetime="2017-05-06T19:45:30.987Z" itemprop="datePublished">2017-05-06</time>
+  <time datetime="2017-05-06T11:45:30.987Z" itemprop="datePublished">2017-05-06</time>
 </a>
     
   </div>
@@ -93,9 +93,9 @@
         <p>如果是Linux系统的话，相对比较方便。先构建一个带gui各应的docker image，然后将<br>本机的X11 sock挂载到container内，<br><code>docker run -ti --rm -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix chrome</code></p>
 <p>如果是mac OS系统的话，相对麻烦一些。</p>
 <p>1.安装所需的软件：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">brew install socat</div><div class="line">brew cask install xquartz</div></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">brew install socat</span><br><span class="line">brew cask install xquartz</span><br></pre></td></tr></table></figure>
 <p>2.依次运行刚刚安装的两个程序：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">socat TCP-LISTEN:6000,reuseaddr,fork UNIX-CLIENT:\&quot;$DISPLAY\&quot;</div><div class="line">open -a XQuartz</div></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">socat TCP-LISTEN:6000,reuseaddr,fork UNIX-CLIENT:\&quot;$DISPLAY\&quot;</span><br><span class="line">open -a XQuartz</span><br></pre></td></tr></table></figure>
 <p>3.设置X11， <code>XQuartz</code> -&gt; <code>Preference</code> -&gt; <code>Security</code> -&gt; <code>Allow connections from network clients</code></p>
 <p>4.<code>docker run --rm -e DISPLAY=</code>ifconfig | grep “inet\ “ | tail -1 | cut -d “ “ -f 2<code>:0 chrome</code></p>
 <p>对于已经启动了的container，可以在container内执行命令 <code>export DISPLAY=&lt;ip&gt;:0</code> 来设置 DISPLAY 从而使用本机的 X11 服务。</p>
@@ -104,7 +104,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84168.html" data-id="cl1hn20h300qspg4k2ispefj8" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84168.html" data-id="cl1hoxk0s0088dwoy5r9f93zj" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Docker/" rel="tag">Docker</a></li></ul>

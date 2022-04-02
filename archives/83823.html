@@ -12,8 +12,8 @@
 <meta property="og:site_name" content="龍昌博客">
 <meta property="og:description" content="SCons是使用Python语言开发的一个软件自动构建工具，功能类似于UNIX上的make、autoconf与automake工具。它跨平台，能够帮助我们更方便，可靠，快速的构建软件。 与make命令和Makefile文件类似，scons也需要编写一个SConstruct文件（实际上也是一个python脚本），scons可以根据此文件自动完成依赖关系的推导及编译链接等过程。 下面通过一个简单的例子">
 <meta property="og:locale">
-<meta property="article:published_time" content="2013-06-29T21:03:36.000Z">
-<meta property="article:modified_time" content="2018-01-11T03:56:42.000Z">
+<meta property="article:published_time" content="2013-06-29T13:03:36.000Z">
+<meta property="article:modified_time" content="2022-04-02T10:06:41.276Z">
 <meta property="article:author" content="龍昌">
 <meta property="article:tag" content="python">
 <meta name="twitter:card" content="summary">
@@ -68,10 +68,10 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="post-/archives/83823.html" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-SCons工具用法介绍" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/83823.html" class="article-date">
-  <time datetime="2013-06-29T21:03:36.000Z" itemprop="datePublished">2013-06-29</time>
+  <time datetime="2013-06-29T13:03:36.000Z" itemprop="datePublished">2013-06-29</time>
 </a>
     
   <div class="article-category">
@@ -98,21 +98,21 @@
 <p>与make命令和Makefile文件类似，scons也需要编写一个SConstruct文件（实际上也是一个python脚本），scons可以根据此文件自动完成依赖关系的推导及编译链接等过程。</p>
 <p>下面通过一个简单的例子来介绍一下scons的用法，首先得先安装scons工具的gcc编译器。</p>
 <p>新建一个hello.c文件，内容如下：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//hello.c</span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</div><div class="line"><span class="built_in">printf</span>(&amp;quot;hello world!\n&amp;quot;);</div><div class="line"><span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//hello.c</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line"><span class="built_in">printf</span>(&amp;quot;hello world!\n&amp;quot;);</span><br><span class="line"><span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>然后再创建一个SConstruct文件，内容为：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Program(&apos;hello.c&apos;)</div></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Program(&#x27;hello.c&#x27;)</span><br></pre></td></tr></table></figure>
 <p>这两个文件放在同一目录下，再执行命令scons即可完成编译，并生成名为hello.o的中间文件和名为hello的可执行文件。</p>
 <p>如果想要清除生成的文件，跟make clean类似可以执行scons –clean命令。</p>
 <p>上面只是一个简单的例子，如果你的程序中使用的第三方库，编译时就需要手动指定链接库。</p>
 <p>以gtk程序为例，编译一个名为gtk_test.c的源文件，SConstruct脚本可以用如下的方法。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">env = Environment(CCFLAGS=&apos;-g&apos;)</div><div class="line">env.ParseConfig(&apos;pkg-config --cflags --libs gtk+-2.0&apos;)</div><div class="line"></div><div class="line">env.Program(&apos;gtk_test.c&apos;)</div></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">env = Environment(CCFLAGS=&#x27;-g&#x27;)</span><br><span class="line">env.ParseConfig(&#x27;pkg-config --cflags --libs gtk+-2.0&#x27;)</span><br><span class="line"></span><br><span class="line">env.Program(&#x27;gtk_test.c&#x27;)</span><br></pre></td></tr></table></figure>
 <p>我个人感觉SConstruct比Makefile要更加简洁灵活，更多关于scons有用法以及SConstruct脚本的写法可以参考它的官方文档。</p>
-<p>scons主页： <a href="http://www.scons.org" target="_blank" rel="external">http://www.scons.org</a><br>scons文档： <a href="http://www.scons.org/documentation.php" target="_blank" rel="external">http://www.scons.org/documentation.php</a></p>
+<p>scons主页： <a target="_blank" rel="noopener" href="http://www.scons.org">http://www.scons.org</a><br>scons文档： <a target="_blank" rel="noopener" href="http://www.scons.org/documentation.php">http://www.scons.org/documentation.php</a></p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83823.html" data-id="cl1hn20ds00f3pg4kg3envxk5" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/83823.html" data-id="cl1hoxjzw004sdwoygcmvfn2b" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/" rel="tag">python</a></li></ul>

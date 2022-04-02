@@ -12,8 +12,8 @@
 <meta property="og:site_name" content="龍昌博客">
 <meta property="og:description" content="有段时间没折腾 Django 了，又有点生疏了。最近又部署了一下 Django 的环境，顺便作个笔记以便之后查阅。 首先安装 nginx、uwsgi 以及 uwsgi 的 python 插件。 然后新建一个 uwsgi 的配置文件： 12345678910111213[uwsgi]uid &#x3D; www-datachdir &#x3D; &#x2F;repo&#x2F;django-blogvirtualenv &#x3D; &#x2F;repo&#x2F;d">
 <meta property="og:locale">
-<meta property="article:published_time" content="2014-11-11T21:02:17.000Z">
-<meta property="article:modified_time" content="2017-01-21T16:20:19.000Z">
+<meta property="article:published_time" content="2014-11-11T13:02:17.000Z">
+<meta property="article:modified_time" content="2022-04-02T10:06:41.280Z">
 <meta property="article:author" content="龍昌">
 <meta property="article:tag" content="python">
 <meta property="article:tag" content="Django">
@@ -69,10 +69,10 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="post-/archives/84135.html" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-Nginx+uwsgi+Django环境配置" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/84135.html" class="article-date">
-  <time datetime="2014-11-11T21:02:17.000Z" itemprop="datePublished">2014-11-11</time>
+  <time datetime="2014-11-11T13:02:17.000Z" itemprop="datePublished">2014-11-11</time>
 </a>
     
   <div class="article-category">
@@ -98,20 +98,20 @@
         <p>有段时间没折腾 Django 了，又有点生疏了。最近又部署了一下 Django 的环境，顺便作个笔记以便之后查阅。</p>
 <p>首先安装 nginx、uwsgi 以及 uwsgi 的 python 插件。</p>
 <p>然后新建一个 uwsgi 的配置文件：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">[uwsgi]</div><div class="line">uid = www-data</div><div class="line">chdir = /repo/django-blog</div><div class="line">virtualenv = /repo/django-blog/pyenv2.7/    # python虚拟环境，没有可以不设置</div><div class="line">env = DJANGO_SETTINGS_MODULE=blog.settings</div><div class="line">module = blog.wsgi:application</div><div class="line">master = true</div><div class="line">plugin = python</div><div class="line">pidfile = /tmp/blog-master.pid</div><div class="line">socket = /tmp/blog.sock</div><div class="line">enable-threads = true</div><div class="line">post-buffering=1024000</div><div class="line">post-buffering-busize=655360</div></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[uwsgi]</span><br><span class="line">uid = www-data</span><br><span class="line">chdir = /repo/django-blog</span><br><span class="line">virtualenv = /repo/django-blog/pyenv2.7/    # python虚拟环境，没有可以不设置</span><br><span class="line">env = DJANGO_SETTINGS_MODULE=blog.settings</span><br><span class="line">module = blog.wsgi:application</span><br><span class="line">master = true</span><br><span class="line">plugin = python</span><br><span class="line">pidfile = /tmp/blog-master.pid</span><br><span class="line">socket = /tmp/blog.sock</span><br><span class="line">enable-threads = true</span><br><span class="line">post-buffering=1024000</span><br><span class="line">post-buffering-busize=655360</span><br></pre></td></tr></table></figure>
 <p>这里我们的 Django 项目代码位于 <code>/repo/django-blog</code> ，项目的配置文件为： <code>blog/settings.py</code> 。</p>
 <p><code>virtualenv</code> 项表明我们使用的是 <code>virtualenv</code> 环境，也可以直接系统的 python 环境。不过还是建议使用虚拟环境，以免软件包版本冲突。</p>
 <p><code>post-buffering</code> 和 <code>post-buffering-busize</code> 这两项设置了 POST 请求时缓冲区的大小，该值可根据自己的情况进行调整。之前遇到过由于缓冲区不足导致返回的内容不完整。</p>
 <p>再安装对应的 python 依赖包，然后运行 uwsgi 服务。</p>
 <p>接着修改 nginx 的配置：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">server &#123;</div><div class="line">  listen 80;</div><div class="line">  server_name localhost;</div><div class="line"></div><div class="line">  client_max_body_size 50m;</div><div class="line"></div><div class="line">  access_log /var/log/nginx/blog-access.log;</div><div class="line">  error_log /var/log/nginx/blog-error.log;</div><div class="line"></div><div class="line">  location / &#123;</div><div class="line">    uwsgi_pass unix:///tmp/blog.sock;</div><div class="line">    include uwsgi_params;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  location /static &#123;</div><div class="line">    alias /repo/django-blog/static/;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">  listen 80;</span><br><span class="line">  server_name localhost;</span><br><span class="line"></span><br><span class="line">  client_max_body_size 50m;</span><br><span class="line"></span><br><span class="line">  access_log /var/log/nginx/blog-access.log;</span><br><span class="line">  error_log /var/log/nginx/blog-error.log;</span><br><span class="line"></span><br><span class="line">  location / &#123;</span><br><span class="line">    uwsgi_pass unix:///tmp/blog.sock;</span><br><span class="line">    include uwsgi_params;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  location /static &#123;</span><br><span class="line">    alias /repo/django-blog/static/;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>这个内容比较简单， <code>client_max_body_size</code> 项是用于设置 http 请求的 body 最大大小。如果你的程序中有文件上传的，那么就需要根据自身情况来设置允许上传文件的最大值。</p>
 <p>最后再启动 nginx 服务。</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84135.html" data-id="cl1hn20ga00nppg4k4byla1ww" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84135.html" data-id="cl1hoxk0j007bdwoy2sfphn02" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Django/" rel="tag">Django</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/" rel="tag">python</a></li></ul>

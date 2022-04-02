@@ -12,8 +12,8 @@
 <meta property="og:site_name" content="龍昌博客">
 <meta property="og:description" content="数据分片即是从一个集合中选择一个片键(shard key)作为数据拆分的依据，原理与索引类似，然后将集合的数据拆分并保存到不同的服务器上。以下通过一个例子来介绍一下Mongodb的分片配置。 有四台主机：  172.17.0.6    (配置服务器) 172.17.0.7    (mongos) 172.17.0.8    (片服务器) 172.17.0.9    (片服务器)  1.在 172.">
 <meta property="og:locale">
-<meta property="article:published_time" content="2014-12-29T16:52:37.000Z">
-<meta property="article:modified_time" content="2017-01-21T16:20:19.000Z">
+<meta property="article:published_time" content="2014-12-29T08:52:37.000Z">
+<meta property="article:modified_time" content="2022-04-02T10:06:41.280Z">
 <meta property="article:author" content="龍昌">
 <meta property="article:tag" content="mongodb">
 <meta name="twitter:card" content="summary">
@@ -68,10 +68,10 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="post-/archives/84139.html" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-Mongodb分片配置实例" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/84139.html" class="article-date">
-  <time datetime="2014-12-29T16:52:37.000Z" itemprop="datePublished">2014-12-29</time>
+  <time datetime="2014-12-29T08:52:37.000Z" itemprop="datePublished">2014-12-29</time>
 </a>
     
   <div class="article-category">
@@ -103,36 +103,36 @@
 <li>172.17.0.9    (片服务器)</li>
 </ul>
 <p>1.在 172.17.0.6 上启动 mongod 服务作为配置服务器；<br>修改配置，使其作为一个配置服务器，默认监听 27019 端口。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">configsvr = true</div></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">configsvr = true</span><br></pre></td></tr></table></figure>
 <p>启动服务 <code>$ service mongodb start</code></p>
 <p>2.在 172.17.0.7 上启动 mongos 服务作为路由服务;<br>建立mongos进程。(可以有多台配置服务器)，用法如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ mongos --configdb &lt;config server hostnames&gt;[,&lt;config server hostnames&gt;]</div></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ mongos --configdb &lt;config server hostnames&gt;[,&lt;config server hostnames&gt;]</span><br></pre></td></tr></table></figure>
 <p>例如： <code>$ mongos --configdb 172.17.0.6:27019</code></p>
 <p>注意：在同一个分片集群中的每个 mongos 必须使用相同的 configDB 配置。</p>
 <p>3.添加分片<br>一个片服务既可以是单个 mongod 实例，也可以是一个副本集。<br>1).先分别在 172.17.0.8 和 172.17.0.9 上启动片服务器，即就是一个普通的 mongod 服务。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ service mongodb start</div></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ service mongodb start</span><br></pre></td></tr></table></figure>
 <p>2).使用 mongo 客户端连接到 mongos 服务</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ mongo --host &lt;hostname of machine running mongos&gt; --port &lt;port mongos listens on&gt;</div></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ mongo --host &lt;hostname of machine running mongos&gt; --port &lt;port mongos listens on&gt;</span><br></pre></td></tr></table></figure>
 <p>如： <code>$ mongo --host 172.17.0.7 --port 27017</code></p>
 <p>3).在 mongo 客户端上执行命令添加分片：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&gt; use admin</div><div class="line">&gt; db.auth(&lt;user&gt;, &lt;pswd&gt;)</div><div class="line">&gt; sh.addShard(&quot;172.17.0.8:27017&quot;)</div><div class="line">&gt; sh.addShard(&quot;172.17.0.9:27017&quot;)</div></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt; use admin</span><br><span class="line">&gt; db.auth(&lt;user&gt;, &lt;pswd&gt;)</span><br><span class="line">&gt; sh.addShard(&quot;172.17.0.8:27017&quot;)</span><br><span class="line">&gt; sh.addShard(&quot;172.17.0.9:27017&quot;)</span><br></pre></td></tr></table></figure>
 <p>4.切片数据<br>1).首先对数据库进行切片<br>使用 mongo 客户端连接到 mongos ，执行命令打开数据库的分片功能，用法如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&gt; sh.enableSharding(&quot;&lt;database&gt;&quot;)</div></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt; sh.enableSharding(&quot;&lt;database&gt;&quot;)</span><br></pre></td></tr></table></figure>
 <p>例如要打开 mydb 数据库的分片功能： <code>&gt; sh.enableSharding(&quot;mydb&quot;)</code></p>
 <p>2).然后对数据集合进行切片<br>命令用法如下：  </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&gt; sh.shardCollection(&quot;&lt;database&gt;.&lt;collection&gt;&quot;, shard-key-pattern)</div></pre></td></tr></table></figure>
-<p><code>shard-key-pattern</code> 与索引的用法一样，例如，要对 mydb 数据库的 test 集合按照 <code>_id</code> 字段进行分片： <code>&gt; sh.shardCollection(&quot;mydb.test&quot;, {&quot;_id&quot;: &quot;hashed&quot;})</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt; sh.shardCollection(&quot;&lt;database&gt;.&lt;collection&gt;&quot;, shard-key-pattern)</span><br></pre></td></tr></table></figure>
+<p><code>shard-key-pattern</code> 与索引的用法一样，例如，要对 mydb 数据库的 test 集合按照 <code>_id</code> 字段进行分片： <code>&gt; sh.shardCollection(&quot;mydb.test&quot;, &#123;&quot;_id&quot;: &quot;hashed&quot;&#125;)</code></p>
 <p>接下来通过一个程序来测试一下，向数据库中添加10000条数据：</p>
-<figure class="highlight ruby"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#!/usr/bin/env ruby</span></div><div class="line"><span class="comment">#-*- coding:utf-8 -*-</span></div><div class="line"></div><div class="line"><span class="keyword">require</span> <span class="string">"mongo"</span></div><div class="line"></div><div class="line"><span class="keyword">begin</span></div><div class="line">  conn = Mongo::Connection.new <span class="string">'172.17.0.7'</span></div><div class="line">  db = conn[<span class="string">'mydb'</span>]</div><div class="line"><span class="keyword">rescue</span> Exception=&gt;e</div><div class="line">  p e</div><div class="line">  exit <span class="number">1</span></div><div class="line"><span class="keyword">end</span></div><div class="line"></div><div class="line">i = <span class="number">0</span></div><div class="line"><span class="keyword">while</span> i &lt; <span class="number">10000</span></div><div class="line">  d = &#123;<span class="string">'no'</span> =&gt; i&#125;</div><div class="line">  d = db[<span class="string">'test'</span>].insert(d)</div><div class="line">  i += <span class="number">1</span></div><div class="line">  puts d</div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/usr/bin/env ruby</span></span><br><span class="line"><span class="comment">#-*- coding:utf-8 -*-</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">require</span> <span class="string">&quot;mongo&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">begin</span></span><br><span class="line">  conn = <span class="title class_">Mongo::Connection</span>.new <span class="string">&#x27;172.17.0.7&#x27;</span></span><br><span class="line">  db = conn[<span class="string">&#x27;mydb&#x27;</span>]</span><br><span class="line"><span class="keyword">rescue</span> Exception=&gt;e</span><br><span class="line">  p e</span><br><span class="line">  exit <span class="number">1</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">i = <span class="number">0</span></span><br><span class="line"><span class="keyword">while</span> i &lt; <span class="number">10000</span></span><br><span class="line">  d = &#123;<span class="string">&#x27;no&#x27;</span> =&gt; i&#125;</span><br><span class="line">  d = db[<span class="string">&#x27;test&#x27;</span>].insert(d)</span><br><span class="line">  i += <span class="number">1</span></span><br><span class="line">  puts d</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
 <p>然后分别查看 172.17.0.8 和 172.17.0.9 的状态：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">172.17.0.8:</div><div class="line">&gt; db.test.count()</div><div class="line">4952</div><div class="line"></div><div class="line">172.17.0.9:</div><div class="line">&gt; db.test.count()</div><div class="line">5048</div></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">172.17.0.8:</span><br><span class="line">&gt; db.test.count()</span><br><span class="line">4952</span><br><span class="line"></span><br><span class="line">172.17.0.9:</span><br><span class="line">&gt; db.test.count()</span><br><span class="line">5048</span><br></pre></td></tr></table></figure>
 <p>数据基本上是平均的分布在两台服务器上。</p>
-<p>参考： <a href="http://docs.mongodb.org/manual/tutorial/deploy-shard-cluster/" target="_blank" rel="external">http://docs.mongodb.org/manual/tutorial/deploy-shard-cluster/</a></p>
+<p>参考： <a target="_blank" rel="noopener" href="http://docs.mongodb.org/manual/tutorial/deploy-shard-cluster/">http://docs.mongodb.org/manual/tutorial/deploy-shard-cluster/</a></p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/84139.html" data-id="cl1hn20gd00o4pg4k8ohqjdfo" class="article-share-link">Share</a>
+      <a data-url="http://www.xefan.com/archives/84139.html" data-id="cl1hoxk0k007fdwoy5z16hc4i" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mongodb/" rel="tag">mongodb</a></li></ul>
