@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>龍昌博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="关注Linux及开源信息">
+<meta property="og:type" content="website">
+<meta property="og:title" content="龍昌博客">
+<meta property="og:url" content="http://www.xefan.com/page/13/index.html">
+<meta property="og:site_name" content="龍昌博客">
+<meta property="og:description" content="关注Linux及开源信息">
+<meta property="og:locale">
+<meta property="article:author" content="龍昌">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="龍昌博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+
+<meta name="generator" content="Hexo 6.1.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">龍昌博客</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+          <a class="main-nav-link" href="/gbook">留言板</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.xefan.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-/archives/83883.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83883.html" class="article-date">
+  <time datetime="2013-10-07T16:47:27.000Z" itemprop="datePublished">2013-10-07</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Python%E6%A0%8F%E7%9B%AE/">Python栏目</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/83883.html">Scrapy框架学习笔记1——概括</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Scrapy是一个python的web爬虫框架，其设计思想与Django非常相似。如果事先用过Django的话那么理解Scrapy应该不难。</p>
+<h3>0.安装Scrapy</h3><br>当前Scrapy的稳定版本是0.18<br>使用pip进行安装：  <code>pip install Scrapy</code><br>使用easy_install进行安装：  <code>easy_install Scrapy</code><br><br><br>初次使用可以按照它的官方教程操作，先熟悉一下：<br><a href="http://doc.scrapy.org/en/0.18/intro/tutorial.html" target="_blank" rel="external">http://doc.scrapy.org/en/0.18/intro/tutorial.html</a><br><br><br><h3>1.一个项目的基本流程</h3><br>  创建新项目  scrapy startproject &lt;name&gt;<br><br>  然后在&lt;name&gt;/spiders目录下新建一个python文件。<br>  编写一个新的class继承自 scrapy.spider.BaseSpider，并且需要设置如下属性：<br>    <em> name: 该爬虫的名字，不能与其它的相同  
+    </em> start_urls: 开始的url入口<br>    <em> parse(): 对从start_urls的获取的内容进行处理的函数，需要一个Response参数  
+    </em> allowed_domains: 一个列表，表示该爬虫允许爬取的网站域名。可选<br><br>  爬虫运行流程：<br>    <em> 首先调用 start_requests()方法访问start_urls的链接（默认的），然后由parse回调方法对请求的响应进行处理。  
+    </em> 在回调中处理Response，并返回Item或者Request，再或者是由这两种对象组成的一个可迭代的对象。<br>      Request对象对应的callback可以与parse相同，也可以不同。<br><br><br>  最后运行这个爬虫脚本：  scrapy crawl name<br><br>  也可以直接在终端运行一个选择器： scrapy shell &lt;url&gt;<br><br><br><h3>2.使用Item</h3>
+
+<pre><code>scrapy.item.Item的调用接口类似于python的dict，Item包含多个scrapy.item.Field。  
+这跟django的Model与Field有点相似。  
+Item通常是在Spider的parse方法里使用，它用来保存解析到的数据。
+</code></pre><h3>3.使用Item Pipeline</h3>
+
+<p>  在settings.py中设置ITEM_PIPELINES，其默认为[]，与django的MIDDLEWARE_CLASSES等相似。<br>  从Spider的parse返回的Item数据将依次被ITEM_PIPELINES列表中的Pipeline类处理。</p>
+<p>  一个Item Pipeline类必须实现以下方法：  </p>
+<blockquote>
+<p> process_item(item, spider)  </p>
+<blockquote>
+<p>为每个item pipeline组件调用，并且需要返回一个scrapy.item.Item实例对象或者抛出一个scrapy.exceptions.DropItem异常。<br>当抛出异常后该item将不会被之后的pipeline处理。<br>参数:<br>        item (Item object) – 由parse方法返回的Item对象<br>        spider (BaseSpider object) – 抓取到这个Item对象对应的爬虫对象  </p>
+</blockquote>
+<p> 也可额外的实现以下两个方法：<br> open_spider(spider)  </p>
+<blockquote>
+<p>当爬虫打开之后被调用。<br>参数: spider (BaseSpider object) – 已经运行的爬虫    </p>
+</blockquote>
+<p> close_spider(spider)  </p>
+<blockquote>
+<p>当爬虫关闭之后被调用。<br>参数: spider (BaseSpider object) – 已经关闭的爬虫  </p>
+</blockquote>
+</blockquote>
+<h3>4.保存数据</h3>
+
+<p>  想要保存抓取到的数据，最简单的方法是使用Feed exports。 参考官方文档：<a href="http://doc.scrapy.org/en/0.18/topics/feed-exports.html#topics-feed-exports" target="_blank" rel="external">http://doc.scrapy.org/en/0.18/topics/feed-exports.html#topics-feed-exports</a>  </p>
+<p>  例如将抓取的数据导出为json:  scrapy crawl dmoz -o items.json -t json  </p>
+<p>  对于小项目用这种方法也足够了。如果是比较复杂的数据的话可能就需要编写一个Item Pipeline进行处理了。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83883.html" data-id="cl1hn20ef00gxpg4kl8otl4qs" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Scrapy/" rel="tag">Scrapy</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/" rel="tag">python</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-/archives/83880.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83880.html" class="article-date">
+  <time datetime="2013-08-24T22:52:05.000Z" itemprop="datePublished">2013-08-24</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E5%BC%80%E6%BA%90%E8%BD%AF%E4%BB%B6/">开源软件</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/83880.html">分享几款vim风格的浏览器</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>作为一个了vim用户，希望所有的操作都能够以vim的按键方式完成，上网浏览网页也不例外。于是乎就找了几款vim按键绑定的浏览器。</p>
+<p>0.Firefox + Vimperator / Chrome + Vimium<br>如果是用的Firefox或者Chrome浏览器的话直接安装相应的插件即可达到想要的效果。<br>Firefox的是Vimperator；Chrome的是Vimium。</p>
+<p>但是感觉Firefox和Chrome有时又太占资源了，我想到一个轻量级的浏览器。</p>
+<p>1.w3m<br>如果你是一个终端控的话，w3m貌似还不错。现在常见的Linux发行版的软件源中应该都包含了w3m，直接通过软件仓库安装就行了。<br>只不过w3m太简洁了，显示不了CSS样式，执行不了js代码，甚至是显示图片都比较麻烦。</p>
+<p>2.uzbl<br>uzbl是一款基于GTK+Webkit的浏览器，只是它的按键与原生的vim相差比较大，我刚开始操作不太适应。<br>它的配置文件在$HOME/.config/uzbl目录下，如果把它配置好了的话那使用起来应该也会很不错的。<br>uzbl默认是不支持多标签的，如果要想打开多个标签请运行uzbl-tabbed程序。<br>下载地址：<a href="http://www.uzbl.org/" target="_blank" rel="external">http://www.uzbl.org/</a></p>
+<p>linuxdeepin用户可以执行命令 sudo apt-get install uzbl来安装。</p>
+<p>3.dwb<br>dwb是一款基于gtk和webkit的轻量级的浏览器。它的按键与Firefox的Vimperator插件较为相似。<br>我个人觉得dwb是这几款浏览器中最为方便的，它配置比较简单，而且提供了一个web的配置页面。如图：<br><img src="http://portix.bitbucket.org/dwb/resources/prefs.jpg" alt=""></p>
+<p>下载地址：<a href="http://portix.bitbucket.org/dwb/" target="_blank" rel="external">http://portix.bitbucket.org/dwb/</a></p>
+<p>4.luakit<br>luakit也是基于gtk和webkit的，只不过它是用lua语言开发的。它的配置文件也是lua脚本，如果想到修改配置的话可能需要懂点lua语言。<br>我感觉luakit的按键与vim最相近，而且它还提供了页面调试功能，这对做web开发的人来说比较方便。</p>
+<p>下载地址：<a href="http://mason-larobina.github.io/luakit/" target="_blank" rel="external">http://mason-larobina.github.io/luakit/</a></p>
+<p>linuxdeepin用户可以执行命令 sudo apt-get install luakit来安装。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83880.html" data-id="cl1hn20ed00gupg4kn88acged" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vim/" rel="tag">vim</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-/archives/83877.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83877.html" class="article-date">
+  <time datetime="2013-08-11T20:40:58.000Z" itemprop="datePublished">2013-08-11</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E5%BC%80%E6%BA%90%E8%BD%AF%E4%BB%B6/">开源软件</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/83877.html">分享两个vim的git插件</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>1.vim-git</p>
+<p>我只是简单体验发一下，个人觉得这个就是用vim的命令把git的命令包装了一下，还不如直接在终端下操作方便。</p>
+<p>常用命令<br>:GitAdd<br>:GitCommit<br>:GitStatus<br>:GitLog<br>:GitCheckout<br>:GitDiff<br>:GitPull<br>:GitPush  </p>
+<p>快捷键<br>&lt;Leader&gt;gd 等同于 :GitDiff<br>&lt;Leader&gt;gD 等同于 :GitDiff —cached<br>&lt;Leader&gt;gs 等同于 :GitStatus<br>&lt;Leader&gt;gl 等同于 :GitLog<br>&lt;Leader&gt;ga 等同于 :GitAdd<br>&lt;Leader&gt;gA 等同于 :GitAdd &lt;cfile&gt;<br>&lt;Leader&gt;gc 等同于 :GitCommit  </p>
+<p>下载地址：<a href="https://github.com/motemen/git-vim.git" target="_blank" rel="external">https://github.com/motemen/git-vim.git</a></p>
+<p>2.vim-fugitive</p>
+<p>感觉这个比较强大，尤其是配合vimdiff来查看文件的发动非常方便。<br>它的说明文档介绍到如果你的vim版本低于7.2，那么建议同时也把vim-git安装上。</p>
+<p>下载地址：<a href="https://github.com/tpope/vim-fugitive.git" target="_blank" rel="external">https://github.com/tpope/vim-fugitive.git</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83877.html" data-id="cl1hn20eb00grpg4k7t7mcbgj" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/git/" rel="tag">git</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vim/" rel="tag">vim</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-/archives/83875.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83875.html" class="article-date">
+  <time datetime="2013-07-20T23:40:23.000Z" itemprop="datePublished">2013-07-20</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%92%8C%E7%AE%97%E6%B3%95/">数据结构和算法</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/83875.html">md5的一个碰撞例子</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>md5作为计算机安全领域广泛使用的一种散列函数，被用于检测信息是否完整一致。</p>
+<p>然而在2004年8月17日的美国加州圣巴巴拉，正在召开的国际密码学会议（Crypto’2004）上来自山东大学的王小云教授做了破译MD5、HAVAL-128、 MD4和RIPEMD算法的报告。她公布了MD系列算法的破解结果。</p>
+<p>各位好奇的可以在网上搜索王小云老师的那篇论文，反正我是看不懂的。不过倒是找到了一个md5碰撞的例子，于是就拿来分享一下。</p>
+<p>比如有两个文件test1、test2，文件的十六进制内容分别如下：</p>
+<pre>
+% xxd test1            
+0000000: 0e30 6561 559a a787 d00b c6f7 0bbd fe34  .0eaU..........4
+0000010: 04cf 0365 9e70 4f85 34c0 0ffb 659c 4c87  ...e.pO.4...e.L.
+0000020: 40cc 942f eb2d a115 a3f4 155c bb86 0749  @../.-.....\...I
+0000030: 7386 656d 7d1f 34a4 2059 d78f 5a8d d1ef  s.em}.4. Y..Z...
+
+% xxd test2
+0000000: 0e30 6561 559a a787 d00b c6f7 0bbd fe34  .0eaU..........4
+0000010: 04cf 0365 9e74 4f85 34c0 0ffb 659c 4c87  ...e.tO.4...e.L.
+0000020: 40cc 942f eb2d a115 a3f4 15dc bb86 0749  @../.-.........I
+0000030: 7386 656d 7d1f 34a4 2059 d78f 5a8d d1ef  s.em}.4. Y..Z...
+</pre>
+
+<p>如果想得到文件的原始内容，可以把上面的输出信息保存为一个文本文件（如test.txt），然后再执行命令 xxd -r test1.txt &gt; test 即可。<br>从上面可以看到这两个文件的内容明显是不一样的，那么现在就来计算一下这两个文件的md5值吧。</p>
+<pre>
+% md5sum test1
+cee9a457e790cf20d4bdaa6d69f01e41  test1
+% md5sum test2
+cee9a457e790cf20d4bdaa6d69f01e41  test2
+</pre>
+
+<p>从计算结果可以看到，虽然这两个文件内容不同，但是它们的md5值却是相同的。这个就是所谓的碰撞。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83875.html" data-id="cl1hn20ea00gnpg4k9ei87yq1" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Hash/" rel="tag">Hash</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-/archives/83873.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83873.html" class="article-date">
+  <time datetime="2013-07-14T17:14:07.000Z" itemprop="datePublished">2013-07-14</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%92%8C%E7%AE%97%E6%B3%95/">数据结构和算法</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/83873.html">Python中的字符串匹配算法分析</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>在Python在str对象的find、index、replace等操作都是基于字符串匹配的。通过阅读Python的源代码可知，在Python中的字符串匹配算法是基于Boyer-Moore、Horspool和Sunday的混合。</p>
+<p>关于它的详细介绍可以访问这个网页： <a href="http://effbot.org/zone/stringlib.htm" target="_blank" rel="external">http://effbot.org/zone/stringlib.htm</a></p>
+<p>用Python代码实现如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#!/usr/bin/env python</span></div><div class="line"><span class="comment">#-*- coding:utf-8 -*-</span></div><div class="line"></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">make_delta1</span><span class="params">(p)</span>:</span></div><div class="line">    ALPHABET_LEN = <span class="number">256</span></div><div class="line">    i = <span class="number">0</span></div><div class="line">    patternlen = len(p)</div><div class="line">    delta1 = [<span class="number">0</span>] * ALPHABET_LEN</div><div class="line"></div><div class="line">    <span class="keyword">while</span> i &lt; ALPHABET_LEN:</div><div class="line">        delta1[i] = patternlen</div><div class="line">        i += <span class="number">1</span></div><div class="line"></div><div class="line">    i = <span class="number">0</span></div><div class="line">    <span class="keyword">while</span> i &lt; patternlen<span class="number">-1</span>:</div><div class="line">        delta1[ord(p[i])] = patternlen<span class="number">-1</span> - i</div><div class="line">        i += <span class="number">1</span></div><div class="line">    <span class="keyword">return</span> delta1</div><div class="line"></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">find</span><span class="params">(s, p)</span>:</span></div><div class="line">    <span class="comment"># find first occurrence of p in s</span></div><div class="line">    n = len(s)</div><div class="line">    m = len(p)</div><div class="line">    delta1 = make_delta1(p)</div><div class="line">    skip = delta1[ord(p[m<span class="number">-1</span>])]</div><div class="line">    i = <span class="number">0</span></div><div class="line">    <span class="keyword">while</span> i &lt;= n-m:</div><div class="line">        <span class="keyword">if</span> s[i+m<span class="number">-1</span>] == p[m<span class="number">-1</span>]:  <span class="comment"># (boyer-moore)</span></div><div class="line">            <span class="comment"># potential match</span></div><div class="line">            <span class="keyword">if</span> s[i:i+m<span class="number">-1</span>] == p[:m<span class="number">-1</span>]:</div><div class="line">                <span class="keyword">return</span> i</div><div class="line">            <span class="keyword">if</span> s[i+m] <span class="keyword">not</span> <span class="keyword">in</span> p:</div><div class="line">                i = i + m + <span class="number">1</span>   <span class="comment"># (sunday)</span></div><div class="line">            <span class="keyword">else</span>:</div><div class="line">                i = i + skip    <span class="comment"># (horspool)</span></div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            <span class="comment"># skip</span></div><div class="line">            <span class="keyword">if</span> s[i+m] <span class="keyword">not</span> <span class="keyword">in</span> p:</div><div class="line">                i = i + m + <span class="number">1</span>   <span class="comment"># (sunday)</span></div><div class="line">            <span class="keyword">else</span>:</div><div class="line">                i = i + <span class="number">1</span></div><div class="line">    <span class="keyword">return</span> <span class="number">-1</span>                   <span class="comment"># not found</span></div><div class="line"></div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</div><div class="line">    <span class="keyword">print</span> find(<span class="string">"HERE IS A SILMPLE EXAMPLE"</span>, <span class="string">"EXAMPLE"</span>)</div></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83873.html" data-id="cl1hn20e800ggpg4kkqqfvs0w" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95/" rel="tag">匹配算法</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-/archives/83871.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83871.html" class="article-date">
+  <time datetime="2013-07-14T16:46:55.000Z" itemprop="datePublished">2013-07-14</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%92%8C%E7%AE%97%E6%B3%95/">数据结构和算法</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/83871.html">字符串匹配算法（五）——Horspool算法</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Horspool算法是Boyer-Moore算法的一个简化版，全名叫做Boyer-Moore-Horspool算法。</p>
+<p>Horspool算法的基本思想是将文本串text中匹配窗口的最后一个字符跟模式串pattern中的最后一个字符比较。如果相等，继续从后向前对主串和模式串进行比较，直到完全相等或者在某个字符处不匹配为止 。如果不匹配，则根据文本串匹配窗口中的最后一个字符β在模式串中的下一个出现位置将窗口向右移动；若字符β没有在模式串中出现，则直接将整个模式串滑过这一位。</p>
+<p>同样的举个例子来说明一下。假定文本串text为：”HERE IS A SIMPLE EXAMPLE”，长度为n；模式串pattern为：”EXAMPLE”，长度为m；现在要在text中搜索看看是否包含pattern。</p>
+<p>1).</p>
+<p><pre><br>HERE I<span style="color: #ff0000;">S</span> A SIMPLE EXAMPLE<br>EXAMPL<span style="color: #ff0000;">E</span><br></pre><br>‘S’与’E’匹配失败，并且’S’没有在pattern中出现，所以直接将pattern滑过’S’这一位。</p>
+<p>2).</p>
+<p><pre><br>HERE IS A SIM<span style="color: #ff0000;">P</span>LE EXAMPLE<br>       EXAMPL<span style="color: #ff0000;">E</span><br></pre><br>这时’P’与’E’匹配失败，但是’P’在模式串pattern中出现了，所以把pattern向右移，使得text中的’P’与pattern中的’P’对齐。</p>
+<p>3).</p>
+<p><pre><br>HERE IS A SIM<span style="color: #00ff00;">P</span>L<span style="color: #ff0000;">E</span> EXAMPLE<br>         EXAM<span style="color: #00ff00;">P</span>L<span style="color: #ff0000;">E</span><br></pre><br>然后重复执行之前的操作。</p>
+<p>用C语言实现如下。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;limits.h&gt;</span></span></div><div class="line"> </div><div class="line"><span class="comment">/* Returns a pointer to the first occurrence of "needle"</span></div><div class="line"> * within "haystack", or NULL if not found. Works like</div><div class="line"> * memmem().</div><div class="line"> */</div><div class="line"> </div><div class="line"><span class="comment">/* <span class="doctag">Note:</span> In this example needle is a C string. The ending</span></div><div class="line"> * 0x00 will be cut off, so you could call this example with</div><div class="line"> * boyermoore_horspool_memmem(haystack, hlen, "abc", sizeof("abc"))</div><div class="line"> */</div><div class="line"><span class="function"><span class="keyword">const</span> <span class="keyword">unsigned</span> <span class="keyword">char</span> *</span></div><div class="line"><span class="title">boyermoore_horspool_memmem</span><span class="params">(<span class="keyword">const</span> <span class="keyword">unsigned</span> <span class="keyword">char</span>* haystack, <span class="keyword">size_t</span> hlen,</span></div><div class="line">                           <span class="keyword">const</span> <span class="keyword">unsigned</span> <span class="keyword">char</span>* needle,   <span class="keyword">size_t</span> nlen)</div><div class="line">&#123;</div><div class="line">    <span class="keyword">int</span> index = <span class="number">0</span>;</div><div class="line">    <span class="keyword">size_t</span> scan = <span class="number">0</span>;</div><div class="line">    <span class="keyword">size_t</span> bad_char_skip[UCHAR_MAX + <span class="number">1</span>]; <span class="comment">/* Officially called:</span></div><div class="line">                                          * bad character shift */</div><div class="line"> </div><div class="line">    <span class="comment">/* Sanity checks on the parameters */</span></div><div class="line">    <span class="keyword">if</span> (nlen &lt;= <span class="number">0</span> || !haystack || !needle)</div><div class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</div><div class="line"> </div><div class="line">    <span class="comment">/* ---- Preprocess ---- */</span></div><div class="line">    <span class="comment">/* Initialize the table to default value */</span></div><div class="line">    <span class="comment">/* When a character is encountered that does not occur</span></div><div class="line">     * in the needle, we can safely skip ahead for the whole</div><div class="line">     * length of the needle.</div><div class="line">     */</div><div class="line">    <span class="keyword">for</span> (scan = <span class="number">0</span>; scan &lt;= UCHAR_MAX; scan = scan + <span class="number">1</span>)</div><div class="line">        bad_char_skip[scan] = nlen;</div><div class="line"> </div><div class="line">    <span class="comment">/* C arrays have the first byte at [0], therefore:</span></div><div class="line">     * [nlen - 1] is the last byte of the array. */</div><div class="line">    <span class="keyword">size_t</span> last = nlen - <span class="number">1</span>;</div><div class="line"> </div><div class="line">    <span class="comment">/* Then populate it with the analysis of the needle */</span></div><div class="line">    <span class="keyword">for</span> (scan = <span class="number">0</span>; scan &lt; last; scan = scan + <span class="number">1</span>)</div><div class="line">        bad_char_skip[needle[scan]] = last - scan;</div><div class="line"> </div><div class="line">    <span class="comment">/* ---- Do the matching ---- */</span></div><div class="line"> </div><div class="line">    <span class="comment">/* Search the haystack, while the needle can still be within it. */</span></div><div class="line">    <span class="keyword">while</span> (hlen &gt;= nlen)</div><div class="line">    &#123;</div><div class="line">        <span class="comment">/* scan from the end of the needle */</span></div><div class="line">        <span class="keyword">for</span> (scan = last; haystack[scan] == needle[scan]; scan = scan - <span class="number">1</span>)</div><div class="line">            <span class="keyword">if</span> (scan == <span class="number">0</span>) <span class="comment">/* If the first byte matches, we've found it. */</span></div><div class="line">            &#123;</div><div class="line">                <span class="built_in">printf</span>(<span class="string">"index: %d\n"</span>, index<span class="number">-1</span>);</div><div class="line">                <span class="keyword">return</span> haystack;</div><div class="line">            &#125;</div><div class="line"> </div><div class="line">        <span class="comment">/* otherwise, we need to skip some bytes and start again.</span></div><div class="line">           Note that here we are getting the skip value based on the last byte</div><div class="line">           of needle, no matter where we didn't match. So if needle is: "abcd"</div><div class="line">           then we are skipping based on 'd' and that value will be 4, and</div><div class="line">           for "abcdd" we again skip on 'd' but the value will be only 1.</div><div class="line">           The alternative of pretending that the mismatched character was</div><div class="line">           the last character is slower in the normal case (E.g. finding</div><div class="line">           "abcd" in "...azcd..." gives 4 by using 'd' but only</div><div class="line">           4-2==2 using 'z'. */</div><div class="line">        hlen     -= bad_char_skip[haystack[last]];</div><div class="line">        index += bad_char_skip[haystack[last]];</div><div class="line">        haystack += bad_char_skip[haystack[last]];</div><div class="line">    &#125;</div><div class="line"> </div><div class="line">    <span class="keyword">return</span> <span class="literal">NULL</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">char</span> text[] = <span class="string">"HERE IS A SILMPLE EXAMPLE"</span>;</div><div class="line">    <span class="keyword">char</span> pattern[] = <span class="string">"EXAMPLE"</span>;</div><div class="line">    <span class="keyword">char</span> *result = boyermoore_horspool_memmem(text, <span class="built_in">strlen</span>(text), pattern, <span class="built_in">strlen</span>(pattern));</div><div class="line">    <span class="keyword">if</span> (result)</div><div class="line">    &#123;</div><div class="line">        <span class="built_in">printf</span>(<span class="string">"result: %s\n"</span>, result);</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">        <span class="built_in">printf</span>(<span class="string">"failed!\n"</span>);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83871.html" data-id="cl1hn20e700gdpg4k2236wcb3" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95/" rel="tag">匹配算法</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-/archives/83866.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83866.html" class="article-date">
+  <time datetime="2013-07-14T15:41:51.000Z" itemprop="datePublished">2013-07-14</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%92%8C%E7%AE%97%E6%B3%95/">数据结构和算法</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/83866.html">字符串匹配算法（四）——Boyer-Moore算法</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>1977年，德克萨斯大学的Robert S. Boyer教授和J Strother Moore教授提出了另一种在O(n)时间复杂度内，完成字符串匹配的算法，其在绝大多数场合的性能表现，比KMP算法还要出色。</p>
+<p>Boyer-Moore算法不仅高效，而且构思巧妙，文本编辑器的”查找”功能（Ctrl+F），大多采用的是该算法。</p>
+<p>Boyer-Moore算法基本原理是从右向左扫描pattern；与KMP算法类似当遇到不匹配的字符时它也不需要对文本串text进行回溯，而是通过预先计算的Bad-character(坏字符)跳转表以及Good-suffix(好后缀)跳转表进行寻找最大的跳转长度。</p>
+<p>下面以Moore教授的例子来讲解一下。这个例子的原始地址： <a href="http://www.cs.utexas.edu/~moore/best-ideas/string-searching/fstrpos-example.html" target="_blank" rel="external">http://www.cs.utexas.edu/~moore/best-ideas/string-searching/fstrpos-example.html</a></p>
+<p>假定文本串text为：”HERE IS A SIMPLE EXAMPLE”，长度为n；模式串pattern为：”EXAMPLE”，长度为m；现在要在text中搜索看看是否包含pattern。</p>
+<p>1).</p>
+<pre>
+HERE I<span style="color: #ff0000;">S</span> A SIMPLE EXAMPLE
+EXAMPL<span style="color: #ff0000;">E</span>
+</pre>
+首先text与pattern左边对齐，从右边开始进行比较。这个方法比较巧妙，因为如果最右边的字符不匹配，那么就只要比较一次就可以知道前7个字符肯定是不相同的。
+
+S与E不匹配，这时'S'被称为Bad-character。并且'S'不包含在pattern之中，这样就可以把pattern直接移动到text的'S'的后一位。
+
+2).
+<pre>
+HERE IS A SIM<span style="color: #ff0000;">P</span>LE EXAMPLE
+       EXAMPL<span style="color: #ff0000;">E</span>
+</pre>
+仍然是从右边开始比较，发现'P'与'E'不匹配，因此'P'是Bad-character。但是'P'包含中pattern中，因此将pattern后移2位，把两个'P'对齐。注意这里后移时需要用到Bad-character跳转表，这个在后面再介绍。
+
+3).
+<pre>
+HERE IS A SIM<span style="color: #00ff00;">P</span>L<span style="color: #ff0000;">E</span> EXAMPLE
+         EXAM<span style="color: #00ff00;">P</span>L<span style="color: #ff0000;">E</span>
+</pre>
+
+<p>再从右边开始比较，’E’与’E’相匹配，然后再比较下一个字符。</p>
+<p>4).</p>
+<pre>
+HERE IS A S<span style="color: #00ff00;">I</span><span style="color: #ff0000;">MPLE</span> EXAMPLE
+         EX<span style="color: #00ff00;">A</span><span style="color: #ff0000;">MPLE</span>
+</pre>
+几次比较之后得到这样的结果，'A'与'I'不匹配，因此'I'是Bad-character。但是'MPLE'与'MPLE'是匹配的。我们尾部匹配的字符串称为Good-suffix(好后缀)。
+
+5).
+根据Bad-character的跳转方法，可以将pattern后移3位，变成如下形式。
+<pre>
+HERE IS A SI<span style="color: #ff0000;">M</span>PLE EXAMPLE
+            <span style="color: #ff0000;">E</span>XAMPLE
+</pre>
+
+<p>但是我们可以有更好的方法。这里’MPLE’为Good-suffix，根据Good-suffix跳转方法，将pattern后移6位，变成如下形式。同样的Good-suffix跳转表也将在后面介绍。</p>
+<pre>
+HERE IS A SIMPL<span style="color: #ff0000;">E</span> EXAM<span style="color: #ff0000;">P</span>LE
+               <span style="color: #ff0000;">E</span>XAMPL<span style="color: #ff0000;">E</span>
+</pre>
+
+<p>6).<br>‘P’与’E’不匹配，因此’P’为Bad-character。再将pattern后移2位，最后变成：</p>
+<pre>
+HERE IS A SIMPLE EXAM<span style="color: #00ff00;">P</span>L<span style="color: #ff0000;">E</span>
+                 EXAM<span style="color: #00ff00;">P</span>L<span style="color: #ff0000;">E</span>
+</pre>
+至此整个字符串的匹配就完成了。
+<pre>
+HERE IS A SIMPLE <span style="color: #ff0000;">EXAMPLE</span>
+                 <span style="color: #ff0000;">EXAMPLE</span>
+</pre>
+
+
+
+<p>接下来介绍一下Bad-character和Good-suffix的跳转方法。<br>(1).对于Bad-character后移位数计算公式为：<br>delta1(x) = m ;x != pattern[j] (1 &lt;= j &lt;= m),即坏字符x中pattern中未出现<br>delta1(x) = m - max{k|pattern[k]=x, 1 &lt;=k&lt;=m} ;其他情况</p>
+<p>例如上面的第2步时，’P’与’E’不匹配，因此’P’为Bad-character，在pattern中上次出现的位置为5,因此后移位数就是 7 - 5 = 2。</p>
+<p>(2).对于Good-suffix后移位数计算方法为：<br>1.pattern中间的某一子字符串pattern[j-s+1:m-s] == pattern[j+1:m]，可将pattern右移s位；<br>2.pattern已比较部分pattern[j+1:m]的后缀pattern[s+1:m]与pattern的前缀pattern[1:m-s]相同，可将pattern右移s位。<br>满足上面情况的s的最小值为最佳右移距离。<br>delta2(j) = min{s|(pattern[j+1:m]=pattern[j-s+1:m-s])&amp;&amp;(pattern[j]!=pattern[j-s])(j&gt;s),pattern[s+1:m]=pattern<a href="j&lt;=s">1:m-s</a>}  </p>
+<p>例如上面的第5步，满足的是情况2.pattern[6+1:7] == pattern[1:7-6] =&gt; pattern[7] == pattern[1]，即是’E’ == ‘E’，所以s为6。故右移6位。</p>
+<p>在匹配过程中，取delta1和delta2中较大的那一个。</p>
+<p>用C语言实现如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdint.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></div><div class="line"> </div><div class="line"><span class="meta">#<span class="meta-keyword">define</span> ALPHABET_LEN 256</span></div><div class="line"><span class="meta">#<span class="meta-keyword">define</span> NOT_FOUND patlen</span></div><div class="line"><span class="meta">#<span class="meta-keyword">define</span> max(a, b) ((a &lt; b) ? b : a)</span></div><div class="line"> </div><div class="line"><span class="comment">// delta1 table: delta1[c] contains the distance between the last</span></div><div class="line"><span class="comment">// character of pat and the rightmost occurence of c in pat.</span></div><div class="line"><span class="comment">// If c does not occur in pat, then delta1[c] = patlen.</span></div><div class="line"><span class="comment">// If c is at string[i] and c != pat[patlen-1], we can</span></div><div class="line"><span class="comment">// safely shift i over by delta1[c], which is the minimum distance</span></div><div class="line"><span class="comment">// needed to shift pat forward to get string[i] lined up </span></div><div class="line"><span class="comment">// with some character in pat.</span></div><div class="line"><span class="comment">// this algorithm runs in alphabet_len+patlen time.</span></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">make_delta1</span><span class="params">(<span class="keyword">int</span> *delta1, <span class="keyword">uint8_t</span> *pat, <span class="keyword">int32_t</span> patlen)</span> </span>&#123;</div><div class="line">    <span class="keyword">int</span> i;</div><div class="line">    <span class="keyword">for</span> (i=<span class="number">0</span>; i &lt; ALPHABET_LEN; i++) &#123;</div><div class="line">        delta1[i] = NOT_FOUND;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">for</span> (i=<span class="number">0</span>; i &lt; patlen<span class="number">-1</span>; i++) &#123;</div><div class="line">        delta1[pat[i]] = patlen<span class="number">-1</span> - i;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"> </div><div class="line"><span class="comment">// true if the suffix of word starting from word[pos] is a prefix </span></div><div class="line"><span class="comment">// of word</span></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">is_prefix</span><span class="params">(<span class="keyword">uint8_t</span> *word, <span class="keyword">int</span> wordlen, <span class="keyword">int</span> pos)</span> </span>&#123;</div><div class="line">    <span class="keyword">int</span> i;</div><div class="line">    <span class="keyword">int</span> suffixlen = wordlen - pos;</div><div class="line">    <span class="comment">// could also use the strncmp() library function here</span></div><div class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; suffixlen; i++) &#123;</div><div class="line">        <span class="keyword">if</span> (word[i] != word[pos+i]) &#123;</div><div class="line">            <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="number">1</span>;</div><div class="line">&#125;</div><div class="line"> </div><div class="line"><span class="comment">// length of the longest suffix of word ending on word[pos].</span></div><div class="line"><span class="comment">// suffix_length("dddbcabc", 8, 4) = 2</span></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">suffix_length</span><span class="params">(<span class="keyword">uint8_t</span> *word, <span class="keyword">int</span> wordlen, <span class="keyword">int</span> pos)</span> </span>&#123;</div><div class="line">    <span class="keyword">int</span> i;</div><div class="line">    <span class="comment">// increment suffix length i to the first mismatch or beginning</span></div><div class="line">    <span class="comment">// of the word</span></div><div class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; (word[pos-i] == word[wordlen<span class="number">-1</span>-i]) &amp;&amp; (i &lt; pos); i++);</div><div class="line">    <span class="keyword">return</span> i;</div><div class="line">&#125;</div><div class="line"> </div><div class="line"><span class="comment">// delta2 table: given a mismatch at pat[pos], we want to align </span></div><div class="line"><span class="comment">// with the next possible full match could be based on what we</span></div><div class="line"><span class="comment">// know about pat[pos+1] to pat[patlen-1].</span></div><div class="line"><span class="comment">//</span></div><div class="line"><span class="comment">// In case 1:</span></div><div class="line"><span class="comment">// pat[pos+1] to pat[patlen-1] does not occur elsewhere in pat,</span></div><div class="line"><span class="comment">// the next plausible match starts at or after the mismatch.</span></div><div class="line"><span class="comment">// If, within the substring pat[pos+1 .. patlen-1], lies a prefix</span></div><div class="line"><span class="comment">// of pat, the next plausible match is here (if there are multiple</span></div><div class="line"><span class="comment">// prefixes in the substring, pick the longest). Otherwise, the</span></div><div class="line"><span class="comment">// next plausible match starts past the character aligned with </span></div><div class="line"><span class="comment">// pat[patlen-1].</span></div><div class="line"><span class="comment">// </span></div><div class="line"><span class="comment">// In case 2:</span></div><div class="line"><span class="comment">// pat[pos+1] to pat[patlen-1] does occur elsewhere in pat. The</span></div><div class="line"><span class="comment">// mismatch tells us that we are not looking at the end of a match.</span></div><div class="line"><span class="comment">// We may, however, be looking at the middle of a match.</span></div><div class="line"><span class="comment">// </span></div><div class="line"><span class="comment">// The first loop, which takes care of case 1, is analogous to</span></div><div class="line"><span class="comment">// the KMP table, adapted for a 'backwards' scan order with the</span></div><div class="line"><span class="comment">// additional restriction that the substrings it considers as </span></div><div class="line"><span class="comment">// potential prefixes are all suffixes. In the worst case scenario</span></div><div class="line"><span class="comment">// pat consists of the same letter repeated, so every suffix is</span></div><div class="line"><span class="comment">// a prefix. This loop alone is not sufficient, however:</span></div><div class="line"><span class="comment">// Suppose that pat is "ABYXCDEYX", and text is ".....ABYXCDEYX".</span></div><div class="line"><span class="comment">// We will match X, Y, and find B != E. There is no prefix of pat</span></div><div class="line"><span class="comment">// in the suffix "YX", so the first loop tells us to skip forward</span></div><div class="line"><span class="comment">// by 9 characters.</span></div><div class="line"><span class="comment">// Although superficially similar to the KMP table, the KMP table</span></div><div class="line"><span class="comment">// relies on information about the beginning of the partial match</span></div><div class="line"><span class="comment">// that the BM algorithm does not have.</span></div><div class="line"><span class="comment">//</span></div><div class="line"><span class="comment">// The second loop addresses case 2. Since suffix_length may not be</span></div><div class="line"><span class="comment">// unique, we want to take the minimum value, which will tell us</span></div><div class="line"><span class="comment">// how far away the closest potential match is.</span></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">make_delta2</span><span class="params">(<span class="keyword">int</span> *delta2, <span class="keyword">uint8_t</span> *pat, <span class="keyword">int32_t</span> patlen)</span> </span>&#123;</div><div class="line">    <span class="keyword">int</span> p;</div><div class="line">    <span class="keyword">int</span> last_prefix_index = patlen<span class="number">-1</span>;</div><div class="line"> </div><div class="line">    <span class="comment">// first loop</span></div><div class="line">    <span class="keyword">for</span> (p=patlen<span class="number">-1</span>; p&gt;=<span class="number">0</span>; p--) &#123;</div><div class="line">        <span class="keyword">if</span> (is_prefix(pat, patlen, p+<span class="number">1</span>)) &#123;</div><div class="line">            last_prefix_index = p+<span class="number">1</span>;</div><div class="line">        &#125;</div><div class="line">        delta2[p] = last_prefix_index + (patlen<span class="number">-1</span> - p);</div><div class="line">    &#125;</div><div class="line"> </div><div class="line">    <span class="comment">// second loop</span></div><div class="line">    <span class="keyword">for</span> (p=<span class="number">0</span>; p &lt; patlen<span class="number">-1</span>; p++) &#123;</div><div class="line">        <span class="keyword">int</span> slen = suffix_length(pat, patlen, p);</div><div class="line">        <span class="keyword">if</span> (pat[p - slen] != pat[patlen<span class="number">-1</span> - slen]) &#123;</div><div class="line">            delta2[patlen<span class="number">-1</span> - slen] = patlen<span class="number">-1</span> - p + slen;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"> </div><div class="line"><span class="keyword">uint8_t</span>* boyer_moore (<span class="keyword">uint8_t</span> *<span class="built_in">string</span>, <span class="keyword">uint32_t</span> stringlen, <span class="keyword">uint8_t</span> *pat, <span class="keyword">uint32_t</span> patlen) &#123;</div><div class="line">    <span class="keyword">int</span> i;</div><div class="line">    <span class="keyword">int</span> delta1[ALPHABET_LEN];</div><div class="line">    <span class="keyword">int</span> *delta2 = <span class="built_in">malloc</span>(patlen * <span class="keyword">sizeof</span>(<span class="keyword">int</span>));</div><div class="line">    make_delta1(delta1, pat, patlen);</div><div class="line">    make_delta2(delta2, pat, patlen);</div><div class="line"> </div><div class="line">    i = patlen<span class="number">-1</span>;</div><div class="line">    <span class="keyword">while</span> (i &lt; stringlen) &#123;</div><div class="line">        <span class="keyword">int</span> j = patlen<span class="number">-1</span>;</div><div class="line">        <span class="keyword">while</span> (j &gt;= <span class="number">0</span> &amp;&amp; (<span class="built_in">string</span>[i] == pat[j])) &#123;</div><div class="line">            --i;</div><div class="line">            --j;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">if</span> (j &lt; <span class="number">0</span>) &#123;</div><div class="line">            <span class="built_in">free</span>(delta2);</div><div class="line">            <span class="built_in">printf</span>(<span class="string">"index: %d\n"</span>, i);</div><div class="line">            <span class="keyword">return</span> (<span class="built_in">string</span> + i+<span class="number">1</span>);</div><div class="line">        &#125;</div><div class="line"> </div><div class="line">        i += max(delta1[<span class="built_in">string</span>[i]], delta2[j]);</div><div class="line">    &#125;</div><div class="line">    <span class="built_in">free</span>(delta2);</div><div class="line">    <span class="keyword">return</span> <span class="literal">NULL</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></div><div class="line">&#123;</div><div class="line">    </div><div class="line">    <span class="keyword">char</span> text[] = <span class="string">"HERE IS A SILMPLE EXAMPLE"</span>;</div><div class="line">    <span class="keyword">char</span> pattern[] = <span class="string">"EXAMPLE"</span>;</div><div class="line">    <span class="keyword">char</span> *result = boyer_moore(text, <span class="built_in">strlen</span>(text), pattern, <span class="built_in">strlen</span>(pattern));</div><div class="line">    <span class="keyword">if</span> (result)</div><div class="line">    &#123;</div><div class="line">        <span class="built_in">printf</span>(<span class="string">"result: %s\n"</span>, result);</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">        <span class="built_in">printf</span>(<span class="string">"failed!\n"</span>);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83866.html" data-id="cl1hn20e900gkpg4km2azyvg2" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95/" rel="tag">匹配算法</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-/archives/83859.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83859.html" class="article-date">
+  <time datetime="2013-07-13T22:46:53.000Z" itemprop="datePublished">2013-07-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%92%8C%E7%AE%97%E6%B3%95/">数据结构和算法</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/83859.html">字符串匹配算法（三）——KMP算法</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>KMP算法是常用的字符串匹配算法之一，是由Knuth、Pratt和Morris发明的。其中Knuth就是著名科学家Donald Knuth。</p>
+<p>该算法可以在O(n+m)的时间数量级上完成模式匹配操作。与传统算法相比其改进在于每当一趟匹配过程中出现比较不相等时不用回溯目标字符串。</p>
+<p>这个算法还是比较难理解，下面通过一个例子来讲解。<br>有一个目标字符串”BBC ABCDAB ABCDABCDABDE”，我想知道，里面是否包含另一个字符串”ABCDABD”？</p>
+<p>1).</p>
+<pre>
+<span style="color: #ff0000;">B</span>BC ABCDAB ABCDABCDABDE
+<span style="color: #ff0000;">A</span>BCDABD
+</pre>
+首先目标字符串”BBC ABCDAB ABCDABCDABDE”的第一个字符与源字符串”ABCDABD”的第一个字符相比，不匹配，则目标字符串后移一位。
+
+2).
+<pre>
+B<span style="color: #ff0000;">B</span>C ABCDAB ABCDABCDABDE
+ <span style="color: #ff0000;">A</span>BCDABD
+</pre>
+B与A不匹配，再次后移。
+
+3).
+<pre>
+BBC <span style="color: #ff0000;">A</span>BCDAB ABCDABCDABDE
+    <span style="color: #ff0000;">A</span>BCDABD
+</pre>
+就这样直到有一个字符相同为止。
+
+4).
+<pre>
+BBC A<span style="color: #ff0000;">B</span>CDAB ABCDABCDABDE
+    A<span style="color: #ff0000;">B</span>CDABD
+</pre>
+接着比较下一个字符，还是相同的。再继续。
+
+5).
+<pre>
+BBC ABCDAB<span style="color: #ff0000;"> </span>ABCDABCDABDE
+    ABCDAB<span style="color: #ff0000;">D</span>
+</pre>
+这时又出现了字符不匹配的情况，如果是传统的算法的话就把目标字符串进行回溯，源字符串后移一位。变成如下情形：
+<pre>
+BBC A<span style="color: #ff0000;">B</span>CDAB ABCDABCDABDE
+     <span style="color: #ff0000;">A</span>BCDABD
+</pre>
+毕竟这也是最容易理解的，但是这样一来很多字符又需要再重新比较一次。因此效率比较低。
+
+6).
+虽然D与空格不匹配，但是前面的ABCDAB是相匹配的。KMP算法就是利用这个已知信息，不要把“搜索”位置称回已经比较过的位置，而且继续比较之后的，这样就减少了重复的比较，提高了效率。继续向后移动变成如下情形：
+<pre>
+BBC ABCDAB<span style="color: #ff0000;"> </span>ABCDABCDABDE
+        AB<span style="color: #ff0000;">C</span>DABD
+</pre>
+
+<p>这个移动过程需要一张部分匹配表：</p>
+<pre>
+j        1234567
+源字符串 ABCDABD
+next[j]  0111123
+</pre>
+因为前6个字符是匹配的，最后一个匹配的字符B对应next值为2,根据公式： 移动位数=已匹配字符数-对应的next值
+因此将源字符串后移6-2=4位。
+
+7).因为空格与C不相同，继续后移。
+<pre>
+BBC ABCDAB<span style="color: #ff0000;"> </span>ABCDABCDABDE
+          <span style="color: #ff0000;">A</span>BCDABD
+</pre>
+
+<p>8).空格与A不相同，继续重复之前的操作进行后移。</p>
+<pre>
+BBC ABCDAB ABCDAB<span style="color: #ff0000;">C</span>DABDE
+           ABCDAB<span style="color: #ff0000;">D</span>
+</pre>
+
+<p>9).这里C与D不相同，继续用之前的方法进行后移。</p>
+<pre>
+BBC ABCDAB ABCDABCDAB<span style="color: #ff0000;">D</span>E
+               ABCDAB<span style="color: #ff0000;">D</span>
+</pre>
+最后匹配完成，字符串”BBC ABCDAB ABCDABCDABDE”里面包含字符串”ABCDABD”。
+
+
+下面介绍一下部分匹配表的计算方法。  
+公式为：  
+next[j] = 0    (j=1)  
+next[j] = Max {k 1&lt;k&lt;j 且 'p(1)...p(k-1)' = 'p(j-k+1)...p(j-1)'} (当此集合不为空时)  
+next[j] = 1    (其他情况)
+
+然后根据公式讲解一下上面例子中的字符串的部分匹配表的计算。(注：这里讲解时是按照数组下标从1开始的，而在C语言中是从0开始的)
+
+<pre>
+j        1234567
+源字符串 ABCDABD
+</pre>
+
+<p>由公式得next[1] = 0， next[2] = 1， next[3] = 1， next[4] = 1， next[5] = 1。<br>当j=6时，p[1]=p<a href="即&#39;A&#39;=&#39;A&#39;">5</a> =&gt; k=2 =&gt; next[6] = 2。<br>当j=7时，p[1:2]=p<a href="即&#39;AB&#39;=&#39;AB&#39;">5:6</a> =&gt; k=3 =&gt; next[7] = 3。</p>
+<p>用C语言实现如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="comment">// KMP算法的重点就是求next函数值</span></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">make_next</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *pattern, <span class="keyword">int</span> len, <span class="keyword">unsigned</span> <span class="keyword">int</span> *next)</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">int</span> i=<span class="number">1</span>, j=<span class="number">0</span>;</div><div class="line">    next[<span class="number">1</span>] = <span class="number">0</span>;</div><div class="line"></div><div class="line">    <span class="keyword">while</span> (i &lt;= len) &#123;</div><div class="line">        <span class="keyword">if</span> (j == <span class="number">0</span> || pattern[i<span class="number">-1</span>] == pattern[j<span class="number">-1</span>]) &#123;</div><div class="line">            i++;</div><div class="line">            j++;</div><div class="line">            next[i] = j;</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            j = next[j];</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">kmp_match</span><span class="params">(<span class="keyword">char</span> *t, <span class="keyword">char</span> *p, <span class="keyword">int</span> next[], <span class="keyword">int</span> len1, <span class="keyword">int</span> len2)</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">int</span> i=<span class="number">0</span>, j=<span class="number">0</span>;</div><div class="line">    <span class="keyword">while</span> (i &lt; len1 &amp;&amp; j &lt; len2) &#123;</div><div class="line">        <span class="keyword">if</span> (j == <span class="number">0</span> || t[i] == p[j]) &#123;</div><div class="line">            i++;</div><div class="line">            j++;</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            j = next[j];</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span> (j &gt;= len2 ) <span class="keyword">return</span> i - len2;</div><div class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">char</span> t[] = <span class="string">"BBC ABCDAB ABCDABCDABDE"</span>;</div><div class="line">    <span class="keyword">char</span> p[] = <span class="string">"ABCDABD"</span>;</div><div class="line">    <span class="built_in">printf</span>(<span class="string">"t: %s\np: %s\n"</span>, t, p);</div><div class="line">    <span class="keyword">int</span> len = <span class="keyword">sizeof</span>(p);</div><div class="line">    <span class="keyword">int</span> next[len];</div><div class="line">    make_next(p, len<span class="number">-1</span>, next);</div><div class="line">    <span class="keyword">int</span> i;</div><div class="line">    <span class="keyword">for</span> (i=<span class="number">1</span>; i&lt;len; i++) &#123;</div><div class="line">        <span class="built_in">printf</span>(<span class="string">"%4d"</span>, next[i]);</div><div class="line">    &#125;</div><div class="line">    <span class="built_in">printf</span>(<span class="string">"\n"</span>);</div><div class="line">    <span class="built_in">printf</span>(<span class="string">"index: %d\n"</span>, kmp_match(t, p, next, <span class="keyword">sizeof</span>(t)<span class="number">-1</span>, len<span class="number">-1</span>));</div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83859.html" data-id="cl1hn20e500g8pg4k8ofswjn2" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95/" rel="tag">匹配算法</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-/archives/83857.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83857.html" class="article-date">
+  <time datetime="2013-07-13T21:08:33.000Z" itemprop="datePublished">2013-07-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%92%8C%E7%AE%97%E6%B3%95/">数据结构和算法</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/83857.html">Python中的排序算法——Timsort</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>突然对Python中list对象的sort函数比较好奇，想知道它用的是什么算法。正好最近我也在复习算法，于是就随便把Python的sort也研究一下吧。刚开始我猜想可能用是快速排序之类的，最后看了 Python的源代码之后发现其实用的是一个适应性强的、稳定的、自然的归并算法，名为timsort。</p>
+<p>Timsort是一种混合的算法，它派生自归并排序和插入排序。它是2002年由Tim Peters为Python语言发明的。<br>Timsort的时间复杂度最好情况为O(n)，平均情况为O(nlogn)，最差情况为O(nlogn)；空间复杂度为O(n)。<br>更多关于Timsort的信息： <a href="http://en.wikipedia.org/wiki/Timsort" target="_blank" rel="external">http://en.wikipedia.org/wiki/Timsort</a></p>
+<p>在<a target="_blank" href="http://www.amazon.cn/gp/product/B003LPO4KS/ref=as_li_ss_tl?ie=UTF8&camp=536&creative=3132&creativeASIN=B003LPO4KS&linkCode=as2&tag=wosuopu-23">《Python Cookbook(第2版)中文版》</a>这本书的第5章中由Tim Peters介绍了Python排序算法发展简史。其中说到Timsort算法的实现包括了大约1200行C程序，而且大概有一半是在实现一个技术上的技巧。可见该算法还是很复杂的。</p>
+<p>在Python源代码目录下有Objects/listsort.txt这个文件，这是Tim Peters写的一个详细的文档。</p>
+<p>有个项目致力于用纯C来实现Timsort算法，如Tim所言代码量超过了1200行。<a href="http://code.google.com/p/timsort/" target="_blank" rel="external">http://code.google.com/p/timsort/</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83857.html" data-id="cl1hn20e600gapg4k99k5d5ql" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/" rel="tag">排序算法</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-/archives/83853.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83853.html" class="article-date">
+  <time datetime="2013-07-11T22:52:04.000Z" itemprop="datePublished">2013-07-11</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%92%8C%E7%AE%97%E6%B3%95/">数据结构和算法</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/83853.html">字符串匹配算法（二）——Rabin-Karp算法</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Rabin-Karp设计了一个巧妙的hash算法。用到的数学公式为：t(s+1) = (d(t(s)-T[s+1]h)+T[s+m+1]) mod q<br>t(s+1)为目标字符串的子字符串T[s+1,s+m+1]的哈希值，因为用到了上一次的结果t(s)，所以可以节省计算时间。</p>
+<p>首先计算pattern字符串的hash值，然后在从目标字符串的开头，计算相同长度字符串的hash值。若hash值相同，则表示匹配，若不同，则向右移动一位，计算新的hash值。整个过程，与暴力的字符串匹配算法很相似，但由于计算hash值时，可以利用上一次的hash值，从而使新的hash值只需要加上新字母的计算，并减去上一次的第一个字母的计算，即可。</p>
+<p>Rabin-Karp算法的预处理时间为O(m)，最坏情况下该算法的匹配时间为O((n-m+1)m)。但是平均运行时间还是比较好的。</p>
+<p>用C语言实现如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;math.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="keyword">int</span> mod = <span class="number">0x7fffffff</span>;</div><div class="line"><span class="keyword">const</span> <span class="keyword">int</span> d = <span class="number">128</span>;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">rabin_karp</span><span class="params">(<span class="keyword">char</span> *T, <span class="keyword">char</span> *P, <span class="keyword">int</span> n, <span class="keyword">int</span> m)</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">if</span> (n &lt; m) <span class="keyword">return</span> <span class="number">-2</span>;</div><div class="line">    <span class="keyword">int</span> h = <span class="built_in">pow</span>(d, m<span class="number">-1</span>);</div><div class="line">    <span class="keyword">int</span> p = <span class="number">0</span>;</div><div class="line">    <span class="keyword">int</span> t = <span class="number">0</span>;</div><div class="line">    <span class="keyword">int</span> i, j;</div><div class="line">    <span class="keyword">for</span> (i=<span class="number">0</span>; i&lt;m; i++) &#123;</div><div class="line">        p = (d*p + P[i]) % mod;</div><div class="line">        t = (d*t + T[i]) % mod;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">for</span> (j=<span class="number">0</span>; j&lt;=n-m; j++) &#123;</div><div class="line">        <span class="keyword">if</span> (p == t) &#123;</div><div class="line">            <span class="keyword">return</span> j;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">if</span> (j &lt; n-m) &#123;</div><div class="line">            t = (d*(t - h*T[j]) + T[j+m]) % mod;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">char</span> t[] = <span class="string">"BBC ABCDAB ABCDABCDABDE"</span>;</div><div class="line">    <span class="keyword">char</span> p[] = <span class="string">"ABCDABD"</span>;</div><div class="line">    <span class="keyword">int</span> len1 = <span class="keyword">sizeof</span>(t) - <span class="number">1</span>;</div><div class="line">    <span class="keyword">int</span> len2 = <span class="keyword">sizeof</span>(p) - <span class="number">1</span>;</div><div class="line">    <span class="keyword">int</span> index = rabin_karp(t, p, len1, len2);</div><div class="line">    <span class="built_in">printf</span>(<span class="string">"index: %d\n"</span>, index);</div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>现在结合上面的公式和代码再进行讲解一下。<br>d表示字母表的字母个数，上面的代码只接受ascii值为0~127的字符。如果采用小写英文字母来做字母表的话，那么d就是26。<br>h等于d^(m-1) % q。其实模q运算应该是可有可无的，加入q应该是为了避免数据溢出。但是加入模q后，由ts == p mod q不能说明ts == p，不过ts != p mod q则可以肯定ts != p。所以q最好选择比较大的质数，并且选取的q要满足使dq的值在一个计算机字长内。如果使用的是动态的编程语言的话就不用担心数据溢出，因此就不用进行模q运算。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83853.html" data-id="cl1hn20e300g4pg4kbg7xijr0" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95/" rel="tag">匹配算法</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+
+
+  <nav id="page-nav">
+    <a class="extend prev" rel="prev" href="/page/12/">&amp;laquo;Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/11/">11</a><a class="page-number" href="/page/12/">12</a><span class="page-number current">13</span><a class="page-number" href="/page/14/">14</a><a class="page-number" href="/page/15/">15</a><span class="space">&hellip;</span><a class="page-number" href="/page/31/">31</a><a class="extend next" rel="next" href="/page/14/">Next&amp;raquo;</a>
+  </nav>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Linux%E6%A0%8F%E7%9B%AE/">Linux栏目</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Python%E6%A0%8F%E7%9B%AE/">Python栏目</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Ruby%E6%A0%8F%E7%9B%AE/">Ruby栏目</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Ruby%E6%A0%8F%E7%9B%AE/Web%E5%BC%80%E5%8F%91/">Web开发</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/Web%E5%BC%80%E5%8F%91/">Web开发</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Web%E5%BC%80%E5%8F%91/Python%E6%A0%8F%E7%9B%AE/">Python栏目</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%89%8D%E7%AB%AF%E7%9B%B8%E5%85%B3/">前端相关</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%B5%8C%E5%85%A5%E5%BC%8F%E6%A0%8F%E7%9B%AE/">嵌入式栏目</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%BC%80%E6%BA%90%E8%BD%AF%E4%BB%B6/">开源软件</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%95%99%E7%A8%8B/">教程</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%92%8C%E7%AE%97%E6%B3%95/">数据结构和算法</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%BC%96%E7%A8%8B%E5%BC%80%E5%8F%91/">编程开发</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%BD%91%E7%BB%9C%E6%97%A5%E5%BF%97/">网络日志</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%B5%84%E6%BA%90%E5%88%86%E4%BA%AB/">资源分享</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ARM/" rel="tag">ARM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/" rel="tag">Android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Arch/" rel="tag">Arch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/" rel="tag">C</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Django/" rel="tag">Django</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker/" rel="tag">Docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Dreamweaver/" rel="tag">Dreamweaver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Fedora/" rel="tag">Fedora</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flash/" rel="tag">Flash</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GObject/" rel="tag">GObject</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Gentoo/" rel="tag">Gentoo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hash/" rel="tag">Hash</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/" rel="tag">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mac/" rel="tag">Mac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PS/" rel="tag">PS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Qt/" rel="tag">Qt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Raspberry-pi/" rel="tag">Raspberry pi</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redis/" rel="tag">Redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Ruby/" rel="tag">Ruby</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scrapy/" rel="tag">Scrapy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TQ2440/" rel="tag">TQ2440</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/USB/" rel="tag">USB</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/VirtualBox/" rel="tag">VirtualBox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web%E5%BC%80%E5%8F%91/" rel="tag">Web开发</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WordPress/" rel="tag">WordPress</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Xcode/" rel="tag">Xcode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/access/" rel="tag">access</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/adobe/" rel="tag">adobe</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ajax/" rel="tag">ajax</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/" rel="tag">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apache/" rel="tag">apache</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asp/" rel="tag">asp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css/" rel="tag">css</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/" rel="tag">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/firefox/" rel="tag">firefox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ftp/" rel="tag">ftp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gcc/" rel="tag">gcc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/" rel="tag">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/grub/" rel="tag">grub</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gtk/" rel="tag">gtk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gulp/" rel="tag">gulp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ibus/" rel="tag">ibus</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/" rel="tag">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s/" rel="tag">k8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mongodb/" rel="tag">mongodb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/" rel="tag">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/" rel="tag">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/" rel="tag">node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/" rel="tag">php</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pygame/" rel="tag">pygame</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/" rel="tag">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/" rel="tag">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/" rel="tag">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ruby/" rel="tag">ruby</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/" rel="tag">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/typescript/" rel="tag">typescript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/" rel="tag">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/" rel="tag">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vmware/" rel="tag">vmware</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/w3m/" rel="tag">w3m</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/windows/" rel="tag">windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xml/" rel="tag">xml</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%85%8D%E8%B4%B9/" rel="tag">免费</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%86%85%E6%A0%B8/" rel="tag">内核</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95/" rel="tag">匹配算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8D%95%E7%89%87%E6%9C%BA/" rel="tag">单片机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/" rel="tag">嵌入式</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%BC%80%E6%BA%90%E8%BD%AF%E4%BB%B6/" rel="tag">开源软件</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/" rel="tag">排序算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%96%87%E4%BB%B6%E7%A9%BA%E9%97%B4/" rel="tag">文件空间</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%97%A0%E7%BA%BF%E7%BD%91/" rel="tag">无线网</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A0%91%E8%8E%93%E6%B4%BE/" rel="tag">树莓派</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%AD%A3%E5%88%99%E5%BC%8F/" rel="tag">正则式</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B3%A8%E5%86%8C%E6%9C%BA/" rel="tag">注册机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B8%B8%E6%88%8F/" rel="tag">游戏</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%94%B5%E8%84%91%E6%8A%80%E5%B7%A7/" rel="tag">电脑技巧</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%A9%BA%E9%97%B4/" rel="tag">空间</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BA%A2%E6%97%97/" rel="tag">红旗</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BB%8F%E5%85%B8%E8%AF%AD%E5%BD%95/" rel="tag">经典语录</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E6%97%A5%E5%BF%97/" rel="tag">网络日志</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BF%BB%E8%AF%91/" rel="tag">翻译</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B/" rel="tag">视频教程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%B5%84%E6%BA%90%E5%88%86%E4%BA%AB/" rel="tag">资源分享</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%BD%AC%E8%BD%BD/" rel="tag">转载</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%9A%8F%E7%AC%94/" rel="tag">随笔</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/ARM/" style="font-size: 13.68px;">ARM</a> <a href="/tags/Android/" style="font-size: 10.53px;">Android</a> <a href="/tags/Arch/" style="font-size: 13.16px;">Arch</a> <a href="/tags/C/" style="font-size: 15.79px;">C</a> <a href="/tags/Django/" style="font-size: 11.05px;">Django</a> <a href="/tags/Docker/" style="font-size: 11.05px;">Docker</a> <a href="/tags/Dreamweaver/" style="font-size: 10px;">Dreamweaver</a> <a href="/tags/Fedora/" style="font-size: 10.53px;">Fedora</a> <a href="/tags/Flash/" style="font-size: 10px;">Flash</a> <a href="/tags/GObject/" style="font-size: 12.63px;">GObject</a> <a href="/tags/Gentoo/" style="font-size: 10.53px;">Gentoo</a> <a href="/tags/Hash/" style="font-size: 10px;">Hash</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Mac/" style="font-size: 10.53px;">Mac</a> <a href="/tags/PS/" style="font-size: 12.63px;">PS</a> <a href="/tags/Qt/" style="font-size: 10.53px;">Qt</a> <a href="/tags/Raspberry-pi/" style="font-size: 10px;">Raspberry pi</a> <a href="/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/tags/Ruby/" style="font-size: 18.95px;">Ruby</a> <a href="/tags/Scrapy/" style="font-size: 11.05px;">Scrapy</a> <a href="/tags/TQ2440/" style="font-size: 12.11px;">TQ2440</a> <a href="/tags/USB/" style="font-size: 11.05px;">USB</a> <a href="/tags/VirtualBox/" style="font-size: 11.05px;">VirtualBox</a> <a href="/tags/Web%E5%BC%80%E5%8F%91/" style="font-size: 16.84px;">Web开发</a> <a href="/tags/WordPress/" style="font-size: 10px;">WordPress</a> <a href="/tags/Xcode/" style="font-size: 10px;">Xcode</a> <a href="/tags/access/" style="font-size: 12.63px;">access</a> <a href="/tags/adobe/" style="font-size: 10px;">adobe</a> <a href="/tags/ajax/" style="font-size: 11.05px;">ajax</a> <a href="/tags/angular/" style="font-size: 13.16px;">angular</a> <a href="/tags/apache/" style="font-size: 10px;">apache</a> <a href="/tags/asp/" style="font-size: 13.16px;">asp</a> <a href="/tags/css/" style="font-size: 10.53px;">css</a> <a href="/tags/docker/" style="font-size: 10px;">docker</a> <a href="/tags/firefox/" style="font-size: 11.05px;">firefox</a> <a href="/tags/ftp/" style="font-size: 10px;">ftp</a> <a href="/tags/gcc/" style="font-size: 12.63px;">gcc</a> <a href="/tags/git/" style="font-size: 13.16px;">git</a> <a href="/tags/grub/" style="font-size: 10px;">grub</a> <a href="/tags/gtk/" style="font-size: 17.89px;">gtk</a> <a href="/tags/gulp/" style="font-size: 10px;">gulp</a> <a href="/tags/ibus/" style="font-size: 10px;">ibus</a> <a href="/tags/js/" style="font-size: 16.32px;">js</a> <a href="/tags/k8s/" style="font-size: 10.53px;">k8s</a> <a href="/tags/mongodb/" style="font-size: 15.26px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 11.58px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/node/" style="font-size: 10.53px;">node</a> <a href="/tags/php/" style="font-size: 14.74px;">php</a> <a href="/tags/pygame/" style="font-size: 15.26px;">pygame</a> <a href="/tags/python/" style="font-size: 19.47px;">python</a> <a href="/tags/react/" style="font-size: 12.63px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/ruby/" style="font-size: 10px;">ruby</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/typescript/" style="font-size: 10px;">typescript</a> <a href="/tags/ubuntu/" style="font-size: 13.16px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 18.42px;">vim</a> <a href="/tags/vmware/" style="font-size: 10px;">vmware</a> <a href="/tags/w3m/" style="font-size: 10px;">w3m</a> <a href="/tags/windows/" style="font-size: 13.16px;">windows</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/%E5%85%8D%E8%B4%B9/" style="font-size: 10px;">免费</a> <a href="/tags/%E5%86%85%E6%A0%B8/" style="font-size: 10px;">内核</a> <a href="/tags/%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95/" style="font-size: 12.63px;">匹配算法</a> <a href="/tags/%E5%8D%95%E7%89%87%E6%9C%BA/" style="font-size: 10.53px;">单片机</a> <a href="/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/" style="font-size: 10px;">嵌入式</a> <a href="/tags/%E5%BC%80%E6%BA%90%E8%BD%AF%E4%BB%B6/" style="font-size: 14.21px;">开源软件</a> <a href="/tags/%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/" style="font-size: 14.21px;">排序算法</a> <a href="/tags/%E6%96%87%E4%BB%B6%E7%A9%BA%E9%97%B4/" style="font-size: 10px;">文件空间</a> <a href="/tags/%E6%97%A0%E7%BA%BF%E7%BD%91/" style="font-size: 10px;">无线网</a> <a href="/tags/%E6%A0%91%E8%8E%93%E6%B4%BE/" style="font-size: 10px;">树莓派</a> <a href="/tags/%E6%AD%A3%E5%88%99%E5%BC%8F/" style="font-size: 10px;">正则式</a> <a href="/tags/%E6%B3%A8%E5%86%8C%E6%9C%BA/" style="font-size: 10.53px;">注册机</a> <a href="/tags/%E6%B8%B8%E6%88%8F/" style="font-size: 14.74px;">游戏</a> <a href="/tags/%E7%94%B5%E8%84%91%E6%8A%80%E5%B7%A7/" style="font-size: 14.21px;">电脑技巧</a> <a href="/tags/%E7%A9%BA%E9%97%B4/" style="font-size: 10px;">空间</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 17.37px;">算法</a> <a href="/tags/%E7%BA%A2%E6%97%97/" style="font-size: 10px;">红旗</a> <a href="/tags/%E7%BB%8F%E5%85%B8%E8%AF%AD%E5%BD%95/" style="font-size: 10px;">经典语录</a> <a href="/tags/%E7%BD%91%E7%BB%9C%E6%97%A5%E5%BF%97/" style="font-size: 13.16px;">网络日志</a> <a href="/tags/%E7%BF%BB%E8%AF%91/" style="font-size: 18.42px;">翻译</a> <a href="/tags/%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B/" style="font-size: 14.74px;">视频教程</a> <a href="/tags/%E8%B5%84%E6%BA%90%E5%88%86%E4%BA%AB/" style="font-size: 15.26px;">资源分享</a> <a href="/tags/%E8%BD%AC%E8%BD%BD/" style="font-size: 10.53px;">转载</a> <a href="/tags/%E9%9A%8F%E7%AC%94/" style="font-size: 10px;">随笔</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/09/">September 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/04/">April 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">April 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">February 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">November 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05/">May 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/02/">February 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/11/">November 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">October 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">September 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/08/">August 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/07/">July 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/05/">May 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04/">April 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">March 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">January 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/12/">December 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">June 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">May 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">April 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">January 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">October 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/09/">September 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/08/">August 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/07/">July 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/05/">May 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/04/">April 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/03/">March 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/02/">February 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/12/">December 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/11/">November 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/10/">October 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/09/">September 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/08/">August 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/07/">July 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/05/">May 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/04/">April 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/03/">March 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/02/">February 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/01/">January 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/12/">December 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/11/">November 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/10/">October 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/09/">September 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/08/">August 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/07/">July 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/06/">June 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/05/">May 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/04/">April 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/03/">March 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/12/">December 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/11/">November 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/10/">October 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/09/">September 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/08/">August 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/07/">July 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/05/">May 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/12/">December 2008</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/07/">July 2008</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/archives/84183.html">记录在docker中运行whenever遇到的问题</a>
+          </li>
+        
+          <li>
+            <a href="/archives/84182.html">Gitlab Runner 配置</a>
+          </li>
+        
+          <li>
+            <a href="/archives/84181.html">Github Runner 配置</a>
+          </li>
+        
+          <li>
+            <a href="/archives/84180.html">使用python编写帝国时代2修改器</a>
+          </li>
+        
+          <li>
+            <a href="/archives/84179.html">使用Vagrant和Docker搭建Kubernetes集群</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    <div class="widget-wrap">
+  <h3 class="widget-title">Link</h3>
+    <div class="widget">
+      <ul id="category-list">
+        <li><a target="_blank" title="我的Github" href="https://github.com/wusuopu">@Github</a></li>
+        <li><a target="_blank" title="我的微博" href="http://www.weibo.com/u/1768691343">@Weibo</a></li>
+        <li><a target="_blank" title="我的Twitter" href="https://twitter.com/longchangjin">@Twitter</a></li>
+        <li><a target="_blank" title="我的豆瓣" href="http://www.douban.com/people/lchj/">@Douban</a></li>
+
+        <li><a target="_blank" title="" href="http://gtk.awaysoft.com/">GTK+ 中文社区</a></li>
+      </ul>
+    </div>
+</div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2022 龍昌<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+<div style="display:none;"><script src="http://s94.cnzz.com/stat.php?id=1259846&web_id=1259846&show=pic" language="JavaScript"></script></div>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+    <a href="/gbook" class="mobile-nav-link">留言板</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery.min.js"></script>
+
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+  </div>
+</body>
+</html>

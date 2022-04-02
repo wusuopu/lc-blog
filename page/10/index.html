@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>龍昌博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="关注Linux及开源信息">
+<meta property="og:type" content="website">
+<meta property="og:title" content="龍昌博客">
+<meta property="og:url" content="http://www.xefan.com/page/10/index.html">
+<meta property="og:site_name" content="龍昌博客">
+<meta property="og:description" content="关注Linux及开源信息">
+<meta property="og:locale">
+<meta property="article:author" content="龍昌">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="龍昌博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+
+<meta name="generator" content="Hexo 6.1.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">龍昌博客</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+          <a class="main-nav-link" href="/gbook">留言板</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.xefan.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-/archives/83998.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83998.html" class="article-date">
+  <time datetime="2013-12-07T16:49:31.000Z" itemprop="datePublished">2013-12-07</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Web%E5%BC%80%E5%8F%91/">Web开发</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/83998.html">python cgi教程5——Cookie</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p></p><h2>设置Cookie</h2><p></p>
+<p>有两个与cookie相关的操作，设置cookie和读取cookie。</p><br><p>以下例子展示了cookie的设置。</p>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#!/usr/bin/env python</span></div><div class="line"><span class="keyword">import</span> time</div><div class="line"></div><div class="line"><span class="comment"># This is the message that contains the cookie</span></div><div class="line"><span class="comment"># and will be sent in the HTTP header to the client</span></div><div class="line"><span class="keyword">print</span> <span class="string">'Set-Cookie: lastvisit='</span> + str(time.time());</div><div class="line"></div><div class="line"><span class="comment"># To save one line of code</span></div><div class="line"><span class="comment"># we replaced the print command with a '\n'</span></div><div class="line"><span class="keyword">print</span> <span class="string">'Content-Type: text/html\n'</span></div><div class="line"><span class="comment"># End of HTTP header</span></div><div class="line"></div><div class="line"><span class="keyword">print</span> <span class="string">'&lt;html&gt;&lt;body&gt;'</span></div><div class="line"><span class="keyword">print</span> <span class="string">'Server time is'</span>, time.asctime(time.localtime())</div><div class="line"><span class="keyword">print</span> <span class="string">'&lt;/body&gt;&lt;/html&gt;'</span></div></pre></td></tr></table></figure>
+<p>这是在数据头中使用<em>Set-Cookie</em>进行的操作。</p><br><h2>检索Cookie</h2><br><p>浏览器返回来的cookie存放于os.environ字典中，对应的字段名为’HTTP_COOKIE’。以下是一个例子：</p>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#!/usr/bin/env python</span></div><div class="line"><span class="keyword">import</span> Cookie, os, time</div><div class="line"></div><div class="line">cookie = Cookie.SimpleCookie()</div><div class="line">cookie[<span class="string">'lastvisit'</span>] = str(time.time())</div><div class="line"></div><div class="line"><span class="keyword">print</span> cookie</div><div class="line"><span class="keyword">print</span> <span class="string">'Content-Type: text/html\n'</span></div><div class="line"></div><div class="line"><span class="keyword">print</span> <span class="string">'&lt;html&gt;&lt;body&gt;'</span></div><div class="line"><span class="keyword">print</span> <span class="string">'&lt;p&gt;Server time is'</span>, time.asctime(time.localtime()), <span class="string">'&lt;/p&gt;'</span></div><div class="line"></div><div class="line"><span class="comment"># The returned cookie is available in the os.environ dictionary</span></div><div class="line">cookie_string = os.environ.get(<span class="string">'HTTP_COOKIE'</span>)</div><div class="line"></div><div class="line"><span class="comment"># The first time the page is run there will be no cookies</span></div><div class="line"><span class="keyword">if</span> <span class="keyword">not</span> cookie_string:</div><div class="line">   <span class="keyword">print</span> <span class="string">'&lt;p&gt;First visit or cookies disabled&lt;/p&gt;'</span></div><div class="line"></div><div class="line"><span class="keyword">else</span>: <span class="comment"># Run the page twice to retrieve the cookie</span></div><div class="line">   <span class="keyword">print</span> <span class="string">'&lt;p&gt;The returned cookie string was "'</span> + cookie_string + <span class="string">'"&lt;/p&gt;'</span></div><div class="line"></div><div class="line">   <span class="comment"># load() parses the cookie string</span></div><div class="line">   cookie.load(cookie_string)</div><div class="line">   <span class="comment"># Use the value attribute of the cookie to get it</span></div><div class="line">   lastvisit = float(cookie[<span class="string">'lastvisit'</span>].value)</div><div class="line">   </div><div class="line">   <span class="keyword">print</span> <span class="string">'&lt;p&gt;Your last visit was at'</span>,</div><div class="line">   <span class="keyword">print</span> time.asctime(time.localtime(lastvisit)), <span class="string">'&lt;/p&gt;'</span></div><div class="line"></div><div class="line"><span class="keyword">print</span> <span class="string">'&lt;/body&gt;&lt;/html&gt;'</span></div></pre></td></tr></table></figure>
+<p>使用SimpleCookie对象的load()方法对字符串进行解析。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83998.html" data-id="cl1hn20f500jrpg4kqq107f3x" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web%E5%BC%80%E5%8F%91/" rel="tag">Web开发</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/" rel="tag">python</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-/archives/83993.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83993.html" class="article-date">
+  <time datetime="2013-12-07T15:36:31.000Z" itemprop="datePublished">2013-12-07</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Web%E5%BC%80%E5%8F%91/">Web开发</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/83993.html">python cgi教程4——执行Shell命令</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>可以使用subprocess.Popen或者os.popen4让cgi执行shell命令。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#!/usr/bin/python</span></div><div class="line"><span class="keyword">import</span> cgitb; cgitb.enable()</div><div class="line"></div><div class="line"><span class="comment"># The subprocess module is new in 2.4</span></div><div class="line"><span class="keyword">import</span> os, urllib, subprocess <span class="keyword">as</span> sub</div><div class="line"></div><div class="line"><span class="comment"># Retrieve the command from the query string</span></div><div class="line"><span class="comment"># and unencode the escaped %xx chars</span></div><div class="line">str_command = urllib.unquote(os.environ[<span class="string">'QUERY_STRING'</span>])</div><div class="line"></div><div class="line">p = sub.Popen([<span class="string">'/bin/bash'</span>, <span class="string">'-c'</span>, str_command], </div><div class="line">    stdout=sub.PIPE, stderr=sub.STDOUT)</div><div class="line">output = urllib.unquote(p.stdout.read())</div><div class="line"></div><div class="line"><span class="keyword">print</span> <span class="string">"""\</span></div><div class="line">Content-Type: text/html\n</div><div class="line">&lt;html&gt;&lt;body&gt;</div><div class="line">&lt;pre&gt;</div><div class="line">$ %s</div><div class="line">%s</div><div class="line">&lt;/pre&gt;</div><div class="line">&lt;/body&gt;&lt;/html&gt;</div><div class="line">""" % (str_command, output)</div></pre></td></tr></table></figure>
+<p>注意：这只是一个例子，在生产环境中这么使用是非常的不安全。</p>
+<p>可以使用Cookies和Session对用户进行认证以提高安全性。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83993.html" data-id="cl1hn20f400jnpg4kk1v0yarb" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web%E5%BC%80%E5%8F%91/" rel="tag">Web开发</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/" rel="tag">python</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-/archives/83990.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83990.html" class="article-date">
+  <time datetime="2013-12-07T14:22:08.000Z" itemprop="datePublished">2013-12-07</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Web%E5%BC%80%E5%8F%91/">Web开发</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/83990.html">python cgi教程3——表单</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>cgi模块中有一个FieldStorage类可用于表单处理。</p><br><h2>单一字段名</h2><br><p>有一个HTML表单如下：</p>
+
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span><span class="tag">&lt;<span class="name">body</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">method</span>=<span class="string">"get"</span> <span class="attr">action</span>=<span class="string">"/cgi-bin/form1.py"</span>&gt;</span></div><div class="line">Name: <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"name"</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">value</span>=<span class="string">"Submit"</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">form</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span><span class="tag">&lt;/<span class="name">html</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>form1.py内容为：</p>
+
+<pre><code>#!/usr/bin/env python
+import cgi
+form = cgi.FieldStorage() # instantiate only once!
+name = form.getfirst(&apos;name&apos;, &apos;empty&apos;)
+
+# Avoid script injection escaping the user input
+name = cgi.escape(name)
+
+print &quot;&quot;&quot;\
+Content-Type: text/html\n
+&lt;html&gt;&lt;body&gt;
+&lt;p&gt;The submitted name was &quot;%s&quot;&lt;/p&gt;
+&lt;/body&gt;&lt;/html&gt;
+&quot;&quot;&quot; % name
+</code></pre><p><em>getfirst</em>方法获取指定字段的第一个值，如果该字段不存在则为空。将表单的方法改为post它同样适用。</p><br><p>为了避免用户提交危险的内容，可以使用<em>cgi.escape()</em>方法对内容进行转换。</p><br><h2>多字段名</h2><br><p>对于多个字段具有相同名字的可以使用<em>getlist()</em>方法，它返回一个列表包含了这些值。</p>
+
+<pre><code>&lt;html&gt;&lt;body&gt;
+&lt;form method=&quot;post&quot; action=&quot;/cgi-bin/form2.py&quot;&gt;
+Red&lt;input type=&quot;checkbox&quot; name=&quot;color&quot; value=&quot;red&quot;&gt;
+Green&lt;input type=&quot;checkbox&quot; name=&quot;color&quot; value=&quot;green&quot;&gt;
+&lt;input type=&quot;submit&quot; value=&quot;Submit&quot;&gt;
+&lt;/form&gt;
+&lt;/body&gt;&lt;/html&gt;
+</code></pre><p>form2.py内容如下：</p>
+
+<pre><code>#!/usr/bin/env python
+import cgi
+form = cgi.FieldStorage()
+
+# getlist() returns a list containing the
+# values of the fields with the given name
+colors = form.getlist(&apos;color&apos;)
+
+print &quot;Content-Type: text/html\n&quot;
+print &apos;&lt;html&gt;&lt;body&gt;&apos;
+print &apos;The colors list:&apos;, colors
+for color in colors:
+   print &apos;&lt;p&gt;&apos;, cgi.escape(color), &apos;&lt;/p&gt;&apos;
+print &apos;&lt;/body&gt;&lt;/html&gt;&apos;
+</code></pre><h2>文件上传</h2>
+
+<pre><code>&lt;html&gt;&lt;body&gt;
+&lt;form enctype=&quot;multipart/form-data&quot; action=&quot;/cgi-bin/form3.py&quot; method=&quot;post&quot;&gt;
+&lt;p&gt;File: &lt;input type=&quot;file&quot; name=&quot;file&quot;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;input type=&quot;submit&quot; value=&quot;Upload&quot;&gt;&lt;/p&gt;
+&lt;/form&gt;
+&lt;/body&gt;&lt;/html&gt;
+</code></pre><p><em>getfirst()</em>和<em>getlist()</em>都只能获取文件的内容。想获取文件名需要使用<em>FieldStorage</em>。</p><br><p>form3.py内容如下：</p>
+
+<pre><code>#!/usr/bin/env python
+import cgi, os
+import cgitb; cgitb.enable()
+
+try: # Windows needs stdio set for binary mode.
+    import msvcrt
+    msvcrt.setmode (0, os.O_BINARY) # stdin  = 0
+    msvcrt.setmode (1, os.O_BINARY) # stdout = 1
+except ImportError:
+    pass
+
+form = cgi.FieldStorage()
+
+# A nested FieldStorage instance holds the file
+fileitem = form[&apos;file&apos;]
+
+# Test if the file was uploaded
+if fileitem.filename:
+
+   # strip leading path from file name to avoid directory traversal attacks
+   fn = os.path.basename(fileitem.filename)
+   open(&apos;files/&apos; + fn, &apos;wb&apos;).write(fileitem.file.read())
+   message = &apos;The file &quot;&apos; + fn + &apos;&quot; was uploaded successfully&apos;
+
+else:
+   message = &apos;No file was uploaded&apos;
+
+print &quot;&quot;&quot;\
+Content-Type: text/html\n
+&lt;html&gt;&lt;body&gt;
+&lt;p&gt;%s&lt;/p&gt;
+&lt;/body&gt;&lt;/html&gt;
+&quot;&quot;&quot; % (message,)
+</code></pre><p></p><h2>大文件上传</h2><p></p>
+<p>在处理大文件时如果内存不足，可以使用生成器将文件分成小片。<br><br>可将之前的脚本改写如下：</p>
+
+<pre><code>#!/usr/bin/env python
+import cgi, os
+import cgitb; cgitb.enable()
+
+try: # Windows needs stdio set for binary mode.
+    import msvcrt
+    msvcrt.setmode (0, os.O_BINARY) # stdin  = 0
+    msvcrt.setmode (1, os.O_BINARY) # stdout = 1
+except ImportError:
+    pass
+
+form = cgi.FieldStorage()
+
+# Generator to buffer file chunks
+def fbuffer(f, chunk_size=10000):
+   while True:
+      chunk = f.read(chunk_size)
+      if not chunk: break
+      yield chunk
+
+# A nested FieldStorage instance holds the file
+fileitem = form[&apos;file&apos;]
+
+# Test if the file was uploaded
+if fileitem.filename:
+
+   # strip leading path from file name to avoid directory traversal attacks
+   fn = os.path.basename(fileitem.filename)
+   f = open(&apos;files/&apos; + fn, &apos;wb&apos;, 10000)
+
+   # Read the file in chunks
+   for chunk in fbuffer(fileitem.file):
+      f.write(chunk)
+   f.close()
+   message = &apos;The file &quot;&apos; + fn + &apos;&quot; was uploaded successfully&apos;
+
+else:
+   message = &apos;No file was uploaded&apos;
+
+print &quot;&quot;&quot;\
+Content-Type: text/html\n
+&lt;html&gt;&lt;body&gt;
+&lt;p&gt;%s&lt;/p&gt;
+&lt;/body&gt;&lt;/html&gt;
+&quot;&quot;&quot; % (message,)
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83990.html" data-id="cl1hn20f400jlpg4k8sl8dy2p" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web%E5%BC%80%E5%8F%91/" rel="tag">Web开发</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/" rel="tag">python</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-/archives/83984.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83984.html" class="article-date">
+  <time datetime="2013-12-06T22:41:50.000Z" itemprop="datePublished">2013-12-06</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Web%E5%BC%80%E5%8F%91/">Web开发</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/83984.html">python cgi教程2——调试</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>有时数据头出错是很难定位的，除非有权限访问服务器日志。</p><br><p>好在Python有cgitb模块，可以将异常的堆栈信息放在正文中，作为HTML输出。</p><br><p>以下是一个简单的例子：</p>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#!/usr/bin/env python</span></div><div class="line"><span class="keyword">print</span> <span class="string">"Content-Type: text/html\n"</span></div><div class="line"><span class="keyword">import</span> cgitb; cgitb.enable()</div><div class="line"><span class="keyword">print</span> <span class="number">1</span>/<span class="number">0</span></div></pre></td></tr></table></figure>
+<p>也可以使用handler()方法进行捕获异常处理。</p>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#!/usr/bin/env python</span></div><div class="line"><span class="keyword">print</span> <span class="string">"Content-Type: text/html"</span></div><div class="line"><span class="keyword">print</span></div><div class="line"><span class="keyword">import</span> cgitb</div><div class="line"><span class="keyword">try</span>:</div><div class="line">   f = open(<span class="string">'non-existent-file.txt'</span>, <span class="string">'r'</span>)</div><div class="line"><span class="keyword">except</span>:</div><div class="line">   cgitb.handler()</div></pre></td></tr></table></figure>
+<p>还有一种更直接的方法，将数据头设为”text/plain”并把标准错误输出设置到标准输出。</p>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">print</span> <span class="string">"Content-Type: text/plain"</span></div><div class="line"><span class="keyword">print</span></div><div class="line"><span class="keyword">import</span> sys</div><div class="line">sys.stderr = sys.stdout</div><div class="line">f = open(<span class="string">'non-existent-file.txt'</span>, <span class="string">'r'</span>)</div></pre></td></tr></table></figure>
+<p>注意：这些只是用于在开发阶段，在生产环境中要把它禁用。以免异常信息被攻击者利用。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83984.html" data-id="cl1hn20f300jhpg4kpilsvj1e" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web%E5%BC%80%E5%8F%91/" rel="tag">Web开发</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/" rel="tag">python</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-/archives/83979.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83979.html" class="article-date">
+  <time datetime="2013-12-06T21:26:30.000Z" itemprop="datePublished">2013-12-06</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Web%E5%BC%80%E5%8F%91/">Web开发</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/83979.html">python cgi教程1——Hello World</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p></p><h2>简介</h2><p></p>
+<p>CGI(Common Gateway Interface)，通用网关接口的简称。它是客户端和服务器程序进行数据传输的一种标准。</p><br><p>一个CGI程序可以使用任何语言编写，通常它是放在Web服务器（如Apache）目录下的cgi-bin目录里。</p><br><h2>实例</h2><br><p>接下来看一个简单的例子。</p>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#!/usr/bin/env python</span></div><div class="line"><span class="keyword">print</span> <span class="string">"Content-Type: text/html"</span></div><div class="line"><span class="keyword">print</span></div><div class="line"><span class="keyword">print</span> <span class="string">"""\</span></div><div class="line">&lt;html&gt;</div><div class="line">&lt;body&gt;</div><div class="line">&lt;h2&gt;Hello World!&lt;/h2&gt;</div><div class="line">&lt;/body&gt;</div><div class="line">&lt;/html&gt;</div><div class="line">"""</div></pre></td></tr></table></figure>
+<p>脚本程序的第一行指定了python解释器的路径。在你系统中它也可能为：</p>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#!/usr/bin/python</span></div><div class="line"><span class="comment">#!/usr/bin/python2</span></div><div class="line"><span class="comment">#!c:\Python26\python.exe</span></div><div class="line"><span class="comment">#!c:\Python27\python.exe</span></div></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">print</span> <span class="string">"Content-Type: text/html"</span></div><div class="line"><span class="keyword">print</span></div></pre></td></tr></table></figure>
+<p>脚本必须输出一个HTTP的头，它由一条或者多条消息构成，然后再一个空行。空行是必需的，它意味着头的结束。<br><br>这里我们想要把输出作为HTML解释，因此指定Content-Type为 text/html。</p><br><p>这里也可以写成：</p>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">print</span> <span class="string">"Content-Type: text/html\n"</span></div></pre></td></tr></table></figure>
+<p>保存以上脚本，并添加执行权限。然后在浏览器中访问执行该脚本，应该可以看到”Hello World”这几个字。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83979.html" data-id="cl1hn20f000j7pg4k0lnnvh9t" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web%E5%BC%80%E5%8F%91/" rel="tag">Web开发</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/" rel="tag">python</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-/archives/83975.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83975.html" class="article-date">
+  <time datetime="2013-11-25T20:30:25.000Z" itemprop="datePublished">2013-11-25</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Ruby%E6%A0%8F%E7%9B%AE/">Ruby栏目</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/83975.html">[翻译]Ruby GTK教程8——贪吃蛇</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p></p><h1>贪吃蛇</h1><p></p>
+<p>在这部分的Ruby GTK编程教程中我们将创建一个贪吃蛇游戏。</p><br><p>贪吃蛇是一个比较老的经典电子游戏。它第一次创建是在70年代后期。之后被移植到PC上。在这个游戏中玩家控制蛇，目标是尽可能多的吃掉苹果。蛇每吃掉一个苹果，身体就会变长。必须避免蛇撞到墙或者自己的身体。</p><br><h2>开发</h2><br><p>蛇的每块关节的大小为10像素。使用方向键控制蛇。初始，蛇有三块关节。游戏立即开始。当游戏结束后在窗口中央显示”Game Over”。</p><br><p><em>board.rb</em></p><br><pre><code>WIDTH = 300<br>HEIGHT = 270<br>DOT_SIZE = 10<br>ALL_DOTS = WIDTH <em> HEIGHT / (DOT_SIZE </em> DOT_SIZE)<br>RAND_POS = 26<br><br>$x = [0] <em> ALL_DOTS<br>$y = [0] </em> ALL_DOTS<br><br>class Board &lt; Gtk::DrawingArea<br><br>    def initialize<br>        super<br><br>        modify_bg Gtk::STATE_NORMAL, Gdk::Color.new(0, 0, 0)<br><br>        signal_connect “expose-event” do<br>            on_expose<br>        end<br><br>        init_game<br>    end<br><br>    def on_timer<br><br>        if @inGame<br>            check_apple<br>            check_collision<br>            move<br>            queue_draw<br>            return true<br>        else<br>            return false<br>        end<br>    end<br><br>    def init_game<br><br>        @left = false<br>        @right = true<br>        @up = false<br>        @down = false<br>        @inGame = true<br>        @dots = 3<br><br>        for i in (0..@dots)<br>            $x[i] = 50 - i <em> 10<br>            $y[i] = 50<br>        end<br><br>        begin<br>            @dot = Cairo::ImageSurface.from_png “dot.png”<br>            @head = Cairo::ImageSurface.from_png “head.png”<br>            @apple = Cairo::ImageSurface.from_png “apple.png”<br>        rescue Exception =&gt; e<br>            puts “cannot load images”<br>            exit<br>        end<br><br>        locate_apple<br>        GLib::Timeout.add(100) { on_timer }<br><br>     end<br><br><br>    def on_expose<br><br>        cr = window.create_cairo_context<br><br>        if @inGame<br>            draw_objects cr<br>        else<br>            game_over cr<br>        end<br>    end<br><br>    def draw_objects cr<br><br>        cr.set_source_rgb 0, 0, 0<br>        cr.paint<br><br>        cr.set_source @apple, @apple_x, @apple_y<br>        cr.paint<br><br>        for z in (0..@dots)<br>            if z == 0<br>                cr.set_source @head, $x[z], $y[z]<br>                cr.paint<br>            else<br>                cr.set_source @dot, $x[z], $y[z]<br>                cr.paint<br>            end<br>        end<br>    end<br><br>    def game_over cr<br><br>        w = allocation.width / 2<br>        h = allocation.height / 2<br><br>        cr.set_font_size 15<br>        te = cr.text_extents “Game Over”<br><br>        cr.set_source_rgb 65535, 65535, 65535<br><br>        cr.move_to w - te.width/2, h<br>        cr.show_text “Game Over”<br><br>    end<br><br><br>    def check_apple<br><br>        if $x[0] == @apple_x and $y[0] == @apple_y<br>            @dots = @dots + 1<br>            locate_apple<br>        end<br>    end<br><br>    def move<br><br>        z = @dots<br><br>        while z &gt; 0<br>            $x[z] = $x[(z - 1)]<br>            $y[z] = $y[(z - 1)]<br>            z = z - 1<br>        end<br><br>        if @left<br>            $x[0] -= DOT_SIZE<br>        end<br><br>        if @right<br>            $x[0] += DOT_SIZE<br>        end<br><br>        if @up<br>            $y[0] -= DOT_SIZE<br>        end<br><br>        if @down<br>            $y[0] += DOT_SIZE<br>        end<br><br>     end<br><br>    def check_collision<br><br>        z = @dots<br><br>        while z &gt; 0<br>            if z &gt; 4 and $x[0] == $x[z] and $y[0] == $y[z]<br>                @inGame = false<br>            end<br>            z = z - 1<br>        end<br><br>        if $y[0] &gt; HEIGHT - DOT_SIZE<br>            @inGame = false<br>        end<br><br>        if $y[0] &lt; 0<br>            @inGame = false<br>        end<br><br>        if $x[0] &gt; WIDTH - DOT_SIZE<br>            @inGame = false<br>        end<br><br>        if $x[0] &lt; 0<br>            @inGame = false<br>        end<br><br>    end<br><br>    def locate_apple<br><br>        r = rand(RAND_POS)<br>        @apple_x = r </em> DOT_SIZE<br>        r = rand(RAND_POS)<br>        @apple_y = r <em> DOT_SIZE<br>    end<br><br>    def on_key_down event<br><br>        key = event.keyval<br><br>        if key == Gdk::Keyval::GDK_Left and not @right<br>            @left = true<br>            @up = false<br>            @down = false<br>        end<br><br>        if key == Gdk::Keyval::GDK_Right and not @left<br>            @right = true<br>            @up = false<br>            @down = false<br>        end<br><br>        if key == Gdk::Keyval::GDK_Up and not @down<br>            @up = true<br>            @right = false<br>            @left = false<br>        end<br><br>        if key == Gdk::Keyval::GDK_Down and not @up<br>            @down = true<br>            @right = false<br>            @left = false<br>        end<br>    end<br>end<br></em></code></pre><br><p>首先我们定义一些全局变量。</p><br><p>WIDTH和HEIGHT常量决定了甲板的大小。DOT_SIZE是苹果和蛇的每个点的大小。ALL_DOTS常量定义了甲板可能包含的最大的点数量。RAND_POS常量用于计算苹果的随机位置。DELAY常量决定游戏速度。</p><br><pre><code>$x = [0]  ALL_DOTS<br>$y = [0] <em> ALL_DOTS<br></em></code></pre><br><p>这两个数组存储了蛇所有关节的x、y坐标。</p><br><p><em>init_game</em>方法初始化变量、加载图片和启动timeout函数。</p><br><pre><code>if @inGame<br>    draw_objects cr<br>else<br>    game_over cr<br>end<br></code></pre><br><p>在<em>on_expose_method</em>方法里我们检查<em>@inGame</em>变量。如果为true，绘制苹果和蛇。否则显示”Game over”文字。</p><br><pre><code>def draw_objects cr<br><br>    cr.set_source_rgb 0, 0, 0<br>    cr.paint<br><br>    cr.set_source @apple, @apple_x, @apple_y<br>    cr.paint<br><br>    for z in (0..@dots)<br>        if z == 0<br>            cr.set_source @head, $x[z], $y[z]<br>            cr.paint<br>        else<br>            cr.set_source @dot, $x[z], $y[z]<br>            cr.paint<br>        end<br>    end<br>end<br></code></pre><br><p><em>draw_objects</em>方法绘制苹果和蛇。蛇的头部用红色的圆表示。</p><br><pre><code>def check_apple<br><br>    if $x[0] == @apple_x and $y[0] == @apple_y<br>        @dots = @dots + 1<br>        locate_apple<br>    end<br>end<br></code></pre><br><p><em>check_apple</em>方法查检蛇是否碰到苹果，如果是则增加蛇的关节并调用<em>locate_apple</em>方法随机放置一个新的苹果。</p><br><p><em>move</em>方法是游戏的关键算法。为了理解它，先看一下蛇是如何移动的。控制蛇头，可以使用方向键改变它的方向。其余的关节朝该方向前进。第二个关节移到到第一关节的位置，第三个关节到第二个等等。</p><br><pre><code>while z &gt; 0<br>    $x[z] = $x[(z - 1)]<br>    $y[z] = $y[(z - 1)]<br>    z = z - 1<br>end<br></code></pre><br><p>这些代码将关节按照链状前进。</p><br><pre><code>if @left<br>    $x[0] -= DOT_SIZE<br>end<br></code></pre><br><p>头部向左移动。</p><br><p><em>check_collision</em>方法中，我们检查蛇是否撞到了自己或者墙。</p><br><pre><code>while z &gt; 0<br>    if z &gt; 4 and $x[0] == $x[z] and $y[0] == $y[z]<br>        @inGame = false<br>    end<br>    z = z - 1<br>end<br></code></pre><br><p>如果蛇撞到了自己，游戏结束。</p><br><pre><code>if $y[0] &gt; HEIGHT - DOT_SIZE<br>    @inGame = false<br>end<br></code></pre><br><p>如果蛇撞到底部，游戏结束。</p><br><p><em>localte_apple</em>方法在甲板上随机定位一个苹果。</p><br><pre><code>r = rand(RAND_POS)<br></code></pre><br><p>获取0到RAND_POS-1的一个随机数。</p><br><pre><code>@apple_x = r  DOT_SIZE<br>…<br>@apple_y = r * DOT_SIZE<br></code></pre><br><p>这几行设置了苹果的x、y坐标。</p><br><pre><code>if @inGame<br>    check_apple<br>    check_collision<br>    move<br>    queue_draw<br>    return true<br>else<br>    return false<br>end<br></code></pre><br><p>第140ms调用一次<em>on_timer</em>方法。如果游戏运行则调用三个组成游戏逻辑的方法。否则返回false，停止定时事件。</p><br><p>在Board类的<em>on_key_down</em>方法中我们判断按下的键。</p><br><pre><code>if key == Gdk::Keyval::GDK_Left and not @right<br>    @left = true<br>    @up = false<br>    @down = false<br>end<br></code></pre><br><p>如果我们按的是左方向键，我们设置<em>left</em>变量为true。这个变量用于<em>move</em>方法改变蛇的坐标。同样注意，当蛇是朝右时，我们不能立即朝左。</p><br><p><em>nibbles.rb</em></p><br><pre><code>#!/usr/bin/ruby<br><br># ZetCode Ruby GTK tutorial<br>#<br># This is a simple nibbles game<br># clone<br>#<br># author: jan bodnar<br># website: www.zetcode.com<br># last modified: June 2009<br><br>require ‘gtk2’<br>require ‘board’<br><br>class RubyApp &gt; Gtk::Window<br>    def initialize<br>        super<br><br>        set_title “Nibbles”<br>        signal_connect “destroy” do<br>            Gtk.main_quit<br>        end<br><br>        @board = Board.new<br>        signal_connect “key-press-event” do |w, e|<br>            on_key_down(w, e)<br>        end<br><br>        add @board<br><br>        set_default_size 300, 270<br>        set_window_position Gtk::Window::POS_CENTER<br>        show_all<br>    end<br><br>    def on_key_down widget, event<br><br>        key = event.keyval<br>        @board.on_key_down event<br>    end<br>end<br><br>Gtk.init<br>    window = RubyApp.new<br>Gtk.main<br></code></pre><br><p>在这个类我们启动了贪吃游戏。</p><br><pre><code>def on_key_down widget, event<br><br>    key = event.keyval<br>    @board.on_key_down event<br>end<br></code></pre><br><p>在这个类的捕获按键事件然后委托Board类的<em>on_key_down method</em>方法进行处理。</p><br><p><img alt="image" src="http://zetcode.com/img/gui/rubygtk/nibbles.png"><br><br><em>图片：贪吃蛇</em></p><br><p>这是使用Ruby语言和GTK库编写的贪吃蛇计算机游戏。</p><br><hr><br><p>原文地址： <a href="http://zetcode.com/gui/rubygtk/nibbles/" target="_blank" rel="external">http://zetcode.com/gui/rubygtk/nibbles/</a><br><br>翻译：龙昌  admin@longchangjin.cn </p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83975.html" data-id="cl1hn20ez00j3pg4kha8dwut1" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ruby/" rel="tag">Ruby</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gtk/" rel="tag">gtk</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%BF%BB%E8%AF%91/" rel="tag">翻译</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-/archives/83972.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83972.html" class="article-date">
+  <time datetime="2013-11-24T19:30:15.000Z" itemprop="datePublished">2013-11-24</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Ruby%E6%A0%8F%E7%9B%AE/">Ruby栏目</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/83972.html">[翻译]Ruby GTK教程7——自定义控件</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p></p><h1>自定义控件</h1><p></p>
+<p>大多数套件通常只提供了最常用的控件，如按钮、文本控件、滑动条等。没有套件可以提供所有可能的控件。程序员必须自己创建这些。这是通过套件提供的绘制工具完成。这有两种可能。程序员可以修改或增强已存在的控件，或者从头开始创建一个自定义控件。</p><br><h2>Burning控件</h2><br><p>这个例子我们从头开始创建一个控件。这个控件可以在各种媒体烧定应用中看到，如Nero Burning ROM。</p><br><p><em>custom.rb</em></p><br><pre><code>#!/usr/bin/ruby<br><br># ZetCode Ruby GTK tutorial<br>#<br># This example creates a burning<br># custom widget<br>#<br># author: jan bodnar<br># website: zetcode.com<br># last edited: June 2009<br><br><br>require ‘gtk2’<br><br>class Burning &lt; Gtk::DrawingArea<br><br>    def initialize(parent)<br>        @parent = parent<br><br>        super()<br><br>        @num = [ “75”, “150”, “225”, “300”,<br>            “375”, “450”, “525”, “600”, “675” ]<br><br>        set_size_request 1, 30<br>        signal_connect “expose-event” do<br>            expose<br>        end<br>    end<br><br><br>    def expose<br><br>        cr = window.create_cairo_context<br>        draw_widget cr<br><br>    end<br><br>    def draw_widget cr<br><br>         cr.set_line_width 0.8<br><br>        cr.select_font_face(“Courier”,<br>            Cairo::FONT_SLANT_NORMAL, Cairo::FONT_WEIGHT_NORMAL)<br>        cr.set_font_size 11<br><br>        width = allocation.width<br><br>        @cur_width = @parent.get_cur_value<br><br>        step = (width / 10.0).round<br><br>        till = (width / 750.0) <em> @cur_width<br>        full = (width / 750.0) </em> 700<br><br>        if @cur_width &gt;= 700<br><br>            cr.set_source_rgb(1.0, 1.0, 0.72)<br>            cr.rectangle(0, 0, full, 30)<br>            cr.clip<br>            cr.paint<br>            cr.reset_clip<br><br>            cr.set_source_rgb(1.0, 0.68, 0.68)<br>            cr.rectangle(full, 0, till-full, 30)<br>            cr.clip<br>            cr.paint<br>            cr.reset_clip<br><br>        else<br>            cr.set_source_rgb 1.0, 1.0, 0.72<br>            cr.rectangle 0, 0, till, 30<br>            cr.clip<br>            cr.paint<br>            cr.reset_clip<br>        end<br><br><br>        cr.set_source_rgb(0.35, 0.31, 0.24)<br><br>        for i in (1..@num.length)<br>            cr.move_to i<em>step, 0<br>            cr.line_to i</em>step, 5<br>            cr.stroke<br><br>            te = cr.text_extents @num[i-1]<br>            cr.move_to i<em>step-te.width/2, 15<br>            cr.text_path @num[i-1]<br>            cr.stroke<br>        end<br>    end<br>end<br><br><br>class RubyApp &lt; Gtk::Window<br>    def initialize<br>        super<br><br>        set_title “Burning”<br>        signal_connect “destroy” do<br>            Gtk.main_quit<br>        end<br><br>        set_size_request 350, 200<br>        set_window_position Gtk::Window::POS_CENTER<br><br>        @cur_value = 0<br><br>        vbox = Gtk::VBox.new false, 2<br><br>        scale = Gtk::HScale.new<br>        scale.set_range 0, 750<br>        scale.set_digits 0<br>        scale.set_size_request 160, 35<br>        scale.set_value @cur_value<br><br>        scale.signal_connect “value-changed” do |w|<br>            on_changed(w)<br>        end<br><br>        fix = Gtk::Fixed.new<br>        fix.put scale, 50, 50<br><br>        vbox.pack_start fix<br><br>        @burning = Burning.new(self)<br>        vbox.pack_start @burning, false, false, 0<br><br>        add vbox<br>        show_all<br>    end<br><br>    def on_changed widget<br><br>        @cur_value = widget.value<br>        @burning.queue_draw<br>    end<br><br>    def get_cur_value<br>        return @cur_value<br>    end<br>end<br><br>Gtk.init<br>    window = RubyApp.new<br>Gtk.main<br></em></code></pre><br><p>我们将DrawingArea放在窗口的底部，并且手动绘制控件的条目。所有的重要代码放在draw_widget里，通过Burning类的expose方法调用。这个控件生动的显示了媒介的容量和剩余空间。这个控件通过刻度控件来控制。我们自定义控件的最小值为0,最大值为750。如果达到700，我们开始绘制红色。这通常表明超标了。</p><br><pre><code>@num = [ “75”, “150”, “225”, “300”,<br>    “375”, “450”, “525”, “600”, “675” ]<br></code></pre><br><p>这些数字显示在控件上。他们显示了媒介的容量。</p><br><pre><code>@cur_width = @parent.get_cur_value<br></code></pre><br><p>通过父控件我们获得刻度控件的值。</p><br><pre><code>till = (width / 750.0)  @cur_width<br>full = (width / 750.0) <em> 700<br></em></code></pre><br><p>我们使用width变量进行刻度值和自定义控件尺寸的转换。注意我们使用了浮点数，得到较大精度的绘制。<em>till</em>参数决定了绘制的总大小，它的值来自刻度控件。它是整个区域的比例。<em>full</em>参数决定了从什么位置开始绘制红色。</p><br><pre><code>cr.set_source_rgb(1.0, 1.0, 0.72)<br>cr.rectangle(0, 0, full, 30)<br>cr.clip<br>cr.paint<br>cr.reset_clip<br></code></pre><br><p>绘制黄色矩形直到<em>full</em>点。</p><br><pre><code>te = cr.text_extents @num[i-1]<br>cr.move_to istep-te.width/2, 15<br>cr.text_path @num[i-1]<br>cr.stroke<br></code></pre><br><p>这些代码绘制了burning控件的数字。我们计算了文本恰当的位置。</p><br><pre><code>def on_changed widget<br><br>    @cur_value = widget.value<br>    @burning.queue_draw<br>end<br></code></pre><br><p>我们获取刻度控件的值保存在<em>cur_value</em>变量中，稍后使用。重绘burning控件。</p><br><p><img alt="image" src="http://zetcode.com/img/gui/rubygtk/burning.png"><br><br><em>图片：Burning widget</em></p><br><p>在这一章中，我们创建了一个自定义控件。</p><br><hr><br><p>原文地址： <a href="http://zetcode.com/gui/rubygtk/customwidget/" target="_blank" rel="external">http://zetcode.com/gui/rubygtk/customwidget/</a><br><br>翻译：龙昌  admin@longchangjin.cn </p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83972.html" data-id="cl1hn20ez00j0pg4kecexrt5x" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ruby/" rel="tag">Ruby</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gtk/" rel="tag">gtk</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%BF%BB%E8%AF%91/" rel="tag">翻译</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-/archives/83969.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83969.html" class="article-date">
+  <time datetime="2013-11-24T10:23:08.000Z" itemprop="datePublished">2013-11-24</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Ruby%E6%A0%8F%E7%9B%AE/">Ruby栏目</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/83969.html">[翻译]Ruby GTK教程6——Cairo</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p></p><h1>使用Cairo绘制</h1><p></p>
+<p>这部分的Ruby GTK教程，我们将使用Cairo库进行一些绘制。</p><br><p>Cairo是一个用于创建2D矢量图像的库。我们可以用它来绘制自己的控件、图表或者各种效果或动画。</p><br><h2>颜色</h2><br><p>在第一个会例子，我们将介绍颜色。颜色是一个代表了红、绿和蓝（RGB）强度值的对象。Cairo的RGB有效值范围为0到1。</p><br><pre><code>#!/usr/bin/ruby<br><br># ZetCode Ruby GTK tutorial<br>#<br># This program shows how to work<br># with colors in Cairo<br>#<br># author: jan bodnar<br># website: www.zetcode.com<br># last modified: June 2009<br><br>require ‘gtk2’<br><br><br>class RubyApp &lt; Gtk::Window<br><br>    def initialize<br>        super<br><br>        set_title “Colors”<br>        signal_connect “destroy” do<br>            Gtk.main_quit<br>        end<br><br>        init_ui<br><br>        set_default_size 360, 100<br>        set_window_position Gtk::Window::POS_CENTER<br><br>        show_all<br>    end<br><br>    def init_ui<br><br>        @darea = Gtk::DrawingArea.new<br><br>        @darea.signal_connect “expose-event” do<br>            on_expose<br>        end<br><br>        add(@darea)<br><br>    end<br><br>    def on_expose<br><br>        cr = @darea.window.create_cairo_context<br>        draw_colors cr<br><br>    end<br><br>    def draw_colors cr<br><br>        cr.set_source_rgb 0.2, 0.23, 0.9<br>        cr.rectangle 10, 15, 90, 60<br>        cr.fill<br><br>        cr.set_source_rgb 0.9, 0.1, 0.1<br>        cr.rectangle 130, 15, 90, 60<br>        cr.fill<br><br>        cr.set_source_rgb 0.4, 0.9, 0.4<br>        cr.rectangle 250, 15, 90, 60<br>        cr.fill<br>    end<br>end<br><br>Gtk.init<br>    window = RubyApp.new<br>Gtk.main<br></code></pre><br><p>这个例子中我们绘制了三个矩形并且用三种不同的颜色填充。</p><br><pre><code>@darea = Gtk::DrawingArea.new<br></code></pre><br><p>我们将在DrawingArea控件是进行绘制操作。</p><br><pre><code>@darea.signal_connect “expose-event” do<br>    on_expose<br>end<br></code></pre><br><p>当窗口需要重绘时<em>expose-event</em>事件将触发。对这个事件的响应中我们调用了<em>on_expose</em>方法。</p><br><pre><code>cr = @darea.window.create_cairo_context<br></code></pre><br><p>从GdkWindow创建cairo上下文对象。这个上下文是我们将要进行所有绘制的对象。</p><br><pre><code>draw_colors cr<br></code></pre><br><p>实际的绘制委托给<em>draw_colors</em>方法。</p><br><pre><code>cr.set_source_rgb 0.2, 0.23, 0.9<br></code></pre><br><p><em>set_source_rgb</em>方法是设置cairo上下文的颜色。这个方法的三个参数是颜色的强度值。</p><br><pre><code>cr.rectangle 10, 15, 90, 60<br></code></pre><br><p>绘制一个矩形。前两个参数是矩形左上角的x、y坐标。后两个参数是矩形的宽和高。</p><br><pre><code>cr.fill<br></code></pre><br><p>使用当前的颜色填充矩形。</p><br><p><img alt="image1" src="http://zetcode.com/img/gui/rubygtk/colors.png"><br><br><em>图片：颜色</em></p><br><h2>基本形状</h2><br><p>下一个例子在窗口上绘制一些基本形状。</p><br><pre><code>#!/usr/bin/ruby<br><br># ZetCode Ruby GTK tutorial<br>#<br># This code example draws basic shapes<br># with the Cairo library<br>#<br># author: jan bodnar<br># website: www.zetcode.com<br># last modified: June 2009<br><br>require ‘gtk2’<br><br><br>class RubyApp &lt; Gtk::Window<br><br>    def initialize<br>        super<br><br>        set_title “Basic shapes”<br>        signal_connect “destroy” do<br>            Gtk.main_quit<br>        end<br><br>        init_ui<br><br>        set_default_size 390, 240<br>        set_window_position Gtk::Window::POS_CENTER<br><br>        show_all<br>    end<br><br>    def init_ui<br><br>        @darea = Gtk::DrawingArea.new<br><br>        @darea.signal_connect “expose-event” do<br>            on_expose<br>        end<br><br>        add(@darea)<br>    end<br><br>    def on_expose<br><br>        cr = @darea.window.create_cairo_context<br>        draw_shapes cr<br>    end<br><br>    def draw_shapes cr<br><br>        cr.set_source_rgb 0.6, 0.6, 0.6<br><br>        cr.rectangle 20, 20, 120, 80<br>        cr.rectangle 180, 20, 80, 80<br>        cr.fill<br><br>        cr.arc 330, 60, 40, 0, 2<em>Math::PI<br>        cr.fill<br><br>        cr.arc 90, 160, 40, Math::PI/4, Math::PI<br>        cr.fill<br><br>        cr.translate 220, 180<br>        cr.scale 1, 0.7<br>        cr.arc 0, 0, 50, 0, 2</em>Math::PI<br>        cr.fill<br>    end<br>end<br><br>Gtk.init<br>    window = RubyApp.new<br>Gtk.main<br></code></pre><br><p>这个例子我们将创建一个矩形、方形、圆形、弧形和椭圆形。我们将轮廓绘为蓝色，内部为白色。</p><br><pre><code>cr.rectangle 20, 20, 120, 80<br>cr.rectangle 180, 20, 80, 80<br>cr.fill<br></code></pre><br><p>这几行绘制了一个矩形和一个方形。</p><br><pre><code>cr.arc 330, 60, 40, 0, 2<em>Math::PI<br>cr.fill<br></em></code></pre><br><p><em>arc</em>方法绘制一个全圆。</p><br><pre><code>cr.translate 220, 180<br>cr.scale 1, 0.7<br>cr.arc 0, 0, 50, 0, 2Math::PI<br>cr.fill<br></code></pre><br><p><em>translate</em>方法将对象移动到指定的点。如果我们想要绘制椭圆，我们需要进行一些缩放。这里<em>scale</em>方法将y轴收缩。</p><br><p><img alt="image2" src="http://zetcode.com/img/gui/rubygtk/shapes.png"><br><br><em>图片：基本形状</em></p><br><h2>透明矩形</h2><br><p>透明度是透过实体的可见度。最简单的理解可以把它想象成玻璃或者水。光线可以透过玻璃，这样我们就可以看到玻璃后的物体。</p><br><p>在计算机图像中，我们可以使用透明混合实现透明度。透明混合处理图片和背景的组合，显示部透明。作品处理使用了阿尔法通道。</p><br><pre><code>#!/usr/bin/ruby<br><br># ZetCode Ruby GTK tutorial<br>#<br># This program shows transparent<br># rectangles using Cairo<br>#<br># author: jan bodnar<br># website: www.zetcode.com<br># last modified: June 2009<br><br>require ‘gtk2’<br><br><br>class RubyApp &lt; Gtk::Window<br><br>    def initialize<br>        super<br><br>        set_title “Transparent rectangles”<br>        signal_connect “destroy” do<br>            Gtk.main_quit<br>        end<br><br>        init_ui<br><br>        set_default_size 590, 90<br>        set_window_position Gtk::Window::POS_CENTER<br><br>        show_all<br>    end<br><br>    def init_ui<br><br>        @darea = Gtk::DrawingArea.new<br><br>        @darea.signal_connect “expose-event” do<br>            on_expose<br>        end<br><br>        add(@darea)<br><br>    end<br><br>    def on_expose<br><br>        cr = @darea.window.create_cairo_context<br><br>        for i in (1..10)<br>            cr.set_source_rgba 0, 0, 1, i<em>0.1<br>            cr.rectangle 50</em>i, 20, 40, 40<br>            cr.fill<br>        end<br>    end<br>end<br><br>Gtk.init<br>    window = RubyApp.new<br>Gtk.main<br></code></pre><br><p>这个例子我们使用不同等级透明度绘制了10个矩形。</p><br><pre><code>cr.set_source_rgba 0, 0, 1, i<em>0.1<br></em></code></pre><br><p><em>set_source_rgba</em>方法是最后一个参数是alpha透明度。</p><br><p><img alt="image3" src="http://zetcode.com/img/gui/rubygtk/transparency.png"> <br><br><em>图片：透明矩形</em></p><br><h2>甜甜圈</h2><br><p>接下来的例子我们通过旋转一堆椭圆来创建一个复杂的形状。</p><br><pre><code>#!/usr/bin/ruby<br><br># ZetCode Ruby GTK tutorial<br>#<br># This program creates a donut<br># with Cairo library<br>#<br># author: jan bodnar<br># website: www.zetcode.com<br># last modified: June 2009<br><br>require ‘gtk2’<br><br><br>class RubyApp &lt; Gtk::Window<br><br>    def initialize<br>        super<br><br>        set_title “Donut”<br>        signal_connect “destroy” do<br>            Gtk.main_quit<br>        end<br><br>        init_ui<br><br>        set_default_size 350, 250<br>        set_window_position Gtk::Window::POS_CENTER<br><br>        show_all<br>    end<br><br>    def init_ui<br><br>        @darea = Gtk::DrawingArea.new<br><br>        @darea.signal_connect “expose-event” do<br>            on_expose<br>        end<br><br>        add(@darea)<br><br>    end<br><br>    def on_expose<br><br>        cr = @darea.window.create_cairo_context<br>        cr.set_line_width 0.5<br><br>        w = allocation.width<br>        h = allocation.height<br><br>        cr.translate w/2, h/2<br>        cr.arc 0, 0, 120, 0, 2Math::PI<br>        cr.stroke<br><br>        for i in (1..36)<br>            cr.save<br>            cr.rotate i<em>Math::PI/36<br>            cr.scale 0.3, 1<br>            cr.arc 0, 0, 120, 0, 2</em>Math::PI<br>            cr.restore<br>            cr.stroke<br>        end<br>    end<br>end<br><br>Gtk.init<br>    window = RubyApp.new<br>Gtk.main<br></code></pre><br><p>这个例子我们创建了一个甜甜圈。它的形状与饼干相似，因此取名为甜甜圈（donut）。</p><br><pre><code>cr.translate w/2, h/2<br>cr.arc 0, 0, 120, 0, 2<em>Math::PI<br>cr.stroke<br></em></code></pre><br><p>在开始只是一个椭圆。</p><br><pre><code>for i in (1..36)<br>    cr.save<br>    cr.rotate iMath::PI/36<br>    cr.scale 0.3, 1<br>    cr.arc 0, 0, 120, 0, 2*Math::PI<br>    cr.restore<br>    cr.stroke<br>end<br></code></pre><br><p>经过一些旋转后变成了甜甜圈。</p><br><p><img alt="image4" src="http://zetcode.com/img/gui/rubygtk/donut.jpg"><br><br><em>图片：Donut</em></p><br><h2>绘制文本</h2><br><p>下一个例子我们在窗口上绘制一些文本。</p><br><pre><code>#!/usr/bin/ruby<br><br># ZetCode Ruby GTK tutorial<br>#<br># This program draws text<br># using Cairo<br>#<br># author: jan bodnar<br># website: www.zetcode.com<br># last modified: June 2009<br><br>require ‘gtk2’<br><br><br>class RubyApp &lt; Gtk::Window<br><br>    def initialize<br>        super<br><br>        set_title “Soulmate”<br>        signal_connect “destroy” do<br>            Gtk.main_quit<br>        end<br><br>        init_ui<br><br>        set_default_size 370, 240<br>        set_window_position Gtk::Window::POS_CENTER<br><br>        show_all<br>    end<br><br>    def init_ui<br><br>        @darea = Gtk::DrawingArea.new<br><br>        @darea.signal_connect “expose-event” do<br>            on_expose<br>        end<br><br>        add(@darea)<br><br>    end<br><br>    def on_expose<br><br>        cr = @darea.window.create_cairo_context<br><br>        cr.set_source_rgb 0.1, 0.1, 0.1<br><br>        cr.select_font_face “Purisa”, Cairo::FONT_SLANT_NORMAL,<br>            Cairo::FONT_WEIGHT_NORMAL<br>        cr.set_font_size 13<br><br>        cr.move_to 20, 30<br>        cr.show_text “Most relationships seem so transitory”<br>        cr.move_to 20, 60<br>        cr.show_text “They’re all good but not the permanent one”<br>        cr.move_to 20, 120<br>        cr.show_text “Who doesn’t long for someone to hold”<br>        cr.move_to 20, 150<br>        cr.show_text “Who knows how to love without being told”<br>        cr.move_to 20, 180<br>        cr.show_text “Somebody tell me why I’m on my own”<br>        cr.move_to 20, 210<br>        cr.show_text “If there’s a soulmate for everyone”<br>    end<br>end<br><br>Gtk.init<br>    window = RubyApp.new<br>Gtk.main<br></code></pre><br><p>我们显示了Natasha Bedingfields Soulmate歌的部分歌词。</p><br><pre><code>cr.select_font_face “Purisa”, Cairo::FONT_SLANT_NORMAL,<br>    Cairo::FONT_WEIGHT_NORMAL<br></code></pre><br><p>这里我们指定我们使用的字体。</p><br><pre><code>cr.set_font_size 13<br></code></pre><br><p>我们指定字体的大小。</p><br><pre><code>cr.move_to 20, 30<br></code></pre><br><p>移动到开始绘制文本的坐标。</p><br><pre><code>cr.show_text “Most relationships seem so transitory”<br></code></pre><br><p><em>show_text</em>方法在窗口上绘制文本。</p><br><p><img alt="image5" src="http://zetcode.com/img/gui/rubygtk/soulmate.png"><br><br><em>图片: Soulmate</em></p><br><p>这章的Ruby GTK教程我们使用Cairo库进行绘制。</p><br><hr><br><p>原文地址： <a href="http://zetcode.com/gui/rubygtk/cairo/" target="_blank" rel="external">http://zetcode.com/gui/rubygtk/cairo/</a><br><br>翻译：龙昌  admin@longchangjin.cn </p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83969.html" data-id="cl1hn20f200jepg4kncl71zb6" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ruby/" rel="tag">Ruby</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gtk/" rel="tag">gtk</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%BF%BB%E8%AF%91/" rel="tag">翻译</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-/archives/83966.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83966.html" class="article-date">
+  <time datetime="2013-11-23T22:22:44.000Z" itemprop="datePublished">2013-11-23</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Ruby%E6%A0%8F%E7%9B%AE/">Ruby栏目</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/83966.html">[翻译]Ruby GTK教程5——对话框</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p></p><h1>对话框</h1><p></p>
+<p>在这部分的Ruby GTK教程我们将介绍对话框。</p><br><p>对话框是现代GUI应用程序不可缺的一部分。对话是两个或者更多人之间交谈。在计算机程序中对话是一个用于与应用程序交互的窗口。对话框用于输入数据、修改数据、修改设置等。对话框在用户与计算机程序之间的交流具有重要意义。</p><br><h2>消息盒子</h2><br><p>消息对话框是应用程序便于给用户提供消息的对话框。消息由文本和图片数据组成。</p><br><pre><code>#!/usr/bin/ruby<br><br># ZetCode Ruby GTK tutorial<br>#<br># This example shows message<br># dialogs<br>#<br># author: jan bodnar<br># website: www.zetcode.com<br># last modified: June 2009<br><br>require ‘gtk2’<br><br><br>class RubyApp &lt; Gtk::Window<br><br>    def initialize<br>        super<br><br>        set_title “Messages”<br>        signal_connect “destroy” do<br>            Gtk.main_quit<br>        end<br><br>        init_ui<br><br>        set_default_size 250, 100<br>        set_window_position Gtk::Window::POS_CENTER<br><br>        show_all<br>    end<br><br>    def init_ui<br><br>        table = Gtk::Table.new 2, 2, true<br><br>        info = Gtk::Button.new “Information”<br>        warn = Gtk::Button.new “Warning”<br>        ques = Gtk::Button.new “Question”<br>        erro = Gtk::Button.new “Error”<br><br>        info.signal_connect “clicked” do<br>            on_info<br>        end<br><br>        warn.signal_connect “clicked” do<br>            on_warn<br>        end<br><br>        ques.signal_connect “clicked” do<br>            on_ques<br>        end<br><br>        erro.signal_connect “clicked” do<br>            on_erro<br>        end<br><br>        table.attach info, 0, 1, 0, 1<br>        table.attach warn, 1, 2, 0, 1<br>        table.attach ques, 0, 1, 1, 2<br>        table.attach erro, 1, 2, 1, 2<br><br>        add table<br><br>    end<br><br>    def on_info<br>        md = Gtk::MessageDialog.new(self,<br>            Gtk::Dialog::DESTROY_WITH_PARENT, Gtk::MessageDialog::INFO,<br>            Gtk::MessageDialog::BUTTONS_CLOSE, “Download completed”)<br>        md.run<br>        md.destroy<br>    end<br><br><br>    def on_erro<br>        md = Gtk::MessageDialog.new(self, Gtk::Dialog::MODAL |<br>            Gtk::Dialog::DESTROY_WITH_PARENT, Gtk::MessageDialog::ERROR,<br>            Gtk::MessageDialog::BUTTONS_CLOSE, “Error loading file”)<br>        md.run<br>        md.destroy<br>    end<br><br><br>    def on_ques<br>        md = Gtk::MessageDialog.new(self,<br>            Gtk::Dialog::DESTROY_WITH_PARENT, Gtk::MessageDialog::QUESTION,<br>            Gtk::MessageDialog::BUTTONS_CLOSE, “Are you sure to quit?”)<br>        md.run<br>        md.destroy<br>    end<br><br>    def on_warn<br>        md = Gtk::MessageDialog.new(self,<br>            Gtk::Dialog::DESTROY_WITH_PARENT, Gtk::MessageDialog::WARNING,<br>            Gtk::MessageDialog::BUTTONS_CLOSE, “Unallowed operation”)<br>        md.run<br>        md.destroy<br>    end<br>end<br><br>Gtk.init<br>    window = RubyApp.new<br>Gtk.main<br></code></pre><br><p>我们的例子中显示了四种消息对话框。信息、警告、询问和错误消息对话框。</p><br><pre><code>info = Gtk::Button.new “Information”<br>warn = Gtk::Button.new “Warning”<br>ques = Gtk::Button.new “Question”<br>erro = Gtk::Button.new “Error”<br></code></pre><br><p>创建四个按钮。每个按钮将显示不同种类的消息对话框。</p><br><pre><code>def on_info<br>    md = Gtk::MessageDialog.new(self,<br>        Gtk::Dialog::DESTROY_WITH_PARENT, Gtk::MessageDialog::INFO,<br>        Gtk::MessageDialog::BUTTONS_CLOSE, “Download completed”)<br>    md.run<br>    md.destroy<br>end<br></code></pre><br><p>如果我们点击了<em>info</em>按钮，信息对话框将显示。<em>Gtk::MessageDialog::INFO</em>指定了对话框的类型。<em>Gtk::MessageDialog::BUTTONS_CLOSE</em>指定在对话框中显示的按钮。最后一个参数是要显示的消息。对话框使用<em>run</em>方法显示。程序员必须也要调用<em>destroy</em>或者<em>hide</em>方法。<br><br><img alt="image1" src="http://zetcode.com/img/gui/rubygtk/information.png">  <img alt="image2" src="http://zetcode.com/img/gui/rubygtk/warning.png">  <br><br><img alt="image3" src="http://zetcode.com/img/gui/rubygtk/question.png">  <img alt="image4" src="http://zetcode.com/img/gui/rubygtk/error.png">   </p><br><h2>关于对话框(AboutDialog)</h2><br><p><em>关于对话框</em>显示了应用程序的信息。<em>关于对话框</em>可以显示logo、应用程序名、版本号、版权、网站或者授权信息。它也可能给出作者、文档编写才、翻译者和设计师的信息。</p><br><pre><code>#!/usr/bin/ruby<br><br># ZetCode Ruby GTK tutorial<br>#<br># This example demonstrates the<br># AboutDialog dialog<br>#<br># author: jan bodnar<br># website: www.zetcode.com<br># last modified: June 2009<br><br>require ‘gtk2’<br><br><br>class RubyApp &lt; Gtk::Window<br><br>    def initialize<br>        super<br><br>        set_title “About dialog”<br>        signal_connect “destroy” do<br>            Gtk.main_quit<br>        end<br><br>        init_ui<br><br>        set_default_size 300, 150<br>        set_window_position Gtk::Window::POS_CENTER<br><br>        show_all<br>    end<br><br>    def init_ui<br><br>        button = Gtk::Button.new “About”<br>        button.set_size_request 80, 30<br><br>        button.signal_connect “clicked” do<br>            on_clicked<br>        end<br><br>        fix = Gtk::Fixed.new<br>        fix.put button, 20, 20<br><br>        add fix<br><br>    end<br><br>    def on_clicked<br>        about = Gtk::AboutDialog.new<br>        about.set_program_name “Battery”<br>        about.set_version “0.1”<br>        about.set_copyright “(c) Jan Bodnar”<br>        about.set_comments “Battery is a simple tool for battery checking”<br>        about.set_website “<a href="http://www.zetcode.com" target="_blank" rel="external">http://www.zetcode.com</a>“<br>        about.set_logo Gdk::Pixbuf.new “battery.png”<br>        about.run<br>        about.destroy<br>    end<br>end<br><br>Gtk.init<br>    window = RubyApp.new<br>Gtk.main<br></code></pre><br><p>代码伅使用了<em>AboutDialog</em>的一些特性。</p><br><pre><code>about = Gtk::AboutDialog.new<br></code></pre><br><p>创建一个AboutDialog。</p><br><pre><code>about.set_program_name “Battery”<br>about.set_version “0.1”<br>about.set_copyright “(c) Jan Bodnar”<br></code></pre><br><p>这里我们指定名称、版本号和版权信息。</p><br><pre><code>about.set_logo Gdk::Pixbuf.new “battery.png”<br></code></pre><br><p>这行创建一个logo。 <br><br><img alt="image5" src="http://zetcode.com/img/gui/rubygtk/about.png"> <br><br><em>图片：AboutDialog</em></p><br><h2>字体选择对话框</h2><br><p>FontSelectionDialog是一个用于选择字体的对话框。它典型的应用于文本编辑或者格式化的应用程序中。</p><br><pre><code>#!/usr/bin/ruby<br><br># ZetCode Ruby GTK tutorial<br>#<br># This example works with the<br># FontSelectionDialog<br>#<br># author: jan bodnar<br># website: www.zetcode.com<br># last modified: June 2009<br><br>require ‘gtk2’<br><br><br>class RubyApp &lt; Gtk::Window<br><br>    def initialize<br>        super<br><br>        set_title “FontSelectionDialog”<br>        signal_connect “destroy” do<br>            Gtk.main_quit<br>        end<br><br>        init_ui<br><br>        set_default_size 300, 150<br>        set_window_position Gtk::Window::POS_CENTER<br><br>        show_all<br>    end<br><br>    def init_ui<br><br>        set_border_width 10<br>        @label = Gtk::Label.new “The only victory over love is flight.”<br>        button = Gtk::Button.new “Select font”<br><br>        button.signal_connect “clicked” do<br>            on_clicked<br>        end<br><br>        fix = Gtk::Fixed.new<br>        fix.put button, 100, 30<br>        fix.put @label, 30, 90<br>        add fix<br><br>    end<br><br>    def on_clicked<br>        fdia = Gtk::FontSelectionDialog.new “Select font name”<br>        response = fdia.run<br><br>        if response == Gtk::Dialog::RESPONSE_OK<br>            font_desc = Pango::FontDescription.new fdia.font_name<br>            if font_desc<br>                @label.modify_font font_desc<br>            end<br>        end<br>        fdia.destroy<br>    end<br>end<br><br>Gtk.init<br>    window = RubyApp.new<br>Gtk.main<br></code></pre><br><p>这个代码例子我们创建了一个按钮和一个标签。点击按钮之后显示字体选择对话框。</p><br><pre><code>fdia = Gtk::FontSelectionDialog.new “Select font name”<br></code></pre><br><p>创建<em>FontSelectionDialog</em>。</p><br><pre><code>if response == Gtk::Dialog::RESPONSE_OK<br>    font_desc = Pango::FontDescription.new fdia.font_name<br>    if font_desc<br>        @label.modify_font font_desc<br>    end<br>end<br></code></pre><br><p>如果点击确定按钮，标签的字体会变为我们在对话框中选中的。<br><br><img alt="image6" src="http://zetcode.com/img/gui/rubygtk/fontdialog.png"><br><br><em>图片：FontSelectionDialog</em></p><br><h2>颜色选择对话框</h2><br><p>ColorSelectionDialog是用于选择颜色的对话框。</p><br><pre><code>#!/usr/bin/ruby<br><br># ZetCode Ruby GTK tutorial<br>#<br># This example works with the<br># ColorSelectionDialog<br>#<br># author: jan bodnar<br># website: www.zetcode.com<br># last modified: June 2009<br><br>require ‘gtk2’<br><br><br>class RubyApp &lt; Gtk::Window<br><br>    def initialize<br>        super<br><br>        set_title “ColorSelectionDialog”<br>        signal_connect “destroy” do<br>            Gtk.main_quit<br>        end<br><br>        init_ui<br><br>        set_default_size 350, 150<br>        set_window_position Gtk::Window::POS_CENTER<br><br>        show_all<br>    end<br><br>    def init_ui<br><br>        set_border_width 10<br>        @label = Gtk::Label.new “The only victory over love is flight.”<br>        button = Gtk::Button.new “Select color”<br><br>        button.signal_connect “clicked” do<br>            on_clicked<br>        end<br><br>        fix = Gtk::Fixed.new<br>        fix.put button, 100, 30<br>        fix.put @label, 30, 90<br>        add fix<br>    end<br><br>    def on_clicked<br>        cdia = Gtk::ColorSelectionDialog.new “Select color”<br>        response = cdia.run<br><br>        if response == Gtk::Dialog::RESPONSE_OK<br>            colorsel = cdia.colorsel<br>            color = colorsel.current_color<br>            @label.modify_fg Gtk::STATE_NORMAL, color<br>        end<br><br>        cdia.destroy<br>    end<br>end<br><br>Gtk.init<br>    window = RubyApp.new<br>Gtk.main<br></code></pre><br><p>这个例子与前一个例子很相似。这次我们是改变标签的颜色。</p><br><pre><code>cdia = Gtk::ColorSelectionDialog.new “Select color”<br></code></pre><br><p>创建ColorSelectionDialog。</p><br><pre><code>if response == Gtk::Dialog::RESPONSE_OK<br>    colorsel = cdia.colorsel<br>    color = colorsel.current_color<br>    @label.modify_fg Gtk::STATE_NORMAL, color<br>end<br></code></pre><br><p>如果按下OK按钮，我们得到颜色值并修改标签的颜色。</p><br><p><img alt="image7" src="http://zetcode.com/img/gui/rubygtk/colordialog.png"><br><br><em>图片：ColorSelectionDialog</em></p><br><p>这部分的Ruby GTK教程我们展示了对话框。</p><br><hr><br><p>原文地址： <a href="http://zetcode.com/gui/rubygtk/dialogs/" target="_blank" rel="external">http://zetcode.com/gui/rubygtk/dialogs/</a><br><br>翻译：龙昌  admin@longchangjin.cn </p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83966.html" data-id="cl1hn20f100j9pg4ky8v5ji3v" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ruby/" rel="tag">Ruby</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gtk/" rel="tag">gtk</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%BF%BB%E8%AF%91/" rel="tag">翻译</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-/archives/83963.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83963.html" class="article-date">
+  <time datetime="2013-11-23T16:03:46.000Z" itemprop="datePublished">2013-11-23</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Ruby%E6%A0%8F%E7%9B%AE/">Ruby栏目</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/83963.html">[翻译]Ruby GTK教程4——菜单&amp;工具条</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p></p><h1>菜单&amp;工具条</h1><p></p>
+<p>这部分的Ruby GTK教程我们将使用菜单和工具条。</p><br><p>菜单栏是GUI应用中最常用的部分之一。它是位于各个菜单的一组命令。在命令行应用程序中我们需要记住这些所有神秘的命令，而现在我们将这些大部分的命令按照逻辑归合在一起。接受这些标准将进一步减少在学习新应用上花费的时间。</p><br><h2>简单的菜单</h2><br><p>我们的第一个例子将创建一个有文件菜单的菜单栏。这个菜单只有一个菜单项，选择这一项将退出应用。</p><br><pre><code>#!/usr/bin/ruby<br><br># ZetCode Ruby GTK tutorial<br>#<br># This example shows a simple menu<br>#<br># author: jan bodnar<br># website: www.zetcode.com<br># last modified: June 2009<br><br>require ‘gtk2’<br><br><br>class RubyApp &lt; Gtk::Window<br><br>    def initialize<br>        super<br><br>        set_title “Simple menu”<br>        signal_connect “destroy” do<br>            Gtk.main_quit<br>        end<br><br>        init_ui<br><br>        set_default_size 250, 200<br>        set_window_position Gtk::Window::POS_CENTER<br><br>        show_all<br>    end<br><br>    def init_ui<br><br>        modify_bg Gtk::STATE_NORMAL, Gdk::Color.new(6400, 6400, 6440)<br><br>        mb = Gtk::MenuBar.new<br><br>        filemenu = Gtk::Menu.new<br>        filem = Gtk::MenuItem.new “File”<br>        filem.set_submenu filemenu<br><br>        exit = Gtk::MenuItem.new “Exit”<br>        exit.signal_connect “activate” do<br>            Gtk.main_quit<br>        end<br><br>        filemenu.append exit<br><br>        mb.append filem<br><br>        vbox = Gtk::VBox.new false, 2<br>        vbox.pack_start mb, false, false, 0<br><br>        add vbox<br>    end<br>end<br><br>Gtk.init<br>    window = RubyApp.new<br>Gtk.main<br></code></pre><br><p>这是一个最小功能的菜单栏的例子。</p><br><pre><code>mb = Gtk::MenuBar.new<br></code></pre><br><p>创建<em>MenuBar</em>控件，这是菜单的容器。</p><br><pre><code>filemenu = Gtk::Menu.new<br>filem = Gtk::MenuItem.new “File”<br>filem.set_submenu filemenu<br></code></pre><br><p>创建顶级菜单项。</p><br><pre><code>exit = Gtk::MenuItem.new “Exit”<br>exit.signal_connect “activate” do<br>    Gtk.main_quit<br>end<br><br>filemenu.append exit<br></code></pre><br><p>创建退出菜单项并添加到文件菜单项中。</p><br><pre><code>mb.append filem<br></code></pre><br><p>将顶级菜单项添加到菜单栏控件中。</p><br><pre><code>vbox = Gtk::VBox.new false, 2<br>vbox.pack_start mb, false, false, 0<br></code></pre><br><p>与其他套件不同，我们必须要自己处理菜单栏的布局。我们将菜单栏放入竖直盒子中。</p><br><p><img alt="image1" src="http://zetcode.com/img/gui/rubygtk/simplemenu.png"> <br><br><em>图片：简单的菜单</em></p><br><h2>子菜单</h2><br><p>最后展示如何创建一个子菜单。</p><br><pre><code>#!/usr/bin/ruby<br><br># ZetCode Ruby GTK tutorial<br>#<br># This example shows a submenu<br>#<br># author: jan bodnar<br># website: www.zetcode.com<br># last modified: June 2009<br><br>require ‘gtk2’<br><br><br>class RubyApp &lt; Gtk::Window<br><br>    def initialize<br>        super<br><br>        set_title “Submenu”<br>        signal_connect “destroy” do<br>            Gtk.main_quit<br>        end<br><br>        init_ui<br><br>        set_default_size 250, 200<br>        set_window_position Gtk::Window::POS_CENTER<br><br>        show_all<br>    end<br><br>    def init_ui<br><br>        modify_bg Gtk::STATE_NORMAL, Gdk::Color.new(6400, 6400, 6440)<br><br>        mb = Gtk::MenuBar.new<br><br>        filemenu = Gtk::Menu.new<br>        filem = Gtk::MenuItem.new “File”<br>        filem.set_submenu filemenu<br><br>        mb.append filem<br><br>        imenu = Gtk::Menu.new<br><br>        importm = Gtk::MenuItem.new “Import”<br>        importm.set_submenu imenu<br><br>        inews = Gtk::MenuItem.new “Import news feed…”<br>        ibookmarks = Gtk::MenuItem.new “Import bookmarks…”<br>        imail = Gtk::MenuItem.new “Import mail…”<br><br>        imenu.append inews<br>        imenu.append ibookmarks<br>        imenu.append imail<br><br>        filemenu.append importm<br><br>        exit = Gtk::MenuItem.new “Exit”<br>        exit.signal_connect “activate” do<br>            Gtk.main_quit<br>        end<br><br>        filemenu.append exit<br><br>        vbox = Gtk::VBox.new false, 2<br>        vbox.pack_start mb, false, false, 0<br><br>        add vbox<br>    end<br>end<br><br>Gtk.init<br>    window = RubyApp.new<br>Gtk.main<br></code></pre><br><p>创建子菜单。</p><br><pre><code>imenu = Gtk::Menu.new<br></code></pre><br><p>子菜单也是Menu控件。</p><br><pre><code>importm = Gtk::MenuItem.new “Import”<br>importm.set_submenu imenu<br></code></pre><br><p>这是属于文件顶级菜单的菜单项的子菜单。</p><br><pre><code>inews = Gtk::MenuItem.new “Import news feed…”<br>ibookmarks = Gtk::MenuItem.new “Import bookmarks…”<br>imail = Gtk::MenuItem.new “Import mail…”<br><br>imenu.append inews<br>imenu.append ibookmarks<br>imenu.append imail<br></code></pre><br><p>子菜单有自己的菜单项。</p><br><p><img alt="image2" src="http://zetcode.com/img/gui/rubygtk/submenu.png"><br><br><em>图片：子菜单</em></p><br><h2>图片菜单</h2><br><p>接下来的例子我们将进一步探索菜单。我们将在菜单项上添加图片和快捷键（accelerators）。</p><br><pre><code>#!/usr/bin/ruby<br><br># ZetCode Ruby GTK tutorial<br>#<br># This example shows a menu with<br># images, accelerators and a separator<br>#<br># author: jan bodnar<br># website: www.zetcode.com<br># last modified: June 2009<br><br>require ‘gtk2’<br><br><br>class RubyApp &lt; Gtk::Window<br><br>    def initialize<br>        super<br><br>        set_title “Image menu”<br>        signal_connect “destroy” do<br>            Gtk.main_quit<br>        end<br><br>        init_ui<br><br>        set_default_size 250, 200<br>        set_window_position Gtk::Window::POS_CENTER<br><br>        show_all<br>    end<br><br>    def init_ui<br><br>        modify_bg Gtk::STATE_NORMAL, Gdk::Color.new(6400, 6400, 6440)<br><br>        mb = Gtk::MenuBar.new<br><br>        filemenu = Gtk::Menu.new<br>        filem = Gtk::MenuItem.new “File”<br>        filem.set_submenu filemenu<br><br>        agr = Gtk::AccelGroup.new<br>        add_accel_group agr<br><br>        newi = Gtk::ImageMenuItem.new Gtk::Stock::NEW, agr<br>        key, mod = Gtk::Accelerator.parse “N”<br>        newi.add_accelerator(“activate”, agr, key,<br>            mod, Gtk::ACCEL_VISIBLE)<br>        filemenu.append newi<br><br>        openm = Gtk::ImageMenuItem.new Gtk::Stock::OPEN, agr<br>        key, mod = Gtk::Accelerator.parse “O”<br>        openm.add_accelerator(“activate”, agr, key,<br>            mod, Gtk::ACCEL_VISIBLE)<br>        filemenu.append openm<br><br>        sep = Gtk::SeparatorMenuItem.new<br>        filemenu.append sep<br><br>        exit = Gtk::ImageMenuItem.new Gtk::Stock::QUIT, agr<br>        key, mod = Gtk::Accelerator.parse “Q”<br>        exit.add_accelerator(“activate”, agr, key,<br>            mod, Gtk::ACCEL_VISIBLE)<br><br>        exit.signal_connect “activate” do<br>            Gtk.main_quit<br>        end<br>        filemenu.append exit<br><br>        mb.append filem<br><br>        vbox = Gtk::VBox.new false, 2<br>        vbox.pack_start mb, false, false, 0<br><br>        add vbox<br>    end<br>end<br><br>Gtk.init<br>    window = RubyApp.new<br>Gtk.main<br></code></pre><br><p>这个例子显示了一个有子菜单的顶级菜单，每个菜单项都有一个图像和一个快捷键。退出菜单的快捷键是激活的。</p><br><pre><code>agr = Gtk::AccelGroup.new<br>add_accel_group agr<br></code></pre><br><p>为了使用快捷键，我们创建了一个全局的<em>AccelGroup</em>对象。它稍后被用到。</p><br><pre><code>newi = Gtk::ImageMenuItem.new Gtk::Stock::NEW, agr<br>key, mod = Gtk::Accelerator.parse “N”<br>newi.add_accelerator(“activate”, agr, key,<br>    mod, Gtk::ACCEL_VISIBLE)<br>filemenu.append newi<br></code></pre><br><p>创建图片菜单项。图片来自图片库中。我们也创建了<em>Ctrl+N</em>快捷键。</p><br><pre><code>sep = Gtk::SeparatorMenuItem.new<br>filemenu.append sep<br></code></pre><br><p>这行创建一条分隔线。它用于将菜单项按照逻辑分组。</p><br><p><img alt="image3" src="http://zetcode.com/img/gui/rubygtk/imagemenu.png"><br><br><em>图片：图片菜单</em></p><br><p>菜单将我们使用的命令进行分组。工具条提供了一个快速访问最常用命令的方式。</p><br><h2>简单的工具条</h2><br><p>接下来我们创建一个简单的工具条。</p><br><pre><code>#!/usr/bin/ruby<br><br># ZetCode Ruby GTK tutorial<br>#<br># This example shows a toolbar<br># widget<br>#<br># author: jan bodnar<br># website: www.zetcode.com<br># last modified: June 2009<br><br>require ‘gtk2’<br><br><br>class RubyApp &lt; Gtk::Window<br><br>    def initialize<br>        super<br><br>        set_title “Toolbar”<br>        signal_connect “destroy” do<br>            Gtk.main_quit<br>        end<br><br>        init_ui<br><br>        set_default_size 250, 200<br>        set_window_position Gtk::Window::POS_CENTER<br><br>        show_all<br>    end<br><br>    def init_ui<br><br>        toolbar = Gtk::Toolbar.new<br>        toolbar.set_toolbar_style Gtk::Toolbar::Style::ICONS<br><br>        newtb = Gtk::ToolButton.new Gtk::Stock::NEW<br>        opentb = Gtk::ToolButton.new Gtk::Stock::OPEN<br>        savetb = Gtk::ToolButton.new Gtk::Stock::SAVE<br>        sep = Gtk::SeparatorToolItem.new<br>        quittb = Gtk::ToolButton.new Gtk::Stock::QUIT<br><br>        toolbar.insert 0, newtb<br>        toolbar.insert 1, opentb<br>        toolbar.insert 2, savetb<br>        toolbar.insert 3, sep<br>        toolbar.insert 4, quittb<br><br>        quittb.signal_connect “clicked” do<br>            Gtk.main_quit<br>        end<br><br>        vbox = Gtk::VBox.new false, 2<br>        vbox.pack_start toolbar, false, false, 0<br><br>        add(vbox)<br>    end<br>end<br><br>Gtk.init<br>    window = RubyApp.new<br>Gtk.main<br></code></pre><br><p>这个例子显示了有四个工具按钮的工具栏。</p><br><pre><code>toolbar = Gtk::Toolbar.new<br></code></pre><br><p>创建<em>Toolbar</em>控件。</p><br><pre><code>toolbar.set_toolbar_style Gtk::Toolbar::Style::ICONS<br></code></pre><br><p>工具栏上我们只显示图标，没有文字。</p><br><pre><code>newtb = Gtk::ToolButton.new Gtk::Stock::NEW<br></code></pre><br><p>创建了一个包含图片的ToolButton控件。图片来自内建的图片库。</p><br><pre><code>sep = Gtk::SeparatorToolItem.new<br></code></pre><br><p>这是一个分隔符，用于将按钮按照逻辑分组。</p><br><pre><code>toolbar.insert 0, newtb<br>toolbar.insert 1, opentb<br>…<br></code></pre><br><p>将按钮添加到工具栏。</p><br><p><img alt="image4" src="http://zetcode.com/img/gui/rubygtk/toolbar.png"><br><br><em>图片：工具栏</em></p><br><h2>撤消重做</h2><br><p>接下来的例子展示了如何停用工具栏上的按钮。这是GUI编程中的常见练习。例如对于保存按钮，在大多数编辑器中如果我们将文档的修改保存到磁盘中了，那么保存按钮会被停用。这是应用程序给用户的提示，所有修改都已保存。</p><br><pre><code>#!/usr/bin/ruby<br><br># ZetCode Ruby GTK tutorial<br>#<br># This example shows how to<br># activate/deactivate a ToolButton<br>#<br># author: jan bodnar<br># website: www.zetcode.com<br># last modified: June 2009<br><br>require ‘gtk2’<br><br><br>class RubyApp &lt; Gtk::Window<br><br><br>    def initialize<br>        super<br><br>        set_title “Undo redo”<br>        signal_connect “destroy” do<br>            Gtk.main_quit<br>        end<br><br>        @count = 2<br><br>        init_ui<br><br>        set_default_size 250, 200<br>        set_window_position Gtk::Window::POS_CENTER<br><br>        show_all<br>    end<br><br>    def init_ui<br><br>        toolbar = Gtk::Toolbar.new<br>        toolbar.set_toolbar_style Gtk::Toolbar::Style::ICONS<br><br>        @undo = Gtk::ToolButton.new Gtk::Stock::UNDO<br>        @redo = Gtk::ToolButton.new Gtk::Stock::REDO<br>        sep = Gtk::SeparatorToolItem.new<br>        quit = Gtk::ToolButton.new Gtk::Stock::QUIT<br><br>        toolbar.insert 0, @undo<br>        toolbar.insert 1, @redo<br>        toolbar.insert 2, sep<br>        toolbar.insert 3, quit<br><br>        @undo.signal_connect “clicked” do<br>            on_undo<br>        end<br><br>        @redo.signal_connect “clicked” do<br>            on_redo<br>        end<br><br>        quit.signal_connect “clicked” do<br>            Gtk.main_quit<br>        end<br><br>        vbox = Gtk::VBox.new false, 2<br>        vbox.pack_start toolbar, false, false, 0<br><br>        self.add vbox<br><br>    end<br><br>    def on_undo<br><br>        @count = @count - 1<br><br>        if @count &lt;= 0<br>            @undo.set_sensitive false<br>            @redo.set_sensitive true<br>        end<br>    end<br><br><br>    def on_redo<br>        @count = @count + 1<br><br>        if @count &gt;= 5<br>            @redo.set_sensitive false<br>            @undo.set_sensitive true<br>        end<br>    end<br>end<br><br>Gtk.init<br>    window = RubyApp.new<br>Gtk.main<br></code></pre><br><p>我们例子从GTK资源中创建了撤消和重做按钮。每个按钮点击多次后会被禁用，变为灰色。</p><br><pre><code>@count = 2<br></code></pre><br><p><em>@count</em>变量用于描述按钮是禁用还是激活。</p><br><pre><code>@undo = Gtk::ToolButton.new Gtk::Stock::UNDO<br>@redo = Gtk::ToolButton.new Gtk::Stock::REDO<br></code></pre><br><p>创建两个工具按钮，图片来自资源库。</p><br><pre><code>@undo.signal_connect “clicked” do<br>    on_undo<br>end<br></code></pre><br><p>点击undo按钮触发<em>on_undo</em>方法。</p><br><pre><code>if @count &lt;= 0<br>    @undo.set_sensitive false<br>    @redo.set_sensitive true<br>end<br></code></pre><br><p>我们使用<em>set_sensitive</em>方法激活或者禁用控件。</p><br><p><img alt="image5" src="http://zetcode.com/img/gui/rubygtk/undoredo.png"><br><br><em>图片：撤消重做</em></p><br><p>这章的Ruby GTK教程我们展示了如何使用菜单和工具栏。</p><br><hr><br><p>原文地址： <a href="http://zetcode.com/gui/rubygtk/menustoolbars/" target="_blank" rel="external">http://zetcode.com/gui/rubygtk/menustoolbars/</a><br><br>翻译：龙昌  admin@longchangjin.cn  </p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83963.html" data-id="cl1hn20ew00irpg4k20uso3ox" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ruby/" rel="tag">Ruby</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gtk/" rel="tag">gtk</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%BF%BB%E8%AF%91/" rel="tag">翻译</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+
+
+  <nav id="page-nav">
+    <a class="extend prev" rel="prev" href="/page/9/">&amp;laquo;Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><a class="page-number" href="/page/9/">9</a><span class="page-number current">10</span><a class="page-number" href="/page/11/">11</a><a class="page-number" href="/page/12/">12</a><span class="space">&hellip;</span><a class="page-number" href="/page/31/">31</a><a class="extend next" rel="next" href="/page/11/">Next&amp;raquo;</a>
+  </nav>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Linux%E6%A0%8F%E7%9B%AE/">Linux栏目</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Python%E6%A0%8F%E7%9B%AE/">Python栏目</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Ruby%E6%A0%8F%E7%9B%AE/">Ruby栏目</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Ruby%E6%A0%8F%E7%9B%AE/Web%E5%BC%80%E5%8F%91/">Web开发</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/Web%E5%BC%80%E5%8F%91/">Web开发</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Web%E5%BC%80%E5%8F%91/Python%E6%A0%8F%E7%9B%AE/">Python栏目</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%89%8D%E7%AB%AF%E7%9B%B8%E5%85%B3/">前端相关</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%B5%8C%E5%85%A5%E5%BC%8F%E6%A0%8F%E7%9B%AE/">嵌入式栏目</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%BC%80%E6%BA%90%E8%BD%AF%E4%BB%B6/">开源软件</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%95%99%E7%A8%8B/">教程</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%92%8C%E7%AE%97%E6%B3%95/">数据结构和算法</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%BC%96%E7%A8%8B%E5%BC%80%E5%8F%91/">编程开发</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%BD%91%E7%BB%9C%E6%97%A5%E5%BF%97/">网络日志</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%B5%84%E6%BA%90%E5%88%86%E4%BA%AB/">资源分享</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ARM/" rel="tag">ARM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/" rel="tag">Android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Arch/" rel="tag">Arch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/" rel="tag">C</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Django/" rel="tag">Django</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker/" rel="tag">Docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Dreamweaver/" rel="tag">Dreamweaver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Fedora/" rel="tag">Fedora</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flash/" rel="tag">Flash</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GObject/" rel="tag">GObject</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Gentoo/" rel="tag">Gentoo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hash/" rel="tag">Hash</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/" rel="tag">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mac/" rel="tag">Mac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PS/" rel="tag">PS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Qt/" rel="tag">Qt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Raspberry-pi/" rel="tag">Raspberry pi</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redis/" rel="tag">Redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Ruby/" rel="tag">Ruby</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scrapy/" rel="tag">Scrapy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TQ2440/" rel="tag">TQ2440</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/USB/" rel="tag">USB</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/VirtualBox/" rel="tag">VirtualBox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web%E5%BC%80%E5%8F%91/" rel="tag">Web开发</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WordPress/" rel="tag">WordPress</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Xcode/" rel="tag">Xcode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/access/" rel="tag">access</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/adobe/" rel="tag">adobe</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ajax/" rel="tag">ajax</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/" rel="tag">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apache/" rel="tag">apache</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asp/" rel="tag">asp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css/" rel="tag">css</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/" rel="tag">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/firefox/" rel="tag">firefox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ftp/" rel="tag">ftp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gcc/" rel="tag">gcc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/" rel="tag">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/grub/" rel="tag">grub</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gtk/" rel="tag">gtk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gulp/" rel="tag">gulp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ibus/" rel="tag">ibus</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/" rel="tag">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s/" rel="tag">k8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mongodb/" rel="tag">mongodb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/" rel="tag">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/" rel="tag">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/" rel="tag">node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/" rel="tag">php</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pygame/" rel="tag">pygame</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/" rel="tag">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/" rel="tag">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/" rel="tag">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ruby/" rel="tag">ruby</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/" rel="tag">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/typescript/" rel="tag">typescript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/" rel="tag">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/" rel="tag">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vmware/" rel="tag">vmware</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/w3m/" rel="tag">w3m</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/windows/" rel="tag">windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xml/" rel="tag">xml</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%85%8D%E8%B4%B9/" rel="tag">免费</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%86%85%E6%A0%B8/" rel="tag">内核</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95/" rel="tag">匹配算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8D%95%E7%89%87%E6%9C%BA/" rel="tag">单片机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/" rel="tag">嵌入式</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%BC%80%E6%BA%90%E8%BD%AF%E4%BB%B6/" rel="tag">开源软件</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/" rel="tag">排序算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%96%87%E4%BB%B6%E7%A9%BA%E9%97%B4/" rel="tag">文件空间</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%97%A0%E7%BA%BF%E7%BD%91/" rel="tag">无线网</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A0%91%E8%8E%93%E6%B4%BE/" rel="tag">树莓派</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%AD%A3%E5%88%99%E5%BC%8F/" rel="tag">正则式</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B3%A8%E5%86%8C%E6%9C%BA/" rel="tag">注册机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B8%B8%E6%88%8F/" rel="tag">游戏</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%94%B5%E8%84%91%E6%8A%80%E5%B7%A7/" rel="tag">电脑技巧</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%A9%BA%E9%97%B4/" rel="tag">空间</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BA%A2%E6%97%97/" rel="tag">红旗</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BB%8F%E5%85%B8%E8%AF%AD%E5%BD%95/" rel="tag">经典语录</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E6%97%A5%E5%BF%97/" rel="tag">网络日志</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BF%BB%E8%AF%91/" rel="tag">翻译</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B/" rel="tag">视频教程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%B5%84%E6%BA%90%E5%88%86%E4%BA%AB/" rel="tag">资源分享</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%BD%AC%E8%BD%BD/" rel="tag">转载</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%9A%8F%E7%AC%94/" rel="tag">随笔</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/ARM/" style="font-size: 13.68px;">ARM</a> <a href="/tags/Android/" style="font-size: 10.53px;">Android</a> <a href="/tags/Arch/" style="font-size: 13.16px;">Arch</a> <a href="/tags/C/" style="font-size: 15.79px;">C</a> <a href="/tags/Django/" style="font-size: 11.05px;">Django</a> <a href="/tags/Docker/" style="font-size: 11.05px;">Docker</a> <a href="/tags/Dreamweaver/" style="font-size: 10px;">Dreamweaver</a> <a href="/tags/Fedora/" style="font-size: 10.53px;">Fedora</a> <a href="/tags/Flash/" style="font-size: 10px;">Flash</a> <a href="/tags/GObject/" style="font-size: 12.63px;">GObject</a> <a href="/tags/Gentoo/" style="font-size: 10.53px;">Gentoo</a> <a href="/tags/Hash/" style="font-size: 10px;">Hash</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Mac/" style="font-size: 10.53px;">Mac</a> <a href="/tags/PS/" style="font-size: 12.63px;">PS</a> <a href="/tags/Qt/" style="font-size: 10.53px;">Qt</a> <a href="/tags/Raspberry-pi/" style="font-size: 10px;">Raspberry pi</a> <a href="/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/tags/Ruby/" style="font-size: 18.95px;">Ruby</a> <a href="/tags/Scrapy/" style="font-size: 11.05px;">Scrapy</a> <a href="/tags/TQ2440/" style="font-size: 12.11px;">TQ2440</a> <a href="/tags/USB/" style="font-size: 11.05px;">USB</a> <a href="/tags/VirtualBox/" style="font-size: 11.05px;">VirtualBox</a> <a href="/tags/Web%E5%BC%80%E5%8F%91/" style="font-size: 16.84px;">Web开发</a> <a href="/tags/WordPress/" style="font-size: 10px;">WordPress</a> <a href="/tags/Xcode/" style="font-size: 10px;">Xcode</a> <a href="/tags/access/" style="font-size: 12.63px;">access</a> <a href="/tags/adobe/" style="font-size: 10px;">adobe</a> <a href="/tags/ajax/" style="font-size: 11.05px;">ajax</a> <a href="/tags/angular/" style="font-size: 13.16px;">angular</a> <a href="/tags/apache/" style="font-size: 10px;">apache</a> <a href="/tags/asp/" style="font-size: 13.16px;">asp</a> <a href="/tags/css/" style="font-size: 10.53px;">css</a> <a href="/tags/docker/" style="font-size: 10px;">docker</a> <a href="/tags/firefox/" style="font-size: 11.05px;">firefox</a> <a href="/tags/ftp/" style="font-size: 10px;">ftp</a> <a href="/tags/gcc/" style="font-size: 12.63px;">gcc</a> <a href="/tags/git/" style="font-size: 13.16px;">git</a> <a href="/tags/grub/" style="font-size: 10px;">grub</a> <a href="/tags/gtk/" style="font-size: 17.89px;">gtk</a> <a href="/tags/gulp/" style="font-size: 10px;">gulp</a> <a href="/tags/ibus/" style="font-size: 10px;">ibus</a> <a href="/tags/js/" style="font-size: 16.32px;">js</a> <a href="/tags/k8s/" style="font-size: 10.53px;">k8s</a> <a href="/tags/mongodb/" style="font-size: 15.26px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 11.58px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/node/" style="font-size: 10.53px;">node</a> <a href="/tags/php/" style="font-size: 14.74px;">php</a> <a href="/tags/pygame/" style="font-size: 15.26px;">pygame</a> <a href="/tags/python/" style="font-size: 19.47px;">python</a> <a href="/tags/react/" style="font-size: 12.63px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/ruby/" style="font-size: 10px;">ruby</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/typescript/" style="font-size: 10px;">typescript</a> <a href="/tags/ubuntu/" style="font-size: 13.16px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 18.42px;">vim</a> <a href="/tags/vmware/" style="font-size: 10px;">vmware</a> <a href="/tags/w3m/" style="font-size: 10px;">w3m</a> <a href="/tags/windows/" style="font-size: 13.16px;">windows</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/%E5%85%8D%E8%B4%B9/" style="font-size: 10px;">免费</a> <a href="/tags/%E5%86%85%E6%A0%B8/" style="font-size: 10px;">内核</a> <a href="/tags/%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95/" style="font-size: 12.63px;">匹配算法</a> <a href="/tags/%E5%8D%95%E7%89%87%E6%9C%BA/" style="font-size: 10.53px;">单片机</a> <a href="/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/" style="font-size: 10px;">嵌入式</a> <a href="/tags/%E5%BC%80%E6%BA%90%E8%BD%AF%E4%BB%B6/" style="font-size: 14.21px;">开源软件</a> <a href="/tags/%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/" style="font-size: 14.21px;">排序算法</a> <a href="/tags/%E6%96%87%E4%BB%B6%E7%A9%BA%E9%97%B4/" style="font-size: 10px;">文件空间</a> <a href="/tags/%E6%97%A0%E7%BA%BF%E7%BD%91/" style="font-size: 10px;">无线网</a> <a href="/tags/%E6%A0%91%E8%8E%93%E6%B4%BE/" style="font-size: 10px;">树莓派</a> <a href="/tags/%E6%AD%A3%E5%88%99%E5%BC%8F/" style="font-size: 10px;">正则式</a> <a href="/tags/%E6%B3%A8%E5%86%8C%E6%9C%BA/" style="font-size: 10.53px;">注册机</a> <a href="/tags/%E6%B8%B8%E6%88%8F/" style="font-size: 14.74px;">游戏</a> <a href="/tags/%E7%94%B5%E8%84%91%E6%8A%80%E5%B7%A7/" style="font-size: 14.21px;">电脑技巧</a> <a href="/tags/%E7%A9%BA%E9%97%B4/" style="font-size: 10px;">空间</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 17.37px;">算法</a> <a href="/tags/%E7%BA%A2%E6%97%97/" style="font-size: 10px;">红旗</a> <a href="/tags/%E7%BB%8F%E5%85%B8%E8%AF%AD%E5%BD%95/" style="font-size: 10px;">经典语录</a> <a href="/tags/%E7%BD%91%E7%BB%9C%E6%97%A5%E5%BF%97/" style="font-size: 13.16px;">网络日志</a> <a href="/tags/%E7%BF%BB%E8%AF%91/" style="font-size: 18.42px;">翻译</a> <a href="/tags/%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B/" style="font-size: 14.74px;">视频教程</a> <a href="/tags/%E8%B5%84%E6%BA%90%E5%88%86%E4%BA%AB/" style="font-size: 15.26px;">资源分享</a> <a href="/tags/%E8%BD%AC%E8%BD%BD/" style="font-size: 10.53px;">转载</a> <a href="/tags/%E9%9A%8F%E7%AC%94/" style="font-size: 10px;">随笔</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/09/">September 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/04/">April 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">April 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">February 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">November 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05/">May 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/02/">February 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/11/">November 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">October 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">September 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/08/">August 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/07/">July 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/05/">May 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04/">April 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">March 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">January 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/12/">December 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">June 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">May 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">April 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">January 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">October 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/09/">September 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/08/">August 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/07/">July 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/05/">May 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/04/">April 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/03/">March 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/02/">February 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/12/">December 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/11/">November 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/10/">October 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/09/">September 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/08/">August 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/07/">July 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/05/">May 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/04/">April 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/03/">March 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/02/">February 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/01/">January 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/12/">December 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/11/">November 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/10/">October 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/09/">September 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/08/">August 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/07/">July 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/06/">June 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/05/">May 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/04/">April 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/03/">March 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/12/">December 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/11/">November 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/10/">October 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/09/">September 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/08/">August 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/07/">July 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/05/">May 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/12/">December 2008</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/07/">July 2008</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/archives/84183.html">记录在docker中运行whenever遇到的问题</a>
+          </li>
+        
+          <li>
+            <a href="/archives/84182.html">Gitlab Runner 配置</a>
+          </li>
+        
+          <li>
+            <a href="/archives/84181.html">Github Runner 配置</a>
+          </li>
+        
+          <li>
+            <a href="/archives/84180.html">使用python编写帝国时代2修改器</a>
+          </li>
+        
+          <li>
+            <a href="/archives/84179.html">使用Vagrant和Docker搭建Kubernetes集群</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    <div class="widget-wrap">
+  <h3 class="widget-title">Link</h3>
+    <div class="widget">
+      <ul id="category-list">
+        <li><a target="_blank" title="我的Github" href="https://github.com/wusuopu">@Github</a></li>
+        <li><a target="_blank" title="我的微博" href="http://www.weibo.com/u/1768691343">@Weibo</a></li>
+        <li><a target="_blank" title="我的Twitter" href="https://twitter.com/longchangjin">@Twitter</a></li>
+        <li><a target="_blank" title="我的豆瓣" href="http://www.douban.com/people/lchj/">@Douban</a></li>
+
+        <li><a target="_blank" title="" href="http://gtk.awaysoft.com/">GTK+ 中文社区</a></li>
+      </ul>
+    </div>
+</div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2022 龍昌<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+<div style="display:none;"><script src="http://s94.cnzz.com/stat.php?id=1259846&web_id=1259846&show=pic" language="JavaScript"></script></div>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+    <a href="/gbook" class="mobile-nav-link">留言板</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery.min.js"></script>
+
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+  </div>
+</body>
+</html>

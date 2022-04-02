@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>[翻译]Ruby教程13——面向对象2 | 龍昌博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Ruby的面向对象编程2 在这章的教程我们继续讨论Ruby的面向对象编程。我们以属性修饰符开始。将会包涵类常量、类方法和操作符重载。我们将定义多态，并展示在Ruby中如何使用它。我们也会提及模块和异常。属性修饰符Ruby的所有变量都是私有的。它只能通过方法来访问。这些方法通常称为设值函数(setters)和获得者(getters)。创建一个setter和getter方法是很平常的事情。加些Ruby">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[翻译]Ruby教程13——面向对象2">
+<meta property="og:url" content="http://www.xefan.com/archives/83942.html">
+<meta property="og:site_name" content="龍昌博客">
+<meta property="og:description" content="Ruby的面向对象编程2 在这章的教程我们继续讨论Ruby的面向对象编程。我们以属性修饰符开始。将会包涵类常量、类方法和操作符重载。我们将定义多态，并展示在Ruby中如何使用它。我们也会提及模块和异常。属性修饰符Ruby的所有变量都是私有的。它只能通过方法来访问。这些方法通常称为设值函数(setters)和获得者(getters)。创建一个setter和getter方法是很平常的事情。加些Ruby">
+<meta property="og:locale">
+<meta property="article:published_time" content="2013-11-17T12:38:07.000Z">
+<meta property="article:modified_time" content="2018-01-11T03:57:01.000Z">
+<meta property="article:author" content="龍昌">
+<meta property="article:tag" content="Ruby">
+<meta property="article:tag" content="翻译">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="龍昌博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+
+<meta name="generator" content="Hexo 6.1.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">龍昌博客</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+          <a class="main-nav-link" href="/gbook">留言板</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.xefan.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-/archives/83942.html" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83942.html" class="article-date">
+  <time datetime="2013-11-17T12:38:07.000Z" itemprop="datePublished">2013-11-17</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Ruby%E6%A0%8F%E7%9B%AE/">Ruby栏目</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      [翻译]Ruby教程13——面向对象2
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p></p><h1>Ruby的面向对象编程2</h1><p></p>
+<p>在这章的教程我们继续讨论Ruby的面向对象编程。</p><br><p>我们以属性修饰符开始。将会包涵类常量、类方法和操作符重载。我们将定义多态，并展示在Ruby中如何使用它。我们也会提及模块和异常。</p><br><h2>属性修饰符</h2><br><p>Ruby的所有变量都是私有的。它只能通过方法来访问。这些方法通常称为设值函数(setters)和获得者(getters)。创建一个setter和getter方法是很平常的事情。加些Ruby有便利的方法来创建这两种方法。它们是<em>attr_reader</em>、<em>attr_writer</em>和<em>attr_accessor</em>。</p><br><p><em>attr_reader</em>用于创建getter方法。<em>attr_writer</em>用于setter方法。<em>attr_accessor</em>用于创建两种方法。</p><br><pre><code>#!/usr/bin/ruby<br><br>class Car<br><br>    attr_reader :name, :price<br>    attr_writer :name, :price<br><br>    def to_s<br>        “#{@name}: #{@price}”<br>    end<br><br>end<br><br><br>c1 = Car.new<br>c2 = Car.new<br><br>c1.name = “Porsche”<br>c1.price = 23500<br><br>c2.name = “Volkswagen”<br>c2.price = 9500<br><br>puts “The #{c1.name} costs #{c1.price}”<br><br>p c1<br>p c2<br></code></pre><br><p>定义了一个<em>Car</em>类，在类内部我们使用了<em>attr_reader</em>和<em>attr_writer</em>创建了两个<em>getter</em>和<em>setter</em>方法。</p><br><pre><code>attr_reader :name, :price<br></code></pre><br><p>这里我们创建了两个实例方法名为：<em>name</em>和<em>price</em>。注意<em>attr_reader</em>将方法名符号作为参数。</p><br><pre><code>attr_writer :name, :price<br></code></pre><br><p><em>attr_writer</em>创建了两个<em>setter</em>方法<em>name</em>、<em>price</em>和两个实例变量<em>@name</em>、 <em>@price</em>。</p><br><pre><code>c1.name = “Porsche”<br>c1.price = 23500<br></code></pre><br><p>这里的上下文中调用了两个<em>setter</em>方法，为实例变量填充数据。</p><br><pre><code>puts “The #{c1.name} costs #{c1.price}”<br></code></pre><br><p>这里调用了两个<em>getter</em>方法获取数据。</p><br><p>$ ./arw.rb <br><br>The Porsche costs 23500<br><br>Porsche: 23500<br><br>Volkswagen: 9500  </p><br><p>例子的输出结果。</p><br><hr><br><p>正如上面阐述的，<em>attr_accessor</em>方法会创建<em>getter</em>、<em>setter</em>方法和它们的实例变量。</p><br><pre><code>#!/usr/bin/ruby<br><br>class Book<br>   attr_accessor :title, :pages<br>end<br><br>b1 = Book.new<br>b1.title = “Hidden motives”<br>b1.pages = 255<br><br>p “The book #{b1.title} has #{b1.pages} pages”<br></code></pre><br><p>定义了一个<em>Book</em>类，它使用<em>attr_accessor</em>创建了两对方法和两个实例变量。</p><br><pre><code>class Book<br>   attr_accessor :title, :pages<br>end<br></code></pre><br><p><em>attr_accessor</em>方法设置了<em>title</em>、<em>pages</em> 方法以及<em>@title</em>、<em>@pages</em>实例变量。</p><br><pre><code>b1 = Book.new<br>b1.title = “Hidden motives”<br>b1.pages = 255<br></code></pre><br><p>创建了一个<em>Book</em>对象。调用两个setter方法为对象的实例变量填充数据。</p><br><pre><code>p “The book #{b1.title} has #{b1.pages} pages”<br></code></pre><br><p>这行的代码我们调用getter方法读取实例变量的值。</p><br><p>$ ./accessor.rb<br><br>“The book Hidden motives has 255 pages”  </p><br><p>例子的输出结果。</p><br><h2>类的常量</h2><br><p>Ruby允许创建类常量。这些常量不属于特定的对象，它们是属于类的。作为约定，常量以大写字母开头。</p><br><pre><code>#!/usr/bin/ruby<br><br>class MMath<br><br>    PI = 3.141592<br>end<br><br><br>puts MMath::PI<br></code></pre><br><p>创建一个<em>MMath</em>类，包含了一个<em>PI</em>常量。</p><br><pre><code>PI = 3.141592<br></code></pre><br><p>我们创建了一个<em>PI</em>常量。记住在Ruby中常量不是强制的。</p><br><pre><code>puts MMath::PI<br></code></pre><br><p>使用<em>::</em>操作符访问<em>PI</em>常量。</p><br><p>$ ./classconstant.rb <br><br>3.141592  </p><br><p>例子输出结果。</p><br><h2>to_s方法</h2><br><p>每个对象都有一个<em>to_s</em>方法，它返回该对象的一个字符串描述。注意<em>puts</em>方法将一个对象作为参数时，该对象的<em>to_s</em>方法将被调用。</p><br><pre><code>#!/usr/bin/ruby<br><br>class Being<br><br>    def to_s<br>        “This is Being class”<br>    end<br>end<br><br>b = Being.new<br>puts b.to_s<br>puts b<br></code></pre><br><p>定义一个<em>Being</em>类并重载了<em>to_s</em>方法。</p><br><pre><code>def to_s<br>    “This is Being class”<br>end<br></code></pre><br><p>每个创建的类都继承自基类<em>Object</em>。<em>to_s</em>方法属于这个类。我们重载了<em>to_s</em>方法，使得描述信息更加可读。</p><br><pre><code>b = Being.new<br>puts b.to_s<br>puts b<br></code></pre><br><p>创建一个<em>Being</em>的对象，调用两次<em>to_s</em>方法。第一次是显式调用，第二次是隐式调用。</p><br><p>$ ./tostring.rb <br><br>This is Being class<br><br>This is Being class  </p><br><p>例子的运行结果。</p><br><h2>操作符重载</h2><br><p>操作符重载是基本参数的不同进行的操作也不同。</p><br><p>Ruby中操作符和方法仅有一点区别。</p><br><pre><code>#!/usr/bin/ruby<br><br>class Circle<br><br>    attr_accessor :radius<br><br>    def initialize r<br>        @radius = r<br>    end<br><br>    def +(other)<br>        Circle.new @radius + other.radius<br>    end<br><br>    def to_s<br>        “Circle with radius: #{@radius}”<br>    end<br>end<br><br><br>c1 = Circle.new 5<br>c2 = Circle.new 6<br>c3 = c1 + c2<br><br>p c3<br></code></pre><br><p>这个例子中，我们创建了一个<em>Circle</em>类，并重载了+操作符，用于将两个<em>circle</em>对象相加。</p><br><pre><code>def +(other)<br>    Circle.new @radius + other.radius<br>end<br></code></pre><br><p>我们定义了一个名为<em>+</em>的方法，这个方法将两个<em>circle</em>对象的半径相加。</p><br><pre><code>c1 = Circle.new 5<br>c2 = Circle.new 6<br>c3 = c1 + c2<br></code></pre><br><p>创建两个<em>circle</em>对象。在第三行我们将这两个对象相加生成一个新的对象。</p><br><p>$ ./operatoroverloading.rb<br><br>Circle with radius: 11  </p><br><p>这两个对象相加生成的第三个对象半径为11。</p><br><h2>类方法</h2><br><p>Ruby方法分为类方法和实例方法。类方法只能被类调用，不能被实例调用。</p><br><p>类方法不能访问实例变量。</p><br><pre><code>#!/usr/bin/ruby<br><br>class Circle<br><br>    def initialize x<br>        @r = x<br>    end<br><br>    def self.info<br>       “This is a Circle class”<br>    end<br><br>    def area<br>        @r <em> @r </em> 3.141592<br>    end<br><br>end<br><br><br>p Circle.info<br>c = Circle.new 3<br>p c.area<br></code></pre><br><p>上面的例子展示了一个<em>Circle</em>类。除了构造函数之外，还有一个类方法和一个实例方法。</p><br><pre><code>def self.info<br>    “This is a Circle class”<br>end<br></code></pre><br><p>以<em>self</em>关键字开头的是类方法。</p><br><pre><code>def area<br>    “Circle, radius: #{@r}”<br>end<br></code></pre><br><p>实例方法不以<em>self</em>关键字开头。</p><br><pre><code>p Circle.info<br></code></pre><br><p>调用类方法。注意我们是通过类来调用这个方法。</p><br><pre><code>c = Circle.new 3<br>p c.area<br></code></pre><br><p>为了调用实例方法我们必须得先创建一个对象。实例方法总是被对象调用。这里<em>c</em>变量保存了该对象，我们利用点操作符调用<em>area</em>方法。</p><br><p>$ ./classmethods.rb<br><br>“This is a Circle class”<br><br>28.274328  </p><br><p>例子的输出描述了Ruby的类方法。</p><br><hr><br><p>在Ruby中有三种方式创建类方法。</p><br><pre><code>#!/usr/bin/ruby<br><br>class Wood<br><br>    def self.info<br>       “This is a Wood class”<br>    end<br>end<br><br>class Brick<br><br>    class &lt;&lt; self<br>        def info<br>           “This is a Brick class”<br>        end<br>    end<br>end<br><br>class Rock<br><br>end<br><br>def Rock.info<br>   “This is a Rock class”<br>end<br><br><br>p Wood.info<br>p Brick.info<br>p Rock.info<br></code></pre><br><p>这个例子创建了三个类，每个都有一个类方法。</p><br><pre><code>def self.info<br>    “This is a Wood class”<br>end<br></code></pre><br><p>类方法可以以<em>self</em>关键字开头。</p><br><pre><code>class &lt;&lt; self<br>    def info<br>        “This is a Brick class”<br>    end<br>end<br></code></pre><br><p>另一个方式是将方法定义放在<em>class &lt;&lt; self</em>结构之后。</p><br><pre><code>def Rock.info<br>   “This is a Rock class”<br>end<br></code></pre><br><p>这是第三种定义类方法的方式。</p><br><p>$ ./classmethods2.rb<br><br>“This is a Wood class”<br><br>“This is a Brick class”<br><br>“This is a Rock class”  </p><br><p>调用<em>Wood</em>、<em>Brick</em>和<em>Rock</em>这三个类的类方法的输出结果。</p><br><h2>创建实例方法的三种方式</h2><br><p>Ruby有三种基本的方式创建实例方法。实例方法是属于实例对象的。它们是通过对象使用点操作符调用。</p><br><pre><code>#!/usr/bin/ruby<br><br>class Wood<br><br>    def info<br>       “This is a wood object”<br>    end<br>end<br><br>wood = Wood.new<br>p wood.info<br><br>class Brick<br><br>    attr_accessor :info<br>end<br><br>brick = Brick.new<br>brick.info = “This is a brick object”<br>p brick.info<br><br>class Rock<br><br>end<br><br>rock = Rock.new<br><br>def rock.info<br>    “This is a rock object”<br>end<br><br>p rock.info<br></code></pre><br><p>这个例子我们创建了三个实例对象<em>Wood</em>、<em>Brick</em>和<em>Rock</em>。每个对象都有一介上实例方法。</p><br><pre><code>class Wood<br><br>    def info<br>       “This is a wood object”<br>    end<br>end<br><br>wood = Wood.new<br>p wood.info<br></code></pre><br><p>这可能是最常用的一种方式。<em>info</em>方法定义在<em>Wood</em>类的内部。稍后创建一个对象并调用它的<em>info</em>方法。</p><br><pre><code>class Brick<br><br>    attr_accessor :info<br>end<br><br>brick = Brick.new<br>brick.info = “This is a brick object”<br>p brick.info<br></code></pre><br><p>另一种创建实例方法的方式是使用属性修饰符。这是一种方便的方式可以减少程序员的按键输入。<em>attr_accessor</em>创建两个方法getter和setter，同样也创建一个实例变量用于存储数据。创建一个<em>brick</em>对象，数据使用setter方法保存在<em>@info</em>变量中。最后使用getter方法读取消息。</p><br><pre><code>class Rock<br><br>end<br><br>rock = Rock.new<br><br>def rock.info<br>    “This is a rock object”<br>end<br><br>p rock.info<br></code></pre><br><p>第三种方法我们创建了一个空的<em>Rock</em>类。稍后实例化一个对象，动态的为这个对外创建一个方法。</p><br><p>$ ./threeways.rb<br><br>“This is a wood object”<br><br>“This is a brick object”<br><br>“This is a rock object”  </p><br><p>例子的输出结果。</p><br><h2>多态性</h2><br><p>多态是使用一个操作符或者函数对不同的数据进行不同的处理。实践中多态意味着如果类B继承自类A，它没有必要将类A的所有都继承；它可以做一些与类A不同的事情。</p><br><p>注意静态语言如C++、Java、或者C#和动态语言如Python、Ruby的多态有些不同。在静态语言中编译器决定了方法的定义。在动态语言中我们专注了同名方法的不同操作。</p><br><pre><code>#!/usr/bin/ruby<br><br>class Animal<br><br>    def make_noise<br>        “Some noise”<br>    end<br><br>    def sleep<br>        puts “#{self.class.name} is sleeping.”<br>    end<br><br>end<br><br>class Dog &lt; Animal<br><br>    def make_noise<br>        ‘Woof!’<br>    end<br><br>end<br><br>class Cat &lt; Animal<br><br>    def make_noise<br>        ‘Meow!’<br>    end<br>end<br><br>[Animal.new, Dog.new, Cat.new].each do |animal|<br>  puts animal.make_noise<br>  animal.sleep<br>end<br></code></pre><br><p>我们创建了一个简单的继承结构。有一个<em>Animal</em>基类和两个后代<em>Cat</em>和<em>Dog</em>。这三个类都有它自己的<em>make_noise</em>方法实现。后代的实现方法会替换掉<em>Animal</em>类的。</p><br><pre><code>class Dog &lt; Animal<br><br>    def make_noise<br>        ‘Woof!’<br>    end<br><br>end<br></code></pre><br><p><em>Dog</em>类的<em>make_noise</em>实现替换掉了<em>Animal</em>类的实现。</p><br><pre><code>[Animal.new, Dog.new, Cat.new].each do |animal|<br>  puts animal.make_noise<br>  animal.sleep<br>end<br></code></pre><br><p>为每个类的创建了一个实例对象，并对该对象调用了<em>make_noise</em>方法和<em>sleep</em>方法。</p><br><p>$ ./polymorhism.rb<br><br>Some noise<br><br>Animal is sleeping.<br><br>Woof!<br><br>Dog is sleeping.<br><br>Meow!<br><br>Cat is sleeping.  </p><br><p>polymorhism.rb脚本的输出结果。</p><br><h2>模块</h2><br><p>一个Ruby模块是方法、类和常量的集合。模块与类相似也有些不同。模块不能创建实例，没有子类。</p><br><p>模块用于将相关的类、方法和常量聚集单独放在一个模块中。这样也避免了命名的冲突，因为模块将它包含的对象进行了封装。从这方面来看Ruby的模块与C#的命名空间和Java的包相似。</p><br><p>在Ruby中模块也支持混合类（mixins）。混入类（mixin）是一个创建多继承的工厂。如果一个类继承自多个类，则称为多继承。</p><br><pre><code>#!/usr/bin/ruby<br><br>puts Math::PI<br>puts Math.sin 2<br></code></pre><br><p>Ruby有一个内建的<em>Math</em>模块。它有许多方法和常量。我们使用<em>::</em>操作符访问PI常量。与类相同使用点操作符访问方法。</p><br><pre><code>#!/usr/bin/ruby<br><br>include Math<br><br>puts PI<br>puts sin 2<br></code></pre><br><p>如果我包含了一个模块，我们就可以直接引用Math的对象了。模块导入使用<em>include</em>关键字。</p><br><p>$ ./modules.rb<br><br>3.141592653589793<br><br>0.9092974268256817  </p><br><p>程序的输出结果。</p><br><hr><br><p>下面的例子我们展示了如何使用模块来组织代码。</p><br><pre><code>#!/usr/bin/ruby<br><br>module Forest<br><br>    class Rock ; end<br>    class Tree ; end<br>    class Animal ; end<br><br>end<br><br>module Town<br><br>   class Pool ; end<br>   class Cinema ; end<br>   class Square ; end<br>   class Animal ; end<br><br>end<br><br><br>p Forest::Tree.new<br>p Forest::Rock.new<br>p Town::Cinema.new<br><br>p Forest::Animal.new<br>p Town::Animal.new<br></code></pre><br><p>Ruby代码可以主义分组。<em>Rocks</em>和<em>Tree</em>属于<em>Forest</em>。<em>Pools</em>、<em>Cinema</em>、<em>Squares</em>属于<em>Town</em>。使用模块让我们的代码更加有条理。<em>Animals</em>可以在<em>Forest</em>里也可以有<em>Town</em>里。对于一个脚本我们不能定义两个<em>Animal</em>类，它们会冲突。将它们放在不同的模块即可解决这个问题。</p><br><pre><code>p Forest::Tree.new<br>p Forest::Rock.new<br>p Town::Cinema.new<br></code></pre><br><p>创建属于<em>Forest</em>和<em>Town</em>的对象。我们使用<em>::</em>操作符访问模块里的对象。</p><br><pre><code>p Forest::Animal.new<br>p Town::Animal.new<br></code></pre><br><p>创建两个Animal对象。Ruby解释器会将它们标识为它们的模块名。</p><br><pre><code>$ ./modules3.rb<br>#&lt;Forest::Tree:0x97f35ec&gt;<br>#&lt;Forest::Rock:0x97f35b0&gt;<br>#&lt;Town::Cinema:0x97f3588&gt;<br>#&lt;Forest::Animal:0x97f3560&gt;<br>#&lt;Town::Animal:0x97f3538&gt;<br></code></pre><br><p>modules3.rb程序的输出。</p><br><hr><br><p>这节的最后一个例子我们将展示使用模块进行多继承。在这里的上下文中模块称为混合类（mixins）。</p><br><pre><code>#!/usr/bin/ruby<br><br>module Device<br>    def switch_on ; puts “on” end<br>    def switch_off ; puts “off” end<br>end<br><br>module Volume<br>    def volume_up ; puts “volume up” end<br>    def vodule_down ; puts “volume down” end<br>end<br><br>module Pluggable<br>    def plug_in ; puts “plug in” end<br>    def plug_out ; puts “plug out” end<br>end<br><br>class CellPhone<br>    include Device, Volume, Pluggable<br><br>    def ring<br>        puts “ringing”<br>    end<br>end<br><br>cph = CellPhone.new<br>cph.switch_on<br>cph.volume_up<br>cph.ring<br></code></pre><br><p>我们定义了三个模块和一个类。模块代表了一些功能。一个设备可以调节开头。许多对象都可以分享这个功能，包含电视、手机、电脑和冰箱。相对于为每个对象创建这个功能，我们是将它分隔在一个模块里，它可以被每个对象包含。这样代码将更加有条理更紧凑。</p><br><pre><code>module Volume<br>    def volume_up ; puts “volume up” end<br>    def vodule_down ; puts “volume down” end<br>end<br></code></pre><br><p><em>Volume</em>模块组织了负责控制音量等级的方法。如果一个设备需要这些方法，它只需要简单的在自己的类中包含这个模块即可。</p><br><pre><code>class CellPhone<br>    include Device, Volume, Pluggable<br><br>    def ring<br>        puts “ringing”<br>    end<br>end<br></code></pre><br><p><em>CellPhone</em>添加了这三个模块。这些模块的方法混合在<em>CellPhone</em>类中。对于这个类的实例对象同样有效。<em>CellPhone</em>类也有一个自己的<em>ring</em>方法。</p><br><pre><code>cph = CellPhone.new<br>cph.switch_on<br>cph.volume_up<br>cph.ring<br></code></pre><br><p>创建了一个<em>CellPhone</em>对象并调用了三个方法。</p><br><p>$ ./mixins.rb<br><br>on<br><br>volume up<br><br>ringing  </p><br><p>例子的运行结果。</p><br><h2>异常</h2><br><p>异常是对象偏离了正常的程序执行流的信号。<br><br>异常出现、抛出或者开始。</p><br><p>在应用程序执行期间，许多事情可能引起错误。磁盘满了我们不能保存文件。网络断了但应用程序试图连接某个网站。所有的这些可能引起应用程序崩溃。为了避免这个的发生，我们应当在程序异常时预先处理错误。对于这个我们可以使用异常处理。</p><br><p>异常是对象，它们是内建<em>Exception</em>类的后代。<em>Exception</em>对象携带了关于异常的信息。它的类型（异常的类名），可选的描述字符串，和一个可选的跟踪信息。为了获取关于程序运行异常的额外信息，程序可以子类化<em>Exception</em>或者更多是<em>StandardError</em>。</p><br><pre><code>#!/usr/bin/ruby<br><br>x = 35<br>y = 0<br><br>begin<br>    z = x / y<br>    puts z<br>rescue =&gt; e<br>    puts e<br>    p e<br>end<br></code></pre><br><p>上面的程序我们故意的除以0,这个导致一个错误。</p><br><pre><code>begin<br>    z = x / y<br>    puts z<br></code></pre><br><p>出错的语句位置<em>begin</em>关键字之后。</p><br><pre><code>rescue =&gt; e<br>    puts e<br>    p e<br>end<br></code></pre><br><p><em>rescue</em>关键字之后的代码我们处理一个异常。这里我们在终端上打印错误信息。<em>e</em>是一个异常对象，在错误发生时创建的。</p><br><pre><code>$ ./zerodivision.rb<br>divided by 0<br>#&lt;ZeroDivisionError: divided by 0&gt;<br></code></pre><br><p>输出结果我们看到了异常信息。最后一行显示了异常对象名为<em>ZeroDivisionError</em>。</p><br><hr><br><p>程序员可以使用<em>raise</em>关键字发起自己的异常。</p><br><pre><code>#!/usr/bin/ruby<br><br>age = 17<br><br>begin<br>    if age &lt; 18<br>        raise “Person is a minor”<br>    end<br><br>    puts “Entry allowed”<br>rescue =&gt; e<br>    puts e<br>    p e<br>    exit 1<br>end<br></code></pre><br><p>俱乐部不允许不满18岁的青年进入。我们使用Ruby脚本模拟这个情况。</p><br><pre><code>begin<br>    if age &lt; 18<br>        raise “Person is a minor”<br>    end<br><br>    puts “Entry allowed”<br></code></pre><br><p>如果是未成年人，将出现一个异常。如果<em>raise</em>关键字没有指明异常参数，则<em>RuntimeError</em>异常将引发。这个代码不会到达<em>puts “Entry allowed”</em>这行。代码执行中断并继续<em>rescue</em>的代码块。</p><br><pre><code>rescue =&gt; e<br>    puts e<br>    p e<br>    exit 1<br>end<br></code></pre><br><p>在<em>rescue</em>代码块中我们打印错误信息，<em>RuntimeError</em>对象的一个字符串描述。我们也调用了<em>exit</em>方法通知环境该脚本错误退出。</p><br><pre><code>$ ./raise_exception.rb<br>Person is a minor<br>#&lt;RuntimeError: Person is a minor&gt;<br>$ echo $?<br>1<br></code></pre><br><p>未成年人不允许进行俱乐部。bash的$?变量设置了这个脚本错误退出。</p><br><hr><br><p>Ruby的<em>ensure</em>从名创建的代码块总是会被执行，不管是否有异常。</p><br><pre><code>#!/usr/bin/ruby<br><br>begin<br>    f = File.open(“stones”, “r”)<br><br>    while line = f.gets do<br>        puts line<br>    end<br><br>rescue =&gt; e<br>    puts e<br>    p e<br>ensure<br>    f.close if f<br>end<br></code></pre><br><p>这个例子我们尝试打开并读取stones文件。I/O操作容易出现错误。</p><br><pre><code>ensure<br>    f.close if f<br>end<br></code></pre><br><p>在<em>ensure</em>的代码块中我们关闭文件处理对象。我们查检处理对象是否存在，因为它可能没有被创建。分配的资源通常位于<em>ensure</em>代码块里。</p><br><hr><br><p>如果想到，我们可以创建自定义的异常。Ruby中自定义异常继承自<em>StandardError</em>类。</p><br><pre><code>#!/usr/bin/ruby<br><br>class BigValueError &lt; StandardError ; end<br><br>LIMIT = 333<br>x = 3_432_453<br><br>begin<br><br>    if x &gt; LIMIT<br>        raise BigValueError, “Exceeded the maximum value”<br>    end<br><br>    puts “Script continues”<br><br>rescue =&gt; e<br>    puts e<br>    p e<br>    exit 1<br>end<br></code></pre><br><p>我们有一个情况不能处理大的数字。</p><br><pre><code>class BigValueError &lt; StandardError ; end<br></code></pre><br><p>我们定义一个<em>BigValueError</em>类。这个类继承自<em>StandardError</em>类。</p><br><pre><code>LIMIT = 333<br></code></pre><br><p>数字超过这个常量就被认为是大的。</p><br><pre><code>if x &gt; LIMIT<br>    raise BigValueError, “Exceeded the maximum value”<br>end<br></code></pre><br><p>如果值比<em>LIMIT</em>在，则抛出一个自定义异常。异常信息为<em>“Exceeded the maximum value”</em>。</p><br><pre><code>$ ./custom_exception.rb<br>Exceeded the maximum value<br>#&lt;BigValueError: Exceeded the maximum value&gt;<br></code></pre><br><p>执行程序。</p><br><p>在这一章我们完成了Ruby语言的面向对象编程。</p><br><hr><br><p>原文地址： <a href="http://zetcode.com/lang/rubytutorial/oop2/" target="_blank" rel="external">http://zetcode.com/lang/rubytutorial/oop2/</a><br><br>翻译：龙昌  admin@longchangjin.cn<br><br>完整教程：<a href="https://github.com/wusuopu/Ruby-tutorial" target="_blank" rel="external">https://github.com/wusuopu/Ruby-tutorial</a> </p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83942.html" data-id="cl1hn20et00ifpg4k6mny82lm" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ruby/" rel="tag">Ruby</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%BF%BB%E8%AF%91/" rel="tag">翻译</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/archives/83945.html" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          [翻译]Ruby教程14——正则表达式
+        
+      </div>
+    </a>
+  
+  
+    <a href="/archives/83939.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">[翻译]Ruby教程12——面向对象</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<section id="comments">
+  <!-- 多说评论框 start -->
+  <div class="ds-thread" data-thread-key="83942" data-title="[翻译]Ruby教程13——面向对象2" data-url="http://www.xefan.com/archives/83942.html"></div>
+  <!-- 多说评论框 end -->
+  <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+  <script type="text/javascript">
+  var duoshuoQuery = {short_name:'longchang'};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0] 
+       || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+    </script>
+  <!-- 多说公共JS代码 end -->
+</section>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Linux%E6%A0%8F%E7%9B%AE/">Linux栏目</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Python%E6%A0%8F%E7%9B%AE/">Python栏目</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Ruby%E6%A0%8F%E7%9B%AE/">Ruby栏目</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Ruby%E6%A0%8F%E7%9B%AE/Web%E5%BC%80%E5%8F%91/">Web开发</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/Web%E5%BC%80%E5%8F%91/">Web开发</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Web%E5%BC%80%E5%8F%91/Python%E6%A0%8F%E7%9B%AE/">Python栏目</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%89%8D%E7%AB%AF%E7%9B%B8%E5%85%B3/">前端相关</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%B5%8C%E5%85%A5%E5%BC%8F%E6%A0%8F%E7%9B%AE/">嵌入式栏目</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%BC%80%E6%BA%90%E8%BD%AF%E4%BB%B6/">开源软件</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%95%99%E7%A8%8B/">教程</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%92%8C%E7%AE%97%E6%B3%95/">数据结构和算法</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%BC%96%E7%A8%8B%E5%BC%80%E5%8F%91/">编程开发</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%BD%91%E7%BB%9C%E6%97%A5%E5%BF%97/">网络日志</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%B5%84%E6%BA%90%E5%88%86%E4%BA%AB/">资源分享</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ARM/" rel="tag">ARM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/" rel="tag">Android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Arch/" rel="tag">Arch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/" rel="tag">C</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Django/" rel="tag">Django</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker/" rel="tag">Docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Dreamweaver/" rel="tag">Dreamweaver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Fedora/" rel="tag">Fedora</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flash/" rel="tag">Flash</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GObject/" rel="tag">GObject</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Gentoo/" rel="tag">Gentoo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hash/" rel="tag">Hash</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/" rel="tag">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mac/" rel="tag">Mac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PS/" rel="tag">PS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Qt/" rel="tag">Qt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Raspberry-pi/" rel="tag">Raspberry pi</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redis/" rel="tag">Redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Ruby/" rel="tag">Ruby</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scrapy/" rel="tag">Scrapy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TQ2440/" rel="tag">TQ2440</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/USB/" rel="tag">USB</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/VirtualBox/" rel="tag">VirtualBox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web%E5%BC%80%E5%8F%91/" rel="tag">Web开发</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WordPress/" rel="tag">WordPress</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Xcode/" rel="tag">Xcode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/access/" rel="tag">access</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/adobe/" rel="tag">adobe</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ajax/" rel="tag">ajax</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/" rel="tag">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apache/" rel="tag">apache</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asp/" rel="tag">asp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css/" rel="tag">css</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/" rel="tag">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/firefox/" rel="tag">firefox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ftp/" rel="tag">ftp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gcc/" rel="tag">gcc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/" rel="tag">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/grub/" rel="tag">grub</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gtk/" rel="tag">gtk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gulp/" rel="tag">gulp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ibus/" rel="tag">ibus</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/" rel="tag">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s/" rel="tag">k8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mongodb/" rel="tag">mongodb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/" rel="tag">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/" rel="tag">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/" rel="tag">node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/" rel="tag">php</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pygame/" rel="tag">pygame</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/" rel="tag">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/" rel="tag">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/" rel="tag">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ruby/" rel="tag">ruby</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/" rel="tag">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/typescript/" rel="tag">typescript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/" rel="tag">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/" rel="tag">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vmware/" rel="tag">vmware</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/w3m/" rel="tag">w3m</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/windows/" rel="tag">windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xml/" rel="tag">xml</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%85%8D%E8%B4%B9/" rel="tag">免费</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%86%85%E6%A0%B8/" rel="tag">内核</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95/" rel="tag">匹配算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8D%95%E7%89%87%E6%9C%BA/" rel="tag">单片机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/" rel="tag">嵌入式</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%BC%80%E6%BA%90%E8%BD%AF%E4%BB%B6/" rel="tag">开源软件</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/" rel="tag">排序算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%96%87%E4%BB%B6%E7%A9%BA%E9%97%B4/" rel="tag">文件空间</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%97%A0%E7%BA%BF%E7%BD%91/" rel="tag">无线网</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A0%91%E8%8E%93%E6%B4%BE/" rel="tag">树莓派</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%AD%A3%E5%88%99%E5%BC%8F/" rel="tag">正则式</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B3%A8%E5%86%8C%E6%9C%BA/" rel="tag">注册机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B8%B8%E6%88%8F/" rel="tag">游戏</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%94%B5%E8%84%91%E6%8A%80%E5%B7%A7/" rel="tag">电脑技巧</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%A9%BA%E9%97%B4/" rel="tag">空间</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BA%A2%E6%97%97/" rel="tag">红旗</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BB%8F%E5%85%B8%E8%AF%AD%E5%BD%95/" rel="tag">经典语录</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E6%97%A5%E5%BF%97/" rel="tag">网络日志</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BF%BB%E8%AF%91/" rel="tag">翻译</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B/" rel="tag">视频教程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%B5%84%E6%BA%90%E5%88%86%E4%BA%AB/" rel="tag">资源分享</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%BD%AC%E8%BD%BD/" rel="tag">转载</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%9A%8F%E7%AC%94/" rel="tag">随笔</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/ARM/" style="font-size: 13.68px;">ARM</a> <a href="/tags/Android/" style="font-size: 10.53px;">Android</a> <a href="/tags/Arch/" style="font-size: 13.16px;">Arch</a> <a href="/tags/C/" style="font-size: 15.79px;">C</a> <a href="/tags/Django/" style="font-size: 11.05px;">Django</a> <a href="/tags/Docker/" style="font-size: 11.05px;">Docker</a> <a href="/tags/Dreamweaver/" style="font-size: 10px;">Dreamweaver</a> <a href="/tags/Fedora/" style="font-size: 10.53px;">Fedora</a> <a href="/tags/Flash/" style="font-size: 10px;">Flash</a> <a href="/tags/GObject/" style="font-size: 12.63px;">GObject</a> <a href="/tags/Gentoo/" style="font-size: 10.53px;">Gentoo</a> <a href="/tags/Hash/" style="font-size: 10px;">Hash</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Mac/" style="font-size: 10.53px;">Mac</a> <a href="/tags/PS/" style="font-size: 12.63px;">PS</a> <a href="/tags/Qt/" style="font-size: 10.53px;">Qt</a> <a href="/tags/Raspberry-pi/" style="font-size: 10px;">Raspberry pi</a> <a href="/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/tags/Ruby/" style="font-size: 18.95px;">Ruby</a> <a href="/tags/Scrapy/" style="font-size: 11.05px;">Scrapy</a> <a href="/tags/TQ2440/" style="font-size: 12.11px;">TQ2440</a> <a href="/tags/USB/" style="font-size: 11.05px;">USB</a> <a href="/tags/VirtualBox/" style="font-size: 11.05px;">VirtualBox</a> <a href="/tags/Web%E5%BC%80%E5%8F%91/" style="font-size: 16.84px;">Web开发</a> <a href="/tags/WordPress/" style="font-size: 10px;">WordPress</a> <a href="/tags/Xcode/" style="font-size: 10px;">Xcode</a> <a href="/tags/access/" style="font-size: 12.63px;">access</a> <a href="/tags/adobe/" style="font-size: 10px;">adobe</a> <a href="/tags/ajax/" style="font-size: 11.05px;">ajax</a> <a href="/tags/angular/" style="font-size: 13.16px;">angular</a> <a href="/tags/apache/" style="font-size: 10px;">apache</a> <a href="/tags/asp/" style="font-size: 13.16px;">asp</a> <a href="/tags/css/" style="font-size: 10.53px;">css</a> <a href="/tags/docker/" style="font-size: 10px;">docker</a> <a href="/tags/firefox/" style="font-size: 11.05px;">firefox</a> <a href="/tags/ftp/" style="font-size: 10px;">ftp</a> <a href="/tags/gcc/" style="font-size: 12.63px;">gcc</a> <a href="/tags/git/" style="font-size: 13.16px;">git</a> <a href="/tags/grub/" style="font-size: 10px;">grub</a> <a href="/tags/gtk/" style="font-size: 17.89px;">gtk</a> <a href="/tags/gulp/" style="font-size: 10px;">gulp</a> <a href="/tags/ibus/" style="font-size: 10px;">ibus</a> <a href="/tags/js/" style="font-size: 16.32px;">js</a> <a href="/tags/k8s/" style="font-size: 10.53px;">k8s</a> <a href="/tags/mongodb/" style="font-size: 15.26px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 11.58px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/node/" style="font-size: 10.53px;">node</a> <a href="/tags/php/" style="font-size: 14.74px;">php</a> <a href="/tags/pygame/" style="font-size: 15.26px;">pygame</a> <a href="/tags/python/" style="font-size: 19.47px;">python</a> <a href="/tags/react/" style="font-size: 12.63px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/ruby/" style="font-size: 10px;">ruby</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/typescript/" style="font-size: 10px;">typescript</a> <a href="/tags/ubuntu/" style="font-size: 13.16px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 18.42px;">vim</a> <a href="/tags/vmware/" style="font-size: 10px;">vmware</a> <a href="/tags/w3m/" style="font-size: 10px;">w3m</a> <a href="/tags/windows/" style="font-size: 13.16px;">windows</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/%E5%85%8D%E8%B4%B9/" style="font-size: 10px;">免费</a> <a href="/tags/%E5%86%85%E6%A0%B8/" style="font-size: 10px;">内核</a> <a href="/tags/%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95/" style="font-size: 12.63px;">匹配算法</a> <a href="/tags/%E5%8D%95%E7%89%87%E6%9C%BA/" style="font-size: 10.53px;">单片机</a> <a href="/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/" style="font-size: 10px;">嵌入式</a> <a href="/tags/%E5%BC%80%E6%BA%90%E8%BD%AF%E4%BB%B6/" style="font-size: 14.21px;">开源软件</a> <a href="/tags/%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/" style="font-size: 14.21px;">排序算法</a> <a href="/tags/%E6%96%87%E4%BB%B6%E7%A9%BA%E9%97%B4/" style="font-size: 10px;">文件空间</a> <a href="/tags/%E6%97%A0%E7%BA%BF%E7%BD%91/" style="font-size: 10px;">无线网</a> <a href="/tags/%E6%A0%91%E8%8E%93%E6%B4%BE/" style="font-size: 10px;">树莓派</a> <a href="/tags/%E6%AD%A3%E5%88%99%E5%BC%8F/" style="font-size: 10px;">正则式</a> <a href="/tags/%E6%B3%A8%E5%86%8C%E6%9C%BA/" style="font-size: 10.53px;">注册机</a> <a href="/tags/%E6%B8%B8%E6%88%8F/" style="font-size: 14.74px;">游戏</a> <a href="/tags/%E7%94%B5%E8%84%91%E6%8A%80%E5%B7%A7/" style="font-size: 14.21px;">电脑技巧</a> <a href="/tags/%E7%A9%BA%E9%97%B4/" style="font-size: 10px;">空间</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 17.37px;">算法</a> <a href="/tags/%E7%BA%A2%E6%97%97/" style="font-size: 10px;">红旗</a> <a href="/tags/%E7%BB%8F%E5%85%B8%E8%AF%AD%E5%BD%95/" style="font-size: 10px;">经典语录</a> <a href="/tags/%E7%BD%91%E7%BB%9C%E6%97%A5%E5%BF%97/" style="font-size: 13.16px;">网络日志</a> <a href="/tags/%E7%BF%BB%E8%AF%91/" style="font-size: 18.42px;">翻译</a> <a href="/tags/%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B/" style="font-size: 14.74px;">视频教程</a> <a href="/tags/%E8%B5%84%E6%BA%90%E5%88%86%E4%BA%AB/" style="font-size: 15.26px;">资源分享</a> <a href="/tags/%E8%BD%AC%E8%BD%BD/" style="font-size: 10.53px;">转载</a> <a href="/tags/%E9%9A%8F%E7%AC%94/" style="font-size: 10px;">随笔</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/09/">September 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/04/">April 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">April 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">February 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">November 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/05/">May 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/02/">February 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/11/">November 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/10/">October 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/09/">September 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/08/">August 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/07/">July 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/05/">May 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/04/">April 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/03/">March 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/01/">January 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/12/">December 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">June 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">May 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">April 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/01/">January 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/10/">October 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/09/">September 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/08/">August 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/07/">July 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/05/">May 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/04/">April 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/03/">March 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/02/">February 2012</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/12/">December 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/11/">November 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/10/">October 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/09/">September 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/08/">August 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/07/">July 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/05/">May 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/04/">April 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/03/">March 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/02/">February 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/01/">January 2011</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/12/">December 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/11/">November 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/10/">October 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/09/">September 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/08/">August 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/07/">July 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/06/">June 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/05/">May 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/04/">April 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/03/">March 2010</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/12/">December 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/11/">November 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/10/">October 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/09/">September 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/08/">August 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/07/">July 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2009/05/">May 2009</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/12/">December 2008</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2008/07/">July 2008</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/archives/84183.html">记录在docker中运行whenever遇到的问题</a>
+          </li>
+        
+          <li>
+            <a href="/archives/84182.html">Gitlab Runner 配置</a>
+          </li>
+        
+          <li>
+            <a href="/archives/84181.html">Github Runner 配置</a>
+          </li>
+        
+          <li>
+            <a href="/archives/84180.html">使用python编写帝国时代2修改器</a>
+          </li>
+        
+          <li>
+            <a href="/archives/84179.html">使用Vagrant和Docker搭建Kubernetes集群</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    <div class="widget-wrap">
+  <h3 class="widget-title">Link</h3>
+    <div class="widget">
+      <ul id="category-list">
+        <li><a target="_blank" title="我的Github" href="https://github.com/wusuopu">@Github</a></li>
+        <li><a target="_blank" title="我的微博" href="http://www.weibo.com/u/1768691343">@Weibo</a></li>
+        <li><a target="_blank" title="我的Twitter" href="https://twitter.com/longchangjin">@Twitter</a></li>
+        <li><a target="_blank" title="我的豆瓣" href="http://www.douban.com/people/lchj/">@Douban</a></li>
+
+        <li><a target="_blank" title="" href="http://gtk.awaysoft.com/">GTK+ 中文社区</a></li>
+      </ul>
+    </div>
+</div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2022 龍昌<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+<div style="display:none;"><script src="http://s94.cnzz.com/stat.php?id=1259846&web_id=1259846&show=pic" language="JavaScript"></script></div>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+    <a href="/gbook" class="mobile-nav-link">留言板</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery.min.js"></script>
+
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+  </div>
+</body>
+</html>
