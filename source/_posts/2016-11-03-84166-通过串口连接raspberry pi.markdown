@@ -21,6 +21,52 @@ tags: ["Raspberry pi"]
 2.然后在 pi 的系统上启用 serial。我安装的是 debian 系统，执行命令： `sudo raspi-config` ，
 选择 `advanced options` -> `serial` 进行启用 serial。
 
+或者在烧录系统时直接配置：
+向microSD卡中烧录树莓派官方的镜像后，先不要急着把它插入树莓派中。
+在电脑上打开microSD卡，按如下方式修改config.txt和cmdline.txt这两个文件，
+在config.txt文件中附加
+```
+dtoverlay=miniuart-bt
+enable_uart=1
+```
+
+在cmdline.txt中添加如下的配置
+```
+dwc_otg.lpm_enable=0 console=tty1 console=serial0,115200
+```
+
+不然串口输出可能会乱码。
+
+修改 /boot/firstrun.sh
+```
+# 启动 vnc 服务
+ln -sv /etc/systemd/system/multi-user.target.wants/vncserver-x11-serviced.service /lib/systemd/system/vncserver-x11-serviced.service
+systemctl enable vncserver-x11-servicedsystemctl enable vncserver-x11-serviced
+
+# 添加新的 wifi ssid
+cat >/etc/wpa_supplicant/wpa_supplicant.conf <<'WPAEOF'
+country=CN
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+ap_scan=1
+
+update_config=1
+# 通过 wpa_passphrase ssid psk 生成
+network={
+        ssid="ssid1"
+        psk=加密后的密码
+        id_str="识别1"
+}
+
+network={
+        ssid="ssid2"
+        psk=加密后的密码
+        id_str="识别2"
+}
+
+WPAEOF
+```
+
+
 3.串口连接  
 
 对于 Raspberry Pi3 的 GPIO 引脚如下：  

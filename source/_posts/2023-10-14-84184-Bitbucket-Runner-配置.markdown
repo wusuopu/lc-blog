@@ -3,7 +3,7 @@ layout: post
 title: Bitbucket Runner 配置
 comments: true
 post_id: 84184
-permalink: /archives/.html
+permalink: /archives/84184.html
 date: 2023-10-14 20:45:42
 categories:
 tags: ["git"]
