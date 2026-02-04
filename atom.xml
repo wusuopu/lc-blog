@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.xefan.com/"/>
-  <updated>2026-02-04T01:56:58.984Z</updated>
+  <updated>2026-02-04T02:18:23.457Z</updated>
   <id>http://www.xefan.com/</id>
   
   <author>
@@ -16,13 +16,53 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>Solana Rust 开发环境搭建</title>
+    <link href="http://www.xefan.com//archives/84186.html"/>
+    <id>http://www.xefan.com//archives/84186.html</id>
+    <published>2026-01-19T11:07:07.000Z</published>
+    <updated>2026-02-04T02:18:23.457Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="开发环境安装"><a href="#开发环境安装" class="headerlink" title="开发环境安装"></a>开发环境安装</h2><h3 id="rust"><a href="#rust" class="headerlink" title="rust"></a>rust</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl --proto <span class="string">&#x27;=https&#x27;</span> --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y</span><br></pre></td></tr></table></figure>
+<p>我是用的 <a href="https://github.com/jdx/mise">mise</a> 工具来安装的<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mise install rust@1.92.0</span><br></pre></td></tr></table></figure></p>
+<h3 id="surfpool"><a href="#surfpool" class="headerlink" title="surfpool"></a>surfpool</h3><p>solana-test-validator 的一个替代方案，用于在本地运行开发测试链。<br><a href="https://github.com/txtx/surfpool">https://github.com/txtx/surfpool</a></p>
+<h3 id="Anchor-CLI-可选"><a href="#Anchor-CLI-可选" class="headerlink" title="Anchor CLI (可选)"></a>Anchor CLI (可选)</h3><p>solana 的一个开发框架，也可以直接使用 rust 的 原生 sdk 进行开发。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cargo install anchor-cli</span><br></pre></td></tr></table></figure></p>
+<h3 id="Solana-CLI"><a href="#Solana-CLI" class="headerlink" title="Solana CLI"></a>Solana CLI</h3><p>用于构建、部署程序<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sh -c <span class="string">&quot;<span class="subst">$(curl -sSfL https://release.anza.xyz/stable/install)</span>&quot;</span></span><br></pre></td></tr></table></figure></p>
+<p>然后还需要配置一下环境变量<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> PATH=<span class="string">&quot;<span class="variable">$HOME</span>/.local/share/solana/install/active_release/bin:<span class="variable">$PATH</span>&quot;</span></span><br></pre></td></tr></table></figure></p>
+<p>查看当前的账号：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">solana address</span><br></pre></td></tr></table></figure></p>
+<p>若当前还没有账号，则需要先创建一个：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">solana-keygen new -o ~/.config/solana/id.json</span><br></pre></td></tr></table></figure></p>
+<p>配置当前使用本地网络：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">solana config <span class="built_in">set</span> --url http://localhost:8899</span><br></pre></td></tr></table></figure></p>
+<p>查询当前的配置：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">solana config get</span><br></pre></td></tr></table></figure></p>
+<p>给自己的账户空投一些 SOL 用于后续的测试:<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">solana airdrop 10</span><br></pre></td></tr></table></figure></p>
+<h2 id="开发流程"><a href="#开发流程" class="headerlink" title="开发流程"></a>开发流程</h2><h3 id="创建项目"><a href="#创建项目" class="headerlink" title="创建项目"></a>创建项目</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cargo new --lib &lt;name&gt;</span><br><span class="line"><span class="built_in">cd</span> &lt;name&gt;</span><br><span class="line">cargo add pinocchio</span><br></pre></td></tr></table></figure>
+<p>修改 <code>Cargo.toml</code>，添加内容：<br><figure class="highlight toml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[package]</span></span><br><span class="line"><span class="attr">edition</span> = <span class="string">&quot;2021&quot;</span>       <span class="comment"># &lt;-- 这个要改为 2021</span></span><br><span class="line"></span><br><span class="line"><span class="section">[lib]</span></span><br><span class="line"><span class="attr">crate-type</span> = [<span class="string">&quot;cdylib&quot;</span>, <span class="string">&quot;lib&quot;</span>]</span><br></pre></td></tr></table></figure></p>
+<p>然后修改 <code>src/lib.rs</code>，编写程序逻辑。</p>
+<h3 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cargo build-bpf</span><br></pre></td></tr></table></figure>
+<p>编译成功会生成 target/deploy/xxx.so、 target/deploy/xxx.json 私钥两个文件</p>
+<h3 id="部署"><a href="#部署" class="headerlink" title="部署"></a>部署</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">solana program deploy target/deploy/&lt;name&gt;.so</span><br></pre></td></tr></table></figure>
+<p>执行成功会输出对应的 Program Id 和 Transaction Id</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;开发环境安装&quot;&gt;&lt;a href=&quot;#开发环境安装&quot; class=&quot;headerlink&quot; title=&quot;开发环境安装&quot;&gt;&lt;/a&gt;开发环境安装&lt;/h2&gt;&lt;h3 id=&quot;rust&quot;&gt;&lt;a href=&quot;#rust&quot; class=&quot;headerlink&quot; title=&quot;r
+    
+    </summary>
+    
+    
+      <category term="web3" scheme="http://www.xefan.com/tags/web3/"/>
+    
+      <category term="solana" scheme="http://www.xefan.com/tags/solana/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Arbitrum Stylus 开发环境搭建</title>
     <link href="http://www.xefan.com//archives/84185.html"/>
     <id>http://www.xefan.com//archives/84185.html</id>
     <published>2026-01-14T09:44:17.000Z</published>
-    <updated>2026-02-04T01:56:58.984Z</updated>
+    <updated>2026-02-04T02:09:53.963Z</updated>
     
-    <content type="html"><![CDATA[<h3 id="rust"><a href="#rust" class="headerlink" title="rust"></a>rust</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl --proto <span class="string">&#x27;=https&#x27;</span> --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y</span><br></pre></td></tr></table></figure>
+    <content type="html"><![CDATA[<h2 id="开发环境安装"><a href="#开发环境安装" class="headerlink" title="开发环境安装"></a>开发环境安装</h2><h3 id="rust"><a href="#rust" class="headerlink" title="rust"></a>rust</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl --proto <span class="string">&#x27;=https&#x27;</span> --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y</span><br></pre></td></tr></table></figure>
 <p>我是用的 <a href="https://github.com/jdx/mise">mise</a> 工具来安装的<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mise install rust@1.92.0</span><br></pre></td></tr></table></figure></p>
 <h3 id="Stylus-CLI"><a href="#Stylus-CLI" class="headerlink" title="Stylus CLI"></a>Stylus CLI</h3><p>Arbitrum 的开发框架<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cargo install cargo-stylus</span><br></pre></td></tr></table></figure></p>
 <p>因为 Arbitrum 的合约程序最终会被编译为 webassembly，所以还需要安装 wasm 相关的编译工具</p>
@@ -49,7 +89,7 @@
     
     <summary type="html">
     
-      &lt;h3 id=&quot;rust&quot;&gt;&lt;a href=&quot;#rust&quot; class=&quot;headerlink&quot; title=&quot;rust&quot;&gt;&lt;/a&gt;rust&lt;/h3&gt;&lt;figure class=&quot;highlight bash&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre
+      &lt;h2 id=&quot;开发环境安装&quot;&gt;&lt;a href=&quot;#开发环境安装&quot; class=&quot;headerlink&quot; title=&quot;开发环境安装&quot;&gt;&lt;/a&gt;开发环境安装&lt;/h2&gt;&lt;h3 id=&quot;rust&quot;&gt;&lt;a href=&quot;#rust&quot; class=&quot;headerlink&quot; title=&quot;r
     
     </summary>
     
@@ -699,41 +739,6 @@
     
     
       <category term="网络日志" scheme="http://www.xefan.com/tags/%E7%BD%91%E7%BB%9C%E6%97%A5%E5%BF%97/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>通过串口连接raspberry pi</title>
-    <link href="http://www.xefan.com//archives/84166.html"/>
-    <id>http://www.xefan.com//archives/84166.html</id>
-    <published>2016-11-03T13:35:57.000Z</published>
-    <updated>2025-10-22T05:34:37.736Z</updated>
-    
-    <content type="html"><![CDATA[<p>最近在玩树莓派，有时没有网络，也没有显示器，此时如果想要连接树莓派执行一些操作的话会很麻烦。<br>因为之前玩过 ARM 的开发板编程，因此想能不能通过串口登录到 pi 呢。于是网上查了一下，还真的可以哦。<br>以下就作为备忘笔记记录一下操作过程。</p>
-<p>1.首先需要一根 USB 转串口的线，如果没有的话可以去某宝上买一根吧，反正也不贵。我选的是 PL2303。<br>再根据系统以及芯片的不同而下载安装不同的驱动程序。 对于 mac OS 用户执行命令： <code>ls /dev/ | grep tty.usb</code> ，<br>如果驱动都安装正确的话应该是会有输出结果的。</p>
-<p>2.然后在 pi 的系统上启用 serial。我安装的是 debian 系统，执行命令： <code>sudo raspi-config</code> ，<br>选择 <code>advanced options</code> -&gt; <code>serial</code> 进行启用 serial。</p>
-<p>或者在烧录系统时直接配置：<br>向microSD卡中烧录树莓派官方的镜像后，先不要急着把它插入树莓派中。<br>在电脑上打开microSD卡，按如下方式修改config.txt和cmdline.txt这两个文件，<br>在config.txt文件中附加<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">dtoverlay=miniuart-bt</span><br><span class="line">enable_uart=1</span><br></pre></td></tr></table></figure></p>
-<p>在cmdline.txt中添加如下的配置<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dwc_otg.lpm_enable=0 console=tty1 console=serial0,115200</span><br></pre></td></tr></table></figure></p>
-<p>不然串口输出可能会乱码。</p>
-<p>修改 /boot/firstrun.sh<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"># 启动 vnc 服务</span><br><span class="line">ln -sv /etc/systemd/system/multi-user.target.wants/vncserver-x11-serviced.service /lib/systemd/system/vncserver-x11-serviced.service</span><br><span class="line">systemctl enable vncserver-x11-servicedsystemctl enable vncserver-x11-serviced</span><br><span class="line"></span><br><span class="line"># 添加新的 wifi ssid</span><br><span class="line">cat &gt;/etc/wpa_supplicant/wpa_supplicant.conf &lt;&lt;&#x27;WPAEOF&#x27;</span><br><span class="line">country=CN</span><br><span class="line">ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev</span><br><span class="line">ap_scan=1</span><br><span class="line"></span><br><span class="line">update_config=1</span><br><span class="line"># 通过 wpa_passphrase ssid psk 生成</span><br><span class="line">network=&#123;</span><br><span class="line">        ssid=&quot;ssid1&quot;</span><br><span class="line">        psk=加密后的密码</span><br><span class="line">        id_str=&quot;识别1&quot;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">network=&#123;</span><br><span class="line">        ssid=&quot;ssid2&quot;</span><br><span class="line">        psk=加密后的密码</span><br><span class="line">        id_str=&quot;识别2&quot;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">WPAEOF</span><br></pre></td></tr></table></figure></p>
-<p>3.串口连接  </p>
-<p>对于 Raspberry Pi3 的 GPIO 引脚如下：<br><img src="/wp-content/uploads/2016/11/03/pi3_gpio.png" alt="pi3_gpio"></p>
-<p>串口线与 pi 的连接方式为： GND -&gt; GND, RXD -&gt; TXD, TXD -&gt; RXD， 如图：<br><img src="/wp-content/uploads/2016/11/03/pi3-board.jpg" alt="pi3-board"></p>
-<p>最后在电脑上使用串口连接软件进行连接，对应的串口设置为 115200 8N1，如图：<br><img src="/wp-content/uploads/2016/11/03/raspberry-pi-serial.png" alt="raspberry-pi-serial"></p>
-<p>参考资料： <a href="http://elinux.org/RPi_Serial_Connection">http://elinux.org/RPi_Serial_Connection</a></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;最近在玩树莓派，有时没有网络，也没有显示器，此时如果想要连接树莓派执行一些操作的话会很麻烦。&lt;br&gt;因为之前玩过 ARM 的开发板编程，因此想能不能通过串口登录到 pi 呢。于是网上查了一下，还真的可以哦。&lt;br&gt;以下就作为备忘笔记记录一下操作过程。&lt;/p&gt;
-&lt;p&gt;1.首先
-    
-    </summary>
-    
-      <category term="嵌入式栏目" scheme="http://www.xefan.com/categories/%E5%B5%8C%E5%85%A5%E5%BC%8F%E6%A0%8F%E7%9B%AE/"/>
-    
-    
-      <category term="Raspberry pi" scheme="http://www.xefan.com/tags/Raspberry-pi/"/>
     
   </entry>
   

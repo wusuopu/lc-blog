@@ -84,6 +84,144 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-字符串匹配算法（三）——KMP算法" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/archives/83859.html" class="article-date">
+  <time datetime="2013-07-13T22:46:53.000Z" itemprop="datePublished">2013-07-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%92%8C%E7%AE%97%E6%B3%95/">数据结构和算法</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/archives/83859.html">字符串匹配算法（三）——KMP算法</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>KMP算法是常用的字符串匹配算法之一，是由Knuth、Pratt和Morris发明的。其中Knuth就是著名科学家Donald Knuth。</p>
+<p>该算法可以在O(n+m)的时间数量级上完成模式匹配操作。与传统算法相比其改进在于每当一趟匹配过程中出现比较不相等时不用回溯目标字符串。</p>
+<p>这个算法还是比较难理解，下面通过一个例子来讲解。<br>有一个目标字符串”BBC ABCDAB ABCDABCDABDE”，我想知道，里面是否包含另一个字符串”ABCDABD”？</p>
+<p>1).</p>
+<pre>
+<span style="color: #ff0000;">B</span>BC ABCDAB ABCDABCDABDE
+<span style="color: #ff0000;">A</span>BCDABD
+</pre>
+首先目标字符串”BBC ABCDAB ABCDABCDABDE”的第一个字符与源字符串”ABCDABD”的第一个字符相比，不匹配，则目标字符串后移一位。
+
+2).
+<pre>
+B<span style="color: #ff0000;">B</span>C ABCDAB ABCDABCDABDE
+ <span style="color: #ff0000;">A</span>BCDABD
+</pre>
+B与A不匹配，再次后移。
+
+3).
+<pre>
+BBC <span style="color: #ff0000;">A</span>BCDAB ABCDABCDABDE
+    <span style="color: #ff0000;">A</span>BCDABD
+</pre>
+就这样直到有一个字符相同为止。
+
+4).
+<pre>
+BBC A<span style="color: #ff0000;">B</span>CDAB ABCDABCDABDE
+    A<span style="color: #ff0000;">B</span>CDABD
+</pre>
+接着比较下一个字符，还是相同的。再继续。
+
+5).
+<pre>
+BBC ABCDAB<span style="color: #ff0000;"> </span>ABCDABCDABDE
+    ABCDAB<span style="color: #ff0000;">D</span>
+</pre>
+这时又出现了字符不匹配的情况，如果是传统的算法的话就把目标字符串进行回溯，源字符串后移一位。变成如下情形：
+<pre>
+BBC A<span style="color: #ff0000;">B</span>CDAB ABCDABCDABDE
+     <span style="color: #ff0000;">A</span>BCDABD
+</pre>
+毕竟这也是最容易理解的，但是这样一来很多字符又需要再重新比较一次。因此效率比较低。
+
+6).
+虽然D与空格不匹配，但是前面的ABCDAB是相匹配的。KMP算法就是利用这个已知信息，不要把“搜索”位置称回已经比较过的位置，而且继续比较之后的，这样就减少了重复的比较，提高了效率。继续向后移动变成如下情形：
+<pre>
+BBC ABCDAB<span style="color: #ff0000;"> </span>ABCDABCDABDE
+        AB<span style="color: #ff0000;">C</span>DABD
+</pre>
+
+<p>这个移动过程需要一张部分匹配表：</p>
+<pre>
+j        1234567
+源字符串 ABCDABD
+next[j]  0111123
+</pre>
+因为前6个字符是匹配的，最后一个匹配的字符B对应next值为2,根据公式： 移动位数=已匹配字符数-对应的next值
+因此将源字符串后移6-2=4位。
+
+7).因为空格与C不相同，继续后移。
+<pre>
+BBC ABCDAB<span style="color: #ff0000;"> </span>ABCDABCDABDE
+          <span style="color: #ff0000;">A</span>BCDABD
+</pre>
+
+<p>8).空格与A不相同，继续重复之前的操作进行后移。</p>
+<pre>
+BBC ABCDAB ABCDAB<span style="color: #ff0000;">C</span>DABDE
+           ABCDAB<span style="color: #ff0000;">D</span>
+</pre>
+
+<p>9).这里C与D不相同，继续用之前的方法进行后移。</p>
+<pre>
+BBC ABCDAB ABCDABCDAB<span style="color: #ff0000;">D</span>E
+               ABCDAB<span style="color: #ff0000;">D</span>
+</pre>
+最后匹配完成，字符串”BBC ABCDAB ABCDABCDABDE”里面包含字符串”ABCDABD”。
+
+
+下面介绍一下部分匹配表的计算方法。  
+公式为：  
+next[j] = 0    (j=1)  
+next[j] = Max {k 1&lt;k&lt;j 且 'p(1)...p(k-1)' = 'p(j-k+1)...p(j-1)'} (当此集合不为空时)  
+next[j] = 1    (其他情况)
+
+然后根据公式讲解一下上面例子中的字符串的部分匹配表的计算。(注：这里讲解时是按照数组下标从1开始的，而在C语言中是从0开始的)
+
+<pre>
+j        1234567
+源字符串 ABCDABD
+</pre>
+
+<p>由公式得next[1] = 0， next[2] = 1， next[3] = 1， next[4] = 1， next[5] = 1。<br>当j=6时，p[1]=p<a href="即&#39;A&#39;=&#39;A&#39;">5</a> =&gt; k=2 =&gt; next[6] = 2。<br>当j=7时，p[1:2]=p<a href="即&#39;AB&#39;=&#39;AB&#39;">5:6</a> =&gt; k=3 =&gt; next[7] = 3。</p>
+<p>用C语言实现如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// KMP算法的重点就是求next函数值</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">make_next</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pattern, <span class="type">int</span> len, <span class="type">unsigned</span> <span class="type">int</span> *next)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> i=<span class="number">1</span>, j=<span class="number">0</span>;</span><br><span class="line">    next[<span class="number">1</span>] = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (i &lt;= len) &#123;</span><br><span class="line">        <span class="keyword">if</span> (j == <span class="number">0</span> || pattern[i<span class="number">-1</span>] == pattern[j<span class="number">-1</span>]) &#123;</span><br><span class="line">            i++;</span><br><span class="line">            j++;</span><br><span class="line">            next[i] = j;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            j = next[j];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">kmp_match</span><span class="params">(<span class="type">char</span> *t, <span class="type">char</span> *p, <span class="type">int</span> next[], <span class="type">int</span> len1, <span class="type">int</span> len2)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> i=<span class="number">0</span>, j=<span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span> (i &lt; len1 &amp;&amp; j &lt; len2) &#123;</span><br><span class="line">        <span class="keyword">if</span> (j == <span class="number">0</span> || t[i] == p[j]) &#123;</span><br><span class="line">            i++;</span><br><span class="line">            j++;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            j = next[j];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (j &gt;= len2 ) <span class="keyword">return</span> i - len2;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> t[] = <span class="string">&quot;BBC ABCDAB ABCDABCDABDE&quot;</span>;</span><br><span class="line">    <span class="type">char</span> p[] = <span class="string">&quot;ABCDABD&quot;</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;t: %s\np: %s\n&quot;</span>, t, p);</span><br><span class="line">    <span class="type">int</span> len = <span class="keyword">sizeof</span>(p);</span><br><span class="line">    <span class="type">int</span> next[len];</span><br><span class="line">    make_next(p, len<span class="number">-1</span>, next);</span><br><span class="line">    <span class="type">int</span> i;</span><br><span class="line">    <span class="keyword">for</span> (i=<span class="number">1</span>; i&lt;len; i++) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%4d&quot;</span>, next[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;index: %d\n&quot;</span>, kmp_match(t, p, next, <span class="keyword">sizeof</span>(t)<span class="number">-1</span>, len<span class="number">-1</span>));</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.xefan.com/archives/83859.html" data-id="cml7d8ap60054mvpa2jsm0kk8" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95/" rel="tag">匹配算法</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-Python中的排序算法——Timsort" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/archives/83857.html" class="article-date">
@@ -525,53 +663,6 @@
 
 
   
-    <article id="post-常用的排序算法（二）——插入排序" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/archives/83832.html" class="article-date">
-  <time datetime="2013-07-09T21:18:30.000Z" itemprop="datePublished">2013-07-09</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%92%8C%E7%AE%97%E6%B3%95/">数据结构和算法</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/archives/83832.html">常用的排序算法（二）——插入排序</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>插入排序的平均时间复杂度为O(n<em>n)，最好的情况下为O(n)，最坏情况为O(n</em>n)。</p>
-<p>其基本机理与我们平时打牌时整理手中的牌的做法差不多。把小的牌插到左边，大的牌往右边移。</p>
-<p>用C语言实现如下：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">print_list</span><span class="params">(<span class="type">int</span> *<span class="built_in">list</span>, <span class="type">int</span> n)</span></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> i;</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;[ &quot;</span>);</span><br><span class="line"><span class="keyword">for</span> (i=<span class="number">0</span>; i&lt;n; i++) &#123;</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;%d &quot;</span>, <span class="built_in">list</span>[i]);</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;]\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">insertion_sort</span><span class="params">(<span class="type">int</span> *base, <span class="type">int</span> len)</span></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> i, j, n;</span><br><span class="line"><span class="type">int</span> value;</span><br><span class="line"><span class="keyword">for</span> (j=<span class="number">1</span>; j&lt;len; j++) &#123;</span><br><span class="line">i = j - <span class="number">1</span>;</span><br><span class="line">value = base[j];</span><br><span class="line"><span class="keyword">while</span> (i&gt;=<span class="number">0</span> &amp;&amp; base[i] &gt; value) &#123;</span><br><span class="line">base[i+<span class="number">1</span>] = base[i];</span><br><span class="line">i--;</span><br><span class="line">&#125;</span><br><span class="line">base[i+<span class="number">1</span>] = value;</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;step %d:&quot;</span>, j);</span><br><span class="line">print_list(base, len);</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="type">int</span> a[] = &#123;<span class="number">5</span>, <span class="number">2</span>, <span class="number">4</span>, <span class="number">6</span>, <span class="number">1</span>, <span class="number">3</span>&#125;;</span><br><span class="line"><span class="type">int</span> len = <span class="keyword">sizeof</span>(a) / <span class="keyword">sizeof</span>(<span class="type">int</span>);</span><br><span class="line">insertion_sort(a, len);</span><br><span class="line"><span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.xefan.com/archives/83832.html" data-id="cml7d8ap6004vmvpa29vg007m" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/" rel="tag">排序算法</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
 
 
   <nav id="page-nav">
@@ -596,7 +687,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ARM/" rel="tag">ARM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/" rel="tag">Android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Arch/" rel="tag">Arch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/" rel="tag">C</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Django/" rel="tag">Django</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker/" rel="tag">Docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Dreamweaver/" rel="tag">Dreamweaver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Fedora/" rel="tag">Fedora</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flash/" rel="tag">Flash</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GObject/" rel="tag">GObject</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Gentoo/" rel="tag">Gentoo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hash/" rel="tag">Hash</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/" rel="tag">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mac/" rel="tag">Mac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PS/" rel="tag">PS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Qt/" rel="tag">Qt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Raspberry-pi/" rel="tag">Raspberry pi</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redis/" rel="tag">Redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Ruby/" rel="tag">Ruby</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scrapy/" rel="tag">Scrapy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TQ2440/" rel="tag">TQ2440</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/USB/" rel="tag">USB</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/VirtualBox/" rel="tag">VirtualBox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web%E5%BC%80%E5%8F%91/" rel="tag">Web开发</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WordPress/" rel="tag">WordPress</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Xcode/" rel="tag">Xcode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/access/" rel="tag">access</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/adobe/" rel="tag">adobe</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ajax/" rel="tag">ajax</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/" rel="tag">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apache/" rel="tag">apache</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asp/" rel="tag">asp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css/" rel="tag">css</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/" rel="tag">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/evm/" rel="tag">evm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/firefox/" rel="tag">firefox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ftp/" rel="tag">ftp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gcc/" rel="tag">gcc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/" rel="tag">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/grub/" rel="tag">grub</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gtk/" rel="tag">gtk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gulp/" rel="tag">gulp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ibus/" rel="tag">ibus</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/" rel="tag">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s/" rel="tag">k8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mongodb/" rel="tag">mongodb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/" rel="tag">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/" rel="tag">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/" rel="tag">node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/" rel="tag">php</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pygame/" rel="tag">pygame</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/" rel="tag">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/" rel="tag">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/" rel="tag">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ruby/" rel="tag">ruby</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/" rel="tag">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/typescript/" rel="tag">typescript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/" rel="tag">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/" rel="tag">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vmware/" rel="tag">vmware</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/w3m/" rel="tag">w3m</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web3/" rel="tag">web3</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/windows/" rel="tag">windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xml/" rel="tag">xml</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%85%8D%E8%B4%B9/" rel="tag">免费</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%86%85%E6%A0%B8/" rel="tag">内核</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95/" rel="tag">匹配算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8D%95%E7%89%87%E6%9C%BA/" rel="tag">单片机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/" rel="tag">嵌入式</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%BC%80%E6%BA%90%E8%BD%AF%E4%BB%B6/" rel="tag">开源软件</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/" rel="tag">排序算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%96%87%E4%BB%B6%E7%A9%BA%E9%97%B4/" rel="tag">文件空间</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%97%A0%E7%BA%BF%E7%BD%91/" rel="tag">无线网</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A0%91%E8%8E%93%E6%B4%BE/" rel="tag">树莓派</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%AD%A3%E5%88%99%E5%BC%8F/" rel="tag">正则式</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B3%A8%E5%86%8C%E6%9C%BA/" rel="tag">注册机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B8%B8%E6%88%8F/" rel="tag">游戏</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%94%B5%E8%84%91%E6%8A%80%E5%B7%A7/" rel="tag">电脑技巧</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%A9%BA%E9%97%B4/" rel="tag">空间</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BA%A2%E6%97%97/" rel="tag">红旗</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BB%8F%E5%85%B8%E8%AF%AD%E5%BD%95/" rel="tag">经典语录</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E6%97%A5%E5%BF%97/" rel="tag">网络日志</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BF%BB%E8%AF%91/" rel="tag">翻译</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B/" rel="tag">视频教程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%B5%84%E6%BA%90%E5%88%86%E4%BA%AB/" rel="tag">资源分享</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%BD%AC%E8%BD%BD/" rel="tag">转载</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%9A%8F%E7%AC%94/" rel="tag">随笔</a></li></ul>
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ARM/" rel="tag">ARM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/" rel="tag">Android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Arch/" rel="tag">Arch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/" rel="tag">C</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Django/" rel="tag">Django</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker/" rel="tag">Docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Dreamweaver/" rel="tag">Dreamweaver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Fedora/" rel="tag">Fedora</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flash/" rel="tag">Flash</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GObject/" rel="tag">GObject</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Gentoo/" rel="tag">Gentoo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hash/" rel="tag">Hash</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/" rel="tag">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mac/" rel="tag">Mac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PS/" rel="tag">PS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Qt/" rel="tag">Qt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Raspberry-pi/" rel="tag">Raspberry pi</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redis/" rel="tag">Redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Ruby/" rel="tag">Ruby</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scrapy/" rel="tag">Scrapy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TQ2440/" rel="tag">TQ2440</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/USB/" rel="tag">USB</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/VirtualBox/" rel="tag">VirtualBox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web%E5%BC%80%E5%8F%91/" rel="tag">Web开发</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WordPress/" rel="tag">WordPress</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Xcode/" rel="tag">Xcode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/access/" rel="tag">access</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/adobe/" rel="tag">adobe</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ajax/" rel="tag">ajax</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/" rel="tag">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apache/" rel="tag">apache</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/asp/" rel="tag">asp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css/" rel="tag">css</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/" rel="tag">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/evm/" rel="tag">evm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/firefox/" rel="tag">firefox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ftp/" rel="tag">ftp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gcc/" rel="tag">gcc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/" rel="tag">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/grub/" rel="tag">grub</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gtk/" rel="tag">gtk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gulp/" rel="tag">gulp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ibus/" rel="tag">ibus</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/" rel="tag">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s/" rel="tag">k8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mongodb/" rel="tag">mongodb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/" rel="tag">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/" rel="tag">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/" rel="tag">node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/" rel="tag">php</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pygame/" rel="tag">pygame</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/" rel="tag">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/" rel="tag">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/" rel="tag">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ruby/" rel="tag">ruby</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/" rel="tag">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/solana/" rel="tag">solana</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/typescript/" rel="tag">typescript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ubuntu/" rel="tag">ubuntu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/" rel="tag">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vmware/" rel="tag">vmware</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/w3m/" rel="tag">w3m</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web3/" rel="tag">web3</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/windows/" rel="tag">windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xml/" rel="tag">xml</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%85%8D%E8%B4%B9/" rel="tag">免费</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%86%85%E6%A0%B8/" rel="tag">内核</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95/" rel="tag">匹配算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8D%95%E7%89%87%E6%9C%BA/" rel="tag">单片机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/" rel="tag">嵌入式</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%BC%80%E6%BA%90%E8%BD%AF%E4%BB%B6/" rel="tag">开源软件</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/" rel="tag">排序算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%96%87%E4%BB%B6%E7%A9%BA%E9%97%B4/" rel="tag">文件空间</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%97%A0%E7%BA%BF%E7%BD%91/" rel="tag">无线网</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A0%91%E8%8E%93%E6%B4%BE/" rel="tag">树莓派</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%AD%A3%E5%88%99%E5%BC%8F/" rel="tag">正则式</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B3%A8%E5%86%8C%E6%9C%BA/" rel="tag">注册机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B8%B8%E6%88%8F/" rel="tag">游戏</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%94%B5%E8%84%91%E6%8A%80%E5%B7%A7/" rel="tag">电脑技巧</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%A9%BA%E9%97%B4/" rel="tag">空间</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BA%A2%E6%97%97/" rel="tag">红旗</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BB%8F%E5%85%B8%E8%AF%AD%E5%BD%95/" rel="tag">经典语录</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E6%97%A5%E5%BF%97/" rel="tag">网络日志</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BF%BB%E8%AF%91/" rel="tag">翻译</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B/" rel="tag">视频教程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%B5%84%E6%BA%90%E5%88%86%E4%BA%AB/" rel="tag">资源分享</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%BD%AC%E8%BD%BD/" rel="tag">转载</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%9A%8F%E7%AC%94/" rel="tag">随笔</a></li></ul>
     </div>
   </div>
 
@@ -606,7 +697,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/ARM/" style="font-size: 13.68px;">ARM</a> <a href="/tags/Android/" style="font-size: 10.53px;">Android</a> <a href="/tags/Arch/" style="font-size: 13.16px;">Arch</a> <a href="/tags/C/" style="font-size: 15.79px;">C</a> <a href="/tags/Django/" style="font-size: 11.05px;">Django</a> <a href="/tags/Docker/" style="font-size: 11.05px;">Docker</a> <a href="/tags/Dreamweaver/" style="font-size: 10px;">Dreamweaver</a> <a href="/tags/Fedora/" style="font-size: 10.53px;">Fedora</a> <a href="/tags/Flash/" style="font-size: 10px;">Flash</a> <a href="/tags/GObject/" style="font-size: 12.63px;">GObject</a> <a href="/tags/Gentoo/" style="font-size: 10.53px;">Gentoo</a> <a href="/tags/Hash/" style="font-size: 10px;">Hash</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Mac/" style="font-size: 10.53px;">Mac</a> <a href="/tags/PS/" style="font-size: 12.63px;">PS</a> <a href="/tags/Qt/" style="font-size: 10.53px;">Qt</a> <a href="/tags/Raspberry-pi/" style="font-size: 10px;">Raspberry pi</a> <a href="/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/tags/Ruby/" style="font-size: 18.95px;">Ruby</a> <a href="/tags/Scrapy/" style="font-size: 11.05px;">Scrapy</a> <a href="/tags/TQ2440/" style="font-size: 12.11px;">TQ2440</a> <a href="/tags/USB/" style="font-size: 11.05px;">USB</a> <a href="/tags/VirtualBox/" style="font-size: 11.05px;">VirtualBox</a> <a href="/tags/Web%E5%BC%80%E5%8F%91/" style="font-size: 16.84px;">Web开发</a> <a href="/tags/WordPress/" style="font-size: 10px;">WordPress</a> <a href="/tags/Xcode/" style="font-size: 10px;">Xcode</a> <a href="/tags/access/" style="font-size: 12.63px;">access</a> <a href="/tags/adobe/" style="font-size: 10px;">adobe</a> <a href="/tags/ajax/" style="font-size: 11.05px;">ajax</a> <a href="/tags/angular/" style="font-size: 13.16px;">angular</a> <a href="/tags/apache/" style="font-size: 10px;">apache</a> <a href="/tags/asp/" style="font-size: 13.16px;">asp</a> <a href="/tags/css/" style="font-size: 10.53px;">css</a> <a href="/tags/docker/" style="font-size: 10px;">docker</a> <a href="/tags/evm/" style="font-size: 10px;">evm</a> <a href="/tags/firefox/" style="font-size: 11.05px;">firefox</a> <a href="/tags/ftp/" style="font-size: 10px;">ftp</a> <a href="/tags/gcc/" style="font-size: 12.63px;">gcc</a> <a href="/tags/git/" style="font-size: 13.68px;">git</a> <a href="/tags/grub/" style="font-size: 10px;">grub</a> <a href="/tags/gtk/" style="font-size: 17.89px;">gtk</a> <a href="/tags/gulp/" style="font-size: 10px;">gulp</a> <a href="/tags/ibus/" style="font-size: 10px;">ibus</a> <a href="/tags/js/" style="font-size: 16.32px;">js</a> <a href="/tags/k8s/" style="font-size: 10.53px;">k8s</a> <a href="/tags/mongodb/" style="font-size: 15.26px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 11.58px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/node/" style="font-size: 10.53px;">node</a> <a href="/tags/php/" style="font-size: 14.74px;">php</a> <a href="/tags/pygame/" style="font-size: 15.26px;">pygame</a> <a href="/tags/python/" style="font-size: 19.47px;">python</a> <a href="/tags/react/" style="font-size: 12.63px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/ruby/" style="font-size: 10px;">ruby</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/typescript/" style="font-size: 10px;">typescript</a> <a href="/tags/ubuntu/" style="font-size: 13.16px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 18.42px;">vim</a> <a href="/tags/vmware/" style="font-size: 10px;">vmware</a> <a href="/tags/w3m/" style="font-size: 10px;">w3m</a> <a href="/tags/web3/" style="font-size: 10px;">web3</a> <a href="/tags/windows/" style="font-size: 13.16px;">windows</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/%E5%85%8D%E8%B4%B9/" style="font-size: 10px;">免费</a> <a href="/tags/%E5%86%85%E6%A0%B8/" style="font-size: 10px;">内核</a> <a href="/tags/%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95/" style="font-size: 12.63px;">匹配算法</a> <a href="/tags/%E5%8D%95%E7%89%87%E6%9C%BA/" style="font-size: 10.53px;">单片机</a> <a href="/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/" style="font-size: 10px;">嵌入式</a> <a href="/tags/%E5%BC%80%E6%BA%90%E8%BD%AF%E4%BB%B6/" style="font-size: 14.21px;">开源软件</a> <a href="/tags/%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/" style="font-size: 14.21px;">排序算法</a> <a href="/tags/%E6%96%87%E4%BB%B6%E7%A9%BA%E9%97%B4/" style="font-size: 10px;">文件空间</a> <a href="/tags/%E6%97%A0%E7%BA%BF%E7%BD%91/" style="font-size: 10px;">无线网</a> <a href="/tags/%E6%A0%91%E8%8E%93%E6%B4%BE/" style="font-size: 10px;">树莓派</a> <a href="/tags/%E6%AD%A3%E5%88%99%E5%BC%8F/" style="font-size: 10px;">正则式</a> <a href="/tags/%E6%B3%A8%E5%86%8C%E6%9C%BA/" style="font-size: 10.53px;">注册机</a> <a href="/tags/%E6%B8%B8%E6%88%8F/" style="font-size: 14.74px;">游戏</a> <a href="/tags/%E7%94%B5%E8%84%91%E6%8A%80%E5%B7%A7/" style="font-size: 14.21px;">电脑技巧</a> <a href="/tags/%E7%A9%BA%E9%97%B4/" style="font-size: 10px;">空间</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 17.37px;">算法</a> <a href="/tags/%E7%BA%A2%E6%97%97/" style="font-size: 10px;">红旗</a> <a href="/tags/%E7%BB%8F%E5%85%B8%E8%AF%AD%E5%BD%95/" style="font-size: 10px;">经典语录</a> <a href="/tags/%E7%BD%91%E7%BB%9C%E6%97%A5%E5%BF%97/" style="font-size: 13.16px;">网络日志</a> <a href="/tags/%E7%BF%BB%E8%AF%91/" style="font-size: 18.42px;">翻译</a> <a href="/tags/%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B/" style="font-size: 14.74px;">视频教程</a> <a href="/tags/%E8%B5%84%E6%BA%90%E5%88%86%E4%BA%AB/" style="font-size: 15.26px;">资源分享</a> <a href="/tags/%E8%BD%AC%E8%BD%BD/" style="font-size: 10.53px;">转载</a> <a href="/tags/%E9%9A%8F%E7%AC%94/" style="font-size: 10px;">随笔</a>
+      <a href="/tags/ARM/" style="font-size: 13.68px;">ARM</a> <a href="/tags/Android/" style="font-size: 10.53px;">Android</a> <a href="/tags/Arch/" style="font-size: 13.16px;">Arch</a> <a href="/tags/C/" style="font-size: 15.79px;">C</a> <a href="/tags/Django/" style="font-size: 11.05px;">Django</a> <a href="/tags/Docker/" style="font-size: 11.05px;">Docker</a> <a href="/tags/Dreamweaver/" style="font-size: 10px;">Dreamweaver</a> <a href="/tags/Fedora/" style="font-size: 10.53px;">Fedora</a> <a href="/tags/Flash/" style="font-size: 10px;">Flash</a> <a href="/tags/GObject/" style="font-size: 12.63px;">GObject</a> <a href="/tags/Gentoo/" style="font-size: 10.53px;">Gentoo</a> <a href="/tags/Hash/" style="font-size: 10px;">Hash</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Mac/" style="font-size: 10.53px;">Mac</a> <a href="/tags/PS/" style="font-size: 12.63px;">PS</a> <a href="/tags/Qt/" style="font-size: 10.53px;">Qt</a> <a href="/tags/Raspberry-pi/" style="font-size: 10px;">Raspberry pi</a> <a href="/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/tags/Ruby/" style="font-size: 18.95px;">Ruby</a> <a href="/tags/Scrapy/" style="font-size: 11.05px;">Scrapy</a> <a href="/tags/TQ2440/" style="font-size: 12.11px;">TQ2440</a> <a href="/tags/USB/" style="font-size: 11.05px;">USB</a> <a href="/tags/VirtualBox/" style="font-size: 11.05px;">VirtualBox</a> <a href="/tags/Web%E5%BC%80%E5%8F%91/" style="font-size: 16.84px;">Web开发</a> <a href="/tags/WordPress/" style="font-size: 10px;">WordPress</a> <a href="/tags/Xcode/" style="font-size: 10px;">Xcode</a> <a href="/tags/access/" style="font-size: 12.63px;">access</a> <a href="/tags/adobe/" style="font-size: 10px;">adobe</a> <a href="/tags/ajax/" style="font-size: 11.05px;">ajax</a> <a href="/tags/angular/" style="font-size: 13.16px;">angular</a> <a href="/tags/apache/" style="font-size: 10px;">apache</a> <a href="/tags/asp/" style="font-size: 13.16px;">asp</a> <a href="/tags/css/" style="font-size: 10.53px;">css</a> <a href="/tags/docker/" style="font-size: 10px;">docker</a> <a href="/tags/evm/" style="font-size: 10px;">evm</a> <a href="/tags/firefox/" style="font-size: 11.05px;">firefox</a> <a href="/tags/ftp/" style="font-size: 10px;">ftp</a> <a href="/tags/gcc/" style="font-size: 12.63px;">gcc</a> <a href="/tags/git/" style="font-size: 13.68px;">git</a> <a href="/tags/grub/" style="font-size: 10px;">grub</a> <a href="/tags/gtk/" style="font-size: 17.89px;">gtk</a> <a href="/tags/gulp/" style="font-size: 10px;">gulp</a> <a href="/tags/ibus/" style="font-size: 10px;">ibus</a> <a href="/tags/js/" style="font-size: 16.32px;">js</a> <a href="/tags/k8s/" style="font-size: 10.53px;">k8s</a> <a href="/tags/mongodb/" style="font-size: 15.26px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 11.58px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/node/" style="font-size: 10.53px;">node</a> <a href="/tags/php/" style="font-size: 14.74px;">php</a> <a href="/tags/pygame/" style="font-size: 15.26px;">pygame</a> <a href="/tags/python/" style="font-size: 19.47px;">python</a> <a href="/tags/react/" style="font-size: 12.63px;">react</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/ruby/" style="font-size: 10px;">ruby</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/solana/" style="font-size: 10px;">solana</a> <a href="/tags/typescript/" style="font-size: 10px;">typescript</a> <a href="/tags/ubuntu/" style="font-size: 13.16px;">ubuntu</a> <a href="/tags/vim/" style="font-size: 18.42px;">vim</a> <a href="/tags/vmware/" style="font-size: 10px;">vmware</a> <a href="/tags/w3m/" style="font-size: 10px;">w3m</a> <a href="/tags/web3/" style="font-size: 10.53px;">web3</a> <a href="/tags/windows/" style="font-size: 13.16px;">windows</a> <a href="/tags/xml/" style="font-size: 10px;">xml</a> <a href="/tags/%E5%85%8D%E8%B4%B9/" style="font-size: 10px;">免费</a> <a href="/tags/%E5%86%85%E6%A0%B8/" style="font-size: 10px;">内核</a> <a href="/tags/%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95/" style="font-size: 12.63px;">匹配算法</a> <a href="/tags/%E5%8D%95%E7%89%87%E6%9C%BA/" style="font-size: 10.53px;">单片机</a> <a href="/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/" style="font-size: 10px;">嵌入式</a> <a href="/tags/%E5%BC%80%E6%BA%90%E8%BD%AF%E4%BB%B6/" style="font-size: 14.21px;">开源软件</a> <a href="/tags/%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/" style="font-size: 14.21px;">排序算法</a> <a href="/tags/%E6%96%87%E4%BB%B6%E7%A9%BA%E9%97%B4/" style="font-size: 10px;">文件空间</a> <a href="/tags/%E6%97%A0%E7%BA%BF%E7%BD%91/" style="font-size: 10px;">无线网</a> <a href="/tags/%E6%A0%91%E8%8E%93%E6%B4%BE/" style="font-size: 10px;">树莓派</a> <a href="/tags/%E6%AD%A3%E5%88%99%E5%BC%8F/" style="font-size: 10px;">正则式</a> <a href="/tags/%E6%B3%A8%E5%86%8C%E6%9C%BA/" style="font-size: 10.53px;">注册机</a> <a href="/tags/%E6%B8%B8%E6%88%8F/" style="font-size: 14.74px;">游戏</a> <a href="/tags/%E7%94%B5%E8%84%91%E6%8A%80%E5%B7%A7/" style="font-size: 14.21px;">电脑技巧</a> <a href="/tags/%E7%A9%BA%E9%97%B4/" style="font-size: 10px;">空间</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 17.37px;">算法</a> <a href="/tags/%E7%BA%A2%E6%97%97/" style="font-size: 10px;">红旗</a> <a href="/tags/%E7%BB%8F%E5%85%B8%E8%AF%AD%E5%BD%95/" style="font-size: 10px;">经典语录</a> <a href="/tags/%E7%BD%91%E7%BB%9C%E6%97%A5%E5%BF%97/" style="font-size: 13.16px;">网络日志</a> <a href="/tags/%E7%BF%BB%E8%AF%91/" style="font-size: 18.42px;">翻译</a> <a href="/tags/%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B/" style="font-size: 14.74px;">视频教程</a> <a href="/tags/%E8%B5%84%E6%BA%90%E5%88%86%E4%BA%AB/" style="font-size: 15.26px;">资源分享</a> <a href="/tags/%E8%BD%AC%E8%BD%BD/" style="font-size: 10.53px;">转载</a> <a href="/tags/%E9%9A%8F%E7%AC%94/" style="font-size: 10px;">随笔</a>
     </div>
   </div>
 
@@ -628,6 +719,10 @@
       <ul>
         
           <li>
+            <a href="/archives/84186.html">Solana Rust 开发环境搭建</a>
+          </li>
+        
+          <li>
             <a href="/archives/84185.html">Arbitrum Stylus 开发环境搭建</a>
           </li>
         
@@ -643,10 +738,6 @@
             <a href="/archives/84182.html">Gitlab Runner 配置</a>
           </li>
         
-          <li>
-            <a href="/archives/84181.html">Github Runner 配置</a>
-          </li>
-        
       </ul>
     </div>
   </div>
@@ -659,9 +750,6 @@
         <li><a target="_blank" title="我的Github" href="https://github.com/wusuopu">@Github</a></li>
         <li><a target="_blank" title="我的微博" href="http://www.weibo.com/u/1768691343">@Weibo</a></li>
         <li><a target="_blank" title="我的Twitter" href="https://twitter.com/longchangjin">@Twitter</a></li>
-        <li><a target="_blank" title="我的豆瓣" href="http://www.douban.com/people/lchj/">@Douban</a></li>
-
-        <li><a target="_blank" title="" href="http://gtk.awaysoft.com/">GTK+ 中文社区</a></li>
       </ul>
     </div>
 </div>
