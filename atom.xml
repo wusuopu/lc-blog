@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.xefan.com/"/>
-  <updated>2023-10-15T01:17:30.306Z</updated>
+  <updated>2026-02-04T01:56:58.984Z</updated>
   <id>http://www.xefan.com/</id>
   
   <author>
@@ -16,11 +16,56 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>Arbitrum Stylus 开发环境搭建</title>
+    <link href="http://www.xefan.com//archives/84185.html"/>
+    <id>http://www.xefan.com//archives/84185.html</id>
+    <published>2026-01-14T09:44:17.000Z</published>
+    <updated>2026-02-04T01:56:58.984Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="rust"><a href="#rust" class="headerlink" title="rust"></a>rust</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl --proto <span class="string">&#x27;=https&#x27;</span> --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y</span><br></pre></td></tr></table></figure>
+<p>我是用的 <a href="https://github.com/jdx/mise">mise</a> 工具来安装的<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mise install rust@1.92.0</span><br></pre></td></tr></table></figure></p>
+<h3 id="Stylus-CLI"><a href="#Stylus-CLI" class="headerlink" title="Stylus CLI"></a>Stylus CLI</h3><p>Arbitrum 的开发框架<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cargo install cargo-stylus</span><br></pre></td></tr></table></figure></p>
+<p>因为 Arbitrum 的合约程序最终会被编译为 webassembly，所以还需要安装 wasm 相关的编译工具</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rustup target add wasm32-unknown-unknown</span><br></pre></td></tr></table></figure>
+<h3 id="foundry"><a href="#foundry" class="headerlink" title="foundry"></a>foundry</h3><p>foundry 是一个 EVM 智能合约开发测试的工具。<br>下载 foundry 相关的命令行工具： <a href="https://github.com/foundry-rs/foundry/releases">https://github.com/foundry-rs/foundry/releases</a></p>
+<h3 id="solc"><a href="#solc" class="headerlink" title="solc"></a>solc</h3><p>下载 solc 的二进制文件： <a href="https://github.com/argotorg/solidity/releases">https://github.com/argotorg/solidity/releases</a></p>
+<h3 id="本地开发结点"><a href="#本地开发结点" class="headerlink" title="本地开发结点"></a>本地开发结点</h3><p>需要先安装 docker 环境<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/OffchainLabs/nitro-devnode.git</span><br><span class="line"><span class="built_in">cd</span> nitro-devnode</span><br><span class="line">./run-dev-node.sh</span><br></pre></td></tr></table></figure></p>
+<p>本地结点的账号、密钥：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Address: 0x3f1Eae7D46d88F08fc2F8ed27FCb2AB183EB2d0E</span><br><span class="line">Private key: 0xb6b15c8cb491557369f3c7d2c287b053eb229daa9c22138887752191c9520659</span><br></pre></td></tr></table></figure></p>
+<p>如果想要外部也能够连接本地的结点，那么需要修改一个 <code>run-dev-node.sh</code> 这个脚本，在 <code>docker run</code> 这条命令后面再加上 <code>--http.vhosts=*</code> 参数。</p>
+<h2 id="开发流程"><a href="#开发流程" class="headerlink" title="开发流程"></a>开发流程</h2><h3 id="创建项目"><a href="#创建项目" class="headerlink" title="创建项目"></a>创建项目</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cargo stylus new &lt;name&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cargo stylus build</span><br></pre></td></tr></table></figure>
+<p>编译成功会生成 target/wasm32-unknown-unknown/release/xxx.wasm 文件</p>
+<h3 id="部署"><a href="#部署" class="headerlink" title="部署"></a>部署</h3><p>验证是否能够部署<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cargo stylus check -e http://127.0.0.1:8547</span><br></pre></td></tr></table></figure></p>
+<p>仅计算部署所需的 gas 费<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cargo stylus deploy \</span><br><span class="line">  --endpoint=http://127.0.0.1:8547 \</span><br><span class="line">  --private-key=&lt;YOUR_PRIVATE_KEY&gt; \</span><br><span class="line">  --estimate-gas-only</span><br></pre></td></tr></table></figure></p>
+<p>部署合约<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cargo stylus deploy \</span><br><span class="line">  --endpoint=http://127.0.0.1:8547 \</span><br><span class="line">  --private-key=&lt;YOUR_PRIVATE_KEY&gt;</span><br></pre></td></tr></table></figure></p>
+<p>导出合约 contract ABI，需要先安装 solc<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cargo stylus export-abi --output=./abi.json --json</span><br></pre></td></tr></table></figure></p>
+<h3 id="合约测试"><a href="#合约测试" class="headerlink" title="合约测试"></a>合约测试</h3><p>调用合约程序查询数据：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cast call --rpc-url http://127.0.0.1:8547  &lt;合约地址&gt; <span class="string">&quot;合约函数签名&quot;</span> [&lt;函数参数&gt;]</span><br></pre></td></tr></table></figure>
+<p>例如，对于一个 ERC20 的程序，查询账户余额：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cast call --rpc-url <span class="variable">$ARB_RPC_URL</span> <span class="variable">$CONTRACT_TOKEN</span> <span class="string">&quot;balanceOf(address)(uint256)&quot;</span> <span class="variable">$PUBLIC_KEY</span></span><br></pre></td></tr></table></figure></p>
+<p>调用合约创建交易：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cast send --rpc-url http://127.0.0.1:8547 --private-key &lt;自己的私钥&gt; &lt;合约地址&gt; <span class="string">&quot;合约函数签名&quot;</span> [&lt;函数参数&gt;]</span><br></pre></td></tr></table></figure>
+<p>例如，一个 ERC20 的转账操作：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cast send --rpc-url <span class="variable">$ARB_RPC_URL</span> --private-key <span class="variable">$PRIVATE_KEY</span> <span class="variable">$CONTRACT_TOKEN</span> <span class="string">&quot;transfer(address, uint256)&quot;</span> <span class="variable">$TARGET_ADDRESS</span> <span class="variable">$AMOUNT</span></span><br></pre></td></tr></table></figure></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;rust&quot;&gt;&lt;a href=&quot;#rust&quot; class=&quot;headerlink&quot; title=&quot;rust&quot;&gt;&lt;/a&gt;rust&lt;/h3&gt;&lt;figure class=&quot;highlight bash&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre
+    
+    </summary>
+    
+    
+      <category term="web3" scheme="http://www.xefan.com/tags/web3/"/>
+    
+      <category term="evm" scheme="http://www.xefan.com/tags/evm/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Bitbucket Runner 配置</title>
-    <link href="http://www.xefan.com//archives/.html"/>
-    <id>http://www.xefan.com//archives/.html</id>
+    <link href="http://www.xefan.com//archives/84184.html"/>
+    <id>http://www.xefan.com//archives/84184.html</id>
     <published>2023-10-14T20:45:42.000Z</published>
-    <updated>2023-10-15T01:17:30.306Z</updated>
+    <updated>2025-10-22T05:34:37.737Z</updated>
     
     <content type="html"><![CDATA[<p>以前有介绍过 Github Runner 和 Gitlab Runner 的配置，现在再来介绍一下 Bitbucket Runner 的配置。</p>
 <p>参考官方文档： <a href="https://support.atlassian.com/bitbucket-cloud/docs/runners/">https://support.atlassian.com/bitbucket-cloud/docs/runners/</a></p>
@@ -49,8 +94,8 @@
     <title>记录在docker中运行whenever遇到的问题</title>
     <link href="http://www.xefan.com//archives/84183.html"/>
     <id>http://www.xefan.com//archives/84183.html</id>
-    <published>2021-09-09T02:12:48.610Z</published>
-    <updated>2023-10-15T01:17:30.306Z</updated>
+    <published>2021-09-09T10:12:48.610Z</published>
+    <updated>2025-10-22T05:34:37.737Z</updated>
     
     <content type="html"><![CDATA[<p>最近在将一个 rails 的项目移到 docker 方式来部署。这个项目有用到了 whenever 来执行定时任务，这里记录一下在迁移过程中遇到的一些问题。</p>
 <p>因为 whenever 是使用系统的 cron 来实现的定时任务，所以直接就在 docker image 内安装一个 cron 即可： <code>apt-get install -y cron</code> 。<br>然后尝试执行命令： <code>whenever -i; crontab -l</code> 看看定时任务都有设置正确。最后在容器启动的时候使用命令 <code>service cron start</code> 一并将 cron 也启动。</p>
@@ -85,8 +130,8 @@
     <title>Gitlab Runner 配置</title>
     <link href="http://www.xefan.com//archives/84182.html"/>
     <id>http://www.xefan.com//archives/84182.html</id>
-    <published>2021-04-13T10:13:48.096Z</published>
-    <updated>2023-10-15T01:17:30.306Z</updated>
+    <published>2021-04-13T18:13:48.096Z</published>
+    <updated>2025-10-22T05:34:37.737Z</updated>
     
     <content type="html"><![CDATA[<p>前一篇文章有介绍了 Github Runner 的配置，现在再来介绍一下 Gitlab Runner 的配置。</p>
 <p>关于添加自己的机器，可参考 Gitlab 官方文档: <a href="https://docs.gitlab.com/runner/register/index.html">https://docs.gitlab.com/runner/register/index.html</a></p>
@@ -118,8 +163,8 @@
     <title>Github Runner 配置</title>
     <link href="http://www.xefan.com//archives/84181.html"/>
     <id>http://www.xefan.com//archives/84181.html</id>
-    <published>2020-11-23T01:00:58.877Z</published>
-    <updated>2023-10-15T01:17:30.306Z</updated>
+    <published>2020-11-23T09:00:58.877Z</published>
+    <updated>2025-10-22T05:34:37.737Z</updated>
     
     <content type="html"><![CDATA[<p>在之前的文章<a href="/archives/84178.html">《Github Actions使用》</a>有介绍了Github Actions的使用方法。<br>之前是直接的 Github 官方提供的 runner，来执行。不过官方提供的 runner 多少还是有些限制。<br>这次我们来尝试将自己的 server 配置成 runner 来执行 actions。</p>
 <p>关于添加自己的机器，可参考 Github 官方文档： <a href="https://docs.github.com/en/free-pro-team@latest/actions/hosting-your-own-runners/adding-self-hosted-runners">https://docs.github.com/en/free-pro-team@latest/actions/hosting-your-own-runners/adding-self-hosted-runners</a></p>
@@ -128,7 +173,7 @@
 <p>参考官方文档，首先进入到 organization 的 actions 设置页面，然后选择添加一个 runner。没有 organization 的可以自己创建一个。<br>接着在自己的 server 上执行命令：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">docker run -d \</span><br><span class="line">    -v /var/run/docker.sock:/var/run/docker.sock \</span><br><span class="line">    -e GH_REPOSITORY=xxxxxxxxxxxx \</span><br><span class="line">    -e GH_RUNNER_TOKEN=xxxxxxxxxxxxx \</span><br><span class="line">    -e GH_RUNNER_LABELS=label1,label2 \</span><br><span class="line">    wusuopu/github-actions-runner:2.273.6</span><br></pre></td></tr></table></figure>
 <p>其中 GH_REPOSITORY 就是设置页面上显示的 url 参数，GH_RUNNER_TOKEN 就是 token 参数。GH_RUNNER_LABELS 则根据自己的需要来为该 runner 设置标签。</p>
-<p>至此，自己的 runner 就已经配置好了。不过这里我们是直接在这个 runerr 的 container 中操作 server 上的 docker 服务。这样其实是非常危险的，尤其是对于公有仓库来说。</p>
+<p>至此，自己的 runner 就已经配置好了。不过这里我们是直接在这个 runner 的 container 中操作 server 上的 docker 服务。这样其实是非常危险的，尤其是对于公有仓库来说。</p>
 <p>为了安全起见，我们可以再运行一个 Docker-in-Docker 的服务，然后这个就只需要连接到该服务即可。<br>创建一个 docker-compose.yml 文件：</p>
 <figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">&quot;2&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="attr">dind:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">docker:19.03-dind</span></span><br><span class="line">    <span class="attr">privileged:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./tmp/docker-lib:/var/lib/docker</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./tmp/docker-run:/var/run</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">github-runner:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">wusuopu/github-actions-runner:2.273.6</span></span><br><span class="line">    <span class="attr">depends_on:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">dind</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">GH_REPOSITORY=https://github.com/xxxx</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">GH_RUNNER_TOKEN=xxxxxxxxxxxxx</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">GH_RUNNER_LABELS=dind</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./tmp/docker-run:/var/run</span></span><br></pre></td></tr></table></figure>
 <p>然后执行命令 <code>docker-compose up -d</code> 启动服务即可。<br>如果之后 actions 任务太多处理不过来，可以将 runner 扩容，多增加几个 runner 实例： <code>docker-compose scale github-runner=3</code></p>
@@ -152,8 +197,8 @@
     <title>使用python编写帝国时代2修改器</title>
     <link href="http://www.xefan.com//archives/84180.html"/>
     <id>http://www.xefan.com//archives/84180.html</id>
-    <published>2020-05-14T02:12:42.474Z</published>
-    <updated>2023-10-15T01:17:30.306Z</updated>
+    <published>2020-05-14T10:12:42.474Z</published>
+    <updated>2025-10-22T05:34:37.737Z</updated>
     
     <content type="html"><![CDATA[<p>之前的文章有介绍了<a href="/archives/84171.html">《使用python编写游戏修改器》</a>。<br>最近怀旧一下，在玩《帝国时代2》，然后就尝试着再写一个修改器试试。</p>
 <h2 id="查找内存地址"><a href="#查找内存地址" class="headerlink" title="查找内存地址"></a>查找内存地址</h2><p>首先用 Cheat Engine 来修改资源，以及查找资源的内存地址。注意这里的数据都要使用浮点数类型。<br>如图找到的食物内存地址是 0F2B93B0<br><img src="/wp-content/uploads/2020/05/age2_ce01.jpg" alt="age2_ce01"></p>
@@ -185,8 +230,8 @@
     <title>使用Vagrant和Docker搭建Kubernetes集群</title>
     <link href="http://www.xefan.com//archives/84179.html"/>
     <id>http://www.xefan.com//archives/84179.html</id>
-    <published>2020-04-03T04:28:20.946Z</published>
-    <updated>2023-10-15T01:17:30.306Z</updated>
+    <published>2020-04-03T12:28:20.946Z</published>
+    <updated>2025-10-22T05:34:37.737Z</updated>
     
     <content type="html"><![CDATA[<p>在之前的文章<a href="/archives/84177.html">《使用Vagrant在Ubuntu系统上搭建Kubernetes集群》</a>介绍了使用 Vagrant 在 VirtualBox 中安装 Ubuntu 系统搭建 Kubernetes 集群。<br>因为 Vagrant 是支持 Docker 的，所以这篇文章就来尝试不再使用 VirtualBox 了，而是直接使用 Docker 来搭建 Kubernetes 集群。</p>
 <h2 id="安装依赖"><a href="#安装依赖" class="headerlink" title="安装依赖"></a>安装依赖</h2><p>需要先安装以下程序：</p>
@@ -221,8 +266,8 @@
     <title>Github Actions使用</title>
     <link href="http://www.xefan.com//archives/84178.html"/>
     <id>http://www.xefan.com//archives/84178.html</id>
-    <published>2020-02-03T06:35:36.443Z</published>
-    <updated>2023-10-15T01:17:30.306Z</updated>
+    <published>2020-02-03T14:35:36.443Z</published>
+    <updated>2025-10-22T05:34:37.737Z</updated>
     
     <content type="html"><![CDATA[<p>最近在看 Github Actions，相对一 Gitlab CI 来说，它的配置就没有那么直观了。</p>
 <p>以下通过一个例子来说下 Github Actions 的用法。</p>
@@ -252,8 +297,8 @@
     <title>使用Vagrant在Ubuntu系统上搭建Kubernetes集群</title>
     <link href="http://www.xefan.com//archives/84177.html"/>
     <id>http://www.xefan.com//archives/84177.html</id>
-    <published>2019-11-30T07:37:50.127Z</published>
-    <updated>2023-10-15T01:17:30.306Z</updated>
+    <published>2019-11-30T15:37:50.127Z</published>
+    <updated>2025-10-22T05:34:37.736Z</updated>
     
     <content type="html"><![CDATA[<h2 id="安装依赖"><a href="#安装依赖" class="headerlink" title="安装依赖"></a>安装依赖</h2><h3 id="Vagrant"><a href="#Vagrant" class="headerlink" title="Vagrant"></a>Vagrant</h3><p>目前 Vagrant (<a href="https://www.vagrantup.com/downloads.html">https://www.vagrantup.com/downloads.html</a>) 最新为 v2.2.6，Kubernetes 为 v1.16</p>
 <h3 id="Kubectl"><a href="#Kubectl" class="headerlink" title="Kubectl"></a>Kubectl</h3><p>下载最新版的 kubectl:</p>
@@ -308,8 +353,8 @@
     <title>使用TypeScript开发Express应用</title>
     <link href="http://www.xefan.com//archives/84176.html"/>
     <id>http://www.xefan.com//archives/84176.html</id>
-    <published>2019-11-04T03:01:06.658Z</published>
-    <updated>2023-10-15T01:17:30.306Z</updated>
+    <published>2019-11-04T11:01:06.658Z</published>
+    <updated>2025-10-22T05:34:37.736Z</updated>
     
     <content type="html"><![CDATA[<h2 id="首先创建新项目"><a href="#首先创建新项目" class="headerlink" title="首先创建新项目"></a>首先创建新项目</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yarn init</span><br></pre></td></tr></table></figure>
 <h2 id="然后安装-express"><a href="#然后安装-express" class="headerlink" title="然后安装 express"></a>然后安装 express</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">yarn add express</span><br><span class="line">yarn add @types/express @types/node --dev</span><br></pre></td></tr></table></figure>
@@ -349,8 +394,8 @@
     <title>记录神舟战神 Z7M-KP7GZ 安装黑苹果过程</title>
     <link href="http://www.xefan.com//archives/84175.html"/>
     <id>http://www.xefan.com//archives/84175.html</id>
-    <published>2019-05-28T00:40:43.583Z</published>
-    <updated>2023-10-15T01:17:30.306Z</updated>
+    <published>2019-05-28T08:40:43.583Z</published>
+    <updated>2025-10-22T05:34:37.736Z</updated>
     
     <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>现在这台 MacBook Air 差不多用了4年，因此打算换台新的电脑。目前需要一台有独显的电脑，一来是跑一些程序，二来是方便打游戏。<br>另外由于 macOS 已经用习惯了，不想再换其他系统。因此才考虑的安装黑苹果。通过两周的调研，别人给的经验是最好选择已经有人安装成功过的电脑型号，免得有问题自己折腾。<br>于是乎就选择了性价比比较高的神舟。最后安装完成之后，系统还有些小问题，不过基本也能用。对于要求比较高的建议还是白苹果吧。</p>
 <h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><ul>
@@ -402,8 +447,8 @@
     <title>react storybook使用typescript</title>
     <link href="http://www.xefan.com//archives/84174.html"/>
     <id>http://www.xefan.com//archives/84174.html</id>
-    <published>2019-03-14T02:27:36.262Z</published>
-    <updated>2023-10-15T01:17:30.306Z</updated>
+    <published>2019-03-14T10:27:36.262Z</published>
+    <updated>2025-10-22T05:34:37.736Z</updated>
     
     <content type="html"><![CDATA[<p>在前面的文章有介绍<a href="84172.html" target="_blank">在storybook中使用antd</a>。<br>之前开发js是使用的flow来作类型检查，最近想尝试一下typescript。<br>如果是从头创建一个空的typescript项目则相对就比较简单，但是现在我们是需要将之前的create-react-app项目迁移到typescript。</p>
 <h2 id="在create-react-app中添加typescript"><a href="#在create-react-app中添加typescript" class="headerlink" title="在create-react-app中添加typescript"></a>在create-react-app中添加typescript</h2><p>参考 <a href="https://facebook.github.io/create-react-app/docs/adding-typescript">https://facebook.github.io/create-react-app/docs/adding-typescript</a><br>react-scripts从2.1.0版本开始就支持typescript了，这里我们先将项目的react-scripts依赖升级到最新版本：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yarn add --exact react-scripts@2.1.8</span><br></pre></td></tr></table></figure></p>
@@ -437,8 +482,8 @@
     <title>在树莓派3上运行Android6</title>
     <link href="http://www.xefan.com//archives/84173.html"/>
     <id>http://www.xefan.com//archives/84173.html</id>
-    <published>2019-03-02T13:26:22.080Z</published>
-    <updated>2023-10-15T01:17:30.306Z</updated>
+    <published>2019-03-02T21:26:22.080Z</published>
+    <updated>2025-10-22T05:34:37.736Z</updated>
     
     <content type="html"><![CDATA[<p>最近需要在 android 上进行测试，无奈在电脑上使用模拟器运行速度太慢了。<br>正好我还有几个闲置的树莓派3设备，于是就尝试在树莓派上运行android看看。</p>
 <h2 id="刻录系统到SD卡"><a href="#刻录系统到SD卡" class="headerlink" title="刻录系统到SD卡"></a>刻录系统到SD卡</h2><p>1.先下载 android6 的树莓派镜像： <a href="https://pan.baidu.com/s/1YHrmjN3be7UaLAdBJr-YhQ">https://pan.baidu.com/s/1YHrmjN3be7UaLAdBJr-YhQ</a></p>
@@ -469,8 +514,8 @@
     <title>在storybook中使用antd</title>
     <link href="http://www.xefan.com//archives/84172.html"/>
     <id>http://www.xefan.com//archives/84172.html</id>
-    <published>2018-11-22T06:55:23.919Z</published>
-    <updated>2023-10-15T01:17:30.306Z</updated>
+    <published>2018-11-22T14:55:23.919Z</published>
+    <updated>2025-10-22T05:34:37.736Z</updated>
     
     <content type="html"><![CDATA[<p>最近一个 react 的项目有用到了 antd 这个 ui 库。这里作个笔记记录一下如何在 storybook 中显示 antd 的组件。</p>
 <p>项目是使用 <code>create-react-app</code> 创建的，项目目录结构如下：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">├── .storybook/</span><br><span class="line">├── README.md</span><br><span class="line">├── antd-theme.js</span><br><span class="line">├── node_modules</span><br><span class="line">├── package.json</span><br><span class="line">├── public</span><br><span class="line">└── src</span><br><span class="line">    ├── App.js</span><br><span class="line">    ├── components</span><br><span class="line">    │   ├── button.js</span><br><span class="line">    │   └── button.stories.js</span><br><span class="line">    ├── index.js</span><br><span class="line">    └── registerServiceWorker.js</span><br></pre></td></tr></table></figure></p>
@@ -505,8 +550,8 @@
     <title>使用python编写游戏修改器</title>
     <link href="http://www.xefan.com//archives/84171.html"/>
     <id>http://www.xefan.com//archives/84171.html</id>
-    <published>2018-11-16T09:25:37.797Z</published>
-    <updated>2023-10-15T01:17:30.306Z</updated>
+    <published>2018-11-16T17:25:37.797Z</published>
+    <updated>2025-10-22T05:34:37.736Z</updated>
     
     <content type="html"><![CDATA[<p>最近比较怀旧，在玩一个比较老的PC游戏。由于游戏难度太高了，于是就打算自己写一个修改器。<br>通过查阅资料，在 Windows 下的修改器主要需要用到四个函数：OpenProcess, CloseHandle, WriteProcessMemory, ReadProcessMemory。</p>
 <p>这几个都是C++的函数，在Python中可以通过ctypes来直接调用。<br>然后接下来介绍一下基本的操作流程。</p>
@@ -535,8 +580,8 @@
     <title>使用pytest测试flask应用</title>
     <link href="http://www.xefan.com//archives/84170.html"/>
     <id>http://www.xefan.com//archives/84170.html</id>
-    <published>2018-11-06T07:12:52.301Z</published>
-    <updated>2023-10-15T01:17:30.302Z</updated>
+    <published>2018-11-06T15:12:52.301Z</published>
+    <updated>2025-10-22T05:34:37.736Z</updated>
     
     <content type="html"><![CDATA[<p>python 本身就有 unittest 单元测试框架，但是觉得它并不是很好用，我更倾向于使用 pytest 。</p>
 <p>下面通过一个例子来介绍如何使用 pytest 对 flask 应用进行单元测试。</p>
@@ -576,8 +621,8 @@
     <title>HAProxy+Nginx+gunicorn获取真实ip</title>
     <link href="http://www.xefan.com//archives/84169.html"/>
     <id>http://www.xefan.com//archives/84169.html</id>
-    <published>2017-06-10T14:31:24.730Z</published>
-    <updated>2023-10-15T01:17:30.302Z</updated>
+    <published>2017-06-10T22:31:24.730Z</published>
+    <updated>2025-10-22T05:34:37.736Z</updated>
     
     <content type="html"><![CDATA[<p>之前在部署在 nginx + uwsgi 应用时都是通过如下方法来获取真实的客户端ip的：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">upstream app_server &#123;</span><br><span class="line">    server unix:///tmp/gunicorn.sock fail_timeout=0;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">    listen       80;</span><br><span class="line">    server_name  localhost;</span><br><span class="line">    location / &#123;</span><br><span class="line">        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;</span><br><span class="line">        proxy_set_header Host $http_host;</span><br><span class="line">        proxy_redirect off;</span><br><span class="line"></span><br><span class="line">        proxy_pass   http://app_server;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -605,8 +650,8 @@
     <title>在Docker中运行X11程序</title>
     <link href="http://www.xefan.com//archives/84168.html"/>
     <id>http://www.xefan.com//archives/84168.html</id>
-    <published>2017-05-06T11:45:30.987Z</published>
-    <updated>2023-10-15T01:17:30.302Z</updated>
+    <published>2017-05-06T19:45:30.987Z</published>
+    <updated>2025-10-22T05:34:37.736Z</updated>
     
     <content type="html"><![CDATA[<p>如果是Linux系统的话，相对比较方便。先构建一个带gui各应的docker image，然后将<br>本机的X11 sock挂载到container内，<br><code>docker run -ti --rm -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix chrome</code></p>
 <p>如果是mac OS系统的话，相对麻烦一些。</p>
@@ -636,7 +681,7 @@
     <link href="http://www.xefan.com//archives/84167.html"/>
     <id>http://www.xefan.com//archives/84167.html</id>
     <published>2017-01-22T10:24:05.512Z</published>
-    <updated>2023-10-15T01:17:30.302Z</updated>
+    <updated>2025-10-22T05:34:37.736Z</updated>
     
     <content type="html"><![CDATA[<p>这两天将博客的系统由原来的ruby octpress 迁移到了 nodejs hexo。</p>
 <p>决定要进行迁移主要是两个原因：<br>1.使用 octpress 来生成页面感觉越来越慢了；<br>2.octpress 的页面样式表不知怎么的突然就坏掉了，整个页面显示都不正常了。这个是最主要的原因。</p>
@@ -661,12 +706,16 @@
     <title>通过串口连接raspberry pi</title>
     <link href="http://www.xefan.com//archives/84166.html"/>
     <id>http://www.xefan.com//archives/84166.html</id>
-    <published>2016-11-03T05:35:57.000Z</published>
-    <updated>2023-10-15T01:17:30.302Z</updated>
+    <published>2016-11-03T13:35:57.000Z</published>
+    <updated>2025-10-22T05:34:37.736Z</updated>
     
     <content type="html"><![CDATA[<p>最近在玩树莓派，有时没有网络，也没有显示器，此时如果想要连接树莓派执行一些操作的话会很麻烦。<br>因为之前玩过 ARM 的开发板编程，因此想能不能通过串口登录到 pi 呢。于是网上查了一下，还真的可以哦。<br>以下就作为备忘笔记记录一下操作过程。</p>
 <p>1.首先需要一根 USB 转串口的线，如果没有的话可以去某宝上买一根吧，反正也不贵。我选的是 PL2303。<br>再根据系统以及芯片的不同而下载安装不同的驱动程序。 对于 mac OS 用户执行命令： <code>ls /dev/ | grep tty.usb</code> ，<br>如果驱动都安装正确的话应该是会有输出结果的。</p>
 <p>2.然后在 pi 的系统上启用 serial。我安装的是 debian 系统，执行命令： <code>sudo raspi-config</code> ，<br>选择 <code>advanced options</code> -&gt; <code>serial</code> 进行启用 serial。</p>
+<p>或者在烧录系统时直接配置：<br>向microSD卡中烧录树莓派官方的镜像后，先不要急着把它插入树莓派中。<br>在电脑上打开microSD卡，按如下方式修改config.txt和cmdline.txt这两个文件，<br>在config.txt文件中附加<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">dtoverlay=miniuart-bt</span><br><span class="line">enable_uart=1</span><br></pre></td></tr></table></figure></p>
+<p>在cmdline.txt中添加如下的配置<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dwc_otg.lpm_enable=0 console=tty1 console=serial0,115200</span><br></pre></td></tr></table></figure></p>
+<p>不然串口输出可能会乱码。</p>
+<p>修改 /boot/firstrun.sh<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"># 启动 vnc 服务</span><br><span class="line">ln -sv /etc/systemd/system/multi-user.target.wants/vncserver-x11-serviced.service /lib/systemd/system/vncserver-x11-serviced.service</span><br><span class="line">systemctl enable vncserver-x11-servicedsystemctl enable vncserver-x11-serviced</span><br><span class="line"></span><br><span class="line"># 添加新的 wifi ssid</span><br><span class="line">cat &gt;/etc/wpa_supplicant/wpa_supplicant.conf &lt;&lt;&#x27;WPAEOF&#x27;</span><br><span class="line">country=CN</span><br><span class="line">ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev</span><br><span class="line">ap_scan=1</span><br><span class="line"></span><br><span class="line">update_config=1</span><br><span class="line"># 通过 wpa_passphrase ssid psk 生成</span><br><span class="line">network=&#123;</span><br><span class="line">        ssid=&quot;ssid1&quot;</span><br><span class="line">        psk=加密后的密码</span><br><span class="line">        id_str=&quot;识别1&quot;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">network=&#123;</span><br><span class="line">        ssid=&quot;ssid2&quot;</span><br><span class="line">        psk=加密后的密码</span><br><span class="line">        id_str=&quot;识别2&quot;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">WPAEOF</span><br></pre></td></tr></table></figure></p>
 <p>3.串口连接  </p>
 <p>对于 Raspberry Pi3 的 GPIO 引脚如下：<br><img src="/wp-content/uploads/2016/11/03/pi3_gpio.png" alt="pi3_gpio"></p>
 <p>串口线与 pi 的连接方式为： GND -&gt; GND, RXD -&gt; TXD, TXD -&gt; RXD， 如图：<br><img src="/wp-content/uploads/2016/11/03/pi3-board.jpg" alt="pi3-board"></p>
@@ -685,46 +734,6 @@
     
     
       <category term="Raspberry pi" scheme="http://www.xefan.com/tags/Raspberry-pi/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>使用CodePush对ReactNative进行热更新</title>
-    <link href="http://www.xefan.com//archives/84165.html"/>
-    <id>http://www.xefan.com//archives/84165.html</id>
-    <published>2016-08-20T08:15:34.000Z</published>
-    <updated>2023-10-15T01:17:30.302Z</updated>
-    
-    <content type="html"><![CDATA[<p><a href="http://microsoft.github.io/code-push/">CodePush</a>是微软提供的可用于对 Cordova 和 ReactNative 进行代码热更新的库。<br>在其官方的文档中已经写得很详细了，按照其说明来配置即可。我这里只是对在使用过程中遇到的一些坑作为总结。</p>
-<h2 id="创建应用"><a href="#创建应用" class="headerlink" title="创建应用"></a>创建应用</h2><p>首先注册一个账号并创建一个 CodePush 的应用：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">npm install -g code-push-cli</span><br><span class="line">code-push register</span><br><span class="line">code-push app add &lt;appName&gt;</span><br></pre></td></tr></table></figure>
-<h2 id="安装配置CodePush"><a href="#安装配置CodePush" class="headerlink" title="安装配置CodePush"></a>安装配置CodePush</h2><p>按照说明 <a href="https://github.com/Microsoft/react-native-code-push#getting-started，使用">https://github.com/Microsoft/react-native-code-push#getting-started，使用</a> rnpm 进行安装即可：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm install --save react-native-code-push</span><br><span class="line">rnpm link react-native-code-push</span><br></pre></td></tr></table></figure>
-<p>安装完成之后还需要再进行一些配置，对于 iOS 需要将 <code>AppDelegate.m</code> 文件中的 <code>jsCodeLocation</code> 修改为： <code>jsCodeLocation = [CodePush bundleURL];</code>。<br>同时再在 <code>Info.plist</code> 文件中添加一项 <code>CodePushDeploymentKey</code>，其值为 CodePush 应用的 Deployment Key。</p>
-<p>对于 android 需要在 <code>MainActivity</code> 类的 <code>getPackages</code> 方法中设置 Deployment Key。同时根据 ReactNative 的版本不同而使用不同的方法来设置 <code>getJSBundleFile</code>，<br>参考： <code>https://github.com/Microsoft/react-native-code-push#android-setup</code>。</p>
-<h2 id="程序更新"><a href="#程序更新" class="headerlink" title="程序更新"></a>程序更新</h2><p>在安装、配置完成之后，即可以使用CodePush进行程序的更新操作了。<br>根据官方的说明只需要调用 <code>CodePush.sync()</code> 即可完成自动更新操作。<br>我针对自己的情况再进行封装了一下：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">function syncCodePush() &#123;</span><br><span class="line">  NetInfo.fetch().done(</span><br><span class="line">    (reach) =&gt; &#123;</span><br><span class="line">      // 检查网络环境</span><br><span class="line">      if (_.includes([&#x27;wifi&#x27;, &#x27;WIFI&#x27;, &#x27;VPN&#x27;], reach)) &#123;</span><br><span class="line">        CodePush.sync().done(</span><br><span class="line">          () =&gt; &#123;</span><br><span class="line">            // 检查更新成功</span><br><span class="line">          &#125;,</span><br><span class="line">          (err) =&gt; &#123;</span><br><span class="line">            // 更新失败</span><br><span class="line">          &#125;</span><br><span class="line">        );</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>以上函数是保证只有在wifi的网络环境下才进行更新操作，同时由于 <code>CodePush.sync()</code> 返回的是一个 <code>Promise</code> 对象，<br>在这里我就遇到了由于网络异常而下载出错，从而导致 app 崩溃。因此需要处理 <code>reject</code> 的情况。</p>
-<p>有时在程序更新之后的首次运行时可能会需要作一些迁移的操作，这里可以使用 <code>getUpdateMetadata</code> 来检查程序是不是首次运行。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Codepush.getUpdateMetadata().then(</span><br><span class="line">  (update) =&gt; &#123;</span><br><span class="line">    if (update &amp;&amp; update.isFirstRun) &#123;</span><br><span class="line">      // 首次运行执行一些操作</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">).done( callback );</span><br></pre></td></tr></table></figure>
-<h2 id="发布更新"><a href="#发布更新" class="headerlink" title="发布更新"></a>发布更新</h2><p>在 app 发布安装包发布出去之后，已经有用户下载安装了。此时如果再有 js 代码更新或者图片文件的改动的话，可以使用 CodePush 进行发布。<br>进入 ReactNative 的项目根目录，使用 code-push 命令进行发布更新。例如：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">code-push release-react DemoApp ios -m -d Staging --des &quot;更新描述&quot; -t &quot;~2.0.0&quot;</span><br></pre></td></tr></table></figure>
-<p>以上命令是发布一个紧急更新到 Staging ，只有 ios appp 的版本为 2.0~3.0 的才会下载该更新包。<br>由于是紧急更新，app在下载安装完成之后会自动重启应用该更新包。否则的话就需要用户下次手动启动app时该更新包才会生效。</p>
-<p>在 CodePush 中针对 ios 和 android 可以共用一个应用，只是我个人感觉这样在管理 deployment history 时不太方便。<br>因此我通常会创建两个应用，例如： DemoApp-iOS、DemoApp-Android 这样的。</p>
-<p>需要注意的是，由于 CodePush 的 server 是在国外，因此下载的速度会比较慢。</p>
-<p>最后我自己使用 Electron + Vue.js 开发了一个 CodePush 的简易管理工具，<a href="https://github.com/wusuopu/code-push-gui">https://github.com/wusuopu/code-push-gui</a> 。<br>可以对 CodePush 的 app 跟 deployment 进行简单的管理。</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;&lt;a href=&quot;http://microsoft.github.io/code-push/&quot;&gt;CodePush&lt;/a&gt;是微软提供的可用于对 Cordova 和 ReactNative 进行代码热更新的库。&lt;br&gt;在其官方的文档中已经写得很详细了，按照其说明来配置即可。我这
-    
-    </summary>
-    
-      <category term="编程开发" scheme="http://www.xefan.com/categories/%E7%BC%96%E7%A8%8B%E5%BC%80%E5%8F%91/"/>
-    
-    
-      <category term="react" scheme="http://www.xefan.com/tags/react/"/>
     
   </entry>
   
