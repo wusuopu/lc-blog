@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.xefan.com/"/>
-  <updated>2026-02-04T02:18:23.457Z</updated>
+  <updated>2026-02-04T02:39:14.820Z</updated>
   <id>http://www.xefan.com/</id>
   
   <author>
@@ -14,6 +14,38 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>不写一行代码，在 Solana 上进行 SPL Token 发币</title>
+    <link href="http://www.xefan.com//archives/84187.html"/>
+    <id>http://www.xefan.com//archives/84187.html</id>
+    <published>2026-02-04T10:22:16.000Z</published>
+    <updated>2026-02-04T02:39:14.820Z</updated>
+    
+    <content type="html"><![CDATA[<p>按照之前的文章，本地安装 Solana CLI 之后，会有一个 spl-token 的命令。<br>在发币之后需要先了解一下 Solana SPL 相关的概念。</p>
+<p>类似于 Ethereum 的 ERC20 程序， Solana 官方提供了一个 SPL Token 程序，专门是用于发币的，对应的 Program ID 是 <code>TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA</code>。</p>
+<h3 id="创建-Mint-Account"><a href="#创建-Mint-Account" class="headerlink" title="创建 Mint Account"></a>创建 Mint Account</h3><p>先创建一个 Mint Account，用于后续的铸币。这里我们为自己的 token 设置精度为6位小数。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ spl-token create-token --decimals=6</span><br><span class="line">Creating token CuDVhtzgm9A9Pjdfvv98bph2noKAWf22Z1FBbLK1DnAk under program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA</span><br><span class="line"></span><br><span class="line">Address:  CuDVhtzgm9A9Pjdfvv98bph2noKAWf22Z1FBbLK1DnAk</span><br><span class="line">Decimals:  6</span><br><span class="line"></span><br><span class="line">Signature: 3f8q7Dserwzf4NHeCbmgCepGfBYLtuimi8tznTBunbKTwdFqHRMqr6iR1kTc8hfKF5DPtAeveQ4EjBzmQWbXLCjb</span><br></pre></td></tr></table></figure>
+<h3 id="创建-Associated-Token-Account"><a href="#创建-Associated-Token-Account" class="headerlink" title="创建 Associated Token Account"></a>创建 Associated Token Account</h3><p>再创建一个ATA(Associated Token Account)，用于接收铸造的币。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 这里为刚刚的 Mint Account 创建 ATA</span></span><br><span class="line">$ spl-token create-account CuDVhtzgm9A9Pjdfvv98bph2noKAWf22Z1FBbLK1DnAk</span><br><span class="line">Creating account EvvQiKLYW67mGSb6oDzGEimJMjGYb1No3ppQWZgB84v</span><br><span class="line"></span><br><span class="line">Signature: 3mRP9mMtTZZSFJnWXAvCffHVgQF3jdgecAqnmUTSTVoi51HyfWoe3fvWWeC3v71XML9h3mwjwrnpG8zquXrgy1b2</span><br></pre></td></tr></table></figure>
+<h2 id="铸币"><a href="#铸币" class="headerlink" title="铸币"></a>铸币</h2><p>往刚刚创建的 ATA 账号发10个币；因为我们的 token 有6位小数，所以实际发的币需要乘以 10*6。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ spl-token mint CuDVhtzgm9A9Pjdfvv98bph2noKAWf22Z1FBbLK1DnAk 10000000 EvvQiKLYW67mGSb6oDzGEimJMjGYb1No3ppQWZgB84v</span><br><span class="line">Minting 10000000 tokens</span><br><span class="line">  Token: CuDVhtzgm9A9Pjdfvv98bph2noKAWf22Z1FBbLK1DnAk</span><br><span class="line">  Recipient: EvvQiKLYW67mGSb6oDzGEimJMjGYb1No3ppQWZgB84v</span><br><span class="line"></span><br><span class="line">Signature: 87psf5aZak7BCQriScEkioqTW2ozvJn5K6mmjTibstVTWofwiKom3FvWGkkiddJ6oq8KUa2vLkYSKku1r87wdst</span><br></pre></td></tr></table></figure>
+<p>至此 Solana 的基本发币操作就完成了。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;按照之前的文章，本地安装 Solana CLI 之后，会有一个 spl-token 的命令。&lt;br&gt;在发币之后需要先了解一下 Solana SPL 相关的概念。&lt;/p&gt;
+&lt;p&gt;类似于 Ethereum 的 ERC20 程序， Solana 官方提供了一个 SPL Token
+    
+    </summary>
+    
+    
+      <category term="web3" scheme="http://www.xefan.com/tags/web3/"/>
+    
+      <category term="solana" scheme="http://www.xefan.com/tags/solana/"/>
+    
+  </entry>
   
   <entry>
     <title>Solana Rust 开发环境搭建</title>
@@ -713,32 +745,6 @@
     
     
       <category term="Docker" scheme="http://www.xefan.com/tags/Docker/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>由octpress迁移到了hexo</title>
-    <link href="http://www.xefan.com//archives/84167.html"/>
-    <id>http://www.xefan.com//archives/84167.html</id>
-    <published>2017-01-22T10:24:05.512Z</published>
-    <updated>2025-10-22T05:34:37.736Z</updated>
-    
-    <content type="html"><![CDATA[<p>这两天将博客的系统由原来的ruby octpress 迁移到了 nodejs hexo。</p>
-<p>决定要进行迁移主要是两个原因：<br>1.使用 octpress 来生成页面感觉越来越慢了；<br>2.octpress 的页面样式表不知怎么的突然就坏掉了，整个页面显示都不正常了。这个是最主要的原因。</p>
-<p>迁移的工作还算是比较顺利，只是体验了一下 hexo 感觉 bug 也不少。只得自己写些 patch，然后将就着用吧。</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;这两天将博客的系统由原来的ruby octpress 迁移到了 nodejs hexo。&lt;/p&gt;
-&lt;p&gt;决定要进行迁移主要是两个原因：&lt;br&gt;1.使用 octpress 来生成页面感觉越来越慢了；&lt;br&gt;2.octpress 的页面样式表不知怎么的突然就坏掉了，整个页面显示
-    
-    </summary>
-    
-      <category term="网络日志" scheme="http://www.xefan.com/categories/%E7%BD%91%E7%BB%9C%E6%97%A5%E5%BF%97/"/>
-    
-    
-      <category term="网络日志" scheme="http://www.xefan.com/tags/%E7%BD%91%E7%BB%9C%E6%97%A5%E5%BF%97/"/>
     
   </entry>
   
